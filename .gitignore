@@ -1,0 +1,23 @@
+# Binaries & builds
+vesseld
+vessel-cli
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+dist/
+build/
+
+# Runtime data & secrets
+data/vessel.db*
+data/backups/
+data/caddy/
+*.env
+*.env.local
+
+# Frontend node_modules
+node_modules/
+.vite/
+.output/
