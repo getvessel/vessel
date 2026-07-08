@@ -21,3 +21,7 @@ data/caddy/
 node_modules/
 .vite/
 .output/
+
+# Local personal development trackers
+TODO.md
+
