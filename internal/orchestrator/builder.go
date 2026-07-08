@@ -23,10 +23,10 @@ const (
 
 // BuildOptions contains options required by builders to generate an OCI image.
 type BuildOptions struct {
-	ProjectID      string              `json:"projectId"`
-	SourceDir      string              `json:"sourceDir"`
-	DockerfilePath string              `json:"dockerfilePath,omitempty"`
-	LogWriter      io.Writer           `json:"-"`
+	ProjectID      string               `json:"projectId"`
+	SourceDir      string               `json:"sourceDir"`
+	DockerfilePath string               `json:"dockerfilePath,omitempty"`
+	LogWriter      io.Writer            `json:"-"`
 	ProjectConfig  *types.ProjectConfig `json:"projectConfig,omitempty"`
 }
 
@@ -37,9 +37,9 @@ type Builder interface {
 
 // EngineBuilder coordinates container image builds and delegates to specific strategy implementations.
 type EngineBuilder struct {
-	dockerClient       *client.Client
-	dockerfileBuilder  *DockerfileBuilder
-	railpackBuilder    *RailpackBuilder
+	dockerClient      *client.Client
+	dockerfileBuilder *DockerfileBuilder
+	railpackBuilder   *RailpackBuilder
 }
 
 // NewBuilder instantiates a new EngineBuilder wired to the provided Docker client without global state.

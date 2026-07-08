@@ -7,6 +7,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/solomonolatunji/vessel/internal/orchestrator"
 	"github.com/solomonolatunji/vessel/internal/proxy"
+	"github.com/solomonolatunji/vessel/internal/services"
 	"github.com/solomonolatunji/vessel/internal/store"
 )
 
@@ -17,22 +18,34 @@ type Server struct {
 	deployer        *orchestrator.Deployer
 	proxyManager    *proxy.ProxyManager
 	dockerClient    *client.Client
-	tokenService    *TokenService
+	tokenService    *services.TokenService
 	dbDeployer      *orchestrator.DatabaseDeployer
 	storageDeployer *orchestrator.StorageDeployer
+	cronManager     *orchestrator.CronManager
+	cronService     *services.CronService
+	serviceLinker   *services.ServiceLinker
 }
 
 // NewServer initializes a Server wired to the database store, container orchestrator, reverse proxy, and Docker client.
 func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *proxy.ProxyManager, dockerClient *client.Client) *Server {
+	cronMgr := orchestrator.NewCronManager(dockerClient, s)
+	_ = cronMgr.Start()
+
 	srv := &Server{
 		router:          http.NewServeMux(),
 		store:           s,
 		deployer:        deployer,
 		proxyManager:    proxyManager,
 		dockerClient:    dockerClient,
-		tokenService:    NewTokenService(),
+		tokenService:    services.NewTokenService(),
 		dbDeployer:      orchestrator.NewDatabaseDeployer(dockerClient, s),
 		storageDeployer: orchestrator.NewStorageDeployer(dockerClient, s),
+		cronManager:     cronMgr,
+		cronService:     services.NewCronService(s, cronMgr),
+		serviceLinker:   services.NewServiceLinker(s),
+	}
+	if srv.deployer != nil {
+		srv.deployer.EnvProvider = srv.serviceLinker.GetLinkedEnvironmentVariables
 	}
 	srv.registerRoutes()
 	return srv
@@ -70,6 +83,12 @@ func (s *Server) registerRoutes() {
 	s.router.HandleFunc("DELETE /api/storage/{id}", s.RequireAuth(s.handleDeleteStorage))
 	s.router.HandleFunc("POST /api/storage/{id}/start", s.RequireAuth(s.handleStartStorage))
 	s.router.HandleFunc("POST /api/storage/{id}/stop", s.RequireAuth(s.handleStopStorage))
+
+	s.router.HandleFunc("GET /api/jobs", s.RequireAuth(s.handleJobs))
+	s.router.HandleFunc("POST /api/jobs", s.RequireAuth(s.handleJobs))
+	s.router.HandleFunc("GET /api/jobs/{id}", s.RequireAuth(s.handleJobDetail))
+	s.router.HandleFunc("DELETE /api/jobs/{id}", s.RequireAuth(s.handleJobDetail))
+	s.router.HandleFunc("POST /api/jobs/{id}/trigger", s.RequireAuth(s.handleJobDetail))
 
 	s.router.HandleFunc("GET /ws/terminal/{id}", s.handleTerminalWebSocket)
 }

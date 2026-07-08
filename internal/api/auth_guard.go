@@ -2,8 +2,11 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/solomonolatunji/vessel/internal/types"
 )
 
 type contextKey string
@@ -19,13 +22,19 @@ func (s *Server) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		claims, err := s.tokenService.ValidateToken(tokenStr)
+		claimsMap, err := s.tokenService.ValidateToken(tokenStr)
 		if err != nil {
 			writeError(w, http.StatusUnauthorized, "invalid authentication token: "+err.Error())
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), userClaimsKey, claims)
+		userClaims := &types.UserClaims{
+			UserID: fmt.Sprintf("%v", claimsMap["sub"]),
+			Email:  fmt.Sprintf("%v", claimsMap["email"]),
+			Role:   fmt.Sprintf("%v", claimsMap["role"]),
+		}
+
+		ctx := context.WithValue(r.Context(), userClaimsKey, userClaims)
 		next(w, r.WithContext(ctx))
 	}
 }
@@ -49,8 +58,8 @@ func (s *Server) RequireRole(requiredRole string, next http.HandlerFunc) http.Ha
 }
 
 // GetUserClaimsFromContext extracts verified JWT UserClaims stored in the request context during authentication.
-func GetUserClaimsFromContext(ctx context.Context) *UserClaims {
-	claims, ok := ctx.Value(userClaimsKey).(*UserClaims)
+func GetUserClaimsFromContext(ctx context.Context) *types.UserClaims {
+	claims, ok := ctx.Value(userClaimsKey).(*types.UserClaims)
 	if !ok {
 		return nil
 	}

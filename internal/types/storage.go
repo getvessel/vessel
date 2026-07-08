@@ -5,6 +5,7 @@ import "time"
 // StorageConfig represents a managed MinIO or S3-compatible object storage container provisioned by Vessel.
 type StorageConfig struct {
 	ID          string    `json:"id"`
+	ProjectID   string    `json:"projectId"`
 	Name        string    `json:"name"`
 	Type        string    `json:"type"` // minio
 	APIPort     int       `json:"apiPort"`

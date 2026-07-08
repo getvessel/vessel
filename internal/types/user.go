@@ -11,3 +11,10 @@ type User struct {
 	CreatedAt    time.Time `json:"createdAt"`
 	UpdatedAt    time.Time `json:"updatedAt"`
 }
+
+// UserClaims holds the payload extracted from a verified JWT access token.
+type UserClaims struct {
+	UserID string `json:"sub"`
+	Email  string `json:"email"`
+	Role   string `json:"role"`
+}

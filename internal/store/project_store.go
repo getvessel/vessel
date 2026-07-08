@@ -72,4 +72,3 @@ func (s *Store) DeleteProject(id string) error {
 	_, err := s.db.Exec(`DELETE FROM projects WHERE id = ?`, id)
 	return err
 }
-

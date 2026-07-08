@@ -67,4 +67,3 @@ func (s *Store) DeleteDomain(id string) error {
 	_, err := s.db.Exec(`DELETE FROM domains WHERE id = ?`, id)
 	return err
 }
-

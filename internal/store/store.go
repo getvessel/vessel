@@ -96,6 +96,7 @@ func (s *Store) migrate() error {
 		);`,
 		`CREATE TABLE IF NOT EXISTS databases (
 			id TEXT PRIMARY KEY,
+			project_id TEXT DEFAULT '',
 			name TEXT UNIQUE NOT NULL,
 			engine TEXT NOT NULL,
 			version TEXT NOT NULL,
@@ -113,6 +114,7 @@ func (s *Store) migrate() error {
 		);`,
 		`CREATE TABLE IF NOT EXISTS storage (
 			id TEXT PRIMARY KEY,
+			project_id TEXT DEFAULT '',
 			name TEXT UNIQUE NOT NULL,
 			type TEXT DEFAULT 'minio',
 			api_port INTEGER DEFAULT 9000,
@@ -128,6 +130,19 @@ func (s *Store) migrate() error {
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
+		`CREATE TABLE IF NOT EXISTS jobs (
+			id TEXT PRIMARY KEY,
+			project_id TEXT NOT NULL,
+			name TEXT NOT NULL,
+			schedule TEXT NOT NULL,
+			command TEXT NOT NULL,
+			status TEXT DEFAULT 'active',
+			last_run_at DATETIME,
+			last_output TEXT DEFAULT '',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+		);`,
 	}
 
 	for _, query := range queries {
@@ -135,6 +150,9 @@ func (s *Store) migrate() error {
 			return err
 		}
 	}
+
+	_, _ = s.db.Exec("ALTER TABLE databases ADD COLUMN project_id TEXT DEFAULT '';")
+	_, _ = s.db.Exec("ALTER TABLE storage ADD COLUMN project_id TEXT DEFAULT '';")
 	log.Println("✅ Vessel SQLite schema initialized successfully (`data/vessel.db`)")
 	return nil
 }

@@ -16,6 +16,7 @@ type Deployer struct {
 	builder          Builder
 	containerManager *ContainerManager
 	store            *store.Store
+	EnvProvider      func(projectID string) (map[string]string, error)
 }
 
 // NewDeployer initializes a Deployer wired to the container build engine, Docker lifecycle manager, and store.
@@ -52,6 +53,22 @@ func (d *Deployer) Deploy(ctx context.Context, project *types.ProjectConfig, sou
 	envVarsMap, err := d.store.GetEnvVars(project.ID)
 	if err != nil && logWriter != nil {
 		fmt.Fprintf(logWriter, "⚠️ [Deployer] Warning: could not load environment variables: %v\n", err)
+	}
+
+	if d.EnvProvider != nil {
+		if linkedEnvs, err := d.EnvProvider(project.ID); err == nil {
+			if envVarsMap == nil {
+				envVarsMap = make(map[string]string)
+			}
+			for k, v := range linkedEnvs {
+				if _, exists := envVarsMap[k]; !exists {
+					envVarsMap[k] = v
+				}
+			}
+			if logWriter != nil && len(linkedEnvs) > 0 {
+				fmt.Fprintf(logWriter, "🔗 [Deployer] Automatically linked %d service connection strings (DATABASE_URL, REDIS_URL, etc.)\n", len(linkedEnvs))
+			}
+		}
 	}
 
 	var envSlice []string
