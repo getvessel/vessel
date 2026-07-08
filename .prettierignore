@@ -1,0 +1,9 @@
+node_modules
+dist
+.tanstack
+.astro
+*.gen.ts
+routeTree.gen.ts
+pnpm-lock.yaml
+package-lock.json
+yarn.lock

@@ -12,6 +12,8 @@
     "build:website": "npm --workspace=website run build",
     "build:all": "npm run build:dashboard && npm run build:website",
     "test:dashboard": "npm --workspace=dashboard run test",
-    "typecheck": "npm --workspace=dashboard run generate-routes && tsc -b dashboard"
+    "typecheck": "npm --workspace=dashboard run generate-routes && tsc -b dashboard",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
   }
 }
