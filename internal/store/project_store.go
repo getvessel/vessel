@@ -43,3 +43,33 @@ func (s *Store) GetProject(id string) (*types.ProjectConfig, error) {
 	}
 	return &p, nil
 }
+
+// ListProjects retrieves all ProjectConfig records ordered by creation date descending.
+func (s *Store) ListProjects() ([]types.ProjectConfig, error) {
+	rows, err := s.db.Query(`SELECT id, name, repository_url, branch, build_command, start_command, dockerfile_path,
+		internal_port, domain, auto_deploy_webhook, cpu_request, memory_limit_mb, health_check_path, created_at, updated_at
+		FROM projects ORDER BY created_at DESC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var projects []types.ProjectConfig
+	for rows.Next() {
+		var p types.ProjectConfig
+		if err := rows.Scan(&p.ID, &p.Name, &p.RepositoryURL, &p.Branch, &p.BuildCommand, &p.StartCommand, &p.DockerfilePath,
+			&p.InternalPort, &p.Domain, &p.AutoDeployWebhook, &p.CPURequest, &p.MemoryLimitMB, &p.HealthCheckPath,
+			&p.CreatedAt, &p.UpdatedAt); err != nil {
+			return nil, err
+		}
+		projects = append(projects, p)
+	}
+	return projects, nil
+}
+
+// DeleteProject deletes a ProjectConfig record from SQLite by ID.
+func (s *Store) DeleteProject(id string) error {
+	_, err := s.db.Exec(`DELETE FROM projects WHERE id = ?`, id)
+	return err
+}
+
