@@ -17,7 +17,7 @@ build-daemon:
 
 build-dashboard:
 	@echo "💻 Building TanStack + Vite Dashboard GUI..."
-	cd dashboard && npm run build
+	npm run build:dashboard
 
 dev-daemon:
 	@echo "🚀 Running Go daemon in dev mode..."
@@ -25,11 +25,11 @@ dev-daemon:
 
 dev-dashboard:
 	@echo "💻 Running Dashboard dev server on port 3000..."
-	cd dashboard && npm run dev
+	npm run dev:dashboard
 
 dev-website:
 	@echo "🌐 Running Astro Marketing site dev server..."
-	cd website && npm run dev
+	npm run dev:website
 
 clean:
 	@echo "🧹 Cleaning builds and temporary binaries..."
