@@ -1,7 +1,7 @@
 # 🛰️ Vessel: The Ultra-Sleek, Lightweight Self-Hosted PaaS
 
 > **Tagline**: _Turn any bare-metal VPS into your own private Vercel & Railway in 60 seconds._  
-> **Project Name**: **Vessel** (`vessel.dev` / `github.com/vessel-run/vessel`)  
+> **Project Name**: **Vessel** (`vessel.dev` / `github.com/solomonolatunji/vessel`)  
 > **Mission**: Build an open-source, blazing-fast, developer-first self-hosted PaaS with a next-generation GUI, automated Docker container builds, zero-downtime deployments, Caddy edge SSL routing, and one-click self-updating/upgrading.
 
 ---

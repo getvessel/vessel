@@ -17,7 +17,7 @@ Thank you for your interest in contributing to **Vessel**! We are building the m
 1. **Fork & Clone**:
 
    ```bash
-   git clone https://github.com/vessel-run/vessel.git
+   git clone https://github.com/solomonolatunji/vessel.git
    cd vessel
    ```
 
@@ -36,6 +36,7 @@ Thank you for your interest in contributing to **Vessel**! We are building the m
    ```
 
 4. **Run the Marketing Landing Page (`website/`)**:
+
    ```bash
    cd website
    npm install
