@@ -1,0 +1,17 @@
+{
+  "name": "vessel-monorepo",
+  "private": true,
+  "workspaces": [
+    "dashboard",
+    "website"
+  ],
+  "scripts": {
+    "dev:dashboard": "npm --workspace=dashboard run dev",
+    "dev:website": "npm --workspace=website run dev",
+    "build:dashboard": "npm --workspace=dashboard run build",
+    "build:website": "npm --workspace=website run build",
+    "build:all": "npm run build:dashboard && npm run build:website",
+    "test:dashboard": "npm --workspace=dashboard run test",
+    "typecheck": "npm --workspace=dashboard run generate-routes && tsc -b dashboard"
+  }
+}
