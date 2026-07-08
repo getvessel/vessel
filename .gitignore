@@ -1,6 +1,6 @@
 # Binaries & builds
-vesseld
-vessel-cli
+/vesseld
+/vessel-cli
 *.exe
 *.exe~
 *.dll
