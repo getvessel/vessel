@@ -24,6 +24,9 @@ node_modules/
 .vite/
 .output/
 
+# Astro generated types
+.astro/
+
 # Local personal development trackers
 TODO.md
 VESSEL_PAAS_BLUEPRINT.md

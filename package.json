@@ -3,11 +3,13 @@
   "private": true,
   "workspaces": [
     "dashboard",
-    "website"
+    "website",
+    "docs"
   ],
   "scripts": {
     "dev:dashboard": "npm --workspace=dashboard run dev",
     "dev:website": "npm --workspace=website run dev",
+    "dev:docs": "npm --workspace=docs run dev",
     "build:dashboard": "npm --workspace=dashboard run build",
     "build:website": "npm --workspace=website run build",
     "build:all": "npm run build:dashboard && npm run build:website",

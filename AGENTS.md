@@ -20,10 +20,11 @@
 | -------------------- | ---------------------------------------------------------------------------- |
 | Frontend (dashboard) | React 19, TanStack Router, TanStack Query, Radix UI, Tailwind CSS v4, Vite   |
 | Marketing (website)  | Astro 7, Tailwind CSS v4                                                     |
+| Docs                 | Astro 7, Starlight                                                           |
 | Backend              | Go (`cmd/vesseld`, `internal/`)                                              |
 | State (dashboard)    | TanStack Store, TanStack Query, Zod validation                               |
 | Styling (dashboard)  | `tailwind-merge` + `clsx` + `class-variance-authority` for class composition |
-| Monorepo             | npm workspaces (`dashboard/`, `website/`)                                    |
+| Monorepo             | npm workspaces (`dashboard/`, `website/`, `docs/`)                           |
 
 ## Conventions
 
