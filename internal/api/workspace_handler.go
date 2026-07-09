@@ -16,7 +16,6 @@ func NewWorkspaceHandler(store *store.Store) *WorkspaceHandler {
 	return &WorkspaceHandler{store: store}
 }
 
-// ListTrustedDomains lists all trusted SSO/workspace domains for a team.
 func (h *WorkspaceHandler) ListTrustedDomains(w http.ResponseWriter, r *http.Request) {
 	teamID := r.PathValue("teamId")
 	if teamID == "" {
@@ -34,7 +33,6 @@ func (h *WorkspaceHandler) ListTrustedDomains(w http.ResponseWriter, r *http.Req
 	json.NewEncoder(w).Encode(list)
 }
 
-// CreateTrustedDomain adds a trusted SSO/workspace domain.
 func (h *WorkspaceHandler) CreateTrustedDomain(w http.ResponseWriter, r *http.Request) {
 	teamID := r.PathValue("teamId")
 	if teamID == "" {
@@ -59,7 +57,6 @@ func (h *WorkspaceHandler) CreateTrustedDomain(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(item)
 }
 
-// DeleteTrustedDomain removes a trusted domain.
 func (h *WorkspaceHandler) DeleteTrustedDomain(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if id == "" {
@@ -74,7 +71,6 @@ func (h *WorkspaceHandler) DeleteTrustedDomain(w http.ResponseWriter, r *http.Re
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// ListSSHKeys lists all SSH public keys registered for a workspace team.
 func (h *WorkspaceHandler) ListSSHKeys(w http.ResponseWriter, r *http.Request) {
 	teamID := r.PathValue("teamId")
 	if teamID == "" {
@@ -92,7 +88,6 @@ func (h *WorkspaceHandler) ListSSHKeys(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(list)
 }
 
-// CreateSSHKey registers a new SSH public key for the workspace.
 func (h *WorkspaceHandler) CreateSSHKey(w http.ResponseWriter, r *http.Request) {
 	teamID := r.PathValue("teamId")
 	if teamID == "" {
@@ -117,7 +112,6 @@ func (h *WorkspaceHandler) CreateSSHKey(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(item)
 }
 
-// DeleteSSHKey removes an SSH key from the workspace.
 func (h *WorkspaceHandler) DeleteSSHKey(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if id == "" {
@@ -132,7 +126,6 @@ func (h *WorkspaceHandler) DeleteSSHKey(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// ListAuditLogs retrieves the audit log history for a workspace team.
 func (h *WorkspaceHandler) ListAuditLogs(w http.ResponseWriter, r *http.Request) {
 	teamID := r.PathValue("teamId")
 	if teamID == "" {

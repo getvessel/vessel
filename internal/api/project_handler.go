@@ -23,7 +23,6 @@ func (s *Server) handleListProjects(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, projects)
 }
 
-// handleCreateProject parses project creation payloads and generates an initial service or auto-named project.
 func (s *Server) handleCreateProject(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		ID                 string `json:"id"`
