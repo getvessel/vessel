@@ -30,18 +30,18 @@ func NewService(repo Repository, apps AppServiceRepository) *Service {
 	}
 }
 
-// ListProjects returns all projects.
-func (s *Service) ListProjects(ctx context.Context) ([]ProjectConfig, error) {
-	return s.repo.ListProjects(ctx)
+// List returns all projects.
+func (s *Service) List(ctx context.Context) ([]ProjectConfig, error) {
+	return s.repo.List(ctx)
 }
 
-// GetProject returns a single project by ID.
-func (s *Service) GetProject(ctx context.Context, id string) (*ProjectConfig, error) {
-	return s.repo.GetProject(ctx, id)
+// Get returns a single project by ID.
+func (s *Service) Get(ctx context.Context, id string) (*ProjectConfig, error) {
+	return s.repo.Get(ctx, id)
 }
 
-// CreateProject creates a project and its default application service.
-func (s *Service) CreateProject(ctx context.Context, req *CreateProjectRequest) (*ProjectConfig, error) {
+// Create creates a project and its default application service.
+func (s *Service) Create(ctx context.Context, req *CreateProjectRequest) (*ProjectConfig, error) {
 	if req.Name == "" {
 		req.Name = fmt.Sprintf("project-%s", uuid.NewString()[:8])
 	}
@@ -52,7 +52,7 @@ func (s *Service) CreateProject(ctx context.Context, req *CreateProjectRequest) 
 		Name:        req.Name,
 		Description: req.Description,
 	}
-	if err := s.repo.CreateProject(ctx, p); err != nil {
+	if err := s.repo.Create(ctx, p); err != nil {
 		return nil, fmt.Errorf("failed to create project: %w", err)
 	}
 
@@ -79,15 +79,9 @@ func (s *Service) CreateProject(ctx context.Context, req *CreateProjectRequest) 
 		branch = "main"
 	}
 
-	envs, _ := s.repo.ListEnvironments(ctx, p.ID)
-	envID := "env-prod"
-	if len(envs) > 0 {
-		envID = envs[0].ID
-	}
-
 	app := &types.AppServiceConfig{
 		ProjectID:     p.ID,
-		EnvironmentID: envID,
+		EnvironmentID: "env-prod",
 		Name:          req.Name,
 		RepositoryURL: repo,
 		Branch:        branch,
@@ -99,59 +93,19 @@ func (s *Service) CreateProject(ctx context.Context, req *CreateProjectRequest) 
 	return p, nil
 }
 
-// DeleteProject removes a project by ID.
-func (s *Service) DeleteProject(ctx context.Context, id string) error {
-	return s.repo.DeleteProject(ctx, id)
+// Delete removes a project by ID.
+func (s *Service) Delete(ctx context.Context, id string) error {
+	return s.repo.Delete(ctx, id)
 }
 
-// ListEnvironments returns all environments for a project.
-func (s *Service) ListEnvironments(ctx context.Context, projectID string) ([]EnvironmentConfig, error) {
-	return s.repo.ListEnvironments(ctx, projectID)
+// ListCanvasSummaries returns aggregated dashboard summaries for all projects.
+func (s *Service) ListCanvasSummaries(ctx context.Context) ([]CanvasSummary, error) {
+	return s.repo.ListCanvasSummaries(ctx)
 }
 
-// CreateEnvironment creates a new environment.
-func (s *Service) CreateEnvironment(ctx context.Context, env *EnvironmentConfig) error {
-	return s.repo.CreateEnvironment(ctx, env)
-}
-
-// DeleteEnvironment removes an environment by ID.
-func (s *Service) DeleteEnvironment(ctx context.Context, id string) error {
-	return s.repo.DeleteEnvironment(ctx, id)
-}
-
-// ListDomains returns all custom domains for a project.
-func (s *Service) ListDomains(ctx context.Context, projectID string) ([]DomainConfig, error) {
-	return s.repo.ListDomains(ctx, projectID)
-}
-
-// AddDomain adds a custom domain to a project.
-func (s *Service) AddDomain(ctx context.Context, d *DomainConfig) error {
-	return s.repo.AddDomain(ctx, d)
-}
-
-// DeleteDomain removes a custom domain by ID.
-func (s *Service) DeleteDomain(ctx context.Context, id string) error {
-	return s.repo.DeleteDomain(ctx, id)
-}
-
-// GetEnvVars returns all project-level environment variables.
-func (s *Service) GetEnvVars(ctx context.Context, projectID string) (map[string]string, error) {
-	return s.repo.GetEnvVars(ctx, projectID)
-}
-
-// SetEnvVar upserts a single project environment variable.
-func (s *Service) SetEnvVar(ctx context.Context, projectID, key, value string) error {
-	return s.repo.SetEnvVar(ctx, projectID, key, value)
-}
-
-// ListProjectCanvasSummaries returns aggregated dashboard summaries for all projects.
-func (s *Service) ListProjectCanvasSummaries(ctx context.Context) ([]ProjectCanvasSummary, error) {
-	return s.repo.ListProjectCanvasSummaries(ctx)
-}
-
-// GetProjectCanvasSummary returns an aggregated dashboard summary for a single project.
-func (s *Service) GetProjectCanvasSummary(ctx context.Context, id string) (*ProjectCanvasSummary, error) {
-	return s.repo.GetProjectCanvasSummary(ctx, id)
+// GetCanvasSummary returns an aggregated dashboard summary for a single project.
+func (s *Service) GetCanvasSummary(ctx context.Context, id string) (*CanvasSummary, error) {
+	return s.repo.GetCanvasSummary(ctx, id)
 }
 
 // GetEnvironmentCanvas returns all resources running in an environment.

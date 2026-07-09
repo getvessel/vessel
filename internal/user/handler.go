@@ -9,8 +9,8 @@ import (
 type ClaimsExtractor func(ctx http.Request) string
 
 type Handler struct {
-	service        *Service
-	extractUserID  func(r *http.Request) string
+	service       *Service
+	extractUserID func(r *http.Request) string
 }
 
 func NewHandler(service *Service, extractUserID func(r *http.Request) string) *Handler {

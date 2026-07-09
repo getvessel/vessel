@@ -6,6 +6,8 @@ import (
 
 	"github.com/docker/docker/client"
 	"vessel.dev/vessel/internal/auth"
+	"vessel.dev/vessel/internal/domain"
+	"vessel.dev/vessel/internal/environment"
 	"vessel.dev/vessel/internal/git"
 	"vessel.dev/vessel/internal/middleware"
 	"vessel.dev/vessel/internal/notification"
@@ -13,6 +15,7 @@ import (
 	"vessel.dev/vessel/internal/oauth"
 	"vessel.dev/vessel/internal/orchestrator"
 	"vessel.dev/vessel/internal/project"
+	"vessel.dev/vessel/internal/project_env"
 	"vessel.dev/vessel/internal/proxy"
 	"vessel.dev/vessel/internal/services"
 	"vessel.dev/vessel/internal/settings"
@@ -51,6 +54,9 @@ type Server struct {
 	oauthHandler           *oauth.Handler
 	gitHandler             *git.Handler
 	projectHandler         *project.Handler
+	environmentHandler     *environment.Handler
+	domainHandler          *domain.Handler
+	projectEnvHandler      *project_env.Handler
 	notifierService        *notifier.NotifierService
 	notificationHandler    *notification.Handler
 	updaterService         *updater.UpdaterService
@@ -103,8 +109,20 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 	gitService.WithProjectService(&gitProjectAdapter{store: s})
 	gitHandler := git.NewHandler(gitService, extractUserID)
 
-	// Project domain
-	projectRepo := project.NewSQLiteRepository(s.DB(), s.Vault())
+	// Project, environment, domain, and project-env domains
+	envRepo := environment.NewSQLiteRepository(s.DB())
+	envService := environment.NewService(envRepo)
+	envHandler := environment.NewHandler(envService)
+
+	domainRepo := domain.NewSQLiteRepository(s.DB())
+	domainService := domain.NewService(domainRepo)
+	domainHandler := domain.NewHandler(domainService, proxyManager)
+
+	projectEnvRepo := project_env.NewSQLiteRepository(s.DB(), s.Vault())
+	projectEnvService := project_env.NewService(projectEnvRepo)
+	projectEnvHandler := project_env.NewHandler(projectEnvService)
+
+	projectRepo := project.NewSQLiteRepository(s.DB(), envRepo)
 	projectService := project.NewService(projectRepo, &appServiceRepoAdapter{store: s})
 	projectHandler := project.NewHandler(projectService, proxyManager, extractUserID)
 
@@ -135,6 +153,9 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 		oauthHandler:           oauth.NewHandler(oauthService, extractClaims),
 		gitHandler:             gitHandler,
 		projectHandler:         projectHandler,
+		environmentHandler:     envHandler,
+		domainHandler:          domainHandler,
+		projectEnvHandler:      projectEnvHandler,
 		notifierService:        notifierService,
 		notificationHandler: func() *notification.Handler {
 			notifService := notification.NewService(notifRepo, notifierService)

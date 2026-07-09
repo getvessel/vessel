@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
-
-	"vessel.dev/vessel/internal/types"
 )
 
 func (s *Server) handleDeployProject(w http.ResponseWriter, r *http.Request) {

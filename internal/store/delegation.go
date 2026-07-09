@@ -3,7 +3,10 @@ package store
 import (
 	"context"
 
+	"vessel.dev/vessel/internal/domain"
+	"vessel.dev/vessel/internal/environment"
 	"vessel.dev/vessel/internal/project"
+	"vessel.dev/vessel/internal/project_env"
 	"vessel.dev/vessel/internal/settings"
 	"vessel.dev/vessel/internal/types"
 	"vessel.dev/vessel/internal/user"
@@ -63,15 +66,29 @@ func (s *Store) DeletePersonalAccessToken(id, userID string) error {
 	return user.NewSQLiteRepository(s.db).DeletePAT(context.Background(), id, userID)
 }
 
-// ── Projects ─────────────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
 func (s *Store) projectRepo() project.Repository {
-	return project.NewSQLiteRepository(s.db, s.vault)
+	return project.NewSQLiteRepository(s.db, environment.NewSQLiteRepository(s.db))
 }
+
+func (s *Store) environmentRepo() environment.Repository {
+	return environment.NewSQLiteRepository(s.db)
+}
+
+func (s *Store) domainRepo() domain.Repository {
+	return domain.NewSQLiteRepository(s.db)
+}
+
+func (s *Store) projectEnvRepo() project_env.Repository {
+	return project_env.NewSQLiteRepository(s.db, s.vault)
+}
+
+// ── Projects ─────────────────────────────────────────────────────────────────
 
 // ListProjects delegates to the modular project repository.
 func (s *Store) ListProjects() ([]types.ProjectConfig, error) {
-	projects, err := s.projectRepo().ListProjects(context.Background())
+	projects, err := s.projectRepo().List(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +101,7 @@ func (s *Store) ListProjects() ([]types.ProjectConfig, error) {
 
 // ListProjectsByWorkspace delegates to the modular project repository.
 func (s *Store) ListProjectsByWorkspace(workspaceID string) ([]types.ProjectConfig, error) {
-	all, err := s.projectRepo().ListProjects(context.Background())
+	all, err := s.projectRepo().List(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +116,7 @@ func (s *Store) ListProjectsByWorkspace(workspaceID string) ([]types.ProjectConf
 
 // GetProject delegates to the modular project repository.
 func (s *Store) GetProject(id string) (*types.ProjectConfig, error) {
-	p, err := s.projectRepo().GetProject(context.Background(), id)
+	p, err := s.projectRepo().Get(context.Background(), id)
 	if err != nil || p == nil {
 		return nil, err
 	}
@@ -118,12 +135,16 @@ func (s *Store) CreateProject(p *types.ProjectConfig) error {
 		CreatedAt:   p.CreatedAt,
 		UpdatedAt:   p.UpdatedAt,
 	}
-	return s.projectRepo().CreateProject(context.Background(), &cfg)
+	if err := s.projectRepo().Create(context.Background(), &cfg); err != nil {
+		return err
+	}
+	p.ID = cfg.ID
+	return nil
 }
 
 // DeleteProject delegates to the modular project repository.
 func (s *Store) DeleteProject(id string) error {
-	return s.projectRepo().DeleteProject(context.Background(), id)
+	return s.projectRepo().Delete(context.Background(), id)
 }
 
 func toTypesProjectConfig(p project.ProjectConfig) types.ProjectConfig {
@@ -140,29 +161,43 @@ func toTypesProjectConfig(p project.ProjectConfig) types.ProjectConfig {
 
 // ── Environments ─────────────────────────────────────────────────────────────
 
-// ListEnvironments delegates to the modular project repository.
+func toTypesEnvironmentConfig(e environment.Config) types.EnvironmentConfig {
+	return types.EnvironmentConfig{
+		ID:        e.ID,
+		ProjectID: e.ProjectID,
+		Name:      e.Name,
+		IsDefault: e.IsDefault,
+		CreatedAt: e.CreatedAt,
+		UpdatedAt: e.UpdatedAt,
+	}
+}
+
+// ListEnvironments delegates to the modular environment repository.
 func (s *Store) ListEnvironments(projectID string) ([]types.EnvironmentConfig, error) {
-	envs, err := s.projectRepo().ListEnvironments(context.Background(), projectID)
+	envs, err := s.environmentRepo().ListByProject(context.Background(), projectID)
 	if err != nil {
 		return nil, err
 	}
 	result := make([]types.EnvironmentConfig, len(envs))
 	for i, e := range envs {
-		result[i] = types.EnvironmentConfig{
-			ID:        e.ID,
-			ProjectID: e.ProjectID,
-			Name:      e.Name,
-			IsDefault: e.IsDefault,
-			CreatedAt: e.CreatedAt,
-			UpdatedAt: e.UpdatedAt,
-		}
+		result[i] = toTypesEnvironmentConfig(e)
 	}
 	return result, nil
 }
 
-// CreateEnvironment delegates to the modular project repository.
+// GetEnvironment delegates to the modular environment repository.
+func (s *Store) GetEnvironment(id string) (*types.EnvironmentConfig, error) {
+	env, err := s.environmentRepo().Get(context.Background(), id)
+	if err != nil || env == nil {
+		return nil, err
+	}
+	cfg := toTypesEnvironmentConfig(*env)
+	return &cfg, nil
+}
+
+// CreateEnvironment delegates to the modular environment repository.
 func (s *Store) CreateEnvironment(env *types.EnvironmentConfig) error {
-	cfg := project.EnvironmentConfig{
+	cfg := environment.Config{
 		ID:        env.ID,
 		ProjectID: env.ProjectID,
 		Name:      env.Name,
@@ -170,70 +205,21 @@ func (s *Store) CreateEnvironment(env *types.EnvironmentConfig) error {
 		CreatedAt: env.CreatedAt,
 		UpdatedAt: env.UpdatedAt,
 	}
-	return s.projectRepo().CreateEnvironment(context.Background(), &cfg)
+	if err := s.environmentRepo().Create(context.Background(), &cfg); err != nil {
+		return err
+	}
+	env.ID = cfg.ID
+	return nil
 }
 
-// DeleteEnvironment delegates to the modular project repository.
+// DeleteEnvironment delegates to the modular environment repository.
 func (s *Store) DeleteEnvironment(id string) error {
-	return s.projectRepo().DeleteEnvironment(context.Background(), id)
+	return s.environmentRepo().Delete(context.Background(), id)
 }
 
 // ── Domains ──────────────────────────────────────────────────────────────────
 
-// ListDomains delegates to the modular project repository.
-func (s *Store) ListDomains(projectID string) ([]types.DomainConfig, error) {
-	domains, err := s.projectRepo().ListDomains(context.Background(), projectID)
-	if err != nil {
-		return nil, err
-	}
-	result := make([]types.DomainConfig, len(domains))
-	for i, d := range domains {
-		result[i] = toTypesDomainConfig(d)
-	}
-	return result, nil
-}
-
-// ListAllDomains returns every custom domain across all projects.
-func (s *Store) ListAllDomains() ([]types.DomainConfig, error) {
-	// Query all projects and aggregate their domains; projects without domains are skipped.
-	projects, err := s.projectRepo().ListProjects(context.Background())
-	if err != nil {
-		return nil, err
-	}
-	var result []types.DomainConfig
-	for _, p := range projects {
-		domains, err := s.projectRepo().ListDomains(context.Background(), p.ID)
-		if err != nil {
-			return nil, err
-		}
-		for _, d := range domains {
-			result = append(result, toTypesDomainConfig(d))
-		}
-	}
-	return result, nil
-}
-
-// AddDomain delegates to the modular project repository.
-func (s *Store) AddDomain(d *types.DomainConfig) error {
-	cfg := project.DomainConfig{
-		ID:            d.ID,
-		ProjectID:     d.ProjectID,
-		DomainName:    d.DomainName,
-		RedirectTo:    d.RedirectTo,
-		SSLCertStatus: d.SSLCertStatus,
-		PathPrefix:    d.PathPrefix,
-		CreatedAt:     d.CreatedAt,
-		UpdatedAt:     d.UpdatedAt,
-	}
-	return s.projectRepo().AddDomain(context.Background(), &cfg)
-}
-
-// DeleteDomain delegates to the modular project repository.
-func (s *Store) DeleteDomain(id string) error {
-	return s.projectRepo().DeleteDomain(context.Background(), id)
-}
-
-func toTypesDomainConfig(d project.DomainConfig) types.DomainConfig {
+func toTypesDomainConfig(d domain.Config) types.DomainConfig {
 	return types.DomainConfig{
 		ID:            d.ID,
 		ProjectID:     d.ProjectID,
@@ -246,23 +232,73 @@ func toTypesDomainConfig(d project.DomainConfig) types.DomainConfig {
 	}
 }
 
-// ── Env Vars ─────────────────────────────────────────────────────────────────
-
-// GetEnvVars delegates to the modular project repository.
-func (s *Store) GetEnvVars(projectID string) (map[string]string, error) {
-	return s.projectRepo().GetEnvVars(context.Background(), projectID)
+// ListDomains delegates to the modular domain repository.
+func (s *Store) ListDomains(projectID string) ([]types.DomainConfig, error) {
+	domains, err := s.domainRepo().ListByProject(context.Background(), projectID)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]types.DomainConfig, len(domains))
+	for i, d := range domains {
+		result[i] = toTypesDomainConfig(d)
+	}
+	return result, nil
 }
 
-// SetEnvVar delegates to the modular project repository.
+// ListAllDomains returns every custom domain across all projects.
+func (s *Store) ListAllDomains() ([]types.DomainConfig, error) {
+	domains, err := s.domainRepo().ListAll(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	result := make([]types.DomainConfig, len(domains))
+	for i, d := range domains {
+		result[i] = toTypesDomainConfig(d)
+	}
+	return result, nil
+}
+
+// AddDomain delegates to the modular domain repository.
+func (s *Store) AddDomain(d *types.DomainConfig) error {
+	cfg := domain.Config{
+		ID:            d.ID,
+		ProjectID:     d.ProjectID,
+		DomainName:    d.DomainName,
+		RedirectTo:    d.RedirectTo,
+		SSLCertStatus: d.SSLCertStatus,
+		PathPrefix:    d.PathPrefix,
+		CreatedAt:     d.CreatedAt,
+		UpdatedAt:     d.UpdatedAt,
+	}
+	if err := s.domainRepo().Create(context.Background(), &cfg); err != nil {
+		return err
+	}
+	d.ID = cfg.ID
+	return nil
+}
+
+// DeleteDomain delegates to the modular domain repository.
+func (s *Store) DeleteDomain(id string) error {
+	return s.domainRepo().Delete(context.Background(), id)
+}
+
+// ── Env Vars ─────────────────────────────────────────────────────────────────
+
+// GetEnvVars delegates to the modular project_env repository.
+func (s *Store) GetEnvVars(projectID string) (map[string]string, error) {
+	return s.projectEnvRepo().GetVars(context.Background(), projectID)
+}
+
+// SetEnvVar delegates to the modular project_env repository.
 func (s *Store) SetEnvVar(projectID, key, value string) error {
-	return s.projectRepo().SetEnvVar(context.Background(), projectID, key, value)
+	return s.projectEnvRepo().SetVar(context.Background(), projectID, key, value)
 }
 
 // ── Canvas ───────────────────────────────────────────────────────────────────
 
 // ListProjectCanvasSummaries delegates to the modular project repository.
 func (s *Store) ListProjectCanvasSummaries() ([]types.ProjectCanvasSummary, error) {
-	summaries, err := s.projectRepo().ListProjectCanvasSummaries(context.Background())
+	summaries, err := s.projectRepo().ListCanvasSummaries(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +311,7 @@ func (s *Store) ListProjectCanvasSummaries() ([]types.ProjectCanvasSummary, erro
 
 // GetProjectCanvasSummary delegates to the modular project repository.
 func (s *Store) GetProjectCanvasSummary(id string) (*types.ProjectCanvasSummary, error) {
-	summary, err := s.projectRepo().GetProjectCanvasSummary(context.Background(), id)
+	summary, err := s.projectRepo().GetCanvasSummary(context.Background(), id)
 	if err != nil || summary == nil {
 		return nil, err
 	}
@@ -306,7 +342,7 @@ func (s *Store) GetEnvironmentCanvas(id string) (*types.EnvironmentCanvas, error
 	return result, nil
 }
 
-func toTypesProjectCanvasSummary(summary project.ProjectCanvasSummary) types.ProjectCanvasSummary {
+func toTypesProjectCanvasSummary(summary project.CanvasSummary) types.ProjectCanvasSummary {
 	return types.ProjectCanvasSummary{
 		ProjectConfig:      toTypesProjectConfig(summary.ProjectConfig),
 		EnvironmentsCount:  summary.EnvironmentsCount,

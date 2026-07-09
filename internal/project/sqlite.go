@@ -3,44 +3,27 @@ package project
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/google/uuid"
+	"vessel.dev/vessel/internal/environment"
 	"vessel.dev/vessel/internal/types"
 )
 
-// Vault is the minimal interface needed to encrypt/decrypt env-var values.
-type Vault interface {
-	Encrypt(plaintext string) (string, error)
-	Decrypt(ciphertext string) (string, error)
-}
-
-// appServiceRow is a minimal read-only projection used by canvas queries.
-type appServiceRow struct {
-	ProjectID     string
-	EnvironmentID string
-	Status        string
-}
-
 // SQLiteRepository implements Repository against a SQLite database.
 type SQLiteRepository struct {
-	mu    sync.RWMutex
-	db    *sql.DB
-	vault Vault
+	db           *sql.DB
+	environments environment.Repository
 }
 
-// NewSQLiteRepository constructs a SQLiteRepository backed by the given db and vault.
-func NewSQLiteRepository(db *sql.DB, vault Vault) *SQLiteRepository {
-	return &SQLiteRepository{db: db, vault: vault}
+// NewSQLiteRepository constructs a SQLiteRepository backed by the given db and environment repository.
+func NewSQLiteRepository(db *sql.DB, envRepo environment.Repository) *SQLiteRepository {
+	return &SQLiteRepository{db: db, environments: envRepo}
 }
 
-// ── Projects ─────────────────────────────────────────────────────────────────
-
-// ListProjects retrieves all ProjectConfig records ordered by creation date descending.
-func (r *SQLiteRepository) ListProjects(_ context.Context) ([]ProjectConfig, error) {
+// List retrieves all ProjectConfig records ordered by creation date descending.
+func (r *SQLiteRepository) List(_ context.Context) ([]ProjectConfig, error) {
 	rows, err := r.db.Query(`SELECT id, COALESCE(workspace_id, ''), COALESCE(team_id,''), name, COALESCE(description,''), created_at, updated_at FROM projects ORDER BY created_at DESC`)
 	if err != nil {
 		return nil, err
@@ -58,12 +41,12 @@ func (r *SQLiteRepository) ListProjects(_ context.Context) ([]ProjectConfig, err
 	return projects, rows.Err()
 }
 
-// GetProject retrieves a single ProjectConfig by its ID.
-func (r *SQLiteRepository) GetProject(_ context.Context, id string) (*ProjectConfig, error) {
+// Get retrieves a single ProjectConfig by its ID.
+func (r *SQLiteRepository) Get(_ context.Context, id string) (*ProjectConfig, error) {
 	row := r.db.QueryRow(`SELECT id, COALESCE(workspace_id, ''), COALESCE(team_id,''), name, COALESCE(description,''), created_at, updated_at FROM projects WHERE id = ?`, id)
 	var p ProjectConfig
 	err := row.Scan(&p.ID, &p.WorkspaceID, &p.TeamID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt)
-	if errors.Is(err, sql.ErrNoRows) {
+	if err == sql.ErrNoRows {
 		return nil, nil
 	}
 	if err != nil {
@@ -72,8 +55,8 @@ func (r *SQLiteRepository) GetProject(_ context.Context, id string) (*ProjectCon
 	return &p, nil
 }
 
-// CreateProject inserts a new project and creates its default production environment.
-func (r *SQLiteRepository) CreateProject(ctx context.Context, p *ProjectConfig) error {
+// Create inserts a new project and creates its default production environment.
+func (r *SQLiteRepository) Create(ctx context.Context, p *ProjectConfig) error {
 	if p.ID == "" {
 		p.ID = uuid.NewString()
 	}
@@ -89,246 +72,30 @@ func (r *SQLiteRepository) CreateProject(ctx context.Context, p *ProjectConfig) 
 		return err
 	}
 
-	defaultEnv := &EnvironmentConfig{
+	defaultEnv := &environment.Config{
 		ProjectID: p.ID,
 		Name:      "production",
 		IsDefault: true,
 	}
-	return r.CreateEnvironment(ctx, defaultEnv)
+	return r.environments.Create(ctx, defaultEnv)
 }
 
-// DeleteProject removes a project record by ID.
-func (r *SQLiteRepository) DeleteProject(_ context.Context, id string) error {
+// Delete removes a project record by ID.
+func (r *SQLiteRepository) Delete(_ context.Context, id string) error {
 	_, err := r.db.Exec(`DELETE FROM projects WHERE id = ?`, id)
 	return err
 }
 
-// ── Environments ──────────────────────────────────────────────────────────────
+// ── Canvas read model ────────────────────────────────────────────────────────
 
-// ListEnvironments returns all environments belonging to a project, value types (not pointers).
-func (r *SQLiteRepository) ListEnvironments(_ context.Context, projectID string) ([]EnvironmentConfig, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	rows, err := r.db.Query(
-		`SELECT id, project_id, name, is_default, created_at, updated_at FROM environments WHERE project_id = ? ORDER BY is_default DESC, created_at ASC`,
-		projectID,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list environments: %w", err)
-	}
-	defer rows.Close()
-
-	var envs []EnvironmentConfig
-	for rows.Next() {
-		var env EnvironmentConfig
-		var isDefault int
-		if err := rows.Scan(&env.ID, &env.ProjectID, &env.Name, &isDefault, &env.CreatedAt, &env.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan environment row: %w", err)
-		}
-		env.IsDefault = isDefault == 1
-		envs = append(envs, env)
-	}
-	return envs, rows.Err()
-}
-
-// CreateEnvironment inserts a new environment record.
-func (r *SQLiteRepository) CreateEnvironment(_ context.Context, env *EnvironmentConfig) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	if env.ID == "" {
-		env.ID = uuid.NewString()
-	}
-	now := time.Now().UTC()
-	env.CreatedAt = now
-	env.UpdatedAt = now
-
-	_, err := r.db.Exec(
-		`INSERT INTO environments (id, project_id, name, is_default, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`,
-		env.ID, env.ProjectID, env.Name, env.IsDefault, env.CreatedAt, env.UpdatedAt,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create environment: %w", err)
-	}
-	return nil
-}
-
-// DeleteEnvironment removes an environment by ID.
-func (r *SQLiteRepository) DeleteEnvironment(_ context.Context, id string) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	_, err := r.db.Exec(`DELETE FROM environments WHERE id = ?`, id)
-	return err
-}
-
-// getEnvironment is an internal helper that retrieves a single environment by ID (no context, no lock).
-func (r *SQLiteRepository) getEnvironment(id string) (*EnvironmentConfig, error) {
-	row := r.db.QueryRow(
-		`SELECT id, project_id, name, is_default, created_at, updated_at FROM environments WHERE id = ?`, id,
-	)
-	var env EnvironmentConfig
-	var isDefault int
-	err := row.Scan(&env.ID, &env.ProjectID, &env.Name, &isDefault, &env.CreatedAt, &env.UpdatedAt)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, fmt.Errorf("environment not found: %s", id)
-	}
-	if err != nil {
-		return nil, err
-	}
-	env.IsDefault = isDefault == 1
-	return &env, nil
-}
-
-// getDefaultEnvironment retrieves the default environment for a project (internal helper).
-func (r *SQLiteRepository) getDefaultEnvironment(projectID string) (*EnvironmentConfig, error) {
-	row := r.db.QueryRow(
-		`SELECT id, project_id, name, is_default, created_at, updated_at FROM environments WHERE project_id = ? AND is_default = 1 LIMIT 1`,
-		projectID,
-	)
-	var env EnvironmentConfig
-	var isDefault int
-	err := row.Scan(&env.ID, &env.ProjectID, &env.Name, &isDefault, &env.CreatedAt, &env.UpdatedAt)
-	if errors.Is(err, sql.ErrNoRows) {
-		// Fall back to the earliest created environment
-		fallback := r.db.QueryRow(
-			`SELECT id, project_id, name, is_default, created_at, updated_at FROM environments WHERE project_id = ? ORDER BY created_at ASC LIMIT 1`,
-			projectID,
-		)
-		err = fallback.Scan(&env.ID, &env.ProjectID, &env.Name, &isDefault, &env.CreatedAt, &env.UpdatedAt)
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
-		}
-		if err != nil {
-			return nil, err
-		}
-	} else if err != nil {
-		return nil, err
-	}
-	env.IsDefault = isDefault == 1
-	return &env, nil
-}
-
-// listAllEnvironments returns every environment across all projects (internal helper for canvas).
-func (r *SQLiteRepository) listAllEnvironments() ([]*EnvironmentConfig, error) {
-	rows, err := r.db.Query(
-		`SELECT id, project_id, name, is_default, created_at, updated_at FROM environments ORDER BY is_default DESC, created_at ASC`,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var envs []*EnvironmentConfig
-	for rows.Next() {
-		var env EnvironmentConfig
-		var isDefault int
-		if err := rows.Scan(&env.ID, &env.ProjectID, &env.Name, &isDefault, &env.CreatedAt, &env.UpdatedAt); err != nil {
-			return nil, err
-		}
-		env.IsDefault = isDefault == 1
-		envs = append(envs, &env)
-	}
-	return envs, rows.Err()
-}
-
-// ── Domains ───────────────────────────────────────────────────────────────────
-
-// ListDomains returns all custom domains for the given project.
-func (r *SQLiteRepository) ListDomains(_ context.Context, projectID string) ([]DomainConfig, error) {
-	rows, err := r.db.Query(
-		`SELECT id, project_id, domain_name, redirect_to, ssl_cert_status, path_prefix, created_at, updated_at FROM domains WHERE project_id = ? ORDER BY domain_name ASC`,
-		projectID,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var domains []DomainConfig
-	for rows.Next() {
-		var d DomainConfig
-		if err := rows.Scan(&d.ID, &d.ProjectID, &d.DomainName, &d.RedirectTo, &d.SSLCertStatus, &d.PathPrefix, &d.CreatedAt, &d.UpdatedAt); err != nil {
-			return nil, err
-		}
-		domains = append(domains, d)
-	}
-	return domains, rows.Err()
-}
-
-// AddDomain inserts a new custom domain record.
-func (r *SQLiteRepository) AddDomain(_ context.Context, d *DomainConfig) error {
-	if d.ID == "" {
-		d.ID = uuid.NewString()
-	}
-	now := time.Now()
-	d.CreatedAt = now
-	d.UpdatedAt = now
-
-	_, err := r.db.Exec(
-		`INSERT INTO domains (id, project_id, domain_name, redirect_to, ssl_cert_status, path_prefix, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		d.ID, d.ProjectID, d.DomainName, d.RedirectTo, d.SSLCertStatus, d.PathPrefix, d.CreatedAt, d.UpdatedAt,
-	)
-	return err
-}
-
-// DeleteDomain removes a custom domain by ID.
-func (r *SQLiteRepository) DeleteDomain(_ context.Context, id string) error {
-	_, err := r.db.Exec(`DELETE FROM domains WHERE id = ?`, id)
-	return err
-}
-
-// ── Env Vars ──────────────────────────────────────────────────────────────────
-
-// GetEnvVars retrieves and decrypts all environment variables for a project.
-func (r *SQLiteRepository) GetEnvVars(_ context.Context, projectID string) (map[string]string, error) {
-	rows, err := r.db.Query(`SELECT key, encrypted_value FROM env_vars WHERE project_id = ?`, projectID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	envs := make(map[string]string)
-	for rows.Next() {
-		var key, encrypted string
-		if err := rows.Scan(&key, &encrypted); err != nil {
-			return nil, err
-		}
-		plaintext, err := r.vault.Decrypt(encrypted)
-		if err != nil {
-			continue // skip undecryptable values rather than failing entirely
-		}
-		envs[key] = plaintext
-	}
-	return envs, rows.Err()
-}
-
-// SetEnvVar encrypts and upserts a single environment variable.
-func (r *SQLiteRepository) SetEnvVar(_ context.Context, projectID, key, plaintextValue string) error {
-	encrypted, err := r.vault.Encrypt(plaintextValue)
-	if err != nil {
-		return err
-	}
-	now := time.Now()
-	_, err = r.db.Exec(
-		`INSERT INTO env_vars (id, project_id, key, encrypted_value, created_at, updated_at)
-		 VALUES (?, ?, ?, ?, ?, ?)
-		 ON CONFLICT(project_id, key) DO UPDATE SET encrypted_value = excluded.encrypted_value, updated_at = excluded.updated_at`,
-		uuid.NewString(), projectID, key, encrypted, now, now,
-	)
-	return err
-}
-
-// ── Canvas ────────────────────────────────────────────────────────────────────
-
-// ListProjectCanvasSummaries returns dashboard summaries for every project without N+1 queries.
-func (r *SQLiteRepository) ListProjectCanvasSummaries(ctx context.Context) ([]ProjectCanvasSummary, error) {
-	projects, err := r.ListProjects(ctx)
+// ListCanvasSummaries returns dashboard summaries for every project without N+1 queries.
+func (r *SQLiteRepository) ListCanvasSummaries(ctx context.Context) ([]CanvasSummary, error) {
+	projects, err := r.List(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	allEnvs, err := r.listAllEnvironments()
+	allEnvs, err := r.listAllEnvironments(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list all environments: %w", err)
 	}
@@ -345,8 +112,7 @@ func (r *SQLiteRepository) ListProjectCanvasSummaries(ctx context.Context) ([]Pr
 		return nil, fmt.Errorf("failed to list all storage: %w", err)
 	}
 
-	// Group by project
-	envsByProject := make(map[string][]*EnvironmentConfig)
+	envsByProject := make(map[string][]*environment.Config)
 	for _, e := range allEnvs {
 		envsByProject[e.ProjectID] = append(envsByProject[e.ProjectID], e)
 	}
@@ -359,18 +125,18 @@ func (r *SQLiteRepository) ListProjectCanvasSummaries(ctx context.Context) ([]Pr
 		dbsByProject[d.ProjectID] = append(dbsByProject[d.ProjectID], d)
 	}
 	storageByProject := make(map[string][]types.StorageConfig)
-	for _, s := range allStorage {
-		storageByProject[s.ProjectID] = append(storageByProject[s.ProjectID], s)
+	for _, st := range allStorage {
+		storageByProject[st.ProjectID] = append(storageByProject[st.ProjectID], st)
 	}
 
-	var summaries []ProjectCanvasSummary
+	var summaries []CanvasSummary
 	for _, project := range projects {
 		envs := envsByProject[project.ID]
 		apps := appsByProject[project.ID]
 		dbs := dbsByProject[project.ID]
 		storage := storageByProject[project.ID]
 
-		var defaultEnv *EnvironmentConfig
+		var defaultEnv *environment.Config
 		if len(envs) > 0 {
 			for _, e := range envs {
 				if e.IsDefault {
@@ -383,7 +149,7 @@ func (r *SQLiteRepository) ListProjectCanvasSummaries(ctx context.Context) ([]Pr
 			}
 		}
 
-		summary := ProjectCanvasSummary{
+		summary := CanvasSummary{
 			ProjectConfig:      project,
 			EnvironmentsCount:  len(envs),
 			AppsCount:          len(apps),
@@ -419,21 +185,32 @@ func (r *SQLiteRepository) ListProjectCanvasSummaries(ctx context.Context) ([]Pr
 	return summaries, nil
 }
 
-// GetProjectCanvasSummary returns a canvas summary for a single project.
-func (r *SQLiteRepository) GetProjectCanvasSummary(ctx context.Context, id string) (*ProjectCanvasSummary, error) {
-	project, err := r.GetProject(ctx, id)
+// GetCanvasSummary returns a canvas summary for a single project.
+func (r *SQLiteRepository) GetCanvasSummary(ctx context.Context, id string) (*CanvasSummary, error) {
+	project, err := r.Get(ctx, id)
 	if err != nil || project == nil {
 		return nil, fmt.Errorf("project not found: %w", err)
 	}
 
-	envs, _ := r.ListEnvironments(ctx, id)
+	envs, _ := r.environments.ListByProject(ctx, id)
 	apps, _ := r.listAppServicesByProject(id)
 	dbs, _ := r.listDatabasesByProject(id)
 	storage, _ := r.listStorageByProject(id)
 
-	defaultEnv, _ := r.getDefaultEnvironment(id)
+	var defaultEnv *environment.Config
+	if len(envs) > 0 {
+		for _, e := range envs {
+			if e.IsDefault {
+				defaultEnv = &e
+				break
+			}
+		}
+		if defaultEnv == nil {
+			defaultEnv = &envs[0]
+		}
+	}
 
-	summary := &ProjectCanvasSummary{
+	summary := &CanvasSummary{
 		ProjectConfig:      *project,
 		EnvironmentsCount:  len(envs),
 		AppsCount:          len(apps),
@@ -469,10 +246,19 @@ func (r *SQLiteRepository) GetProjectCanvasSummary(ctx context.Context, id strin
 
 // GetEnvironmentCanvas retrieves all apps, databases, and storage for a given environment.
 func (r *SQLiteRepository) GetEnvironmentCanvas(_ context.Context, environmentID string) (*EnvironmentCanvas, error) {
-	env, err := r.getEnvironment(environmentID)
-	if err != nil || env == nil {
-		return nil, fmt.Errorf("environment not found: %w", err)
+	row := r.db.QueryRow(
+		`SELECT id, project_id, name, is_default, created_at, updated_at FROM environments WHERE id = ?`, environmentID,
+	)
+	var env environment.Config
+	var isDefault int
+	err := row.Scan(&env.ID, &env.ProjectID, &env.Name, &isDefault, &env.CreatedAt, &env.UpdatedAt)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("environment not found: %s", environmentID)
 	}
+	if err != nil {
+		return nil, err
+	}
+	env.IsDefault = isDefault == 1
 
 	apps, _ := r.listAppServicesByEnvironment(environmentID)
 	dbs, _ := r.listDatabasesByEnvironment(environmentID)
@@ -488,7 +274,7 @@ func (r *SQLiteRepository) GetEnvironmentCanvas(_ context.Context, environmentID
 	}
 
 	return &EnvironmentCanvas{
-		Environment: env,
+		Environment: &env,
 		Apps:        apps,
 		Databases:   dbsPtrs,
 		Storage:     storagePtrs,
@@ -496,6 +282,37 @@ func (r *SQLiteRepository) GetEnvironmentCanvas(_ context.Context, environmentID
 }
 
 // ── Internal read helpers (delegating to store tables) ────────────────────────
+
+func (r *SQLiteRepository) listAllEnvironments(ctx context.Context) ([]*environment.Config, error) {
+	envs, err := r.environments.ListByProject(ctx, "")
+	if err == nil && len(envs) > 0 {
+		var result []*environment.Config
+		for i := range envs {
+			result = append(result, &envs[i])
+		}
+		return result, nil
+	}
+	// Fallback: query directly so we don't require ListByProject to support empty projectID.
+	rows, err := r.db.Query(
+		`SELECT id, project_id, name, is_default, created_at, updated_at FROM environments ORDER BY is_default DESC, created_at ASC`,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []*environment.Config
+	for rows.Next() {
+		var env environment.Config
+		var isDefault int
+		if err := rows.Scan(&env.ID, &env.ProjectID, &env.Name, &isDefault, &env.CreatedAt, &env.UpdatedAt); err != nil {
+			return nil, err
+		}
+		env.IsDefault = isDefault == 1
+		result = append(result, &env)
+	}
+	return result, rows.Err()
+}
 
 func (r *SQLiteRepository) listAllAppServices() ([]*types.AppServiceConfig, error) {
 	return r.scanAppServices(`SELECT id, project_id, environment_id, name, COALESCE(icon,''), COALESCE(repository_url,''), COALESCE(branch,''), COALESCE(root_directory,''), COALESCE(build_command,''), COALESCE(start_command,''), COALESCE(dockerfile_path,''), internal_port, COALESCE(domain,''), env_vars_count, auto_deploy_webhook, COALESCE(git_repo_full_name,''), wait_for_ci, auto_deploy_branch, COALESCE(public_networking_domain,''), COALESCE(private_networking_internal,''), enable_outbound_ipv6, cpu_request, memory_limit_mb, replicas, COALESCE(restart_policy,''), teardown_timeout, serverless, COALESCE(cron_schedule,''), COALESCE(health_check_path,''), status, COALESCE(container_id,''), created_at, updated_at FROM app_services ORDER BY created_at DESC`)

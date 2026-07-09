@@ -489,3 +489,18 @@ func (s *Store) initBackupTables() error {
 func (s *Store) Close() error {
 	return s.db.Close()
 }
+
+// initEnvironmentTable creates the environments table if it doesn't already exist.
+func (s *Store) initEnvironmentTable() error {
+	_, err := s.db.Exec(`
+		CREATE TABLE IF NOT EXISTS environments (
+			id TEXT PRIMARY KEY,
+			project_id TEXT NOT NULL,
+			name TEXT NOT NULL,
+			is_default BOOLEAN NOT NULL DEFAULT 0,
+			created_at DATETIME NOT NULL,
+			updated_at DATETIME NOT NULL,
+			UNIQUE(project_id, name)
+		);`)
+	return err
+}
