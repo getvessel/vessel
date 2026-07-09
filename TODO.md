@@ -154,6 +154,7 @@
 - [ ] **Downgrade Support**: `scripts/downgrade.sh` — backup DB, pull previous version, restart. Detect version mismatch on startup.
 - [ ] **CI Smoke Test**: `scripts/railpack-smoke.sh` — spin up a test container, verify build + healthcheck.
 - [ ] **Cloud Upgrade**: `scripts/cloud_upgrade.sh` — zero-downtime migration for cloud Postgres + API.
+- [ ] **One-Click Service Templates**: `templates/` — Docker Compose stubs for popular services (Gitea, WordPress, Plausible, NocoDB, etc.), selectable from the dashboard.
 
 ---
 
