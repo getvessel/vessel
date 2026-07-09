@@ -19,7 +19,7 @@ Turn any bare-metal Linux VPS into your own private Vercel, Railway, or Heroku i
 
 ## 📂 Repository Layout
 
-```table
+```text
 vessel/
 ├── cmd/vesseld/          # Go Daemon entrypoint (`main.go`)
 ├── internal/             # Core Go packages
