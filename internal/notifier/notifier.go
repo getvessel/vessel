@@ -2,6 +2,7 @@ package notifier
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -11,35 +12,34 @@ import (
 	"strings"
 	"time"
 
-	"vessel.dev/vessel/internal/store"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/notification"
 )
 
 type NotifierService struct {
-	store *store.Store
+	repo notification.Repository
 }
 
-func NewNotifierService(s *store.Store) *NotifierService {
-	return &NotifierService{store: s}
+func NewNotifierService(repo notification.Repository) *NotifierService {
+	return &NotifierService{repo: repo}
 }
 
-func (n *NotifierService) Dispatch(event *types.NotificationEvent) {
+func (n *NotifierService) Dispatch(event *notification.NotificationEvent) {
 	go func() {
 		if err := n.Send(event); err != nil {
-			log.Printf("⚠️ [Notifier] Failed to dispatch event '%s': %v", event.Title, err)
+			log.Printf("[Notifier] Failed to dispatch event '%s': %v", event.Title, err)
 		}
 	}()
 }
 
-func (n *NotifierService) Send(event *types.NotificationEvent) error {
-	integ, err := n.store.GetNotificationIntegration()
+func (n *NotifierService) Send(event *notification.NotificationEvent) error {
+	integ, err := n.repo.GetIntegration(context.Background())
 	if err != nil || integ == nil {
 		return fmt.Errorf("could not load notification integrations: %w", err)
 	}
 
-	var pref *types.ProjectNotificationPref
+	var pref *notification.ProjectNotificationPref
 	if event.ProjectID != "" {
-		p, err := n.store.GetProjectNotificationPref(event.ProjectID)
+		p, err := n.repo.GetProjectPref(context.Background(), event.ProjectID)
 		if err == nil {
 			pref = p
 		}
@@ -82,7 +82,7 @@ func (n *NotifierService) Send(event *types.NotificationEvent) error {
 	return nil
 }
 
-func (n *NotifierService) sendSMTP(integ *types.NotificationIntegration, event *types.NotificationEvent) error {
+func (n *NotifierService) sendSMTP(integ *notification.NotificationIntegration, event *notification.NotificationEvent) error {
 	var auth smtp.Auth
 	if integ.SMTPUser != "" && integ.SMTPPassword != "" {
 		auth = smtp.PlainAuth("", integ.SMTPUser, integ.SMTPPassword, integ.SMTPHost)
@@ -112,7 +112,7 @@ func (n *NotifierService) sendSMTP(integ *types.NotificationIntegration, event *
 	return smtp.SendMail(addr, auth, fromAddr, to, msg)
 }
 
-func (n *NotifierService) sendResend(integ *types.NotificationIntegration, event *types.NotificationEvent) error {
+func (n *NotifierService) sendResend(integ *notification.NotificationIntegration, event *notification.NotificationEvent) error {
 	fromStr := "Vessel Notifications <alerts@vessel.dev>"
 	if integ.SMTPFromAddress != "" {
 		if integ.SMTPFromName != "" {
@@ -141,7 +141,7 @@ func (n *NotifierService) sendResend(integ *types.NotificationIntegration, event
 	return nil
 }
 
-func (n *NotifierService) sendSlack(webhookURL string, event *types.NotificationEvent) error {
+func (n *NotifierService) sendSlack(webhookURL string, event *notification.NotificationEvent) error {
 	payload := map[string]string{
 		"text": fmt.Sprintf("🚀 *%s*\n%s\n<%s|View Details>", event.Title, event.Message, event.URL),
 	}
@@ -154,7 +154,7 @@ func (n *NotifierService) sendSlack(webhookURL string, event *types.Notification
 	return nil
 }
 
-func (n *NotifierService) sendDiscord(webhookURL string, ping bool, event *types.NotificationEvent) error {
+func (n *NotifierService) sendDiscord(webhookURL string, ping bool, event *notification.NotificationEvent) error {
 	content := fmt.Sprintf("**%s**\n%s\n[View Details](%s)", event.Title, event.Message, event.URL)
 	if ping && event.Level == "error" {
 		content = "@everyone " + content
@@ -169,7 +169,7 @@ func (n *NotifierService) sendDiscord(webhookURL string, ping bool, event *types
 	return nil
 }
 
-func (n *NotifierService) sendTelegram(botToken, chatID string, event *types.NotificationEvent) error {
+func (n *NotifierService) sendTelegram(botToken, chatID string, event *notification.NotificationEvent) error {
 	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", botToken)
 	text := fmt.Sprintf("🛰 *%s*\n%s\n%s", event.Title, event.Message, event.URL)
 	payload := map[string]string{
@@ -186,7 +186,7 @@ func (n *NotifierService) sendTelegram(botToken, chatID string, event *types.Not
 	return nil
 }
 
-func (n *NotifierService) sendPushover(userKey, apiToken string, event *types.NotificationEvent) error {
+func (n *NotifierService) sendPushover(userKey, apiToken string, event *notification.NotificationEvent) error {
 	values := url.Values{
 		"token":   {apiToken},
 		"user":    {userKey},
@@ -201,7 +201,7 @@ func (n *NotifierService) sendPushover(userKey, apiToken string, event *types.No
 	return nil
 }
 
-func (n *NotifierService) sendWebhook(webhookURL string, event *types.NotificationEvent) error {
+func (n *NotifierService) sendWebhook(webhookURL string, event *notification.NotificationEvent) error {
 	body, _ := json.Marshal(event)
 	resp, err := http.Post(webhookURL, "application/json", bytes.NewBuffer(body))
 	if err != nil {

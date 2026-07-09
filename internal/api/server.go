@@ -6,14 +6,18 @@ import (
 
 	"github.com/docker/docker/client"
 	"vessel.dev/vessel/internal/auth"
+	"vessel.dev/vessel/internal/git"
 	"vessel.dev/vessel/internal/middleware"
+	"vessel.dev/vessel/internal/notification"
 	"vessel.dev/vessel/internal/notifier"
 	"vessel.dev/vessel/internal/oauth"
 	"vessel.dev/vessel/internal/orchestrator"
+	"vessel.dev/vessel/internal/project"
 	"vessel.dev/vessel/internal/proxy"
 	"vessel.dev/vessel/internal/services"
 	"vessel.dev/vessel/internal/settings"
 	"vessel.dev/vessel/internal/store"
+	"vessel.dev/vessel/internal/types"
 	"vessel.dev/vessel/internal/updater"
 	"vessel.dev/vessel/internal/user"
 )
@@ -32,7 +36,7 @@ type Server struct {
 	cronManager            *orchestrator.CronManager
 	cronService            *services.CronService
 	serviceLinker          *services.ServiceLinker
-	gitService             *services.GitService
+	gitService             *git.Service
 	deploymentHandler      *DeploymentHandler
 	serviceVarHandler      *ServiceVarHandler
 	projectSettingsHandler *ProjectSettingsHandler
@@ -45,8 +49,10 @@ type Server struct {
 	userHandler            *user.Handler
 	authHandler            *auth.Handler
 	oauthHandler           *oauth.Handler
+	gitHandler             *git.Handler
+	projectHandler         *project.Handler
 	notifierService        *notifier.NotifierService
-	notificationHandler    *NotificationHandler
+	notificationHandler    *notification.Handler
 	updaterService         *updater.UpdaterService
 }
 
@@ -59,12 +65,14 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 	_ = backupMgr.Start()
 
 	tokenService := services.NewTokenService()
-	notifierService := notifier.NewNotifierService(s)
 
 	// Domain repositories
 	settingsRepo := settings.NewSQLiteRepository(s.DB())
 	userRepo := user.NewSQLiteRepository(s.DB())
 	oauthRepo := oauth.NewSQLiteRepository(s.DB())
+	notifRepo := notification.NewSQLiteRepository(s.DB())
+
+	notifierService := notifier.NewNotifierService(notifRepo)
 
 	// Domain services
 	settingsService := settings.NewService(settingsRepo)
@@ -89,6 +97,17 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 		return "", ""
 	}
 
+	// Git domain
+	gitRepo := git.NewSQLiteRepository(s.DB(), s.Vault())
+	gitService := git.NewService(gitRepo, nil)
+	gitService.WithProjectService(&gitProjectAdapter{store: s})
+	gitHandler := git.NewHandler(gitService, extractUserID)
+
+	// Project domain
+	projectRepo := project.NewSQLiteRepository(s.DB(), s.Vault())
+	projectService := project.NewService(projectRepo, &appServiceRepoAdapter{store: s})
+	projectHandler := project.NewHandler(projectService, proxyManager, extractUserID)
+
 	srv := &Server{
 		router:                 http.NewServeMux(),
 		store:                  s,
@@ -102,7 +121,6 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 		cronManager:            cronMgr,
 		cronService:            services.NewCronService(s, cronMgr),
 		serviceLinker:          services.NewServiceLinker(s),
-		gitService:             services.NewGitService(s),
 		deploymentHandler:      NewDeploymentHandler(s),
 		serviceVarHandler:      NewServiceVarHandler(s),
 		projectSettingsHandler: NewProjectSettingsHandler(s),
@@ -115,9 +133,14 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 		userHandler:            user.NewHandler(userService, extractUserID),
 		authHandler:            auth.NewHandler(authService, extractUserID),
 		oauthHandler:           oauth.NewHandler(oauthService, extractClaims),
+		gitHandler:             gitHandler,
+		projectHandler:         projectHandler,
 		notifierService:        notifierService,
-		notificationHandler:    NewNotificationHandler(s, notifierService),
-		updaterService:         updaterService,
+		notificationHandler: func() *notification.Handler {
+			notifService := notification.NewService(notifRepo, notifierService)
+			return notification.NewHandler(notifService)
+		}(),
+		updaterService: updaterService,
 	}
 	if srv.deployer != nil {
 		srv.deployer.EnvProvider = srv.serviceLinker.GetLinkedEnvironmentVariables
@@ -149,4 +172,38 @@ func (s *Server) RequireRole(requiredRole string, next http.HandlerFunc) http.Ha
 // GetUserClaimsFromContext retrieves the authenticated user's claims from request context via middleware.
 func GetUserClaimsFromContext(ctx context.Context) *user.UserClaims {
 	return middleware.GetUserClaimsFromContext(ctx)
+}
+
+// gitProjectAdapter bridges the legacy store app-service query to the git.ProjectService interface.
+type gitProjectAdapter struct {
+	store *store.Store
+}
+
+func (a *gitProjectAdapter) ListAppServicesByProject(projectID string) ([]*git.AppService, error) {
+	apps, err := a.store.ListAppServicesByProject(projectID)
+	if err != nil {
+		return nil, err
+	}
+	var result []*git.AppService
+	for _, app := range apps {
+		result = append(result, &git.AppService{
+			ID:            app.ID,
+			ProjectID:     app.ProjectID,
+			EnvironmentID: app.EnvironmentID,
+			Name:          app.Name,
+			RepositoryURL: app.RepositoryURL,
+			Branch:        app.Branch,
+			ContainerID:   app.ContainerID,
+		})
+	}
+	return result, nil
+}
+
+// appServiceRepoAdapter bridges the legacy store app-service creation to the project.AppServiceRepository interface.
+type appServiceRepoAdapter struct {
+	store *store.Store
+}
+
+func (a *appServiceRepoAdapter) CreateAppService(_ context.Context, app *types.AppServiceConfig) error {
+	return a.store.CreateAppService(app)
 }

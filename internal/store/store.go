@@ -41,6 +41,11 @@ func (s *Store) DB() *sql.DB {
 	return s.db
 }
 
+// Vault exposes the store's encryption vault for domain-specific repository adapters.
+func (s *Store) Vault() *Vault {
+	return s.vault
+}
+
 func (s *Store) migrate() error {
 	queries := []string{
 		`CREATE TABLE IF NOT EXISTS projects (

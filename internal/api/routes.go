@@ -15,20 +15,20 @@ func (s *Server) registerRoutes() {
 	s.router.HandleFunc("POST /api/auth/logout", s.authHandler.Logout)
 
 	// --- Projects ---
-	s.router.HandleFunc("GET /api/projects", s.RequireAuth(s.handleListProjects))
-	s.router.HandleFunc("POST /api/projects", s.RequireAuth(s.handleCreateProject))
-	s.router.HandleFunc("GET /api/projects/{id}", s.RequireAuth(s.handleGetProject))
-	s.router.HandleFunc("DELETE /api/projects/{id}", s.RequireAuth(s.handleDeleteProject))
+	s.router.HandleFunc("GET /api/projects", s.RequireAuth(s.projectHandler.ListProjects))
+	s.router.HandleFunc("POST /api/projects", s.RequireAuth(s.projectHandler.CreateProject))
+	s.router.HandleFunc("GET /api/projects/{id}", s.RequireAuth(s.projectHandler.GetProject))
+	s.router.HandleFunc("DELETE /api/projects/{id}", s.RequireAuth(s.projectHandler.DeleteProject))
 	s.router.HandleFunc("POST /api/projects/{id}/deploy", s.RequireAuth(s.handleDeployProject))
 
 	// --- Domains ---
-	s.router.HandleFunc("GET /api/projects/{id}/domains", s.RequireAuth(s.handleListDomains))
-	s.router.HandleFunc("POST /api/projects/{id}/domains", s.RequireAuth(s.handleAddDomain))
-	s.router.HandleFunc("DELETE /api/domains/{id}", s.RequireAuth(s.handleDeleteDomain))
+	s.router.HandleFunc("GET /api/projects/{id}/domains", s.RequireAuth(s.projectHandler.ListDomains))
+	s.router.HandleFunc("POST /api/projects/{id}/domains", s.RequireAuth(s.projectHandler.AddDomain))
+	s.router.HandleFunc("DELETE /api/domains/{id}", s.RequireAuth(s.projectHandler.DeleteDomain))
 
 	// --- Env Vars ---
-	s.router.HandleFunc("GET /api/projects/{id}/env", s.RequireAuth(s.handleGetEnvVars))
-	s.router.HandleFunc("PUT /api/projects/{id}/env", s.RequireAuth(s.handleSetEnvVars))
+	s.router.HandleFunc("GET /api/projects/{id}/env", s.RequireAuth(s.projectHandler.GetEnvVars))
+	s.router.HandleFunc("PUT /api/projects/{id}/env", s.RequireAuth(s.projectHandler.SetEnvVars))
 
 	// --- Databases ---
 	s.router.HandleFunc("GET /api/databases", s.RequireAuth(s.handleListDatabases))
@@ -54,22 +54,22 @@ func (s *Server) registerRoutes() {
 	s.router.HandleFunc("POST /api/jobs/{id}/trigger", s.RequireAuth(s.handleJobDetail))
 
 	// --- Git ---
-	s.router.HandleFunc("POST /api/git/connect", s.RequireAuth(s.handleConnectGitProvider))
-	s.router.HandleFunc("GET /api/git/status", s.RequireAuth(s.handleGetGitProvidersStatus))
-	s.router.HandleFunc("DELETE /api/git/connect/{provider}", s.RequireAuth(s.handleDisconnectGitProvider))
-	s.router.HandleFunc("GET /api/git/repos", s.RequireAuth(s.handleListGitRepositories))
+	s.router.HandleFunc("POST /api/git/connect", s.RequireAuth(s.gitHandler.Connect))
+	s.router.HandleFunc("GET /api/git/status", s.RequireAuth(s.gitHandler.Status))
+	s.router.HandleFunc("DELETE /api/git/connect/{provider}", s.RequireAuth(s.gitHandler.Disconnect))
+	s.router.HandleFunc("GET /api/git/repos", s.RequireAuth(s.gitHandler.ListRepos))
 	s.router.HandleFunc("POST /api/webhooks/git/{projectId}", s.handleGitWebhook)
 	s.router.HandleFunc("POST /api/webhooks/git/services/{serviceId}", s.handleServiceGitWebhook)
 
 	// --- Canvas ---
-	s.router.HandleFunc("GET /api/canvas/projects", s.RequireAuth(s.ListProjectCanvasSummaries))
-	s.router.HandleFunc("GET /api/projects/{id}/summary", s.RequireAuth(s.GetProjectCanvasSummary))
-	s.router.HandleFunc("GET /api/environments/{id}/canvas", s.RequireAuth(s.GetEnvironmentCanvas))
+	s.router.HandleFunc("GET /api/canvas/projects", s.RequireAuth(s.projectHandler.ListProjectCanvasSummaries))
+	s.router.HandleFunc("GET /api/projects/{id}/summary", s.RequireAuth(s.projectHandler.GetProjectCanvasSummary))
+	s.router.HandleFunc("GET /api/environments/{id}/canvas", s.RequireAuth(s.projectHandler.GetEnvironmentCanvas))
 
 	// --- Environments ---
-	s.router.HandleFunc("POST /api/projects/{id}/environments", s.RequireAuth(s.CreateEnvironment))
-	s.router.HandleFunc("GET /api/projects/{id}/environments", s.RequireAuth(s.ListEnvironments))
-	s.router.HandleFunc("DELETE /api/environments/{id}", s.RequireAuth(s.DeleteEnvironment))
+	s.router.HandleFunc("POST /api/projects/{id}/environments", s.RequireAuth(s.projectHandler.CreateEnvironment))
+	s.router.HandleFunc("GET /api/projects/{id}/environments", s.RequireAuth(s.projectHandler.ListEnvironments))
+	s.router.HandleFunc("DELETE /api/environments/{id}", s.RequireAuth(s.projectHandler.DeleteEnvironment))
 
 	// --- App Services ---
 	s.router.HandleFunc("POST /api/environments/{id}/apps", s.RequireAuth(s.CreateAppService))
