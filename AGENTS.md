@@ -44,6 +44,7 @@
   - `internal/repositories/` — ALL database persistence, SQL interfaces, and SQLite implementations (`project.go`, `user.go`, `auth.go`).
   - `internal/services/` — ALL business logic and external integrations (`auth.go`, `git.go`, `deploy.go`).
   - `internal/handlers/` — ALL HTTP controllers and Echo route handlers (`auth.go`, `project.go`, `oauth.go`).
+  - `internal/http/` — HTTP server setup, routes, CORS, and auth middleware wiring.
   - `internal/engine/` — Container engine, Docker deployer, runtime management, cron, and backup workers.
 - **Consumer-Defined Interfaces:** Define narrow interfaces where consumed (`Accept interfaces, return structs`).
 - **Max 350 lines per file:** If a file exceeds 350 lines, split into smaller focused files.
