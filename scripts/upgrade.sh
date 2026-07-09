@@ -21,7 +21,7 @@ if command -v docker &> /dev/null && [ -f "docker-compose.yml" ]; then
   docker compose pull vessel || echo "Local build required or pull deferred..."
   docker compose up -d --force-recreate vessel
 else
-  echo "Running outside Docker. Please replace the binary manually or via get-vessel/install.sh."
+  echo "Running outside Docker. Please replace the binary manually or via bootstrap/install.sh."
 fi
 
 echo "🚀 Vessel upgrade completed successfully! Your user containers experienced zero downtime."

@@ -32,7 +32,7 @@ vessel/
 │   └── types/            # DTOs, API payloads, and internal data structures
 ├── dashboard/            # 💻 Main Panel Dashboard (TanStack Router + React SPA)
 ├── web/                 # 🌐 Public Marketing Landing Page (vessel.dev)
-├── get-vessel/           # 📦 Installation host (`install.sh`, `upgrade.sh`)
+├── bootstrap/           # 📦 One-line install server (`install.sh`, `upgrade.sh`)
 ├── scripts/              # 🛠️ System automation (`upgrade.sh`, `backup.sh`, `restore.sh`)
 ├── Dockerfile            # Multi-stage container build uniting `dashboard/` and `vesseld`
 ├── docker-compose.yml    # Production/dev container stack with Docker socket mounting

@@ -58,7 +58,7 @@
       "!**/*.gen.ts",
       "!**/routeTree.gen.ts",
       "!**/data",
-      "!**/get-vessel",
+      "!**/bootstrap",
       "!**/*.astro"
     ]
   }
