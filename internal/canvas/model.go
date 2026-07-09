@@ -3,8 +3,10 @@ package canvas
 import (
 	"time"
 
+	"vessel.dev/vessel/internal/database"
 	"vessel.dev/vessel/internal/environment"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/service"
+	"vessel.dev/vessel/internal/storage"
 )
 
 // CanvasSummary is an aggregated view of a project including resource counts and service status.
@@ -28,8 +30,8 @@ type CanvasSummary struct {
 
 // EnvironmentCanvas holds the complete set of services running within a single environment.
 type EnvironmentCanvas struct {
-	Environment *environment.Config       `json:"environment"`
-	Apps        []*types.AppServiceConfig `json:"apps"`
-	Databases   []*types.DatabaseConfig   `json:"databases"`
-	Storage     []*types.StorageConfig    `json:"storage"`
+	Environment *environment.Config   `json:"environment"`
+	Apps        []*service.AppService `json:"apps"`
+	Databases   []*database.Database  `json:"databases"`
+	Storage     []*storage.Storage    `json:"storage"`
 }

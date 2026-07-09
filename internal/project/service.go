@@ -5,13 +5,13 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/service"
 	"vessel.dev/vessel/internal/utils"
 )
 
 // AppServiceRepository is the minimal surface project.Service needs from the app-service domain.
 type AppServiceRepository interface {
-	CreateAppService(ctx context.Context, app *types.AppServiceConfig) error
+	CreateAppService(ctx context.Context, app *service.AppService) error
 }
 
 // Service implements the project domain business logic.
@@ -79,7 +79,7 @@ func (s *Service) Create(ctx context.Context, req *CreateProjectRequest) (*Proje
 		branch = "main"
 	}
 
-	app := &types.AppServiceConfig{
+	app := &service.AppService{
 		ProjectID:     p.ID,
 		EnvironmentID: "env-prod",
 		Name:          req.Name,

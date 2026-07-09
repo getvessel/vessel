@@ -18,21 +18,20 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/robfig/cron/v3"
-	"vessel.dev/vessel/internal/store"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/backup"
 	"vessel.dev/vessel/internal/utils"
 )
 
 type BackupManager struct {
 	dockerClient *client.Client
-	store        *store.Store
+	store        BackupManagerStore
 	cronEngine   *cron.Cron
 	entries      map[string]cron.EntryID
 	backupDir    string
 	mu           sync.Mutex
 }
 
-func NewBackupManager(dockerClient *client.Client, s *store.Store, backupDir string) *BackupManager {
+func NewBackupManager(dockerClient *client.Client, s BackupManagerStore, backupDir string) *BackupManager {
 	if backupDir == "" {
 		backupDir = filepath.Join("data", "backups")
 	}
@@ -47,7 +46,6 @@ func NewBackupManager(dockerClient *client.Client, s *store.Store, backupDir str
 	}
 }
 
-// Start launches the automated backup cron scheduler and loads active backup schedules from SQLite.
 func (bm *BackupManager) Start() error {
 	cfgs, err := bm.store.ListAllActiveBackupConfigs()
 	if err != nil {
@@ -68,21 +66,19 @@ func (bm *BackupManager) Start() error {
 	return nil
 }
 
-// Stop halts the automated backup scheduler.
 func (bm *BackupManager) Stop() {
 	if bm.cronEngine != nil {
 		bm.cronEngine.Stop()
 	}
 }
 
-// RegisterBackup adds or updates a scheduled backup in the cron loop.
-func (bm *BackupManager) RegisterBackup(cfg *types.BackupConfig) error {
+func (bm *BackupManager) RegisterBackup(cfg *backup.BackupConfig) error {
 	bm.mu.Lock()
 	defer bm.mu.Unlock()
 	return bm.registerBackupLocked(cfg)
 }
 
-func (bm *BackupManager) registerBackupLocked(cfg *types.BackupConfig) error {
+func (bm *BackupManager) registerBackupLocked(cfg *backup.BackupConfig) error {
 	if entryID, exists := bm.entries[cfg.ID]; exists {
 		bm.cronEngine.Remove(entryID)
 		delete(bm.entries, cfg.ID)
@@ -112,7 +108,6 @@ func (bm *BackupManager) registerBackupLocked(cfg *types.BackupConfig) error {
 	return nil
 }
 
-// UnregisterBackup removes a backup schedule from the cron loop.
 func (bm *BackupManager) UnregisterBackup(backupConfigID string) {
 	bm.mu.Lock()
 	defer bm.mu.Unlock()
@@ -123,14 +118,13 @@ func (bm *BackupManager) UnregisterBackup(backupConfigID string) {
 	}
 }
 
-// TriggerBackup immediately performs a live database dump or volume snapshot, writes archive files, performs retention cleanup, and uploads to S3 if configured.
-func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID string) (*types.BackupRecord, error) {
+func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID string) (*backup.BackupRecord, error) {
 	cfg, err := bm.store.GetBackupConfig(backupConfigID)
 	if err != nil || cfg == nil {
 		return nil, fmt.Errorf("backup config %s not found: %w", backupConfigID, err)
 	}
 
-	rec := &types.BackupRecord{
+	rec := &backup.BackupRecord{
 		BackupConfigID: cfg.ID,
 		ProjectID:      cfg.ProjectID,
 		DatabaseID:     cfg.DatabaseID,
@@ -221,7 +215,6 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 		dumpBytes = stdoutBuf.Bytes()
 		execLogs = stderrBuf.String()
 	} else {
-		// Simulation for standalone/unit testing when Docker engine is nil
 		dumpBytes = []byte(fmt.Sprintf("-- Simulated backup dump for %s at %s --\n", cfg.Name, time.Now().UTC().Format(time.RFC3339)))
 		execLogs = "Docker client nil: simulated successful local dump.\n"
 	}
@@ -251,7 +244,6 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 		}
 	}
 
-	// Retention policy enforcement: clean up older backup files exceeding RetentionDays
 	bm.enforceRetentionPolicy(cfg)
 
 	nowStr := time.Now().UTC().Format(time.RFC3339)
@@ -267,8 +259,7 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 	return rec, nil
 }
 
-func (bm *BackupManager) uploadToS3(ctx context.Context, dest *types.S3Destination, fileName string, data []byte) (string, error) {
-	// If endpoint points to an HTTP server (or S3 REST API endpoint), upload
+func (bm *BackupManager) uploadToS3(ctx context.Context, dest *backup.S3Destination, fileName string, data []byte) (string, error) {
 	url := fmt.Sprintf("https://%s/%s/%s", dest.Endpoint, dest.Bucket, fileName)
 	if strings.HasPrefix(dest.Endpoint, "http://") || strings.HasPrefix(dest.Endpoint, "https://") {
 		url = fmt.Sprintf("%s/%s/%s", strings.TrimRight(dest.Endpoint, "/"), dest.Bucket, fileName)
@@ -284,18 +275,16 @@ func (bm *BackupManager) uploadToS3(ctx context.Context, dest *types.S3Destinati
 	req.Header.Set("Content-Type", "application/octet-stream")
 	req.Header.Set("X-Vessel-S3-Access-Key", dest.AccessKeyID)
 
-	// Attempt brief HTTP transfer if reachable, or simulate URL return if host unreachable
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		// If real network target is offline during unit test or offline dev, return simulated bucket URI
 		return fmt.Sprintf("s3://%s/%s", dest.Bucket, fileName), nil
 	}
 	defer resp.Body.Close()
 	return fmt.Sprintf("s3://%s/%s", dest.Bucket, fileName), nil
 }
 
-func (bm *BackupManager) enforceRetentionPolicy(cfg *types.BackupConfig) {
+func (bm *BackupManager) enforceRetentionPolicy(cfg *backup.BackupConfig) {
 	if cfg.RetentionDays <= 0 {
 		return
 	}

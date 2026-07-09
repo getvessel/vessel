@@ -4,14 +4,16 @@ import (
 	"strings"
 	"testing"
 
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/domain"
+	"vessel.dev/vessel/internal/project"
+	"vessel.dev/vessel/internal/service"
 )
 
 func TestCaddyfileGenerator(t *testing.T) {
 	config := NewCaddyConfig("testdata", "ops@vessel.local")
 	gen := NewCaddyfileGenerator(config)
 
-	projects := []types.ProjectConfig{
+	projects := []project.ProjectConfig{
 		{
 			ID:   "test-id-123",
 			Name: "Frontend App",
@@ -22,7 +24,7 @@ func TestCaddyfileGenerator(t *testing.T) {
 		},
 	}
 
-	services := []*types.AppServiceConfig{
+	services := []*service.AppService{
 		{
 			ID:           "test-id-123",
 			ProjectID:    "test-id-123",
@@ -38,7 +40,7 @@ func TestCaddyfileGenerator(t *testing.T) {
 		},
 	}
 
-	domains := []types.DomainConfig{
+	domains := []domain.Config{
 		{
 			ID:         "dom-1",
 			ProjectID:  "test-id-123",

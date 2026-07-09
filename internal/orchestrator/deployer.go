@@ -6,19 +6,19 @@ import (
 	"io"
 
 	"github.com/docker/docker/client"
-	"vessel.dev/vessel/internal/store"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/project"
+	"vessel.dev/vessel/internal/service"
 	"vessel.dev/vessel/internal/utils"
 )
 
 type Deployer struct {
 	builder          Builder
 	containerManager *ContainerManager
-	store            *store.Store
+	store            DeployerStore
 	EnvProvider      func(projectID string) (map[string]string, error)
 }
 
-func NewDeployer(dockerClient *client.Client, s *store.Store) *Deployer {
+func NewDeployer(dockerClient *client.Client, s DeployerStore) *Deployer {
 	return &Deployer{
 		builder:          NewBuilder(dockerClient),
 		containerManager: NewContainerManager(dockerClient, s),
@@ -26,26 +26,22 @@ func NewDeployer(dockerClient *client.Client, s *store.Store) *Deployer {
 	}
 }
 
-// Deploy executes the complete deployment sequence for a given project configuration or its primary application service.
-func (d *Deployer) Deploy(ctx context.Context, project *types.ProjectConfig, sourceDir string, logWriter io.Writer) (string, error) {
+func (d *Deployer) Deploy(ctx context.Context, project *project.ProjectConfig, sourceDir string, logWriter io.Writer) (string, error) {
 	apps, err := d.store.ListAppServicesByProject(project.ID)
 	if err == nil && len(apps) > 0 {
 		return d.DeployAppService(ctx, apps[0], sourceDir, logWriter)
 	}
 
-	syntheticApp := &types.AppServiceConfig{
-		ID:            project.ID,
-		ProjectID:     project.ID,
-		Name:          project.Name,
-		InternalPort:  3000,
-		MemoryLimitMB: 512,
-		CPURequest:    0.5,
+	syntheticApp := &service.AppService{
+		ID:           project.ID,
+		ProjectID:    project.ID,
+		Name:         project.Name,
+		InternalPort: 3000,
 	}
 	return d.DeployAppService(ctx, syntheticApp, sourceDir, logWriter)
 }
 
-// DeployAppService executes the complete zero-downtime deployment sequence for a specific application service container.
-func (d *Deployer) DeployAppService(ctx context.Context, app *types.AppServiceConfig, sourceDir string, logWriter io.Writer) (string, error) {
+func (d *Deployer) DeployAppService(ctx context.Context, app *service.AppService, sourceDir string, logWriter io.Writer) (string, error) {
 	if logWriter != nil {
 		fmt.Fprintf(logWriter, "🚀 [Deployer] Starting deployment for service: %s (ID: %s)\n", app.Name, app.ID)
 	}
@@ -54,7 +50,6 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *types.AppServiceCo
 		ProjectID:      app.ProjectID,
 		ServiceID:      app.ID,
 		SourceDir:      sourceDir,
-		DockerfilePath: app.DockerfilePath,
 		LogWriter:      logWriter,
 		AppConfig:      app,
 	}
@@ -75,7 +70,6 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *types.AppServiceCo
 		envVarsMap = make(map[string]string)
 	}
 
-	// Merge service-specific variables over shared project variables
 	serviceVars, _ := d.store.ListServiceVariables(app.ID)
 	for _, sv := range serviceVars {
 		envVarsMap[sv.Key] = sv.Value
@@ -108,14 +102,8 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *types.AppServiceCo
 	if port <= 0 {
 		port = 3000
 	}
-	memMB := app.MemoryLimitMB
-	if memMB <= 0 {
-		memMB = 512
-	}
-	cpuReq := app.CPURequest
-	if cpuReq <= 0 {
-		cpuReq = 0.5
-	}
+	memMB := 512
+	cpuReq := 0.5
 
 	containerID, err := d.containerManager.CreateAndStart(
 		ctx,

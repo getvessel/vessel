@@ -13,25 +13,23 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
-	"vessel.dev/vessel/internal/store"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/storage"
 	"vessel.dev/vessel/internal/utils"
 )
 
 type StorageDeployer struct {
 	dockerClient *client.Client
-	store        *store.Store
+	store        StorageDeployerStore
 }
 
-func NewStorageDeployer(dockerClient *client.Client, s *store.Store) *StorageDeployer {
+func NewStorageDeployer(dockerClient *client.Client, s StorageDeployerStore) *StorageDeployer {
 	return &StorageDeployer{
 		dockerClient: dockerClient,
 		store:        s,
 	}
 }
 
-// SpinUp provisions a persistent volume, pulls MinIO, and launches the object storage container on vessel-net.
-func (d *StorageDeployer) SpinUp(ctx context.Context, sc *types.StorageConfig) (string, error) {
+func (d *StorageDeployer) SpinUp(ctx context.Context, sc *storage.Storage) (string, error) {
 	if d.dockerClient == nil {
 		return "", fmt.Errorf("docker daemon connection is not available")
 	}
@@ -122,7 +120,6 @@ func (d *StorageDeployer) SpinUp(ctx context.Context, sc *types.StorageConfig) (
 	return created.ID, nil
 }
 
-// Stop halts and removes the container associated with a managed storage service while preserving volume data.
 func (d *StorageDeployer) Stop(ctx context.Context, storageID string) error {
 	if d.dockerClient == nil {
 		return fmt.Errorf("docker daemon connection is not available")

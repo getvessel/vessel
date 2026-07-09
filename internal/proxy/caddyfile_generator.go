@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/domain"
+	"vessel.dev/vessel/internal/project"
+	"vessel.dev/vessel/internal/service"
 	"vessel.dev/vessel/internal/utils"
 )
 
@@ -18,7 +20,7 @@ func NewCaddyfileGenerator(config *CaddyConfig) *CaddyfileGenerator {
 }
 
 // Generate formats a Caddyfile string containing global TLS configurations, project/service routes, and custom domain proxies.
-func (g *CaddyfileGenerator) Generate(projects []types.ProjectConfig, services []*types.AppServiceConfig, domains []types.DomainConfig) (string, error) {
+func (g *CaddyfileGenerator) Generate(projects []project.ProjectConfig, services []*service.AppService, domains []domain.Config) (string, error) {
 	var buf bytes.Buffer
 
 	buf.WriteString("{\n")
@@ -29,13 +31,13 @@ func (g *CaddyfileGenerator) Generate(projects []types.ProjectConfig, services [
 	}
 	buf.WriteString("}\n\n")
 
-	projectMap := make(map[string]*types.ProjectConfig)
+	projectMap := make(map[string]*project.ProjectConfig)
 	for i := range projects {
 		projectMap[projects[i].ID] = &projects[i]
 		g.writeProjectBlock(&buf, &projects[i])
 	}
 
-	serviceMap := make(map[string]*types.AppServiceConfig)
+	serviceMap := make(map[string]*service.AppService)
 	for _, s := range services {
 		if s == nil {
 			continue
@@ -60,7 +62,7 @@ func (g *CaddyfileGenerator) Generate(projects []types.ProjectConfig, services [
 	return buf.String(), nil
 }
 
-func (g *CaddyfileGenerator) writeProjectBlock(buf *bytes.Buffer, p *types.ProjectConfig) {
+func (g *CaddyfileGenerator) writeProjectBlock(buf *bytes.Buffer, p *project.ProjectConfig) {
 	if p.Name == "" {
 		return
 	}
@@ -80,7 +82,7 @@ func (g *CaddyfileGenerator) writeProjectBlock(buf *bytes.Buffer, p *types.Proje
 	buf.WriteString("}\n\n")
 }
 
-func (g *CaddyfileGenerator) writeAppServiceBlock(buf *bytes.Buffer, s *types.AppServiceConfig) {
+func (g *CaddyfileGenerator) writeAppServiceBlock(buf *bytes.Buffer, s *service.AppService) {
 	if s.Domain == "" && s.Name == "" {
 		return
 	}
@@ -113,7 +115,7 @@ func (g *CaddyfileGenerator) writeAppServiceBlock(buf *bytes.Buffer, s *types.Ap
 	buf.WriteString("}\n\n")
 }
 
-func (g *CaddyfileGenerator) writeCustomDomainServiceBlock(buf *bytes.Buffer, d *types.DomainConfig, s *types.AppServiceConfig) {
+func (g *CaddyfileGenerator) writeCustomDomainServiceBlock(buf *bytes.Buffer, d *domain.Config, s *service.AppService) {
 	if d.DomainName == "" {
 		return
 	}
@@ -144,7 +146,7 @@ func (g *CaddyfileGenerator) writeCustomDomainServiceBlock(buf *bytes.Buffer, d 
 	buf.WriteString("}\n\n")
 }
 
-func (g *CaddyfileGenerator) writeCustomDomainBlock(buf *bytes.Buffer, d *types.DomainConfig, p *types.ProjectConfig) {
+func (g *CaddyfileGenerator) writeCustomDomainBlock(buf *bytes.Buffer, d *domain.Config, p *project.ProjectConfig) {
 	if d.DomainName == "" {
 		return
 	}

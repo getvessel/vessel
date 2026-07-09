@@ -10,13 +10,15 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/deployment"
+	"vessel.dev/vessel/internal/project"
+	"vessel.dev/vessel/internal/service"
 )
 
 type Store interface {
-	GetProject(id string) (*types.ProjectConfig, error)
-	GetAppService(id string) (*types.AppServiceConfig, error)
-	CreateDeployment(dep *types.DeploymentRecord) error
+	GetProject(id string) (*project.ProjectConfig, error)
+	GetAppService(id string) (*service.AppService, error)
+	CreateDeployment(dep *deployment.Deployment) error
 	UpdateDeploymentStatus(id, status, buildLogs, containerID string) error
 }
 
@@ -26,7 +28,7 @@ type GitService interface {
 }
 
 type Deployer interface {
-	Deploy(ctx context.Context, project *types.ProjectConfig, sourceDir string, logWriter io.Writer) (string, error)
+	Deploy(ctx context.Context, config *project.ProjectConfig, sourceDir string, logWriter io.Writer) (string, error)
 }
 
 type ProxyManager interface {
@@ -112,7 +114,7 @@ func (h *WebhookHandler) HandleServiceWebhook(w http.ResponseWriter, r *http.Req
 	})
 
 	ctx := context.Background()
-	dep := &types.DeploymentRecord{
+	dep := &deployment.Deployment{
 		ID:            uuid.NewString(),
 		ServiceID:     appService.ID,
 		EnvironmentID: appService.EnvironmentID,

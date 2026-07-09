@@ -13,25 +13,23 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
-	"vessel.dev/vessel/internal/store"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/database"
 	"vessel.dev/vessel/internal/utils"
 )
 
 type DatabaseDeployer struct {
 	dockerClient *client.Client
-	store        *store.Store
+	store        DatabaseDeployerStore
 }
 
-func NewDatabaseDeployer(dockerClient *client.Client, s *store.Store) *DatabaseDeployer {
+func NewDatabaseDeployer(dockerClient *client.Client, s DatabaseDeployerStore) *DatabaseDeployer {
 	return &DatabaseDeployer{
 		dockerClient: dockerClient,
 		store:        s,
 	}
 }
 
-// SpinUp provisions a persistent Docker volume, pulls the engine image, and launches the database container on vessel-net.
-func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *types.DatabaseConfig) (string, error) {
+func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *database.Database) (string, error) {
 	if d.dockerClient == nil {
 		return "", fmt.Errorf("docker daemon connection is not available")
 	}
@@ -157,7 +155,6 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *types.DatabaseC
 	return created.ID, nil
 }
 
-// Stop halts and removes the container associated with a managed database instance while preserving volume data.
 func (d *DatabaseDeployer) Stop(ctx context.Context, dbID string) error {
 	if d.dockerClient == nil {
 		return fmt.Errorf("docker daemon connection is not available")

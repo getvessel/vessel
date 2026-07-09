@@ -2,8 +2,10 @@ package api
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/docker/docker/client"
 	"vessel.dev/vessel/internal/auth"
@@ -29,19 +31,16 @@ import (
 	"vessel.dev/vessel/internal/services"
 	"vessel.dev/vessel/internal/settings"
 	"vessel.dev/vessel/internal/storage"
-	"vessel.dev/vessel/internal/store"
 	"vessel.dev/vessel/internal/team"
 	"vessel.dev/vessel/internal/terminal"
-	"vessel.dev/vessel/internal/types"
 	"vessel.dev/vessel/internal/updater"
 	"vessel.dev/vessel/internal/user"
+	"vessel.dev/vessel/internal/vault"
 	"vessel.dev/vessel/internal/workspace"
 )
 
-// Server encapsulates HTTP routing, API handler dependencies, and authentication guards for the Vessel control plane.
 type Server struct {
 	router                 *http.ServeMux
-	store                  *store.Store
 	deployer               *orchestrator.Deployer
 	proxyManager           *proxy.ProxyManager
 	dockerClient           *client.Client
@@ -81,34 +80,25 @@ type Server struct {
 	updaterService         *updater.UpdaterService
 }
 
-// NewServer initializes a Server wired to the database store, container orchestrator, reverse proxy, and Docker client.
-func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *proxy.ProxyManager, dockerClient *client.Client) *Server {
-	cronMgr := orchestrator.NewCronManager(dockerClient, s)
-	_ = cronMgr.Start()
+func NewServer(db *sql.DB, vault *vault.Vault, deployer *orchestrator.Deployer, proxyManager *proxy.ProxyManager, dockerClient *client.Client) *Server {
+	sa := &storeAdapter{db: db, vault: vault}
 
-	backupMgr := orchestrator.NewBackupManager(dockerClient, s, "")
-	_ = backupMgr.Start()
-
-	tokenService := services.NewTokenService()
-
-	// Domain repositories
-	settingsRepo := settings.NewSQLiteRepository(s.DB())
-	userRepo := user.NewSQLiteRepository(s.DB())
-	oauthRepo := oauth.NewSQLiteRepository(s.DB())
-	notifRepo := notification.NewSQLiteRepository(s.DB())
+	settingsRepo := settings.NewSQLiteRepository(db)
+	userRepo := user.NewSQLiteRepository(db)
+	oauthRepo := oauth.NewSQLiteRepository(db)
+	notifRepo := notification.NewSQLiteRepository(db)
 
 	notifierService := notifier.NewNotifierService(notifRepo)
 
-	// Domain services
 	settingsService := settings.NewService(settingsRepo)
 	userService := user.NewService(userRepo)
+	tokenService := services.NewTokenService()
 	authService := auth.NewService(userRepo, settingsRepo, tokenService)
 	oauthService := oauth.NewService(oauthRepo, userRepo, tokenService)
 
 	updaterService := updater.NewUpdaterService(settingsRepo)
 	updaterService.Start(context.Background())
 
-	// Claims extractor helpers
 	extractUserID := func(r *http.Request) string {
 		if c := GetUserClaimsFromContext(r.Context()); c != nil {
 			return c.UserID
@@ -128,91 +118,86 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 		return "", "", ""
 	}
 
-	// Git domain
-	gitRepo := git.NewSQLiteRepository(s.DB(), s.Vault())
+	serviceRepo := service.NewSQLiteRepository(db)
+
+	gitRepo := git.NewSQLiteRepository(db, vault)
 	gitService := git.NewService(gitRepo, nil)
-	gitService.WithProjectService(&gitProjectAdapter{store: s})
+	gitService.WithProjectService(&gitProjectAdapter{svcRepo: serviceRepo})
 	gitHandler := git.NewHandler(gitService, extractUserID)
 
-	// Project, environment, domain, and project-env domains
-	envRepo := environment.NewSQLiteRepository(s.DB())
+	envRepo := environment.NewSQLiteRepository(db)
 	envService := environment.NewService(envRepo)
 	envHandler := environment.NewHandler(envService)
 
-	domainRepo := domain.NewSQLiteRepository(s.DB())
+	domainRepo := domain.NewSQLiteRepository(db)
 	domainService := domain.NewService(domainRepo)
 	domainHandler := domain.NewHandler(domainService, proxyManager)
 
-	projectEnvRepo := env.NewSQLiteRepository(s.DB(), s.Vault())
+	projectEnvRepo := env.NewSQLiteRepository(db, vault)
 	projectEnvService := env.NewService(projectEnvRepo)
 	projectEnvHandler := env.NewHandler(projectEnvService)
 
-	projectRepo := project.NewSQLiteRepository(s.DB(), envRepo)
-	projectService := project.NewService(projectRepo, &appServiceRepoAdapter{store: s})
+	projectRepo := project.NewSQLiteRepository(db, envRepo)
+	projectService := project.NewService(projectRepo, &appServiceRepoAdapter{svcRepo: serviceRepo})
 	projectHandler := project.NewHandler(projectService, proxyManager, extractUserID)
 
-	// ── New domain packages ──────────────────────────────────────────
-
-	// Service (app services)
-	serviceRepo := service.NewSQLiteRepository(s.DB())
 	serviceHandler := service.NewHandler(serviceRepo)
 
-	// Database
-	dbRepo := database.NewSQLiteRepository(s.DB(), s.Vault())
-	dbHandler := database.NewHandler(dbRepo, &dbDeployerAdapter{inner: orchestrator.NewDatabaseDeployer(dockerClient, s)})
+	databaseRepo := database.NewSQLiteRepository(db, vault)
+	storageRepo := storage.NewSQLiteRepository(db, vault)
+	jobRepo := job.NewSQLiteRepository(db)
+	canvasRepo := canvas.NewSQLiteRepository(db, envRepo)
+	deploymentRepo := deployment.NewSQLiteRepository(db)
+	backupRepo := backup.NewSQLiteRepository(db)
+	teamRepo := team.NewSQLiteRepository(db)
+	wsRepo := workspace.NewSQLiteRepository(db)
+	psRepo := project_settings.NewSQLiteRepository(db)
+	svVarRepo := service_var.NewSQLiteRepository(db, &serviceVarSvcAdapter{svcRepo: serviceRepo})
 
-	// Storage
-	storageRepo := storage.NewSQLiteRepository(s.DB(), s.Vault())
-	storageHandler := storage.NewHandler(storageRepo, &storageDeployerAdapter{inner: orchestrator.NewStorageDeployer(dockerClient, s)})
+	sa.settingsRepo = settingsRepo
+	sa.serviceRepo = serviceRepo
+	sa.envRepo = projectEnvRepo
+	sa.databaseRepo = databaseRepo
+	sa.storageRepo = storageRepo
+	sa.projectRepo = projectRepo
+	sa.jobRepo = jobRepo
+	sa.backupRepo = backupRepo
+	sa.deploymentRepo = deploymentRepo
+	sa.userRepo = userRepo
 
-	// Jobs
-	jobRepo := job.NewSQLiteRepository(s.DB())
+	orcCronMgr := orchestrator.NewCronManager(dockerClient, sa)
+	_ = orcCronMgr.Start()
+
+	backupMgr := orchestrator.NewBackupManager(dockerClient, sa, "")
+	_ = backupMgr.Start()
+
+	dbDeployer := orchestrator.NewDatabaseDeployer(dockerClient, sa)
+	storageDeployer := orchestrator.NewStorageDeployer(dockerClient, sa)
+
+	dbHandler := database.NewHandler(databaseRepo, dbDeployer)
+	storageHandler := storage.NewHandler(storageRepo, storageDeployer)
 	jobHandler := job.NewHandler(jobRepo)
-
-	// Canvas
-	canvasRepo := canvas.NewSQLiteRepository(s.DB(), envRepo)
 	canvasHandler := canvas.NewHandler(canvasRepo)
-
-	// Deployment
-	deploymentRepo := deployment.NewSQLiteRepository(s.DB())
-	deploymentHandler := deployment.NewHandler(deploymentRepo, &deploymentSvcAdapter{svcRepo: serviceRepo}, &deploymentProjectStoreAdapter{store: s}, &deploymentProjectDeployerAdapter{gitService: gitService, deployer: deployer, proxyManager: proxyManager})
-
-	// Service Variables
-	svVarRepo := service_var.NewSQLiteRepository(s.DB(), &serviceVarSvcAdapter{svcRepo: serviceRepo})
+	deploymentHandler := deployment.NewHandler(deploymentRepo, &deploymentSvcAdapter{svcRepo: serviceRepo}, &deploymentProjectStoreAdapter{projectRepo: projectRepo}, &deploymentProjectDeployerAdapter{gitService: gitService, deployer: deployer, proxyManager: proxyManager})
 	svVarHandler := service_var.NewHandler(svVarRepo, &serviceVarSvcAdapter{svcRepo: serviceRepo})
-
-	// Terminal
 	terminalHandler := terminal.NewHandler(dockerClient, &tokenValidatorAdapter{inner: tokenService}, &terminalSvcAdapter{svcRepo: serviceRepo})
-
-	// Backup
-	backupRepo := backup.NewSQLiteRepository(s.DB())
-	backupHandler := backup.NewHandler(backupRepo, &backupManagerAdapter{inner: backupMgr})
-
-	// Team
-	teamRepo := team.NewSQLiteRepository(s.DB())
+	backupHandler := backup.NewHandler(backupRepo, backupMgr)
 	teamHandler := team.NewHandler(teamRepo, &teamUserProviderAdapter{userRepo: userRepo}, extractClaims3)
-
-	// Workspace
-	wsRepo := workspace.NewSQLiteRepository(s.DB())
 	workspaceHandler := workspace.NewHandler(wsRepo, extractClaims3)
-
-	// Project Settings
-	psRepo := project_settings.NewSQLiteRepository(s.DB())
 	projectSettingsHandler := project_settings.NewHandler(psRepo, &projectSettingsUserProviderAdapter{userRepo: userRepo}, extractUserID)
 
 	srv := &Server{
 		router:                 http.NewServeMux(),
-		store:                  s,
 		deployer:               deployer,
 		proxyManager:           proxyManager,
 		dockerClient:           dockerClient,
 		tokenService:           tokenService,
-		authGuard:              middleware.NewAuthGuard(tokenService, s),
-		dbDeployer:             orchestrator.NewDatabaseDeployer(dockerClient, s),
-		storageDeployer:        orchestrator.NewStorageDeployer(dockerClient, s),
-		cronManager:            cronMgr,
-		cronService:            services.NewCronService(s, cronMgr),
-		serviceLinker:          services.NewServiceLinker(s),
+		authGuard:              middleware.NewAuthGuard(tokenService, &settingsProviderAdapter{repo: settingsRepo}),
+		dbDeployer:             dbDeployer,
+		storageDeployer:        storageDeployer,
+		cronManager:            orcCronMgr,
+		cronService:            services.NewCronService(sa, sa, orcCronMgr),
+		serviceLinker:          services.NewServiceLinker(sa, sa),
 		serviceHandler:         serviceHandler,
 		dbHandler:              dbHandler,
 		storageHandler:         storageHandler,
@@ -231,7 +216,7 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 		authHandler:            auth.NewHandler(authService, extractUserID),
 		oauthHandler:           oauth.NewHandler(oauthService, extractClaims),
 		gitHandler:             gitHandler,
-		webhookHandler:         git.NewWebhookHandler(s, gitService, deployer, proxyManager),
+		webhookHandler:         git.NewWebhookHandler(sa, gitService, deployer, proxyManager),
 		projectHandler:         projectHandler,
 		environmentHandler:     envHandler,
 		domainHandler:          domainHandler,
@@ -250,40 +235,34 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 	return srv
 }
 
-// ServeHTTP satisfies the http.Handler interface, routing through the registered mux with CORS middleware.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	middleware.CORSMiddleware(s.router).ServeHTTP(w, r)
 }
 
-// Handler returns the root HTTP handler wrapped with global CORS and authentication middleware.
 func (s *Server) Handler() http.Handler {
 	return middleware.CORSMiddleware(s.router)
 }
 
-// RequireAuth validates Bearer tokens or query parameters via middleware before invoking the handler.
 func (s *Server) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return s.authGuard.RequireAuth(next)
 }
 
-// RequireRole enforces that the authenticated user possesses the specified role via middleware.
 func (s *Server) RequireRole(requiredRole string, next http.HandlerFunc) http.HandlerFunc {
 	return s.authGuard.RequireRole(requiredRole, next)
 }
 
-// GetUserClaimsFromContext retrieves the authenticated user's claims from request context via middleware.
 func GetUserClaimsFromContext(ctx context.Context) *user.UserClaims {
 	return middleware.GetUserClaimsFromContext(ctx)
 }
 
 // ── Legacy adapters ────────────────────────────────────────────────────
 
-// gitProjectAdapter bridges the legacy store app-service query to the git.ProjectService interface.
 type gitProjectAdapter struct {
-	store *store.Store
+	svcRepo *service.SQLiteRepository
 }
 
 func (a *gitProjectAdapter) ListAppServicesByProject(projectID string) ([]*git.AppService, error) {
-	apps, err := a.store.ListAppServicesByProject(projectID)
+	apps, err := a.svcRepo.ListByProject(context.Background(), projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -302,98 +281,65 @@ func (a *gitProjectAdapter) ListAppServicesByProject(projectID string) ([]*git.A
 	return result, nil
 }
 
-// appServiceRepoAdapter bridges the legacy store app-service creation to the project.AppServiceRepository interface.
 type appServiceRepoAdapter struct {
-	store *store.Store
+	svcRepo *service.SQLiteRepository
 }
 
-func (a *appServiceRepoAdapter) CreateAppService(_ context.Context, app *types.AppServiceConfig) error {
-	return a.store.CreateAppService(app)
+func (a *appServiceRepoAdapter) CreateAppService(ctx context.Context, app *service.AppService) error {
+	return a.svcRepo.Create(ctx, app)
 }
 
-// dbDeployerAdapter bridges the orchestrator.DatabaseDeployer to the database.Deployer interface.
-type dbDeployerAdapter struct {
-	inner *orchestrator.DatabaseDeployer
+type deploymentProjectStoreAdapter struct {
+	projectRepo *project.SQLiteRepository
 }
 
-func (a *dbDeployerAdapter) SpinUp(ctx context.Context, db *database.Database) (string, error) {
-	cfg := &types.DatabaseConfig{
-		ID: db.ID, ProjectID: db.ProjectID, EnvironmentID: db.EnvironmentID,
-		Name: db.Name, Engine: db.Engine, Version: db.Version,
-		Port: db.Port, Username: db.Username, Password: db.Password,
-		DatabaseName: db.DatabaseName, VolumePath: db.VolumePath,
-		ContainerID: db.ContainerID, Status: db.Status,
-		InternalDNS: db.InternalDNS, ExternalDNS: db.ExternalDNS,
-		CreatedAt: db.CreatedAt, UpdatedAt: db.UpdatedAt,
-	}
-	return a.inner.SpinUp(ctx, cfg)
-}
-
-func (a *dbDeployerAdapter) Stop(ctx context.Context, id string) error {
-	return a.inner.Stop(ctx, id)
-}
-
-// storageDeployerAdapter bridges the orchestrator.StorageDeployer to the storage.Deployer interface.
-type storageDeployerAdapter struct {
-	inner *orchestrator.StorageDeployer
-}
-
-func (a *storageDeployerAdapter) SpinUp(ctx context.Context, s *storage.Storage) (string, error) {
-	cfg := &types.StorageConfig{
-		ID: s.ID, ProjectID: s.ProjectID, EnvironmentID: s.EnvironmentID,
-		Name: s.Name, Type: s.Type, APIPort: s.APIPort, ConsolePort: s.ConsolePort,
-		AccessKey: s.AccessKey, SecretKey: s.SecretKey, BucketName: s.BucketName,
-		VolumePath: s.VolumePath, ContainerID: s.ContainerID, Status: s.Status,
-		InternalDNS: s.InternalDNS, ExternalDNS: s.ExternalDNS,
-		CreatedAt: s.CreatedAt, UpdatedAt: s.UpdatedAt,
-	}
-	return a.inner.SpinUp(ctx, cfg)
-}
-
-func (a *storageDeployerAdapter) Stop(ctx context.Context, id string) error {
-	return a.inner.Stop(ctx, id)
-}
-
-// backupManagerAdapter bridges the orchestrator.BackupManager to the backup.BackupManager interface.
-type backupManagerAdapter struct {
-	inner *orchestrator.BackupManager
-}
-
-func (a *backupManagerAdapter) RegisterBackup(cfg *backup.BackupConfig) error {
-	return a.inner.RegisterBackup(toTypesBackupConfig(cfg))
-}
-
-func (a *backupManagerAdapter) UnregisterBackup(backupConfigID string) {
-	a.inner.UnregisterBackup(backupConfigID)
-}
-
-func (a *backupManagerAdapter) TriggerBackup(ctx context.Context, backupConfigID string) (*backup.BackupRecord, error) {
-	rec, err := a.inner.TriggerBackup(ctx, backupConfigID)
+func (a *deploymentProjectStoreAdapter) GetByID(ctx context.Context, id string) (*deployment.ProjectConfig, error) {
+	p, err := a.projectRepo.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	return fromTypesBackupRecord(rec), nil
-}
-
-func toTypesBackupConfig(cfg *backup.BackupConfig) *types.BackupConfig {
-	return &types.BackupConfig{
-		ID: cfg.ID, ProjectID: cfg.ProjectID, DatabaseID: cfg.DatabaseID,
-		StorageID: cfg.StorageID, S3DestinationID: cfg.S3DestinationID,
-		Name: cfg.Name, Schedule: cfg.Schedule, RetentionDays: cfg.RetentionDays,
-		Status: cfg.Status, CreatedAt: cfg.CreatedAt, UpdatedAt: cfg.UpdatedAt,
+	if p == nil {
+		return nil, nil
 	}
+	return &deployment.ProjectConfig{ID: p.ID, Name: p.Name, Description: p.Description, TeamID: p.TeamID}, nil
 }
 
-func fromTypesBackupRecord(rec *types.BackupRecord) *backup.BackupRecord {
-	return &backup.BackupRecord{
-		ID: rec.ID, BackupConfigID: rec.BackupConfigID, ProjectID: rec.ProjectID,
-		DatabaseID: rec.DatabaseID, Status: rec.Status, FilePath: rec.FilePath,
-		FileSizeBytes: rec.FileSizeBytes, S3URL: rec.S3URL, Logs: rec.Logs,
-		StartedAt: rec.StartedAt, CompletedAt: rec.CompletedAt,
+type deploymentProjectDeployerAdapter struct {
+	gitService   *git.Service
+	deployer     *orchestrator.Deployer
+	proxyManager *proxy.ProxyManager
+}
+
+func (a *deploymentProjectDeployerAdapter) CloneOrPullRepository(ctx context.Context, projectID, sourceDir string) error {
+	if a.gitService == nil {
+		return nil
 	}
+	return a.gitService.CloneOrPullRepository(ctx, projectID, sourceDir, nil)
 }
 
-// serviceVarSvcAdapter bridges the service repository to the service_var.ServiceRepository interface.
+func (a *deploymentProjectDeployerAdapter) DeployProject(ctx context.Context, cfg *deployment.ProjectConfig, sourceDir string) (string, error) {
+	if a.deployer == nil {
+		return "", fmt.Errorf("deployer not available")
+	}
+	p := &project.ProjectConfig{ID: cfg.ID, Name: cfg.Name, Description: cfg.Description, TeamID: cfg.TeamID}
+	return a.deployer.Deploy(ctx, p, sourceDir, nil)
+}
+
+func (a *deploymentProjectDeployerAdapter) ReloadProxy(ctx context.Context) error {
+	if a.proxyManager == nil {
+		return nil
+	}
+	return a.proxyManager.Reload(ctx)
+}
+
+type deploymentSvcAdapter struct {
+	svcRepo *service.SQLiteRepository
+}
+
+func (a *deploymentSvcAdapter) GetByID(ctx context.Context, id string) (any, error) {
+	return a.svcRepo.GetByID(ctx, id)
+}
+
 type serviceVarSvcAdapter struct {
 	svcRepo *service.SQLiteRepository
 }
@@ -413,7 +359,6 @@ func (a *serviceVarSvcAdapter) GetByID(ctx context.Context, id string) (*service
 	}, nil
 }
 
-// terminalSvcAdapter bridges the service repository to the terminal.ServiceRepository interface.
 type terminalSvcAdapter struct {
 	svcRepo *service.SQLiteRepository
 }
@@ -429,61 +374,6 @@ func (a *terminalSvcAdapter) GetByID(ctx context.Context, id string) (*terminal.
 	return &terminal.AppService{ID: app.ID, ContainerID: app.ContainerID}, nil
 }
 
-// deploymentProjectStoreAdapter bridges the store to the deployment.ProjectStore interface.
-type deploymentProjectStoreAdapter struct {
-	store *store.Store
-}
-
-func (a *deploymentProjectStoreAdapter) GetByID(ctx context.Context, id string) (*deployment.ProjectConfig, error) {
-	p, err := a.store.GetProject(id)
-	if err != nil {
-		return nil, err
-	}
-	if p == nil {
-		return nil, nil
-	}
-	return &deployment.ProjectConfig{ID: p.ID, Name: p.Name, Description: p.Description, TeamID: p.TeamID}, nil
-}
-
-// deploymentProjectDeployerAdapter bridges gitService, deployer, and proxyManager into a single ProjectDeployer.
-type deploymentProjectDeployerAdapter struct {
-	gitService   *git.Service
-	deployer     *orchestrator.Deployer
-	proxyManager *proxy.ProxyManager
-}
-
-func (a *deploymentProjectDeployerAdapter) CloneOrPullRepository(ctx context.Context, projectID, sourceDir string) error {
-	if a.gitService == nil {
-		return nil
-	}
-	return a.gitService.CloneOrPullRepository(ctx, projectID, sourceDir, nil)
-}
-
-func (a *deploymentProjectDeployerAdapter) DeployProject(ctx context.Context, project *deployment.ProjectConfig, sourceDir string) (string, error) {
-	if a.deployer == nil {
-		return "", fmt.Errorf("deployer not available")
-	}
-	p := &types.ProjectConfig{ID: project.ID, Name: project.Name, Description: project.Description, TeamID: project.TeamID}
-	return a.deployer.Deploy(ctx, p, sourceDir, nil)
-}
-
-func (a *deploymentProjectDeployerAdapter) ReloadProxy(ctx context.Context) error {
-	if a.proxyManager == nil {
-		return nil
-	}
-	return a.proxyManager.Reload(ctx)
-}
-
-// deploymentSvcAdapter bridges the service repository to the deployment.ServiceRepository interface.
-type deploymentSvcAdapter struct {
-	svcRepo *service.SQLiteRepository
-}
-
-func (a *deploymentSvcAdapter) GetByID(ctx context.Context, id string) (any, error) {
-	return a.svcRepo.GetByID(ctx, id)
-}
-
-// teamUserProviderAdapter bridges the user repository to the team.UserProvider interface.
 type teamUserProviderAdapter struct {
 	userRepo *user.SQLiteRepository
 }
@@ -492,7 +382,6 @@ func (a *teamUserProviderAdapter) GetUserByEmail(email string) (*user.User, erro
 	return a.userRepo.GetUserByEmail(context.Background(), email)
 }
 
-// projectSettingsUserProviderAdapter bridges the user repository to the project_settings.UserProvider interface.
 type projectSettingsUserProviderAdapter struct {
 	userRepo *user.SQLiteRepository
 }
@@ -508,7 +397,6 @@ func (a *projectSettingsUserProviderAdapter) GetUserByEmail(ctx context.Context,
 	return &project_settings.User{ID: u.ID, Email: u.Email}, nil
 }
 
-// tokenValidatorAdapter bridges the services.TokenService to the terminal.TokenValidator interface.
 type tokenValidatorAdapter struct {
 	inner *services.TokenService
 }
@@ -521,4 +409,191 @@ func (a *tokenValidatorAdapter) ValidateToken(tokenStr string) (*terminal.TokenC
 	sub, _ := claims["sub"].(string)
 	email, _ := claims["email"].(string)
 	return &terminal.TokenClaim{UserID: sub, Email: email}, nil
+}
+
+type settingsProviderAdapter struct {
+	repo *settings.SQLiteRepository
+}
+
+func (a *settingsProviderAdapter) GetServerSettings() (*settings.ServerSettings, error) {
+	return a.repo.GetServerSettings(context.Background())
+}
+
+// storeAdapter implements all legacy store interfaces consumed by orchestrator, services, and git.
+type storeAdapter struct {
+	db             *sql.DB
+	vault          *vault.Vault
+	settingsRepo   *settings.SQLiteRepository
+	serviceRepo    *service.SQLiteRepository
+	envRepo        *env.SQLiteRepository
+	databaseRepo   *database.SQLiteRepository
+	storageRepo    *storage.SQLiteRepository
+	projectRepo    *project.SQLiteRepository
+	jobRepo        *job.SQLiteRepository
+	backupRepo     *backup.SQLiteRepository
+	deploymentRepo *deployment.SQLiteRepository
+	userRepo       *user.SQLiteRepository
+}
+
+// ── ContainerManagerStore ─────────────────────────────────────────────
+
+func (a *storeAdapter) GetServerSettings() (*settings.ServerSettings, error) {
+	return a.settingsRepo.GetServerSettings(context.Background())
+}
+
+// ── DeployerStore ────────────────────────────────────────────────────
+
+func (a *storeAdapter) ListAppServicesByProject(projectID string) ([]*service.AppService, error) {
+	return a.serviceRepo.ListByProject(context.Background(), projectID)
+}
+
+func (a *storeAdapter) GetEnvVars(projectID string) (map[string]string, error) {
+	return a.envRepo.GetVars(context.Background(), projectID)
+}
+
+func (a *storeAdapter) ListServiceVariables(serviceID string) ([]*service_var.Variable, error) {
+	svVarRepo := service_var.NewSQLiteRepository(a.db, &serviceVarSvcAdapter{svcRepo: a.serviceRepo})
+	return svVarRepo.ListByService(context.Background(), serviceID)
+}
+
+// ── DatabaseDeployerStore ────────────────────────────────────────────
+
+func (a *storeAdapter) UpdateDatabaseStatus(id string, status string, containerID string) error {
+	_, err := a.db.Exec(`UPDATE databases SET status = ?, container_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, status, containerID, id)
+	return err
+}
+
+func (a *storeAdapter) GetDatabase(id string) (*database.Database, error) {
+	return a.databaseRepo.GetByID(context.Background(), id)
+}
+
+// ── StorageDeployerStore ─────────────────────────────────────────────
+
+func (a *storeAdapter) UpdateStorageStatus(id string, status string, containerID string) error {
+	_, err := a.db.Exec(`UPDATE storage SET status = ?, container_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, status, containerID, id)
+	return err
+}
+
+func (a *storeAdapter) GetStorage(id string) (*storage.Storage, error) {
+	return a.storageRepo.GetByID(context.Background(), id)
+}
+
+// ── CronManagerStore ─────────────────────────────────────────────────
+
+func (a *storeAdapter) ListJobs() ([]job.Job, error) {
+	return a.jobRepo.ListByProject(context.Background(), "")
+}
+
+func (a *storeAdapter) GetJob(id string) (*job.Job, error) {
+	return a.jobRepo.GetByID(context.Background(), id)
+}
+
+func (a *storeAdapter) GetProject(id string) (*project.ProjectConfig, error) {
+	return a.projectRepo.Get(context.Background(), id)
+}
+
+func (a *storeAdapter) UpdateJobStatusAndOutput(id string, status string, lastRunAt *time.Time, output string) error {
+	return a.jobRepo.UpdateStatus(context.Background(), id, status, lastRunAt, output)
+}
+
+// ── BackupManagerStore ───────────────────────────────────────────────
+
+func (a *storeAdapter) ListAllActiveBackupConfigs() ([]*backup.BackupConfig, error) {
+	return a.backupRepo.ListAllActiveConfigs(context.Background())
+}
+
+func (a *storeAdapter) GetBackupConfig(id string) (*backup.BackupConfig, error) {
+	return a.backupRepo.GetConfigByID(context.Background(), id)
+}
+
+func (a *storeAdapter) CreateBackupRecord(rec *backup.BackupRecord) error {
+	return a.backupRepo.CreateRecord(context.Background(), rec)
+}
+
+func (a *storeAdapter) UpdateBackupRecord(id, status, filePath, s3URL, logs string, fileSizeBytes int64, completedAt string) error {
+	_, err := a.db.Exec(`UPDATE backup_records SET status = ?, file_path = ?, s3_url = ?, logs = ?, file_size_bytes = ?, completed_at = ? WHERE id = ?`,
+		status, filePath, s3URL, logs, fileSizeBytes, completedAt, id)
+	return err
+}
+
+func (a *storeAdapter) GetS3Destination(id string) (*backup.S3Destination, error) {
+	return a.backupRepo.GetS3Destination(context.Background(), id)
+}
+
+func (a *storeAdapter) ListBackupRecords(backupConfigID string) ([]*backup.BackupRecord, error) {
+	return a.backupRepo.ListRecordsByConfig(context.Background(), backupConfigID)
+}
+
+// ── services.JobStore ────────────────────────────────────────────────
+
+func (a *storeAdapter) CreateJob(j *job.Job) error {
+	return a.jobRepo.Create(context.Background(), j)
+}
+
+func (a *storeAdapter) ListJobsByProject(projectID string) ([]job.Job, error) {
+	return a.jobRepo.ListByProject(context.Background(), projectID)
+}
+
+func (a *storeAdapter) DeleteJob(id string) error {
+	return a.jobRepo.Delete(context.Background(), id)
+}
+
+// ── services.ProjectStore ────────────────────────────────────────────
+
+// GetProject is already defined above for CronManagerStore.
+
+// ── services.DatabaseLister ──────────────────────────────────────────
+
+func (a *storeAdapter) ListDatabasesByProject(projectID string) ([]database.Database, error) {
+	rows, err := a.db.Query(`SELECT id, COALESCE(project_id, ''), COALESCE(environment_id, ''), name, engine, version, port, username, encrypted_password, database_name, volume_path, COALESCE(container_id, ''), status, COALESCE(internal_dns, ''), COALESCE(external_dns, ''), created_at, updated_at FROM databases WHERE project_id = ?`, projectID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []database.Database
+	for rows.Next() {
+		var d database.Database
+		var encryptedPassword string
+		if err := rows.Scan(&d.ID, &d.ProjectID, &d.EnvironmentID, &d.Name, &d.Engine, &d.Version, &d.Port, &d.Username, &encryptedPassword, &d.DatabaseName, &d.VolumePath, &d.ContainerID, &d.Status, &d.InternalDNS, &d.ExternalDNS, &d.CreatedAt, &d.UpdatedAt); err != nil {
+			return nil, err
+		}
+		list = append(list, d)
+	}
+	return list, rows.Err()
+}
+
+// ── services.StorageLister ───────────────────────────────────────────
+
+func (a *storeAdapter) ListStorageByProject(projectID string) ([]storage.Storage, error) {
+	rows, err := a.db.Query(`SELECT id, COALESCE(project_id, ''), COALESCE(environment_id, ''), name, type, api_port, console_port, access_key, encrypted_secret_key, bucket_name, COALESCE(volume_path, ''), COALESCE(container_id, ''), COALESCE(status, 'stopped'), COALESCE(internal_dns, ''), COALESCE(external_dns, ''), created_at, updated_at FROM storage WHERE project_id = ?`, projectID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []storage.Storage
+	for rows.Next() {
+		var s storage.Storage
+		var encryptedSecretKey string
+		if err := rows.Scan(&s.ID, &s.ProjectID, &s.EnvironmentID, &s.Name, &s.Type, &s.APIPort, &s.ConsolePort, &s.AccessKey, &encryptedSecretKey, &s.BucketName, &s.VolumePath, &s.ContainerID, &s.Status, &s.InternalDNS, &s.ExternalDNS, &s.CreatedAt, &s.UpdatedAt); err != nil {
+			return nil, err
+		}
+		list = append(list, s)
+	}
+	return list, rows.Err()
+}
+
+// ── git.Store ────────────────────────────────────────────────────────
+
+func (a *storeAdapter) GetAppService(id string) (*service.AppService, error) {
+	return a.serviceRepo.GetByID(context.Background(), id)
+}
+
+func (a *storeAdapter) CreateDeployment(dep *deployment.Deployment) error {
+	return a.deploymentRepo.Create(context.Background(), dep)
+}
+
+func (a *storeAdapter) UpdateDeploymentStatus(id, status, buildLogs, containerID string) error {
+	return a.deploymentRepo.UpdateStatus(context.Background(), id, status, buildLogs, containerID)
 }

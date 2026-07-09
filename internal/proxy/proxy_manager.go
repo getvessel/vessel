@@ -9,35 +9,53 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"vessel.dev/vessel/internal/store"
+	"vessel.dev/vessel/internal/domain"
+	"vessel.dev/vessel/internal/project"
+	"vessel.dev/vessel/internal/service"
 )
+
+type ProjectLister interface {
+	ListProjects() ([]project.ProjectConfig, error)
+}
+
+type AppServiceLister interface {
+	ListAllAppServices() ([]*service.AppService, error)
+}
+
+type DomainLister interface {
+	ListAllDomains() ([]domain.Config, error)
+}
 
 type ProxyManager struct {
 	config    *CaddyConfig
 	generator *CaddyfileGenerator
-	store     *store.Store
+	projects  ProjectLister
+	services  AppServiceLister
+	domains   DomainLister
 	docker    *client.Client
 }
 
-func NewProxyManager(config *CaddyConfig, s *store.Store, docker *client.Client) *ProxyManager {
+func NewProxyManager(config *CaddyConfig, projects ProjectLister, services AppServiceLister, domains DomainLister, docker *client.Client) *ProxyManager {
 	return &ProxyManager{
 		config:    config,
 		generator: NewCaddyfileGenerator(config),
-		store:     s,
+		projects:  projects,
+		services:  services,
+		domains:   domains,
 		docker:    docker,
 	}
 }
 
 // Reload recomputes the entire reverse proxy configuration table and applies it to the running Caddy instance without downtime.
 func (m *ProxyManager) Reload(ctx context.Context) error {
-	projects, err := m.store.ListProjects()
+	projects, err := m.projects.ListProjects()
 	if err != nil {
 		return fmt.Errorf("failed to load active projects for caddy reload: %w", err)
 	}
 
-	services, _ := m.store.ListAllAppServices()
+	services, _ := m.services.ListAllAppServices()
 
-	domains, err := m.store.ListAllDomains()
+	domains, err := m.domains.ListAllDomains()
 	if err != nil {
 		return fmt.Errorf("failed to load custom domains for caddy reload: %w", err)
 	}

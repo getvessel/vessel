@@ -8,43 +8,37 @@ import (
 	"path/filepath"
 
 	"github.com/docker/docker/client"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/project"
+	"vessel.dev/vessel/internal/service"
 )
 
-// BuildStrategy identifies the container compilation mechanism chosen for the project.
 type BuildStrategy string
 
 const (
-	// StrategyDockerfile indicates building directly from an existing Dockerfile in the repository.
 	StrategyDockerfile BuildStrategy = "dockerfile"
-	// StrategyRailpack indicates zero-configuration build auto-detection using Railpack or Nixpacks.
-	StrategyRailpack BuildStrategy = "railpack"
+	StrategyRailpack   BuildStrategy = "railpack"
 )
 
-// BuildOptions contains options required by builders to generate an OCI image.
 type BuildOptions struct {
-	ProjectID      string                  `json:"projectId"`
-	ServiceID      string                  `json:"serviceId,omitempty"`
-	SourceDir      string                  `json:"sourceDir"`
-	DockerfilePath string                  `json:"dockerfilePath,omitempty"`
-	LogWriter      io.Writer               `json:"-"`
-	ProjectConfig  *types.ProjectConfig    `json:"projectConfig,omitempty"`
-	AppConfig      *types.AppServiceConfig `json:"appConfig,omitempty"`
+	ProjectID      string                   `json:"projectId"`
+	ServiceID      string                   `json:"serviceId,omitempty"`
+	SourceDir      string                   `json:"sourceDir"`
+	DockerfilePath string                   `json:"dockerfilePath,omitempty"`
+	LogWriter      io.Writer                `json:"-"`
+	ProjectConfig  *project.ProjectConfig   `json:"projectConfig,omitempty"`
+	AppConfig      *service.AppService      `json:"appConfig,omitempty"`
 }
 
-// Builder defines the interface required for any container image builder strategy.
 type Builder interface {
 	Build(ctx context.Context, opts BuildOptions) (string, error)
 }
 
-// EngineBuilder coordinates container image builds and delegates to specific strategy implementations.
 type EngineBuilder struct {
 	dockerClient      *client.Client
 	dockerfileBuilder *DockerfileBuilder
 	railpackBuilder   *RailpackBuilder
 }
 
-// NewBuilder instantiates a new EngineBuilder wired to the provided Docker client without global state.
 func NewBuilder(dockerClient *client.Client) *EngineBuilder {
 	return &EngineBuilder{
 		dockerClient:      dockerClient,
@@ -53,7 +47,6 @@ func NewBuilder(dockerClient *client.Client) *EngineBuilder {
 	}
 }
 
-// Build inspects the source directory and dispatches to the appropriate builder strategy.
 func (b *EngineBuilder) Build(ctx context.Context, opts BuildOptions) (string, error) {
 	strategy := b.DetectStrategy(opts.SourceDir, opts.DockerfilePath)
 	if opts.LogWriter != nil {
@@ -78,7 +71,6 @@ func (b *EngineBuilder) Build(ctx context.Context, opts BuildOptions) (string, e
 	}
 }
 
-// DetectStrategy examines the project filesystem to determine if a Dockerfile or Railpack should be used.
 func (b *EngineBuilder) DetectStrategy(sourceDir, dockerfilePath string) BuildStrategy {
 	if dockerfilePath != "" {
 		if _, err := os.Stat(filepath.Join(sourceDir, dockerfilePath)); err == nil {

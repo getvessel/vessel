@@ -15,20 +15,19 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/robfig/cron/v3"
-	"vessel.dev/vessel/internal/store"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/job"
 	"vessel.dev/vessel/internal/utils"
 )
 
 type CronManager struct {
 	dockerClient *client.Client
-	store        *store.Store
+	store        CronManagerStore
 	cronEngine   *cron.Cron
 	entries      map[string]cron.EntryID
 	mu           sync.Mutex
 }
 
-func NewCronManager(dockerClient *client.Client, s *store.Store) *CronManager {
+func NewCronManager(dockerClient *client.Client, s CronManagerStore) *CronManager {
 	return &CronManager{
 		dockerClient: dockerClient,
 		store:        s,
@@ -37,7 +36,6 @@ func NewCronManager(dockerClient *client.Client, s *store.Store) *CronManager {
 	}
 }
 
-// Start launches the background cron loop and loads all active scheduled jobs from the store.
 func (cm *CronManager) Start() error {
 	jobs, err := cm.store.ListJobs()
 	if err != nil {
@@ -47,10 +45,11 @@ func (cm *CronManager) Start() error {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
 
-	for _, job := range jobs {
-		if job.Status == "active" {
-			if err := cm.registerJobLocked(&job); err != nil {
-				log.Printf("⚠️ Failed to register cron job %s (%s): %v", job.Name, job.ID, err)
+	for _, j := range jobs {
+		if j.Status == "active" {
+			jobCopy := j
+			if err := cm.registerJobLocked(&jobCopy); err != nil {
+				log.Printf("⚠️ Failed to register cron job %s (%s): %v", jobCopy.Name, jobCopy.ID, err)
 			}
 		}
 	}
@@ -60,36 +59,34 @@ func (cm *CronManager) Start() error {
 	return nil
 }
 
-// Stop halts all active cron timers.
 func (cm *CronManager) Stop() {
 	if cm.cronEngine != nil {
 		cm.cronEngine.Stop()
 	}
 }
 
-// RegisterJob adds or updates a scheduled job in the active cron runner.
-func (cm *CronManager) RegisterJob(job *types.JobConfig) error {
+func (cm *CronManager) RegisterJob(j *job.Job) error {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
-	return cm.registerJobLocked(job)
+	return cm.registerJobLocked(j)
 }
 
-func (cm *CronManager) registerJobLocked(job *types.JobConfig) error {
-	if entryID, exists := cm.entries[job.ID]; exists {
+func (cm *CronManager) registerJobLocked(j *job.Job) error {
+	if entryID, exists := cm.entries[j.ID]; exists {
 		cm.cronEngine.Remove(entryID)
-		delete(cm.entries, job.ID)
+		delete(cm.entries, j.ID)
 	}
 
-	if job.Status != "active" {
+	if j.Status != "active" {
 		return nil
 	}
 
-	schedule := strings.TrimSpace(job.Schedule)
+	schedule := strings.TrimSpace(j.Schedule)
 	if len(strings.Fields(schedule)) == 5 && !strings.HasPrefix(schedule, "@") {
 		schedule = "0 " + schedule
 	}
 
-	jobID := job.ID
+	jobID := j.ID
 	entryID, err := cm.cronEngine.AddFunc(schedule, func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 		defer cancel()
@@ -97,14 +94,13 @@ func (cm *CronManager) registerJobLocked(job *types.JobConfig) error {
 		_, _ = cm.ExecuteJob(ctx, jobID)
 	})
 	if err != nil {
-		return fmt.Errorf("invalid cron schedule '%s': %w", job.Schedule, err)
+		return fmt.Errorf("invalid cron schedule '%s': %w", j.Schedule, err)
 	}
 
-	cm.entries[job.ID] = entryID
+	cm.entries[j.ID] = entryID
 	return nil
 }
 
-// UnregisterJob removes a scheduled job from the cron execution schedule.
 func (cm *CronManager) UnregisterJob(jobID string) {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
@@ -115,16 +111,15 @@ func (cm *CronManager) UnregisterJob(jobID string) {
 	}
 }
 
-// ExecuteJob immediately runs the job's command inside the target project container and persists output logs.
 func (cm *CronManager) ExecuteJob(ctx context.Context, jobID string) (string, error) {
-	job, err := cm.store.GetJob(jobID)
-	if err != nil || job == nil {
+	j, err := cm.store.GetJob(jobID)
+	if err != nil || j == nil {
 		return "", fmt.Errorf("job %s not found: %w", jobID, err)
 	}
 
-	project, err := cm.store.GetProject(job.ProjectID)
+	project, err := cm.store.GetProject(j.ProjectID)
 	if err != nil || project == nil {
-		return "", fmt.Errorf("project %s for job %s not found: %w", job.ProjectID, jobID, err)
+		return "", fmt.Errorf("project %s for job %s not found: %w", j.ProjectID, jobID, err)
 	}
 
 	containerName := utils.NormalizeContainerName(project.ID)
@@ -139,21 +134,21 @@ func (cm *CronManager) ExecuteJob(ctx context.Context, jobID string) (string, er
 	execConfig := dockertypes.ExecConfig{
 		AttachStdout: true,
 		AttachStderr: true,
-		Cmd:          []string{"sh", "-c", job.Command},
+		Cmd:          []string{"sh", "-c", j.Command},
 	}
 
 	execIDResp, err := cm.dockerClient.ContainerExecCreate(ctx, inspectResp.ID, execConfig)
 	if err != nil {
 		now := time.Now()
 		_ = cm.store.UpdateJobStatusAndOutput(jobID, "error", &now, err.Error())
-		return "", fmt.Errorf("failed to create container exec for job %s: %w", job.Name, err)
+		return "", fmt.Errorf("failed to create container exec for job %s: %w", j.Name, err)
 	}
 
 	attachResp, err := cm.dockerClient.ContainerExecAttach(ctx, execIDResp.ID, dockertypes.ExecStartCheck{})
 	if err != nil {
 		now := time.Now()
 		_ = cm.store.UpdateJobStatusAndOutput(jobID, "error", &now, err.Error())
-		return "", fmt.Errorf("failed to attach to container exec for job %s: %w", job.Name, err)
+		return "", fmt.Errorf("failed to attach to container exec for job %s: %w", j.Name, err)
 	}
 	defer attachResp.Close()
 

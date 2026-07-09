@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"vessel.dev/vessel/internal/services"
-	"vessel.dev/vessel/internal/store"
+	"vessel.dev/vessel/internal/settings"
 	"vessel.dev/vessel/internal/user"
 )
 
@@ -16,20 +16,24 @@ type contextKey string
 
 const userClaimsKey contextKey = "user_claims"
 
-type AuthGuard struct {
-	TokenService *services.TokenService
-	Store        *store.Store
+type SettingsProvider interface {
+	GetServerSettings() (*settings.ServerSettings, error)
 }
 
-// NewAuthGuard initializes a new AuthGuard with the provided token service and store.
-func NewAuthGuard(ts *services.TokenService, st *store.Store) *AuthGuard {
-	return &AuthGuard{TokenService: ts, Store: st}
+type AuthGuard struct {
+	TokenService *services.TokenService
+	Settings     SettingsProvider
+}
+
+// NewAuthGuard initializes a new AuthGuard with the provided token service and settings provider.
+func NewAuthGuard(ts *services.TokenService, sp SettingsProvider) *AuthGuard {
+	return &AuthGuard{TokenService: ts, Settings: sp}
 }
 
 func (g *AuthGuard) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if g.Store != nil {
-			settings, _ := g.Store.GetServerSettings()
+		if g.Settings != nil {
+			settings, _ := g.Settings.GetServerSettings()
 			if settings != nil && strings.TrimSpace(settings.IPAllowlist) != "" {
 				clientIP := ExtractClientIP(r)
 				if !IsIPAllowed(clientIP, settings.IPAllowlist) {
@@ -119,8 +123,8 @@ func ExtractClientIP(r *http.Request) string {
 
 func (g *AuthGuard) RequireRole(requiredRole string, next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if g.Store != nil {
-			settings, _ := g.Store.GetServerSettings()
+		if g.Settings != nil {
+			settings, _ := g.Settings.GetServerSettings()
 			if settings != nil && strings.TrimSpace(settings.IPAllowlist) != "" {
 				clientIP := ExtractClientIP(r)
 				if !IsIPAllowed(clientIP, settings.IPAllowlist) {

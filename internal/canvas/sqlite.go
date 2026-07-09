@@ -7,8 +7,10 @@ import (
 	"sync"
 	"time"
 
+	"vessel.dev/vessel/internal/database"
 	"vessel.dev/vessel/internal/environment"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/service"
+	"vessel.dev/vessel/internal/storage"
 )
 
 // SQLiteRepository implements Repository against a SQLite database.
@@ -56,15 +58,15 @@ func (r *SQLiteRepository) ListCanvasSummaries(ctx context.Context) ([]CanvasSum
 	for _, e := range allEnvs {
 		envsByProject[e.ProjectID] = append(envsByProject[e.ProjectID], e)
 	}
-	appsByProject := make(map[string][]*types.AppServiceConfig)
+	appsByProject := make(map[string][]*service.AppService)
 	for _, a := range allApps {
 		appsByProject[a.ProjectID] = append(appsByProject[a.ProjectID], a)
 	}
-	dbsByProject := make(map[string][]types.DatabaseConfig)
+	dbsByProject := make(map[string][]database.Database)
 	for _, d := range allDbs {
 		dbsByProject[d.ProjectID] = append(dbsByProject[d.ProjectID], d)
 	}
-	storageByProject := make(map[string][]types.StorageConfig)
+	storageByProject := make(map[string][]storage.Storage)
 	for _, st := range allStorage {
 		storageByProject[st.ProjectID] = append(storageByProject[st.ProjectID], st)
 	}
@@ -74,7 +76,7 @@ func (r *SQLiteRepository) ListCanvasSummaries(ctx context.Context) ([]CanvasSum
 		envs := envsByProject[project.ID]
 		apps := appsByProject[project.ID]
 		dbs := dbsByProject[project.ID]
-		storage := storageByProject[project.ID]
+		storageItems := storageByProject[project.ID]
 
 		var defaultEnv *environment.Config
 		if len(envs) > 0 {
@@ -100,8 +102,8 @@ func (r *SQLiteRepository) ListCanvasSummaries(ctx context.Context) ([]CanvasSum
 			EnvironmentsCount:  len(envs),
 			AppsCount:          len(apps),
 			DatabasesCount:     len(dbs),
-			StorageCount:       len(storage),
-			TotalServices:      len(apps) + len(dbs) + len(storage),
+			StorageCount:       len(storageItems),
+			TotalServices:      len(apps) + len(dbs) + len(storageItems),
 			DefaultEnvironment: defaultEnv,
 			ServiceIcons:       make([]string, 0),
 		}
@@ -119,7 +121,7 @@ func (r *SQLiteRepository) ListCanvasSummaries(ctx context.Context) ([]CanvasSum
 			}
 			summary.ServiceIcons = append(summary.ServiceIcons, db.Engine)
 		}
-		for _, st := range storage {
+		for _, st := range storageItems {
 			if st.Status == "running" {
 				onlineCount++
 			}
@@ -144,7 +146,7 @@ func (r *SQLiteRepository) GetCanvasSummary(ctx context.Context, id string) (*Ca
 	envs, _ := r.environments.ListByProject(ctx, id)
 	apps, _ := r.listAppServicesByProject(id)
 	dbs, _ := r.listDatabasesByProject(id)
-	storage, _ := r.listStorageByProject(id)
+	storageItems, _ := r.listStorageByProject(id)
 
 	var defaultEnv *environment.Config
 	if len(envs) > 0 {
@@ -171,8 +173,8 @@ func (r *SQLiteRepository) GetCanvasSummary(ctx context.Context, id string) (*Ca
 		EnvironmentsCount:  len(envs),
 		AppsCount:          len(apps),
 		DatabasesCount:     len(dbs),
-		StorageCount:       len(storage),
-		TotalServices:      len(apps) + len(dbs) + len(storage),
+		StorageCount:       len(storageItems),
+		TotalServices:      len(apps) + len(dbs) + len(storageItems),
 		DefaultEnvironment: defaultEnv,
 		ServiceIcons:       make([]string, 0),
 	}
@@ -190,7 +192,7 @@ func (r *SQLiteRepository) GetCanvasSummary(ctx context.Context, id string) (*Ca
 		}
 		summary.ServiceIcons = append(summary.ServiceIcons, db.Engine)
 	}
-	for _, st := range storage {
+	for _, st := range storageItems {
 		if st.Status == "running" {
 			onlineCount++
 		}
@@ -221,15 +223,15 @@ func (r *SQLiteRepository) GetEnvironmentCanvas(_ context.Context, environmentID
 
 	apps, _ := r.listAppServicesByEnvironment(environmentID)
 	dbs, _ := r.listDatabasesByEnvironment(environmentID)
-	storage, _ := r.listStorageByEnvironment(environmentID)
+	storageItems, _ := r.listStorageByEnvironment(environmentID)
 
-	var dbsPtrs []*types.DatabaseConfig
+	var dbsPtrs []*database.Database
 	for i := range dbs {
 		dbsPtrs = append(dbsPtrs, &dbs[i])
 	}
-	var storagePtrs []*types.StorageConfig
-	for i := range storage {
-		storagePtrs = append(storagePtrs, &storage[i])
+	var storagePtrs []*storage.Storage
+	for i := range storageItems {
+		storagePtrs = append(storagePtrs, &storageItems[i])
 	}
 
 	return &EnvironmentCanvas{
@@ -313,36 +315,32 @@ func (r *SQLiteRepository) listAllEnvironments(ctx context.Context) ([]*environm
 	return result, rows.Err()
 }
 
-func (r *SQLiteRepository) listAllAppServices() ([]*types.AppServiceConfig, error) {
-	return r.scanAppServices(`SELECT id, project_id, environment_id, name, COALESCE(icon,''), COALESCE(repository_url,''), COALESCE(branch,''), COALESCE(root_directory,''), COALESCE(build_command,''), COALESCE(start_command,''), COALESCE(dockerfile_path,''), internal_port, COALESCE(domain,''), env_vars_count, auto_deploy_webhook, COALESCE(git_repo_full_name,''), wait_for_ci, auto_deploy_branch, COALESCE(public_networking_domain,''), COALESCE(private_networking_internal,''), enable_outbound_ipv6, cpu_request, memory_limit_mb, replicas, COALESCE(restart_policy,''), teardown_timeout, serverless, COALESCE(cron_schedule,''), COALESCE(health_check_path,''), status, COALESCE(container_id,''), created_at, updated_at FROM app_services ORDER BY created_at DESC`)
+func (r *SQLiteRepository) listAllAppServices() ([]*service.AppService, error) {
+	return r.scanAppServices(`SELECT id, project_id, environment_id, name, COALESCE(repository_url,''), COALESCE(branch,''), internal_port, COALESCE(domain,''), COALESCE(container_id,''), status, created_at, updated_at FROM app_services ORDER BY created_at DESC`)
 }
 
-func (r *SQLiteRepository) listAppServicesByProject(projectID string) ([]*types.AppServiceConfig, error) {
-	return r.scanAppServices(`SELECT id, project_id, environment_id, name, COALESCE(icon,''), COALESCE(repository_url,''), COALESCE(branch,''), COALESCE(root_directory,''), COALESCE(build_command,''), COALESCE(start_command,''), COALESCE(dockerfile_path,''), internal_port, COALESCE(domain,''), env_vars_count, auto_deploy_webhook, COALESCE(git_repo_full_name,''), wait_for_ci, auto_deploy_branch, COALESCE(public_networking_domain,''), COALESCE(private_networking_internal,''), enable_outbound_ipv6, cpu_request, memory_limit_mb, replicas, COALESCE(restart_policy,''), teardown_timeout, serverless, COALESCE(cron_schedule,''), COALESCE(health_check_path,''), status, COALESCE(container_id,''), created_at, updated_at FROM app_services WHERE project_id = ? ORDER BY created_at DESC`, projectID)
+func (r *SQLiteRepository) listAppServicesByProject(projectID string) ([]*service.AppService, error) {
+	return r.scanAppServices(`SELECT id, project_id, environment_id, name, COALESCE(repository_url,''), COALESCE(branch,''), internal_port, COALESCE(domain,''), COALESCE(container_id,''), status, created_at, updated_at FROM app_services WHERE project_id = ? ORDER BY created_at DESC`, projectID)
 }
 
-func (r *SQLiteRepository) listAppServicesByEnvironment(environmentID string) ([]*types.AppServiceConfig, error) {
-	return r.scanAppServices(`SELECT id, project_id, environment_id, name, COALESCE(icon,''), COALESCE(repository_url,''), COALESCE(branch,''), COALESCE(root_directory,''), COALESCE(build_command,''), COALESCE(start_command,''), COALESCE(dockerfile_path,''), internal_port, COALESCE(domain,''), env_vars_count, auto_deploy_webhook, COALESCE(git_repo_full_name,''), wait_for_ci, auto_deploy_branch, COALESCE(public_networking_domain,''), COALESCE(private_networking_internal,''), enable_outbound_ipv6, cpu_request, memory_limit_mb, replicas, COALESCE(restart_policy,''), teardown_timeout, serverless, COALESCE(cron_schedule,''), COALESCE(health_check_path,''), status, COALESCE(container_id,''), created_at, updated_at FROM app_services WHERE environment_id = ? ORDER BY created_at DESC`, environmentID)
+func (r *SQLiteRepository) listAppServicesByEnvironment(environmentID string) ([]*service.AppService, error) {
+	return r.scanAppServices(`SELECT id, project_id, environment_id, name, COALESCE(repository_url,''), COALESCE(branch,''), internal_port, COALESCE(domain,''), COALESCE(container_id,''), status, created_at, updated_at FROM app_services WHERE environment_id = ? ORDER BY created_at DESC`, environmentID)
 }
 
-func (r *SQLiteRepository) scanAppServices(query string, args ...any) ([]*types.AppServiceConfig, error) {
+func (r *SQLiteRepository) scanAppServices(query string, args ...any) ([]*service.AppService, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var apps []*types.AppServiceConfig
+	var apps []*service.AppService
 	for rows.Next() {
-		var a types.AppServiceConfig
+		var a service.AppService
 		if err := rows.Scan(
-			&a.ID, &a.ProjectID, &a.EnvironmentID, &a.Name, &a.Icon, &a.RepositoryURL, &a.Branch,
-			&a.RootDirectory, &a.BuildCommand, &a.StartCommand, &a.DockerfilePath, &a.InternalPort,
-			&a.Domain, &a.EnvVarsCount, &a.AutoDeployWebhook, &a.GitRepoFullName, &a.WaitForCI,
-			&a.AutoDeployBranch, &a.PublicNetworkingDomain, &a.PrivateNetworkingInternal,
-			&a.EnableOutboundIPv6, &a.CPURequest, &a.MemoryLimitMB, &a.Replicas,
-			&a.RestartPolicy, &a.TeardownTimeout, &a.Serverless, &a.CronSchedule,
-			&a.HealthCheckPath, &a.Status, &a.ContainerID, &a.CreatedAt, &a.UpdatedAt,
+			&a.ID, &a.ProjectID, &a.EnvironmentID, &a.Name,
+			&a.RepositoryURL, &a.Branch, &a.InternalPort,
+			&a.Domain, &a.ContainerID, &a.Status, &a.CreatedAt, &a.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -351,28 +349,28 @@ func (r *SQLiteRepository) scanAppServices(query string, args ...any) ([]*types.
 	return apps, rows.Err()
 }
 
-func (r *SQLiteRepository) listAllDatabases() ([]types.DatabaseConfig, error) {
+func (r *SQLiteRepository) listAllDatabases() ([]database.Database, error) {
 	return r.scanDatabases(`SELECT id, COALESCE(project_id,''), COALESCE(environment_id,''), name, engine, version, port, username, database_name, volume_path, COALESCE(container_id,''), status, COALESCE(internal_dns,''), COALESCE(external_dns,''), created_at, updated_at FROM databases ORDER BY created_at DESC`)
 }
 
-func (r *SQLiteRepository) listDatabasesByProject(projectID string) ([]types.DatabaseConfig, error) {
+func (r *SQLiteRepository) listDatabasesByProject(projectID string) ([]database.Database, error) {
 	return r.scanDatabases(`SELECT id, COALESCE(project_id,''), COALESCE(environment_id,''), name, engine, version, port, username, database_name, volume_path, COALESCE(container_id,''), status, COALESCE(internal_dns,''), COALESCE(external_dns,''), created_at, updated_at FROM databases WHERE project_id = ? ORDER BY created_at DESC`, projectID)
 }
 
-func (r *SQLiteRepository) listDatabasesByEnvironment(environmentID string) ([]types.DatabaseConfig, error) {
+func (r *SQLiteRepository) listDatabasesByEnvironment(environmentID string) ([]database.Database, error) {
 	return r.scanDatabases(`SELECT id, COALESCE(project_id,''), COALESCE(environment_id,''), name, engine, version, port, username, database_name, volume_path, COALESCE(container_id,''), status, COALESCE(internal_dns,''), COALESCE(external_dns,''), created_at, updated_at FROM databases WHERE environment_id = ? ORDER BY created_at DESC`, environmentID)
 }
 
-func (r *SQLiteRepository) scanDatabases(query string, args ...any) ([]types.DatabaseConfig, error) {
+func (r *SQLiteRepository) scanDatabases(query string, args ...any) ([]database.Database, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var dbs []types.DatabaseConfig
+	var dbs []database.Database
 	for rows.Next() {
-		var d types.DatabaseConfig
+		var d database.Database
 		if err := rows.Scan(
 			&d.ID, &d.ProjectID, &d.EnvironmentID, &d.Name, &d.Engine, &d.Version, &d.Port,
 			&d.Username, &d.DatabaseName, &d.VolumePath, &d.ContainerID, &d.Status,
@@ -385,28 +383,28 @@ func (r *SQLiteRepository) scanDatabases(query string, args ...any) ([]types.Dat
 	return dbs, rows.Err()
 }
 
-func (r *SQLiteRepository) listAllStorage() ([]types.StorageConfig, error) {
+func (r *SQLiteRepository) listAllStorage() ([]storage.Storage, error) {
 	return r.scanStorage(`SELECT id, COALESCE(project_id,''), COALESCE(environment_id,''), name, type, api_port, console_port, access_key, bucket_name, volume_path, COALESCE(container_id,''), status, COALESCE(internal_dns,''), COALESCE(external_dns,''), created_at, updated_at FROM storage ORDER BY created_at DESC`)
 }
 
-func (r *SQLiteRepository) listStorageByProject(projectID string) ([]types.StorageConfig, error) {
+func (r *SQLiteRepository) listStorageByProject(projectID string) ([]storage.Storage, error) {
 	return r.scanStorage(`SELECT id, COALESCE(project_id,''), COALESCE(environment_id,''), name, type, api_port, console_port, access_key, bucket_name, volume_path, COALESCE(container_id,''), status, COALESCE(internal_dns,''), COALESCE(external_dns,''), created_at, updated_at FROM storage WHERE project_id = ? ORDER BY created_at DESC`, projectID)
 }
 
-func (r *SQLiteRepository) listStorageByEnvironment(environmentID string) ([]types.StorageConfig, error) {
+func (r *SQLiteRepository) listStorageByEnvironment(environmentID string) ([]storage.Storage, error) {
 	return r.scanStorage(`SELECT id, COALESCE(project_id,''), COALESCE(environment_id,''), name, type, api_port, console_port, access_key, bucket_name, volume_path, COALESCE(container_id,''), status, COALESCE(internal_dns,''), COALESCE(external_dns,''), created_at, updated_at FROM storage WHERE environment_id = ? ORDER BY created_at DESC`, environmentID)
 }
 
-func (r *SQLiteRepository) scanStorage(query string, args ...any) ([]types.StorageConfig, error) {
+func (r *SQLiteRepository) scanStorage(query string, args ...any) ([]storage.Storage, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var items []types.StorageConfig
+	var items []storage.Storage
 	for rows.Next() {
-		var s types.StorageConfig
+		var s storage.Storage
 		if err := rows.Scan(
 			&s.ID, &s.ProjectID, &s.EnvironmentID, &s.Name, &s.Type, &s.APIPort, &s.ConsolePort,
 			&s.AccessKey, &s.BucketName, &s.VolumePath, &s.ContainerID, &s.Status,
