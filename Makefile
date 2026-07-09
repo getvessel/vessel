@@ -1,14 +1,21 @@
-.PHONY: all build-daemon build-dashboard dev-daemon dev-dashboard clean check
+.PHONY: all build build-daemon build-dashboard dev dev-daemon dev-dashboard clean check test docker-build docker-up docker-down
 
 BINARY_NAME=vesseld
 BUILD_DIR=bin
 
-all: check build-daemon build-dashboard
+all: check build
 
 check:
 	@echo "🔍 Running Go checks and formatting..."
 	go fmt ./...
 	go vet ./...
+
+test:
+	@echo "🧪 Running full test suite..."
+	go test ./... -v
+
+build: build-dashboard build-daemon
+	@echo "✅ Build complete! Binary available at $(BUILD_DIR)/$(BINARY_NAME) and GUI at dashboard/dist"
 
 build-daemon:
 	@echo "⚙️  Building Go daemon binary ($(BINARY_NAME))..."
@@ -18,6 +25,10 @@ build-daemon:
 build-dashboard:
 	@echo "💻 Building TanStack + Vite Dashboard GUI..."
 	npm run build:dashboard
+
+dev:
+	@echo "🚀 Launching backend daemon and frontend GUI concurrently..."
+	npx concurrently -k "make dev-daemon" "make dev-dashboard"
 
 dev-daemon:
 	@echo "🚀 Running Go daemon in dev mode..."
@@ -30,6 +41,18 @@ dev-dashboard:
 dev-website:
 	@echo "🌐 Running Astro Marketing site dev server..."
 	npm run dev:website
+
+docker-build:
+	@echo "🐳 Building Docker image..."
+	docker compose build
+
+docker-up:
+	@echo "🐳 Starting Vessel via Docker Compose..."
+	docker compose up -d
+
+docker-down:
+	@echo "🐳 Stopping Vessel Docker stack..."
+	docker compose down
 
 clean:
 	@echo "🧹 Cleaning builds and temporary binaries..."
