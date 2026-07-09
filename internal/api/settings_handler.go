@@ -177,7 +177,10 @@ func (h *SettingsHandler) CreatePAT(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rawBytes := make([]byte, 24)
-	_, _ = rand.Read(rawBytes)
+	if _, err := rand.Read(rawBytes); err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to generate random token")
+		return
+	}
 	rawToken := fmt.Sprintf("vsl_user_%s", hex.EncodeToString(rawBytes))
 	tokenHash := sha256.Sum256([]byte(rawToken))
 	hashStr := hex.EncodeToString(tokenHash[:])
@@ -190,7 +193,7 @@ func (h *SettingsHandler) CreatePAT(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.store.CreatePersonalAccessToken(pat); err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 

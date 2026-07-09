@@ -59,14 +59,18 @@ func (gs *GitService) SaveProvider(userID string, req *types.GitConnectRequest) 
 
 // GetConnectedProviders returns the connection status for GitHub and GitLab for a specific user.
 func (gs *GitService) GetConnectedProviders(userID string) ([]map[string]any, error) {
-	var results []map[string]any
+	providers, err := gs.store.ListGitProvidersByUser(userID)
+	if err != nil {
+		return nil, err
+	}
+	providerMap := make(map[string]*types.GitProviderConfig)
+	for _, gp := range providers {
+		providerMap[gp.Provider] = gp
+	}
 
+	var results []map[string]any
 	for _, provider := range []string{"github", "gitlab"} {
-		gp, err := gs.store.GetGitProvider(userID, provider)
-		if err != nil {
-			return nil, err
-		}
-		if gp != nil {
+		if gp, ok := providerMap[provider]; ok && gp != nil {
 			results = append(results, map[string]any{
 				"provider":    provider,
 				"connected":   true,

@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -13,8 +14,15 @@ type TokenService struct {
 }
 
 func NewTokenService() *TokenService {
+	secret := os.Getenv("VESSEL_JWT_SECRET")
+	if secret == "" {
+		secret = os.Getenv("JWT_SECRET")
+	}
+	if secret == "" {
+		secret = "vessel-super-secret-jwt-signing-key-change-in-prod"
+	}
 	return &TokenService{
-		secretKey: []byte("vessel-super-secret-jwt-signing-key-change-in-prod"),
+		secretKey: []byte(secret),
 	}
 }
 

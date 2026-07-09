@@ -76,7 +76,10 @@ func (h *OAuthHandler) OAuthRedirect(w http.ResponseWriter, r *http.Request) {
 	}
 
 	stateBytes := make([]byte, 16)
-	_, _ = rand.Read(stateBytes)
+	if _, err := rand.Read(stateBytes); err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to generate secure state token")
+		return
+	}
 	state := hex.EncodeToString(stateBytes)
 
 	authURL, err := h.oauthService.GetAuthorizationURL(p, state)

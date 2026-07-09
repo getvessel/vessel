@@ -83,6 +83,32 @@ func (s *Store) GetAnyGitProviderByProvider(provider string) (*types.GitProvider
 	return &gp, nil
 }
 
+// ListGitProvidersByUser retrieves all decrypted Git access tokens for a given user.
+func (s *Store) ListGitProvidersByUser(userID string) ([]*types.GitProviderConfig, error) {
+	rows, err := s.db.Query(`SELECT id, user_id, provider, encrypted_access_token, account_name, created_at, updated_at
+		FROM user_git_providers WHERE user_id = ?`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []*types.GitProviderConfig
+	for rows.Next() {
+		var gp types.GitProviderConfig
+		var encryptedToken string
+		if err := rows.Scan(&gp.ID, &gp.UserID, &gp.Provider, &encryptedToken, &gp.AccountName, &gp.CreatedAt, &gp.UpdatedAt); err != nil {
+			return nil, err
+		}
+		decryptedToken, err := s.vault.Decrypt(encryptedToken)
+		if err != nil {
+			return nil, err
+		}
+		gp.AccessToken = decryptedToken
+		list = append(list, &gp)
+	}
+	return list, nil
+}
+
 // DeleteGitProvider removes a stored Git provider connection for a user.
 func (s *Store) DeleteGitProvider(userID, provider string) error {
 	_, err := s.db.Exec(`DELETE FROM user_git_providers WHERE user_id = ? AND provider = ?`, userID, provider)

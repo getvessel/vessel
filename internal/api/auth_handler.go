@@ -34,7 +34,7 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	existing, err := s.store.GetUserByEmail(payload.Email)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	if existing != nil {
@@ -60,7 +60,7 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.store.CreateUser(user); err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 
@@ -118,8 +118,12 @@ func (s *Server) handleGetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := s.store.GetUserByID(claims.UserID)
-	if err != nil || user == nil {
-		writeError(w, http.StatusNotFound, "user account not found")
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
+	if user == nil {
+		writeError(w, http.StatusNotFound, "user account no longer exists")
 		return
 	}
 
@@ -133,6 +137,7 @@ func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
+		Secure:   true,
 		MaxAge:   -1,
 	})
 	writeJSON(w, http.StatusOK, map[string]string{"status": "logged_out"})
@@ -144,6 +149,7 @@ func setAuthCookie(w http.ResponseWriter, token string) {
 		Value:    token,
 		Path:     "/",
 		HttpOnly: true,
+		Secure:   true,
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   72 * 3600,
 	})
