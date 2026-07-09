@@ -8,8 +8,8 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/gorilla/websocket"
-	"github.com/solomonolatunji/vessel/internal/middleware"
-	"github.com/solomonolatunji/vessel/internal/utils"
+	"vessel.dev/vessel/internal/middleware"
+	"vessel.dev/vessel/internal/utils"
 )
 
 var upgrader = websocket.Upgrader{

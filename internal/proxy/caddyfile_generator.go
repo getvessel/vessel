@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/solomonolatunji/vessel/internal/types"
-	"github.com/solomonolatunji/vessel/internal/utils"
+	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/utils"
 )
 
 type CaddyfileGenerator struct {

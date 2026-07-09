@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/solomonolatunji/vessel/internal/api"
-	"github.com/solomonolatunji/vessel/internal/proxy"
-	"github.com/solomonolatunji/vessel/internal/store"
+	"vessel.dev/vessel/internal/api"
+	"vessel.dev/vessel/internal/proxy"
+	"vessel.dev/vessel/internal/store"
 )
 
 func TestGitEndpointsAndWebhooks(t *testing.T) {

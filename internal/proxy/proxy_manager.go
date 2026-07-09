@@ -9,7 +9,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"github.com/solomonolatunji/vessel/internal/store"
+	"vessel.dev/vessel/internal/store"
 )
 
 type ProxyManager struct {

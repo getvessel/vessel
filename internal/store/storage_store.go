@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/types"
 )
 
 // CreateStorage inserts a new managed storage cluster record and encrypts its secret key.

@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/solomonolatunji/vessel/internal/store"
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/store"
+	"vessel.dev/vessel/internal/types"
 )
 
 func TestStoreAndVault(t *testing.T) {

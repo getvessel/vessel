@@ -8,7 +8,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"github.com/solomonolatunji/vessel/internal/utils"
+	"vessel.dev/vessel/internal/utils"
 )
 
 // DockerfileBuilder compiles OCI images from repositories that contain an explicit Dockerfile.

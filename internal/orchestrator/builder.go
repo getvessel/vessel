@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/docker/docker/client"
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/types"
 )
 
 // BuildStrategy identifies the container compilation mechanism chosen for the project.

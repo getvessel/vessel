@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/solomonolatunji/vessel/internal/store"
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/store"
+	"vessel.dev/vessel/internal/types"
 )
 
 type GitService struct {

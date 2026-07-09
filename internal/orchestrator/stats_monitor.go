@@ -8,7 +8,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	vesseltypes "github.com/solomonolatunji/vessel/internal/types"
+	vesseltypes "vessel.dev/vessel/internal/types"
 )
 
 type StatsMonitor struct {

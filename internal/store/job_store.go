@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/types"
 )
 
 // CreateJob inserts a new scheduled cron job record into the store.

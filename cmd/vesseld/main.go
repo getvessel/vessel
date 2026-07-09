@@ -8,10 +8,10 @@ import (
 	"runtime"
 
 	"github.com/docker/docker/client"
-	"github.com/solomonolatunji/vessel/internal/api"
-	"github.com/solomonolatunji/vessel/internal/orchestrator"
-	"github.com/solomonolatunji/vessel/internal/proxy"
-	"github.com/solomonolatunji/vessel/internal/store"
+	"vessel.dev/vessel/internal/api"
+	"vessel.dev/vessel/internal/orchestrator"
+	"vessel.dev/vessel/internal/proxy"
+	"vessel.dev/vessel/internal/store"
 )
 
 const vesselVersion = "0.1.0-alpha"

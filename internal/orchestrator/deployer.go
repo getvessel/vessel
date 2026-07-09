@@ -6,9 +6,9 @@ import (
 	"io"
 
 	"github.com/docker/docker/client"
-	"github.com/solomonolatunji/vessel/internal/store"
-	"github.com/solomonolatunji/vessel/internal/types"
-	"github.com/solomonolatunji/vessel/internal/utils"
+	"vessel.dev/vessel/internal/store"
+	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/utils"
 )
 
 type Deployer struct {

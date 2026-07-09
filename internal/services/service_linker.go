@@ -3,7 +3,7 @@ package services
 import (
 	"fmt"
 
-	"github.com/solomonolatunji/vessel/internal/store"
+	"vessel.dev/vessel/internal/store"
 )
 
 type ServiceLinker struct {

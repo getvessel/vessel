@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/types"
 )
 
 func TestCaddyfileGenerator(t *testing.T) {

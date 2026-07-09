@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/solomonolatunji/vessel/internal/orchestrator"
-	"github.com/solomonolatunji/vessel/internal/store"
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/orchestrator"
+	"vessel.dev/vessel/internal/store"
+	"vessel.dev/vessel/internal/types"
 )
 
 type CronService struct {

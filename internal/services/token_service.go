@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/types"
 )
 
 type TokenService struct {

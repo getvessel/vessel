@@ -11,9 +11,9 @@ import (
 
 	dockerfilters "github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	"github.com/solomonolatunji/vessel/internal/store"
-	"github.com/solomonolatunji/vessel/internal/types"
 	"golang.org/x/crypto/bcrypt"
+	"vessel.dev/vessel/internal/store"
+	"vessel.dev/vessel/internal/types"
 )
 
 type SettingsHandler struct {

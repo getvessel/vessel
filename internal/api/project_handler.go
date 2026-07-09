@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	"github.com/google/uuid"
-	"github.com/solomonolatunji/vessel/internal/types"
-	"github.com/solomonolatunji/vessel/internal/utils"
+	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/utils"
 )
 
 func (s *Server) handleListProjects(w http.ResponseWriter, r *http.Request) {

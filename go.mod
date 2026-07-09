@@ -1,4 +1,4 @@
-module github.com/solomonolatunji/vessel
+module vessel.dev/vessel
 
 go 1.25.11
 

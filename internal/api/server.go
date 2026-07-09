@@ -5,12 +5,12 @@ import (
 	"net/http"
 
 	"github.com/docker/docker/client"
-	"github.com/solomonolatunji/vessel/internal/middleware"
-	"github.com/solomonolatunji/vessel/internal/orchestrator"
-	"github.com/solomonolatunji/vessel/internal/proxy"
-	"github.com/solomonolatunji/vessel/internal/services"
-	"github.com/solomonolatunji/vessel/internal/store"
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/middleware"
+	"vessel.dev/vessel/internal/orchestrator"
+	"vessel.dev/vessel/internal/proxy"
+	"vessel.dev/vessel/internal/services"
+	"vessel.dev/vessel/internal/store"
+	"vessel.dev/vessel/internal/types"
 )
 
 // Server encapsulates HTTP routing, API handler dependencies, and authentication guards for the Vessel control plane.

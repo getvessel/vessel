@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/solomonolatunji/vessel/internal/api"
-	"github.com/solomonolatunji/vessel/internal/store"
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/api"
+	"vessel.dev/vessel/internal/store"
+	"vessel.dev/vessel/internal/types"
 )
 
 func TestManagedDatabasesAndStorageEndpoints(t *testing.T) {

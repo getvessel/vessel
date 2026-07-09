@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/types"
 )
 
 func (s *Server) handleJobs(w http.ResponseWriter, r *http.Request) {

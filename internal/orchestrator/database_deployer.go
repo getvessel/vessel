@@ -13,9 +13,9 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
-	"github.com/solomonolatunji/vessel/internal/store"
-	"github.com/solomonolatunji/vessel/internal/types"
-	"github.com/solomonolatunji/vessel/internal/utils"
+	"vessel.dev/vessel/internal/store"
+	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/utils"
 )
 
 type DatabaseDeployer struct {

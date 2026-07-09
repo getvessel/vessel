@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/solomonolatunji/vessel/internal/types"
 	"golang.org/x/crypto/bcrypt"
+	"vessel.dev/vessel/internal/types"
 )
 
 type authPayload struct {

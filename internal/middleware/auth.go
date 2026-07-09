@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/solomonolatunji/vessel/internal/services"
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/services"
+	"vessel.dev/vessel/internal/types"
 )
 
 type contextKey string

@@ -3,7 +3,7 @@ package store
 import (
 	"fmt"
 
-	"github.com/solomonolatunji/vessel/internal/types"
+	"vessel.dev/vessel/internal/types"
 )
 
 // GetProjectCanvasSummary calculates aggregated counts and status icons for a single project canvas.
