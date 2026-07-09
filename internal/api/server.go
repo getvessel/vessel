@@ -22,7 +22,7 @@ import (
 	"vessel.dev/vessel/internal/notification"
 	"vessel.dev/vessel/internal/notifier"
 	"vessel.dev/vessel/internal/oauth"
-	"vessel.dev/vessel/internal/orchestrator"
+	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/project"
 	"vessel.dev/vessel/internal/project_settings"
 	"vessel.dev/vessel/internal/proxy"
@@ -41,14 +41,14 @@ import (
 
 type Server struct {
 	router                 *http.ServeMux
-	deployer               *orchestrator.Deployer
+	deployer               *engine.Deployer
 	proxyManager           *proxy.ProxyManager
 	dockerClient           *client.Client
 	tokenService           *services.TokenService
 	authGuard              *middleware.AuthGuard
-	dbDeployer             *orchestrator.DatabaseDeployer
-	storageDeployer        *orchestrator.StorageDeployer
-	cronManager            *orchestrator.CronManager
+	dbDeployer             *engine.DatabaseDeployer
+	storageDeployer        *engine.StorageDeployer
+	cronManager            *engine.CronManager
 	cronService            *services.CronService
 	serviceLinker          *services.ServiceLinker
 	gitService             *git.Service
@@ -80,7 +80,7 @@ type Server struct {
 	updaterService         *updater.UpdaterService
 }
 
-func NewServer(db *sql.DB, vault *vault.Vault, deployer *orchestrator.Deployer, proxyManager *proxy.ProxyManager, dockerClient *client.Client) *Server {
+func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyManager *proxy.ProxyManager, dockerClient *client.Client) *Server {
 	sa := &storeAdapter{db: db, vault: vault}
 
 	settingsRepo := settings.NewSQLiteRepository(db)
@@ -165,14 +165,14 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *orchestrator.Deployer, 
 	sa.deploymentRepo = deploymentRepo
 	sa.userRepo = userRepo
 
-	orcCronMgr := orchestrator.NewCronManager(dockerClient, sa)
+	orcCronMgr := engine.NewCronManager(dockerClient, sa)
 	_ = orcCronMgr.Start()
 
-	backupMgr := orchestrator.NewBackupManager(dockerClient, sa, "")
+	backupMgr := engine.NewBackupManager(dockerClient, sa, "")
 	_ = backupMgr.Start()
 
-	dbDeployer := orchestrator.NewDatabaseDeployer(dockerClient, sa)
-	storageDeployer := orchestrator.NewStorageDeployer(dockerClient, sa)
+	dbDeployer := engine.NewDatabaseDeployer(dockerClient, sa)
+	storageDeployer := engine.NewStorageDeployer(dockerClient, sa)
 
 	dbHandler := database.NewHandler(databaseRepo, dbDeployer)
 	storageHandler := storage.NewHandler(storageRepo, storageDeployer)
@@ -304,7 +304,7 @@ func (a *deploymentProjectStoreAdapter) GetByID(ctx context.Context, id string) 
 
 type deploymentProjectDeployerAdapter struct {
 	gitService   *git.Service
-	deployer     *orchestrator.Deployer
+	deployer     *engine.Deployer
 	proxyManager *proxy.ProxyManager
 }
 

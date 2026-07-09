@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"vessel.dev/vessel/internal/job"
-	"vessel.dev/vessel/internal/orchestrator"
+	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/project"
 )
 
@@ -25,10 +25,10 @@ type ProjectStore interface {
 type CronService struct {
 	jobs        JobStore
 	projects    ProjectStore
-	cronManager *orchestrator.CronManager
+	cronManager *engine.CronManager
 }
 
-func NewCronService(js JobStore, ps ProjectStore, cm *orchestrator.CronManager) *CronService {
+func NewCronService(js JobStore, ps ProjectStore, cm *engine.CronManager) *CronService {
 	return &CronService{
 		jobs:        js,
 		projects:    ps,

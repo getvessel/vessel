@@ -39,8 +39,15 @@
 
 ## Go Conventions & Architecture
 
-- **Feature/Domain Packaging (`internal/<domain>/`):** All Go code inside `internal/` must be organized by feature/domain (each domain package encapsulates its own `model.go`, `dto.go`, `handler.go`, `service.go`, `repository.go`, and `sqlite.go`).
-- **Consumer-Defined Interfaces:** Define interfaces where they are _consumed_, not where they are implemented (`Accept interfaces, return structs`). Services define narrow `Repository` interfaces. Concrete database adapters (`*SQLiteRepository`) satisfy them implicitly without `implements` clauses.
+- **Layered Monolith Architecture (`internal/`):** All Go code inside `internal/` must be organized by clean functional layers:
+  - `internal/models/` — ALL domain structs, DTOs, and database entities (no circular imports).
+  - `internal/repositories/` — ALL database persistence, SQL interfaces, and SQLite implementations (`project.go`, `user.go`, `auth.go`).
+  - `internal/services/` — ALL business logic and external integrations (`auth.go`, `git.go`, `deploy.go`).
+  - `internal/handlers/` — ALL HTTP controllers and Echo route handlers (`auth.go`, `project.go`, `oauth.go`).
+  - `internal/engine/` — Container engine, Docker deployer, runtime management, cron, and backup workers.
+- **Consumer-Defined Interfaces:** Define narrow interfaces where consumed (`Accept interfaces, return structs`).
+- **Max 350 lines per file:** If a file exceeds 350 lines, split into smaller focused files.
+- **No comments or GoDoc allowed:** Code must be self-explanatory without comments.
 - **File naming:** lowercase snake_case (`container_health.go`).
 - **Package naming:** short, lowercase, single word (`cron`, `auth`, `apikeys`).
 - **Error handling:** always check errors; wrap with `fmt.Errorf("context: %w", err)`.

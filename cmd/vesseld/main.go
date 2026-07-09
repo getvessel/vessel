@@ -15,7 +15,7 @@ import (
 	"vessel.dev/vessel/internal/api"
 	"vessel.dev/vessel/internal/domain"
 	"vessel.dev/vessel/internal/env"
-	"vessel.dev/vessel/internal/orchestrator"
+	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/project"
 	"vessel.dev/vessel/internal/proxy"
 	"vessel.dev/vessel/internal/service"
@@ -161,7 +161,7 @@ func main() {
 	proxyMgr := proxy.NewProxyManager(proxyCfg, &dbProjectLister{db: db}, &dbServiceLister{db: db}, &dbDomainLister{db: db}, dockerClient)
 	_ = proxyMgr.Reload(context.Background())
 
-	deployer := orchestrator.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
+	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
 
 	apiServer := api.NewServer(db, vlt, deployer, proxyMgr, dockerClient)
 
