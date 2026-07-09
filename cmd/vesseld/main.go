@@ -290,6 +290,7 @@ func runMigrations(db *sql.DB) error {
 			build_command TEXT DEFAULT '',
 			start_command TEXT DEFAULT '',
 			dockerfile_path TEXT DEFAULT '',
+			build_engine TEXT DEFAULT 'railpack',
 			internal_port INTEGER DEFAULT 3000,
 			domain TEXT DEFAULT '',
 			env_vars_count INTEGER DEFAULT 0,

@@ -19,7 +19,7 @@ func NewRailpackBuilder(dockerClient *client.Client) *RailpackBuilder {
 	return &RailpackBuilder{dockerClient: dockerClient}
 }
 
-func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions) (string, error) {
+func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions, engineName string) (string, error) {
 	imageTag := fmt.Sprintf("vessel-app-%s:latest", strings.ToLower(opts.ProjectID))
 	if opts.LogWriter != nil {
 		fmt.Fprintf(opts.LogWriter, "🌟 [Railpack/Nixpacks] Auto-detecting language & framework in %s...\n", opts.SourceDir)
@@ -30,18 +30,34 @@ func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions) (string,
 		fmt.Fprintf(opts.LogWriter, "🛠️ [Railpack/Nixpacks] Stack detected: %s\n", stack)
 	}
 
-	nixpacksPath, err := exec.LookPath("nixpacks")
-	if err == nil {
-		if opts.LogWriter != nil {
-			fmt.Fprintf(opts.LogWriter, "⚙️ [Railpack/Nixpacks] Executing Nixpacks builder engine (%s)...\n", nixpacksPath)
+	if engineName == "buildpacks" {
+		packPath, err := exec.LookPath("pack")
+		if err == nil {
+			if opts.LogWriter != nil {
+				fmt.Fprintf(opts.LogWriter, "⚙️ [Buildpacks] Executing pack builder engine (%s)...\n", packPath)
+			}
+			cmd := exec.CommandContext(ctx, packPath, "build", imageTag, "--path", opts.SourceDir, "--builder", "paketobuildpacks/builder:base")
+			cmd.Stdout = opts.LogWriter
+			cmd.Stderr = opts.LogWriter
+			if err := cmd.Run(); err != nil {
+				return "", fmt.Errorf("buildpacks execution failed: %w", err)
+			}
+			return imageTag, nil
 		}
-		cmd := exec.CommandContext(ctx, nixpacksPath, "build", opts.SourceDir, "--name", imageTag)
-		cmd.Stdout = opts.LogWriter
-		cmd.Stderr = opts.LogWriter
-		if err := cmd.Run(); err != nil {
-			return "", fmt.Errorf("nixpacks execution failed: %w", err)
+	} else {
+		nixpacksPath, err := exec.LookPath("nixpacks")
+		if err == nil {
+			if opts.LogWriter != nil {
+				fmt.Fprintf(opts.LogWriter, "⚙️ [Nixpacks] Executing Nixpacks builder engine (%s)...\n", nixpacksPath)
+			}
+			cmd := exec.CommandContext(ctx, nixpacksPath, "build", opts.SourceDir, "--name", imageTag)
+			cmd.Stdout = opts.LogWriter
+			cmd.Stderr = opts.LogWriter
+			if err := cmd.Run(); err != nil {
+				return "", fmt.Errorf("nixpacks execution failed: %w", err)
+			}
+			return imageTag, nil
 		}
-		return imageTag, nil
 	}
 
 	if opts.LogWriter != nil {

@@ -32,37 +32,55 @@ type TriggerDeploymentRequest struct {
 }
 
 type AppService struct {
-	ID            string    `json:"id"`
-	ProjectID     string    `json:"projectId"`
-	EnvironmentID string    `json:"environmentId"`
-	Name          string    `json:"name"`
-	RepositoryURL string    `json:"repositoryUrl"`
-	Branch        string    `json:"branch"`
-	InternalPort  int       `json:"internalPort"`
-	Domain        string    `json:"domain"`
-	ContainerID   string    `json:"containerId"`
-	Status        string    `json:"status"`
-	CreatedAt     time.Time `json:"createdAt"`
-	UpdatedAt     time.Time `json:"updatedAt"`
+	ID              string    `json:"id"`
+	ProjectID       string    `json:"projectId"`
+	EnvironmentID   string    `json:"environmentId"`
+	Name            string    `json:"name"`
+	RepositoryURL   string    `json:"repositoryUrl"`
+	Branch          string    `json:"branch"`
+	RootDirectory   string    `json:"rootDirectory"`
+	BuildCommand    string    `json:"buildCommand"`
+	StartCommand    string    `json:"startCommand"`
+	DockerfilePath  string    `json:"dockerfilePath"`
+	BuildEngine     string    `json:"buildEngine"`
+	InternalPort    int       `json:"internalPort"`
+	Domain          string    `json:"domain"`
+	HealthCheckPath string    `json:"healthCheckPath"`
+	ContainerID     string    `json:"containerId"`
+	Status          string    `json:"status"`
+	CreatedAt       time.Time `json:"createdAt"`
+	UpdatedAt       time.Time `json:"updatedAt"`
 }
 
 type CreateAppServiceRequest struct {
-	ProjectID     string `json:"projectId"`
-	Name          string `json:"name"`
-	RepositoryURL string `json:"repositoryUrl"`
-	Branch        string `json:"branch"`
-	InternalPort  int    `json:"internalPort"`
-	Domain        string `json:"domain"`
+	ProjectID       string `json:"projectId"`
+	Name            string `json:"name"`
+	RepositoryURL   string `json:"repositoryUrl"`
+	Branch          string `json:"branch"`
+	RootDirectory   string `json:"rootDirectory"`
+	BuildCommand    string `json:"buildCommand"`
+	StartCommand    string `json:"startCommand"`
+	DockerfilePath  string `json:"dockerfilePath"`
+	BuildEngine     string `json:"buildEngine"`
+	InternalPort    int    `json:"internalPort"`
+	Domain          string `json:"domain"`
+	HealthCheckPath string `json:"healthCheckPath"`
 }
 
 type UpdateAppServiceRequest struct {
-	Name          string `json:"name"`
-	RepositoryURL string `json:"repositoryUrl"`
-	Branch        string `json:"branch"`
-	InternalPort  int    `json:"internalPort"`
-	Domain        string `json:"domain"`
-	ContainerID   string `json:"containerId"`
-	Status        string `json:"status"`
+	Name            string `json:"name"`
+	RepositoryURL   string `json:"repositoryUrl"`
+	Branch          string `json:"branch"`
+	RootDirectory   string `json:"rootDirectory"`
+	BuildCommand    string `json:"buildCommand"`
+	StartCommand    string `json:"startCommand"`
+	DockerfilePath  string `json:"dockerfilePath"`
+	BuildEngine     string `json:"buildEngine"`
+	InternalPort    int    `json:"internalPort"`
+	Domain          string `json:"domain"`
+	HealthCheckPath string `json:"healthCheckPath"`
+	ContainerID     string `json:"containerId"`
+	Status          string `json:"status"`
 }
 
 type Variable struct {

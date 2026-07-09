@@ -83,7 +83,10 @@ func (g *CaddyfileGenerator) writeAppServiceBlock(buf *bytes.Buffer, s *models.A
 		return
 	}
 
-	containerHost := utils.NormalizeContainerName(s.ID)
+	containerHost := s.ContainerID
+	if containerHost == "" {
+		containerHost = utils.NormalizeContainerName(s.ID)
+	}
 	targetPort := s.InternalPort
 	if targetPort <= 0 {
 		targetPort = 3000
@@ -120,7 +123,10 @@ func (g *CaddyfileGenerator) writeDomainBlock(buf *bytes.Buffer, d *models.Domai
 	var targetPort int
 
 	if s != nil {
-		containerHost = utils.NormalizeContainerName(s.ID)
+		containerHost = s.ContainerID
+		if containerHost == "" {
+			containerHost = utils.NormalizeContainerName(s.ID)
+		}
 		targetPort = s.InternalPort
 	} else if p != nil {
 		containerHost = utils.NormalizeContainerName(p.ID)

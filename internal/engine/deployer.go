@@ -5,8 +5,12 @@ import (
 	"fmt"
 	"io"
 
+	"net/http"
+	"time"
+
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/google/uuid"
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/utils"
 )
@@ -93,9 +97,9 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 		envSlice = append(envSlice, fmt.Sprintf("%s=%s", k, v))
 	}
 
-	containerName := utils.NormalizeContainerName(app.ID)
+	newContainerName := fmt.Sprintf("%s-%s", utils.NormalizeContainerName(app.ID), uuid.New().String()[:8])
 	if logWriter != nil {
-		fmt.Fprintf(logWriter, "🔄 [Deployer] Rolling out container %s with %d encrypted environment variables...\n", containerName, len(envSlice))
+		fmt.Fprintf(logWriter, "🔄 [Deployer] Rolling out container %s with %d encrypted environment variables...\n", newContainerName, len(envSlice))
 	}
 
 	port := app.InternalPort
@@ -105,9 +109,9 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 	memMB := 512
 	cpuReq := 0.5
 
-	containerID, err := d.containerManager.CreateAndStart(
+	_, err = d.containerManager.CreateAndStart(
 		ctx,
-		containerName,
+		newContainerName,
 		imageTag,
 		port,
 		envSlice,
@@ -118,11 +122,71 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 		return "", fmt.Errorf("container rollout failed: %w", err)
 	}
 
+	// Active polling before swapping (Health Check)
+	healthy := false
 	if logWriter != nil {
-		fmt.Fprintf(logWriter, "🎉 [Deployer] Deployment successful! Container ID: %s\n", containerID[:12])
+		fmt.Fprintf(logWriter, "⏳ [Deployer] Waiting for container to become healthy...\n")
 	}
 
-	return containerID, nil
+	for i := 0; i < 30; i++ {
+		time.Sleep(2 * time.Second)
+		inspect, err := d.containerManager.Inspect(ctx, newContainerName)
+		if err == nil {
+			if !inspect.State.Running {
+				if inspect.State.Status == "exited" {
+					break // Container crashed
+				}
+				continue
+			}
+
+			if app.HealthCheckPath != "" {
+				var hostPort string
+				for _, bindings := range inspect.NetworkSettings.Ports {
+					if len(bindings) > 0 {
+						hostPort = bindings[0].HostPort
+						break
+					}
+				}
+				if hostPort != "" {
+					resp, err := http.Get(fmt.Sprintf("http://127.0.0.1:%s%s", hostPort, app.HealthCheckPath))
+					if err == nil {
+						resp.Body.Close()
+						if resp.StatusCode >= 200 && resp.StatusCode < 400 {
+							healthy = true
+							break
+						}
+					}
+				}
+			} else {
+				healthy = true
+				break
+			}
+		}
+	}
+
+	if !healthy {
+		_ = d.containerManager.StopAndRemove(ctx, newContainerName)
+		if logWriter != nil {
+			fmt.Fprintf(logWriter, "❌ [Deployer] Health check failed. Rolling back to previous version.\n")
+		}
+		return "", fmt.Errorf("health check failed, deployment aborted")
+	}
+
+	if logWriter != nil {
+		fmt.Fprintf(logWriter, "🎉 [Deployer] Health check passed! Container is ready.\n")
+		fmt.Fprintf(logWriter, "🎉 [Deployer] Deployment successful! Container ID: %s\n", newContainerName)
+	}
+
+	// Schedule removal of the old container to allow zero-downtime swap
+	oldContainerID := app.ContainerID
+	if oldContainerID != "" && oldContainerID != newContainerName {
+		go func() {
+			time.Sleep(10 * time.Second)
+			_ = d.containerManager.StopAndRemove(context.Background(), oldContainerID)
+		}()
+	}
+
+	return newContainerName, nil
 }
 
 func (d *Deployer) Stop(ctx context.Context, containerID string) error {

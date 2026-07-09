@@ -39,6 +39,7 @@ func (d *DockerfileBuilder) Build(ctx context.Context, opts BuildOptions) (strin
 		Tags:       []string{imageTag},
 		Dockerfile: dockerfilePath,
 		Remove:     true,
+		CacheFrom:  []string{imageTag},
 	}
 
 	resp, err := d.dockerClient.ImageBuild(ctx, tarContext, buildOptions)

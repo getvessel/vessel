@@ -16,6 +16,8 @@ type BuildStrategy string
 const (
 	StrategyDockerfile BuildStrategy = "dockerfile"
 	StrategyRailpack   BuildStrategy = "railpack"
+	StrategyNixpacks   BuildStrategy = "nixpacks"
+	StrategyBuildpacks BuildStrategy = "buildpacks"
 )
 
 type BuildOptions struct {
@@ -47,7 +49,7 @@ func NewBuilder(dockerClient *client.Client) *EngineBuilder {
 }
 
 func (b *EngineBuilder) Build(ctx context.Context, opts BuildOptions) (string, error) {
-	strategy := b.DetectStrategy(opts.SourceDir, opts.DockerfilePath)
+	strategy := b.DetectStrategy(opts.SourceDir, opts.DockerfilePath, opts.AppConfig)
 	if opts.LogWriter != nil {
 		fmt.Fprintf(opts.LogWriter, "🚀 [Builder] Detected build strategy: %s\n", strategy)
 	}
@@ -59,10 +61,10 @@ func (b *EngineBuilder) Build(ctx context.Context, opts BuildOptions) (string, e
 			return "", fmt.Errorf("dockerfile build failed: %w", err)
 		}
 		return imageTag, nil
-	case StrategyRailpack:
-		imageTag, err := b.railpackBuilder.Build(ctx, opts)
+	case StrategyRailpack, StrategyNixpacks, StrategyBuildpacks:
+		imageTag, err := b.railpackBuilder.Build(ctx, opts, string(strategy))
 		if err != nil {
-			return "", fmt.Errorf("railpack/nixpacks build failed: %w", err)
+			return "", fmt.Errorf("%s build failed: %w", strategy, err)
 		}
 		return imageTag, nil
 	default:
@@ -70,7 +72,11 @@ func (b *EngineBuilder) Build(ctx context.Context, opts BuildOptions) (string, e
 	}
 }
 
-func (b *EngineBuilder) DetectStrategy(sourceDir, dockerfilePath string) BuildStrategy {
+func (b *EngineBuilder) DetectStrategy(sourceDir, dockerfilePath string, app *models.AppService) BuildStrategy {
+	if app != nil && app.BuildEngine != "" {
+		return BuildStrategy(app.BuildEngine)
+	}
+
 	if dockerfilePath != "" {
 		if _, err := os.Stat(filepath.Join(sourceDir, dockerfilePath)); err == nil {
 			return StrategyDockerfile

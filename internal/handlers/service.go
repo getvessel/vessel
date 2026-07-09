@@ -77,8 +77,14 @@ func (h *AppHandler) Update(c echo.Context) error {
 	existing.Name = req.Name
 	existing.RepositoryURL = req.RepositoryURL
 	existing.Branch = req.Branch
+	existing.RootDirectory = req.RootDirectory
+	existing.BuildCommand = req.BuildCommand
+	existing.StartCommand = req.StartCommand
+	existing.DockerfilePath = req.DockerfilePath
+	existing.BuildEngine = req.BuildEngine
 	existing.InternalPort = req.InternalPort
 	existing.Domain = req.Domain
+	existing.HealthCheckPath = req.HealthCheckPath
 	existing.ContainerID = req.ContainerID
 	existing.Status = req.Status
 	if err := h.appService.UpdateAppService(c.Request().Context(), existing); err != nil {
