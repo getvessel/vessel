@@ -5,30 +5,18 @@ import (
 	"errors"
 	"fmt"
 
-	"vessel.dev/vessel/internal/job"
 	"vessel.dev/vessel/internal/engine"
-	"vessel.dev/vessel/internal/project"
+	"vessel.dev/vessel/internal/models"
+	"vessel.dev/vessel/internal/repositories"
 )
 
-type JobStore interface {
-	CreateJob(job *job.Job) error
-	GetJob(id string) (*job.Job, error)
-	ListJobs() ([]job.Job, error)
-	ListJobsByProject(projectID string) ([]job.Job, error)
-	DeleteJob(id string) error
-}
-
-type ProjectStore interface {
-	GetProject(id string) (*project.ProjectConfig, error)
-}
-
 type CronService struct {
-	jobs        JobStore
-	projects    ProjectStore
+	jobs        repositories.JobRepository
+	projects    repositories.ProjectRepository
 	cronManager *engine.CronManager
 }
 
-func NewCronService(js JobStore, ps ProjectStore, cm *engine.CronManager) *CronService {
+func NewCronService(js repositories.JobRepository, ps repositories.ProjectRepository, cm *engine.CronManager) *CronService {
 	return &CronService{
 		jobs:        js,
 		projects:    ps,
@@ -36,7 +24,7 @@ func NewCronService(js JobStore, ps ProjectStore, cm *engine.CronManager) *CronS
 	}
 }
 
-func (cs *CronService) CreateJob(j *job.Job) error {
+func (cs *CronService) CreateJob(ctx context.Context, j *models.Job) error {
 	if j.ProjectID == "" {
 		return errors.New("projectId is required when creating a scheduled job")
 	}
@@ -47,7 +35,7 @@ func (cs *CronService) CreateJob(j *job.Job) error {
 		return errors.New("command is required")
 	}
 
-	project, err := cs.projects.GetProject(j.ProjectID)
+	project, err := cs.projects.Get(ctx, j.ProjectID)
 	if err != nil {
 		return fmt.Errorf("failed to verify project existence: %w", err)
 	}
@@ -55,29 +43,29 @@ func (cs *CronService) CreateJob(j *job.Job) error {
 		return fmt.Errorf("project with ID %s not found", j.ProjectID)
 	}
 
-	if err := cs.jobs.CreateJob(j); err != nil {
+	if err := cs.jobs.Create(ctx, j); err != nil {
 		return err
 	}
 
 	return cs.cronManager.RegisterJob(j)
 }
 
-func (cs *CronService) GetJob(id string) (*job.Job, error) {
-	return cs.jobs.GetJob(id)
+func (cs *CronService) GetJob(ctx context.Context, id string) (*models.Job, error) {
+	return cs.jobs.GetByID(ctx, id)
 }
 
-func (cs *CronService) ListJobs(projectID string) ([]job.Job, error) {
+func (cs *CronService) ListJobs(ctx context.Context, projectID string) ([]models.Job, error) {
 	if projectID != "" {
-		return cs.jobs.ListJobsByProject(projectID)
+		return cs.jobs.ListByProject(ctx, projectID)
 	}
-	return cs.jobs.ListJobs()
+	return cs.jobs.ListAll(ctx)
 }
 
 func (cs *CronService) TriggerJobImmediately(ctx context.Context, jobID string) (string, error) {
 	return cs.cronManager.ExecuteJob(ctx, jobID)
 }
 
-func (cs *CronService) DeleteJob(id string) error {
+func (cs *CronService) DeleteJob(ctx context.Context, id string) error {
 	cs.cronManager.UnregisterJob(id)
-	return cs.jobs.DeleteJob(id)
+	return cs.jobs.Delete(ctx, id)
 }

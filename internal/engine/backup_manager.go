@@ -18,7 +18,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/robfig/cron/v3"
-	"vessel.dev/vessel/internal/backup"
+	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/utils"
 )
 
@@ -72,13 +72,13 @@ func (bm *BackupManager) Stop() {
 	}
 }
 
-func (bm *BackupManager) RegisterBackup(cfg *backup.BackupConfig) error {
+func (bm *BackupManager) RegisterBackup(cfg *models.BackupConfig) error {
 	bm.mu.Lock()
 	defer bm.mu.Unlock()
 	return bm.registerBackupLocked(cfg)
 }
 
-func (bm *BackupManager) registerBackupLocked(cfg *backup.BackupConfig) error {
+func (bm *BackupManager) registerBackupLocked(cfg *models.BackupConfig) error {
 	if entryID, exists := bm.entries[cfg.ID]; exists {
 		bm.cronEngine.Remove(entryID)
 		delete(bm.entries, cfg.ID)
@@ -118,13 +118,13 @@ func (bm *BackupManager) UnregisterBackup(backupConfigID string) {
 	}
 }
 
-func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID string) (*backup.BackupRecord, error) {
+func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID string) (*models.BackupRecord, error) {
 	cfg, err := bm.store.GetBackupConfig(backupConfigID)
 	if err != nil || cfg == nil {
 		return nil, fmt.Errorf("backup config %s not found: %w", backupConfigID, err)
 	}
 
-	rec := &backup.BackupRecord{
+	rec := &models.BackupRecord{
 		BackupConfigID: cfg.ID,
 		ProjectID:      cfg.ProjectID,
 		DatabaseID:     cfg.DatabaseID,
@@ -259,7 +259,7 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 	return rec, nil
 }
 
-func (bm *BackupManager) uploadToS3(ctx context.Context, dest *backup.S3Destination, fileName string, data []byte) (string, error) {
+func (bm *BackupManager) uploadToS3(ctx context.Context, dest *models.S3Destination, fileName string, data []byte) (string, error) {
 	url := fmt.Sprintf("https://%s/%s/%s", dest.Endpoint, dest.Bucket, fileName)
 	if strings.HasPrefix(dest.Endpoint, "http://") || strings.HasPrefix(dest.Endpoint, "https://") {
 		url = fmt.Sprintf("%s/%s/%s", strings.TrimRight(dest.Endpoint, "/"), dest.Bucket, fileName)
@@ -284,7 +284,7 @@ func (bm *BackupManager) uploadToS3(ctx context.Context, dest *backup.S3Destinat
 	return fmt.Sprintf("s3://%s/%s", dest.Bucket, fileName), nil
 }
 
-func (bm *BackupManager) enforceRetentionPolicy(cfg *backup.BackupConfig) {
+func (bm *BackupManager) enforceRetentionPolicy(cfg *models.BackupConfig) {
 	if cfg.RetentionDays <= 0 {
 		return
 	}

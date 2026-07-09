@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/services"
 	"vessel.dev/vessel/internal/user"
 )
@@ -58,7 +59,7 @@ func (s *Service) HandleCallback(ctx context.Context, providerName, code string)
 		}
 	}
 
-	token, err := s.tokenService.GenerateToken(u)
+	token, err := s.tokenService.GenerateToken(&models.User{ID: u.ID, Email: u.Email, Role: u.Role})
 	if err != nil {
 		return "", nil, errors.New("failed generating token")
 	}

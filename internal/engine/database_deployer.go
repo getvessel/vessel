@@ -13,7 +13,7 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
-	"vessel.dev/vessel/internal/database"
+	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/utils"
 )
 
@@ -29,7 +29,7 @@ func NewDatabaseDeployer(dockerClient *client.Client, s DatabaseDeployerStore) *
 	}
 }
 
-func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *database.Database) (string, error) {
+func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database) (string, error) {
 	if d.dockerClient == nil {
 		return "", fmt.Errorf("docker daemon connection is not available")
 	}

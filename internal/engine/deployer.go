@@ -6,8 +6,7 @@ import (
 	"io"
 
 	"github.com/docker/docker/client"
-	"vessel.dev/vessel/internal/project"
-	"vessel.dev/vessel/internal/service"
+	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/utils"
 )
 
@@ -26,13 +25,13 @@ func NewDeployer(dockerClient *client.Client, s DeployerStore) *Deployer {
 	}
 }
 
-func (d *Deployer) Deploy(ctx context.Context, project *project.ProjectConfig, sourceDir string, logWriter io.Writer) (string, error) {
+func (d *Deployer) Deploy(ctx context.Context, project *models.ProjectConfig, sourceDir string, logWriter io.Writer) (string, error) {
 	apps, err := d.store.ListAppServicesByProject(project.ID)
 	if err == nil && len(apps) > 0 {
 		return d.DeployAppService(ctx, apps[0], sourceDir, logWriter)
 	}
 
-	syntheticApp := &service.AppService{
+	syntheticApp := &models.AppService{
 		ID:           project.ID,
 		ProjectID:    project.ID,
 		Name:         project.Name,
@@ -41,7 +40,7 @@ func (d *Deployer) Deploy(ctx context.Context, project *project.ProjectConfig, s
 	return d.DeployAppService(ctx, syntheticApp, sourceDir, logWriter)
 }
 
-func (d *Deployer) DeployAppService(ctx context.Context, app *service.AppService, sourceDir string, logWriter io.Writer) (string, error) {
+func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService, sourceDir string, logWriter io.Writer) (string, error) {
 	if logWriter != nil {
 		fmt.Fprintf(logWriter, "🚀 [Deployer] Starting deployment for service: %s (ID: %s)\n", app.Name, app.ID)
 	}

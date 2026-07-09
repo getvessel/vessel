@@ -15,7 +15,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/robfig/cron/v3"
-	"vessel.dev/vessel/internal/job"
+	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/utils"
 )
 
@@ -65,13 +65,13 @@ func (cm *CronManager) Stop() {
 	}
 }
 
-func (cm *CronManager) RegisterJob(j *job.Job) error {
+func (cm *CronManager) RegisterJob(j *models.Job) error {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
 	return cm.registerJobLocked(j)
 }
 
-func (cm *CronManager) registerJobLocked(j *job.Job) error {
+func (cm *CronManager) registerJobLocked(j *models.Job) error {
 	if entryID, exists := cm.entries[j.ID]; exists {
 		cm.cronEngine.Remove(entryID)
 		delete(cm.entries, j.ID)

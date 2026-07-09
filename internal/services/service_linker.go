@@ -1,36 +1,28 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
-	"vessel.dev/vessel/internal/database"
-	"vessel.dev/vessel/internal/storage"
+	"vessel.dev/vessel/internal/repositories"
 )
 
-type DatabaseLister interface {
-	ListDatabasesByProject(projectID string) ([]database.Database, error)
-}
-
-type StorageLister interface {
-	ListStorageByProject(projectID string) ([]storage.Storage, error)
-}
-
 type ServiceLinker struct {
-	databases DatabaseLister
-	storages  StorageLister
+	databases repositories.DatabaseRepository
+	storages  repositories.StorageRepository
 }
 
-func NewServiceLinker(dl DatabaseLister, sl StorageLister) *ServiceLinker {
-	return &ServiceLinker{databases: dl, storages: sl}
+func NewServiceLinker(dbRepo repositories.DatabaseRepository, stRepo repositories.StorageRepository) *ServiceLinker {
+	return &ServiceLinker{databases: dbRepo, storages: stRepo}
 }
 
-func (sl *ServiceLinker) GetLinkedEnvironmentVariables(projectID string) (map[string]string, error) {
+func (sl *ServiceLinker) GetLinkedEnvironmentVariables(ctx context.Context, projectID string) (map[string]string, error) {
 	envMap := make(map[string]string)
 	if projectID == "" {
 		return envMap, nil
 	}
 
-	databases, err := sl.databases.ListDatabasesByProject(projectID)
+	databases, err := sl.databases.ListByProject(ctx, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list linked databases for project %s: %w", projectID, err)
 	}
@@ -73,7 +65,7 @@ func (sl *ServiceLinker) GetLinkedEnvironmentVariables(projectID string) (map[st
 		}
 	}
 
-	storages, err := sl.storages.ListStorageByProject(projectID)
+	storages, err := sl.storages.ListByProject(ctx, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list linked storage for project %s: %w", projectID, err)
 	}

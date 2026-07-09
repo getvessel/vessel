@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
+	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/services"
 	"vessel.dev/vessel/internal/settings"
 	"vessel.dev/vessel/internal/user"
@@ -77,7 +78,7 @@ func (s *Service) Signup(ctx context.Context, req SignupRequest) (*AuthResult, e
 		return nil, err
 	}
 
-	token, err := s.tokenService.GenerateToken(u)
+	token, err := s.tokenService.GenerateToken(&models.User{ID: u.ID, Email: u.Email, Role: u.Role})
 	if err != nil {
 		return nil, errors.New("failed to issue authentication token")
 	}
@@ -100,7 +101,7 @@ func (s *Service) Signin(ctx context.Context, req SigninRequest) (*AuthResult, e
 		return nil, errors.New("invalid email or password")
 	}
 
-	token, err := s.tokenService.GenerateToken(u)
+	token, err := s.tokenService.GenerateToken(&models.User{ID: u.ID, Email: u.Email, Role: u.Role})
 	if err != nil {
 		return nil, errors.New("failed to issue authentication token")
 	}

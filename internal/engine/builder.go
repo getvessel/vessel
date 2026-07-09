@@ -8,8 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/docker/docker/client"
-	"vessel.dev/vessel/internal/project"
-	"vessel.dev/vessel/internal/service"
+	"vessel.dev/vessel/internal/models"
 )
 
 type BuildStrategy string
@@ -20,13 +19,13 @@ const (
 )
 
 type BuildOptions struct {
-	ProjectID      string                 `json:"projectId"`
-	ServiceID      string                 `json:"serviceId,omitempty"`
-	SourceDir      string                 `json:"sourceDir"`
-	DockerfilePath string                 `json:"dockerfilePath,omitempty"`
-	LogWriter      io.Writer              `json:"-"`
-	ProjectConfig  *project.ProjectConfig `json:"projectConfig,omitempty"`
-	AppConfig      *service.AppService    `json:"appConfig,omitempty"`
+	ProjectID      string                `json:"projectId"`
+	ServiceID      string                `json:"serviceId,omitempty"`
+	SourceDir      string                `json:"sourceDir"`
+	DockerfilePath string                `json:"dockerfilePath,omitempty"`
+	LogWriter      io.Writer             `json:"-"`
+	ProjectConfig  *models.ProjectConfig `json:"projectConfig,omitempty"`
+	AppConfig      *models.AppService    `json:"appConfig,omitempty"`
 }
 
 type Builder interface {

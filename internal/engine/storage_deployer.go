@@ -13,7 +13,7 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
-	"vessel.dev/vessel/internal/storage"
+	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/utils"
 )
 
@@ -29,7 +29,7 @@ func NewStorageDeployer(dockerClient *client.Client, s StorageDeployerStore) *St
 	}
 }
 
-func (d *StorageDeployer) SpinUp(ctx context.Context, sc *storage.Storage) (string, error) {
+func (d *StorageDeployer) SpinUp(ctx context.Context, sc *models.Storage) (string, error) {
 	if d.dockerClient == nil {
 		return "", fmt.Errorf("docker daemon connection is not available")
 	}

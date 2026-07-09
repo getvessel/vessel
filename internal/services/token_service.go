@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"vessel.dev/vessel/internal/user"
+	"vessel.dev/vessel/internal/models"
 )
 
 type TokenService struct {
@@ -26,16 +26,16 @@ func NewTokenService() *TokenService {
 	}
 }
 
-func (ts *TokenService) GenerateToken(user *user.User) (string, error) {
-	if user == nil {
+func (ts *TokenService) GenerateToken(u *models.User) (string, error) {
+	if u == nil {
 		return "", errors.New("user cannot be nil when generating token")
 	}
 
 	claims := jwt.MapClaims{
-		"sub":         user.ID,
-		"email":       user.Email,
-		"role":        user.Role,
-		"totpEnabled": user.TOTPEnabled,
+		"sub":         u.ID,
+		"email":       u.Email,
+		"role":        u.Role,
+		"totpEnabled": u.TOTPEnabled,
 		"exp":         time.Now().Add(72 * time.Hour).Unix(),
 		"iat":         time.Now().Unix(),
 		"iss":         "vessel-auth",
