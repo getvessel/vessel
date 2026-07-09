@@ -1,4 +1,4 @@
-package api
+package middleware
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/solomonolatunji/vessel/internal/services"
 	"github.com/solomonolatunji/vessel/internal/types"
 )
 
@@ -13,9 +14,20 @@ type contextKey string
 
 const userClaimsKey contextKey = "user_claims"
 
-func (s *Server) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
+// AuthGuard provides HTTP middleware for verifying authentication tokens and role permissions.
+type AuthGuard struct {
+	TokenService *services.TokenService
+}
+
+// NewAuthGuard initializes a new AuthGuard with the provided token service.
+func NewAuthGuard(ts *services.TokenService) *AuthGuard {
+	return &AuthGuard{TokenService: ts}
+}
+
+// RequireAuth validates Bearer tokens or query parameters before invoking the protected handler.
+func (g *AuthGuard) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if s.tokenService == nil {
+		if g.TokenService == nil {
 			userClaims := &types.UserClaims{
 				UserID: "default",
 				Email:  "default@vessel.dev",
@@ -26,13 +38,13 @@ func (s *Server) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		tokenStr := extractTokenFromRequest(r)
+		tokenStr := ExtractTokenFromRequest(r)
 		if tokenStr == "" {
 			writeError(w, http.StatusUnauthorized, "missing authentication token")
 			return
 		}
 
-		claimsMap, err := s.tokenService.ValidateToken(tokenStr)
+		claimsMap, err := g.TokenService.ValidateToken(tokenStr)
 		if err != nil {
 			writeError(w, http.StatusUnauthorized, "invalid authentication token: "+err.Error())
 			return
@@ -49,8 +61,9 @@ func (s *Server) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func (s *Server) RequireRole(requiredRole string, next http.HandlerFunc) http.HandlerFunc {
-	return s.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
+// RequireRole enforces that the authenticated user possesses the specified role or administrative access.
+func (g *AuthGuard) RequireRole(requiredRole string, next http.HandlerFunc) http.HandlerFunc {
+	return g.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
 		claims := GetUserClaimsFromContext(r.Context())
 		if claims == nil {
 			writeError(w, http.StatusUnauthorized, "unauthorized access")
@@ -66,6 +79,7 @@ func (s *Server) RequireRole(requiredRole string, next http.HandlerFunc) http.Ha
 	})
 }
 
+// GetUserClaimsFromContext retrieves the authenticated user's claims from the HTTP request context.
 func GetUserClaimsFromContext(ctx context.Context) *types.UserClaims {
 	claims, ok := ctx.Value(userClaimsKey).(*types.UserClaims)
 	if !ok {
@@ -74,7 +88,8 @@ func GetUserClaimsFromContext(ctx context.Context) *types.UserClaims {
 	return claims
 }
 
-func extractTokenFromRequest(r *http.Request) string {
+// ExtractTokenFromRequest extracts a JWT or PAT from the Authorization header, cookie, or query parameters.
+func ExtractTokenFromRequest(r *http.Request) string {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
 		return strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
@@ -91,4 +106,10 @@ func extractTokenFromRequest(r *http.Request) string {
 	}
 
 	return ""
+}
+
+func writeError(w http.ResponseWriter, status int, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_, _ = fmt.Fprintf(w, `{"error":"%s"}`, message)
 }

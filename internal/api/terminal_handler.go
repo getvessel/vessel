@@ -8,6 +8,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/gorilla/websocket"
+	"github.com/solomonolatunji/vessel/internal/middleware"
 	"github.com/solomonolatunji/vessel/internal/utils"
 )
 
@@ -21,7 +22,7 @@ var upgrader = websocket.Upgrader{
 
 func (s *Server) handleTerminalWebSocket(w http.ResponseWriter, r *http.Request) {
 	if s.tokenService != nil {
-		tokenStr := extractTokenFromRequest(r)
+		tokenStr := middleware.ExtractTokenFromRequest(r)
 		if tokenStr == "" {
 			writeError(w, http.StatusUnauthorized, "missing authentication token for terminal access")
 			return
