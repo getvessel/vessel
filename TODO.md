@@ -163,7 +163,7 @@ vessel-cloud/
 ├── cmd/apid/                  # Cloud API server entrypoint
 ├── internal/                  # Core Go packages (horizontal layers)
 │   ├── handlers/              # HTTP handlers (instances, teams, billing, admin)
-│   ├── http/                  # Server setup, routes, middleware, tenant isolation
+│   ├── server/               # Server setup, routes, middleware, tenant isolation
 │   ├── middleware/            # API key auth, multi-tenant guards, rate limiting
 │   ├── models/                # Domain structs (team, instance, subscription, etc.)
 │   ├── repositories/          # PostgreSQL data access layer
