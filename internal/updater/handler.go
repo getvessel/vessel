@@ -5,12 +5,10 @@ import (
 	"net/http"
 )
 
-// Handler manages pure HTTP endpoints for version checks and auto-update deployments.
 type Handler struct {
 	service *UpdaterService
 }
 
-// NewHandler initializes a new Updater HTTP handler.
 func NewHandler(service *UpdaterService) *Handler {
 	return &Handler{service: service}
 }

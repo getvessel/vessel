@@ -1,6 +1,5 @@
 package settings
 
-// ServerSettings represents the global daemon and server configuration.
 type ServerSettings struct {
 	ID                 string `json:"id"`
 	CaddyWildcardIP    string `json:"caddyWildcardIp"`

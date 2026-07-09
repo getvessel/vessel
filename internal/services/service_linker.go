@@ -24,7 +24,6 @@ func NewServiceLinker(dl DatabaseLister, sl StorageLister) *ServiceLinker {
 	return &ServiceLinker{databases: dl, storages: sl}
 }
 
-// GetLinkedEnvironmentVariables computes connection strings (DATABASE_URL, REDIS_URL, S3 credentials) for all databases/storage assigned to projectID.
 func (sl *ServiceLinker) GetLinkedEnvironmentVariables(projectID string) (map[string]string, error) {
 	envMap := make(map[string]string)
 	if projectID == "" {

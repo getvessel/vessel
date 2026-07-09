@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 )
 
-// CreateTarContext archives the directory at sourceDir into an in-memory tarball suitable for Docker daemon builds.
 func CreateTarContext(sourceDir string) (io.Reader, error) {
 	var buf bytes.Buffer
 	tw := tar.NewWriter(&buf)

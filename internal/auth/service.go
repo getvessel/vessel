@@ -11,7 +11,6 @@ import (
 	"vessel.dev/vessel/internal/user"
 )
 
-// Service handles signup, signin, and me (profile retrieval) business logic.
 type Service struct {
 	userRepo     user.Repository
 	settingsRepo settings.Repository

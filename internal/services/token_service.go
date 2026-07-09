@@ -13,7 +13,6 @@ type TokenService struct {
 	secretKey []byte
 }
 
-// NewTokenService initializes a TokenService with the signing key from environment or default fallback.
 func NewTokenService() *TokenService {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
@@ -27,7 +26,6 @@ func NewTokenService() *TokenService {
 	}
 }
 
-// GenerateToken creates an HMAC-SHA256 JWT access token for a validated user identity.
 func (ts *TokenService) GenerateToken(user *user.User) (string, error) {
 	if user == nil {
 		return "", errors.New("user cannot be nil when generating token")
@@ -47,7 +45,6 @@ func (ts *TokenService) GenerateToken(user *user.User) (string, error) {
 	return token.SignedString(ts.secretKey)
 }
 
-// ValidateToken parses and verifies the HMAC signature and expiration timestamp of a JWT token string.
 func (ts *TokenService) ValidateToken(tokenStr string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {

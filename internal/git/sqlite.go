@@ -9,24 +9,20 @@ import (
 	"github.com/google/uuid"
 )
 
-// Vault is a minimal interface for encrypting and decrypting sensitive values.
 type Vault interface {
 	Encrypt(plaintext string) (string, error)
 	Decrypt(ciphertext string) (string, error)
 }
 
-// SQLiteRepository implements Repository using a SQLite database and a Vault for token encryption.
 type SQLiteRepository struct {
 	db    *sql.DB
 	vault Vault
 }
 
-// NewSQLiteRepository creates a new SQLiteRepository with the given database and vault.
 func NewSQLiteRepository(db *sql.DB, vault Vault) *SQLiteRepository {
 	return &SQLiteRepository{db: db, vault: vault}
 }
 
-// SaveProvider encrypts and stores a user's Git platform credentials.
 func (r *SQLiteRepository) SaveProvider(_ context.Context, gp *GitProviderConfig) error {
 	if gp.ID == "" {
 		gp.ID = uuid.NewString()
@@ -48,8 +44,6 @@ func (r *SQLiteRepository) SaveProvider(_ context.Context, gp *GitProviderConfig
 	return err
 }
 
-// GetProvider retrieves and decrypts a user's stored Git access token for a given provider.
-// If userID is empty, it delegates to GetAnyProviderByType.
 func (r *SQLiteRepository) GetProvider(_ context.Context, userID, provider string) (*GitProviderConfig, error) {
 	if userID == "" {
 		return r.GetAnyProviderByType(context.Background(), provider)
@@ -76,7 +70,6 @@ func (r *SQLiteRepository) GetProvider(_ context.Context, userID, provider strin
 	return &gp, nil
 }
 
-// GetAnyProviderByType retrieves the first available encrypted Git access token for a provider.
 func (r *SQLiteRepository) GetAnyProviderByType(_ context.Context, provider string) (*GitProviderConfig, error) {
 	row := r.db.QueryRow(`SELECT id, user_id, provider, encrypted_access_token, account_name, created_at, updated_at
 		FROM user_git_providers WHERE provider = ? LIMIT 1`, provider)
@@ -99,7 +92,6 @@ func (r *SQLiteRepository) GetAnyProviderByType(_ context.Context, provider stri
 	return &gp, nil
 }
 
-// ListProvidersByUser retrieves all decrypted Git access tokens for a given user.
 func (r *SQLiteRepository) ListProvidersByUser(_ context.Context, userID string) ([]*GitProviderConfig, error) {
 	rows, err := r.db.Query(`SELECT id, user_id, provider, encrypted_access_token, account_name, created_at, updated_at
 		FROM user_git_providers WHERE user_id = ?`, userID)
@@ -125,7 +117,6 @@ func (r *SQLiteRepository) ListProvidersByUser(_ context.Context, userID string)
 	return list, nil
 }
 
-// DeleteProvider removes a stored Git provider connection for a user.
 func (r *SQLiteRepository) DeleteProvider(_ context.Context, userID, provider string) error {
 	_, err := r.db.Exec(`DELETE FROM user_git_providers WHERE user_id = ? AND provider = ?`, userID, provider)
 	return err

@@ -9,19 +9,16 @@ import (
 	"vessel.dev/vessel/internal/utils"
 )
 
-// AppServiceRepository is the minimal surface project.Service needs from the app-service domain.
 type AppServiceRepository interface {
 	CreateAppService(ctx context.Context, app *service.AppService) error
 }
 
-// Service implements the project domain business logic.
 type Service struct {
 	repo     Repository
 	apps     AppServiceRepository
 	domainFn func(name string) string
 }
 
-// NewService creates a new project Service.
 func NewService(repo Repository, apps AppServiceRepository) *Service {
 	return &Service{
 		repo:     repo,
@@ -30,17 +27,14 @@ func NewService(repo Repository, apps AppServiceRepository) *Service {
 	}
 }
 
-// List returns all projects.
 func (s *Service) List(ctx context.Context) ([]ProjectConfig, error) {
 	return s.repo.List(ctx)
 }
 
-// Get returns a single project by ID.
 func (s *Service) Get(ctx context.Context, id string) (*ProjectConfig, error) {
 	return s.repo.Get(ctx, id)
 }
 
-// Create creates a project and its default application service.
 func (s *Service) Create(ctx context.Context, req *CreateProjectRequest) (*ProjectConfig, error) {
 	if req.Name == "" {
 		req.Name = fmt.Sprintf("project-%s", uuid.NewString()[:8])
@@ -93,7 +87,6 @@ func (s *Service) Create(ctx context.Context, req *CreateProjectRequest) (*Proje
 	return p, nil
 }
 
-// Delete removes a project by ID.
 func (s *Service) Delete(ctx context.Context, id string) error {
 	return s.repo.Delete(ctx, id)
 }

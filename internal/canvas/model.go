@@ -9,7 +9,6 @@ import (
 	"vessel.dev/vessel/internal/storage"
 )
 
-// CanvasSummary is an aggregated view of a project including resource counts and service status.
 type CanvasSummary struct {
 	ID                 string              `json:"id"`
 	WorkspaceID        string              `json:"workspaceId,omitempty"`
@@ -28,7 +27,6 @@ type CanvasSummary struct {
 	DefaultEnvironment *environment.Config `json:"defaultEnvironment,omitempty"`
 }
 
-// EnvironmentCanvas holds the complete set of services running within a single environment.
 type EnvironmentCanvas struct {
 	Environment *environment.Config   `json:"environment"`
 	Apps        []*service.AppService `json:"apps"`

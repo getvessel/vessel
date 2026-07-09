@@ -19,7 +19,6 @@ func NewCaddyfileGenerator(config *CaddyConfig) *CaddyfileGenerator {
 	return &CaddyfileGenerator{config: config}
 }
 
-// Generate formats a Caddyfile string containing global TLS configurations, project/service routes, and custom domain proxies.
 func (g *CaddyfileGenerator) Generate(projects []project.ProjectConfig, services []*service.AppService, domains []domain.Config) (string, error) {
 	var buf bytes.Buffer
 

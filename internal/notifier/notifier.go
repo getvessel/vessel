@@ -45,7 +45,6 @@ func (n *NotifierService) Send(event *notification.NotificationEvent) error {
 		}
 	}
 
-	// Email (SMTP or Resend)
 	if pref == nil || pref.EmailEnabled {
 		if integ.SMTPEnabled && integ.SMTPHost != "" {
 			_ = n.sendSMTP(integ, event)
@@ -54,27 +53,22 @@ func (n *NotifierService) Send(event *notification.NotificationEvent) error {
 		}
 	}
 
-	// Slack
 	if (pref == nil || pref.SlackEnabled) && integ.SlackEnabled && integ.SlackWebhookURL != "" {
 		_ = n.sendSlack(integ.SlackWebhookURL, event)
 	}
 
-	// Discord
 	if (pref == nil || pref.DiscordEnabled) && integ.DiscordEnabled && integ.DiscordWebhookURL != "" {
 		_ = n.sendDiscord(integ.DiscordWebhookURL, integ.DiscordPingEnabled, event)
 	}
 
-	// Telegram
 	if (pref == nil || pref.TelegramEnabled) && integ.TelegramEnabled && integ.TelegramBotToken != "" && integ.TelegramChatID != "" {
 		_ = n.sendTelegram(integ.TelegramBotToken, integ.TelegramChatID, event)
 	}
 
-	// Pushover
 	if (pref == nil || pref.PushoverEnabled) && integ.PushoverEnabled && integ.PushoverUserKey != "" && integ.PushoverAPIToken != "" {
 		_ = n.sendPushover(integ.PushoverUserKey, integ.PushoverAPIToken, event)
 	}
 
-	// Generic Webhook
 	if (pref == nil || pref.WebhookEnabled) && integ.WebhookEnabled && integ.WebhookURL != "" {
 		_ = n.sendWebhook(integ.WebhookURL, event)
 	}

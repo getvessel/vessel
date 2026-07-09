@@ -7,22 +7,18 @@ import (
 	"strings"
 )
 
-// Service orchestrates settings validation, persistence, and MCP server capabilities.
 type Service struct {
 	repo Repository
 }
 
-// NewService creates a new instance of Settings Service using consumer-defined Repository.
 func NewService(repo Repository) *Service {
 	return &Service{repo: repo}
 }
 
-// GetSettings retrieves global server configuration.
 func (s *Service) GetSettings(ctx context.Context) (*ServerSettings, error) {
 	return s.repo.GetServerSettings(ctx)
 }
 
-// UpdateSettings validates and applies changes to server settings.
 func (s *Service) UpdateSettings(ctx context.Context, cfg *ServerSettings) error {
 	if cfg == nil {
 		return errors.New("settings configuration cannot be nil")
@@ -36,7 +32,6 @@ func (s *Service) UpdateSettings(ctx context.Context, cfg *ServerSettings) error
 	return s.repo.UpdateServerSettings(ctx, cfg)
 }
 
-// CheckMCPEnabled verifies whether MCP server capabilities are allowed by policy.
 func (s *Service) CheckMCPEnabled(ctx context.Context) error {
 	settings, err := s.repo.GetServerSettings(ctx)
 	if err != nil {
@@ -48,7 +43,6 @@ func (s *Service) CheckMCPEnabled(ctx context.Context) error {
 	return nil
 }
 
-// ExecuteMCPTool executes requested MCP tools like list_projects or get_system_status if permitted.
 func (s *Service) ExecuteMCPTool(ctx context.Context, toolName string) ([]map[string]any, error) {
 	if err := s.CheckMCPEnabled(ctx); err != nil {
 		return nil, err

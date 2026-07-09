@@ -6,7 +6,6 @@ import (
 	"strings"
 )
 
-// GenerateSslipDomain synthesizes an automatic sslip.io wildcard domain name using the server host IP and project identifier.
 func GenerateSslipDomain(projectNameOrID string, hostIP string) string {
 	if hostIP == "" {
 		hostIP = os.Getenv("VESSEL_HOST_IP")

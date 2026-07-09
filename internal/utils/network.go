@@ -7,7 +7,6 @@ import (
 	"github.com/docker/docker/client"
 )
 
-// EnsureVesselNetwork verifies that the isolated Docker bridge network vessel-net exists, creating it if missing.
 func EnsureVesselNetwork(ctx context.Context, cli *client.Client) error {
 	if cli == nil {
 		return nil

@@ -11,18 +11,15 @@ import (
 	"github.com/google/uuid"
 )
 
-// SQLiteRepository implements Repository using a SQLite database.
 type SQLiteRepository struct {
 	mu sync.RWMutex
 	db *sql.DB
 }
 
-// NewSQLiteRepository creates a new SQLiteRepository backed by the given db.
 func NewSQLiteRepository(db *sql.DB) *SQLiteRepository {
 	return &SQLiteRepository{db: db}
 }
 
-// Get retrieves a single environment by ID.
 func (r *SQLiteRepository) Get(_ context.Context, id string) (*Config, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -43,7 +40,6 @@ func (r *SQLiteRepository) Get(_ context.Context, id string) (*Config, error) {
 	return &env, nil
 }
 
-// ListByProject returns all environments belonging to a project.
 func (r *SQLiteRepository) ListByProject(_ context.Context, projectID string) ([]Config, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -70,7 +66,6 @@ func (r *SQLiteRepository) ListByProject(_ context.Context, projectID string) ([
 	return envs, rows.Err()
 }
 
-// Create inserts a new environment record.
 func (r *SQLiteRepository) Create(_ context.Context, env *Config) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -92,7 +87,6 @@ func (r *SQLiteRepository) Create(_ context.Context, env *Config) error {
 	return nil
 }
 
-// Delete removes an environment by ID.
 func (r *SQLiteRepository) Delete(_ context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.RUnlock()

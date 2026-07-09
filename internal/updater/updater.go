@@ -43,7 +43,6 @@ func NewUpdaterService(repo Repository) *UpdaterService {
 	}
 }
 
-// Start initiates the background loop checking for updates based on UpdateCheckCron interval.
 func (u *UpdaterService) Start(ctx context.Context) {
 	go func() {
 		ticker := time.NewTicker(1 * time.Hour)
@@ -77,7 +76,6 @@ func (u *UpdaterService) Stop() {
 	close(u.stopCh)
 }
 
-// CheckForUpdate queries the release repository or simulated endpoint to check if a new version exists.
 func (u *UpdaterService) CheckForUpdate(ctx context.Context) (*UpdateInfo, error) {
 	u.mu.Lock()
 	defer u.mu.Unlock()
@@ -145,7 +143,6 @@ func (u *UpdaterService) CheckForUpdate(ctx context.Context) (*UpdateInfo, error
 	}, nil
 }
 
-// DeployUpdate applies the latest available update or triggers a self-upgrade routine.
 func (u *UpdaterService) DeployUpdate(ctx context.Context) error {
 	u.mu.Lock()
 	defer u.mu.Unlock()

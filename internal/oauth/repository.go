@@ -2,7 +2,6 @@ package oauth
 
 import "context"
 
-// Repository defines persistence operations for OAuth providers and TOTP secrets.
 type Repository interface {
 	ListProviders(ctx context.Context) ([]Provider, error)
 	GetProvider(ctx context.Context, idOrName string) (*Provider, error)

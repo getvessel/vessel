@@ -2,7 +2,6 @@ package domain
 
 import "time"
 
-// Config represents a custom domain routing rule attached to a project.
 type Config struct {
 	ID            string    `json:"id"`
 	ProjectID     string    `json:"projectId"`

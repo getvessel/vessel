@@ -5,12 +5,10 @@ import (
 	"net/http"
 )
 
-// Handler serves HTTP requests for notification configuration.
 type Handler struct {
 	service *Service
 }
 
-// NewHandler creates a new notification Handler.
 func NewHandler(service *Service) *Handler {
 	return &Handler{service: service}
 }
@@ -25,7 +23,6 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 	http.Error(w, msg, status)
 }
 
-// GetIntegrations returns the global notification integration settings.
 func (h *Handler) GetIntegrations(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
@@ -41,7 +38,6 @@ func (h *Handler) GetIntegrations(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, integ)
 }
 
-// SaveIntegrations persists the global notification integration settings.
 func (h *Handler) SaveIntegrations(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut && r.Method != http.MethodPost {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
@@ -62,7 +58,6 @@ func (h *Handler) SaveIntegrations(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, integ)
 }
 
-// TestNotification sends a test notification through the specified channel.
 func (h *Handler) TestNotification(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
@@ -89,8 +84,6 @@ func (h *Handler) TestNotification(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// GetProjectPreferences returns notification preferences for a project.
-// Uses r.PathValue("id") since the route is /api/projects/{id}/notifications.
 func (h *Handler) GetProjectPreferences(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
@@ -112,7 +105,6 @@ func (h *Handler) GetProjectPreferences(w http.ResponseWriter, r *http.Request) 
 	writeJSON(w, http.StatusOK, pref)
 }
 
-// SaveProjectPreferences persists notification preferences for a project.
 func (h *Handler) SaveProjectPreferences(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut && r.Method != http.MethodPost {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")

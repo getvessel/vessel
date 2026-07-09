@@ -8,13 +8,11 @@ import (
 	"github.com/docker/docker/client"
 )
 
-// Handler manages pure HTTP concerns for global settings and MCP endpoints.
 type Handler struct {
 	service      *Service
 	dockerClient *client.Client
 }
 
-// NewHandler initializes a new Settings HTTP handler.
 func NewHandler(service *Service, dockerClient *client.Client) *Handler {
 	return &Handler{
 		service:      service,

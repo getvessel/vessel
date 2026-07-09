@@ -6,19 +6,16 @@ import (
 	"net/http"
 )
 
-// ProxyReloader is the minimal proxy surface used by project handlers.
 type ProxyReloader interface {
 	Reload(ctx context.Context) error
 }
 
-// Handler serves HTTP requests for the project domain.
 type Handler struct {
 	service     *Service
 	proxy       ProxyReloader
 	extractUser func(r *http.Request) string
 }
 
-// NewHandler creates a new project Handler.
 func NewHandler(service *Service, proxy ProxyReloader, extractUser func(r *http.Request) string) *Handler {
 	return &Handler{
 		service:     service,
@@ -37,7 +34,6 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 	writeJSON(w, status, map[string]string{"error": msg})
 }
 
-// List handles GET /api/projects.
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	projects, err := h.service.List(r.Context())
 	if err != nil {
@@ -47,7 +43,6 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, projects)
 }
 
-// Create handles POST /api/projects.
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	var req CreateProjectRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -67,7 +62,6 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, p)
 }
 
-// Get handles GET /api/projects/{id}.
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if id == "" {
@@ -83,7 +77,6 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, p)
 }
 
-// Delete handles DELETE /api/projects/{id}.
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if id == "" {

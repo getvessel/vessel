@@ -2,7 +2,6 @@ package oauth
 
 import "time"
 
-// Provider holds OAuth 2.0 / OIDC provider configuration.
 type Provider struct {
 	ID           string    `json:"id"`
 	ProviderName string    `json:"providerName"`
@@ -16,7 +15,6 @@ type Provider struct {
 	UpdatedAt    time.Time `json:"updatedAt"`
 }
 
-// TwoFASetupResponse is returned when a user initiates TOTP 2FA enrollment.
 type TwoFASetupResponse struct {
 	Secret        string   `json:"secret"`
 	QRCodeURI     string   `json:"qrCodeUri"`

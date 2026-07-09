@@ -9,7 +9,6 @@ import (
 	"vessel.dev/vessel/internal/user"
 )
 
-// Service handles all OAuth provider management and 2FA logic.
 type Service struct {
 	repo         Repository
 	userRepo     user.Repository
@@ -31,7 +30,6 @@ func (s *Service) SaveProvider(ctx context.Context, p *Provider) error {
 	return s.repo.SaveProvider(ctx, p)
 }
 
-// HandleCallback exchanges the OAuth code for a user email, upserts the user, and returns a JWT token.
 func (s *Service) HandleCallback(ctx context.Context, providerName, code string) (string, *user.User, error) {
 	p, err := s.repo.GetProvider(ctx, providerName)
 	if err != nil || p == nil {
@@ -73,7 +71,6 @@ func (s *Service) GetProvider(ctx context.Context, idOrName string) (*Provider, 
 	return s.repo.GetProvider(ctx, idOrName)
 }
 
-// Setup2FA generates a new TOTP secret and recovery codes for a user.
 func (s *Service) Setup2FA(ctx context.Context, userID, email string) (*TwoFASetupResponse, error) {
 	secret, err := GenerateTOTPSecret()
 	if err != nil {
@@ -93,7 +90,6 @@ func (s *Service) Setup2FA(ctx context.Context, userID, email string) (*TwoFASet
 	}, nil
 }
 
-// Verify2FA validates the TOTP passcode and enables 2FA on success.
 func (s *Service) Verify2FA(ctx context.Context, userID, passcode string) error {
 	secret, recoveryCodes, err := s.repo.GetUserTOTPSecret(ctx, userID)
 	if err != nil || secret == "" {
@@ -105,7 +101,6 @@ func (s *Service) Verify2FA(ctx context.Context, userID, passcode string) error 
 	return s.repo.UpdateUserTOTP(ctx, userID, true, secret, recoveryCodes)
 }
 
-// Disable2FA removes TOTP for a user.
 func (s *Service) Disable2FA(ctx context.Context, userID string) error {
 	return s.repo.UpdateUserTOTP(ctx, userID, false, "", nil)
 }

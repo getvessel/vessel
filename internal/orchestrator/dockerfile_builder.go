@@ -11,17 +11,14 @@ import (
 	"vessel.dev/vessel/internal/utils"
 )
 
-// DockerfileBuilder compiles OCI images from repositories that contain an explicit Dockerfile.
 type DockerfileBuilder struct {
 	dockerClient *client.Client
 }
 
-// NewDockerfileBuilder creates a new DockerfileBuilder using the provided Docker daemon client.
 func NewDockerfileBuilder(dockerClient *client.Client) *DockerfileBuilder {
 	return &DockerfileBuilder{dockerClient: dockerClient}
 }
 
-// Build archives the source context using utils and invokes the Docker daemon ImageBuild API.
 func (d *DockerfileBuilder) Build(ctx context.Context, opts BuildOptions) (string, error) {
 	imageTag := fmt.Sprintf("vessel-app-%s:latest", strings.ToLower(opts.ProjectID))
 	if opts.LogWriter != nil {

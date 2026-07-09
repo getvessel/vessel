@@ -5,12 +5,10 @@ import (
 	"net/http"
 )
 
-// Handler serves HTTP requests for deployment environments.
 type Handler struct {
 	service *Service
 }
 
-// NewHandler creates a new environment Handler.
 func NewHandler(service *Service) *Handler {
 	return &Handler{service: service}
 }
@@ -25,7 +23,6 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 	writeJSON(w, status, map[string]string{"error": msg})
 }
 
-// ListByProject handles GET /api/projects/{id}/environments.
 func (h *Handler) ListByProject(w http.ResponseWriter, r *http.Request) {
 	projectID := r.PathValue("id")
 	envs, err := h.service.ListByProject(r.Context(), projectID)
@@ -36,7 +33,6 @@ func (h *Handler) ListByProject(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, envs)
 }
 
-// Create handles POST /api/projects/{id}/environments.
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	projectID := r.PathValue("id")
 	var env Config
@@ -57,7 +53,6 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, env)
 }
 
-// Delete handles DELETE /api/environments/{id}.
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.service.Delete(r.Context(), id); err != nil {

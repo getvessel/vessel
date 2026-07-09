@@ -16,7 +16,6 @@ import (
 	"time"
 )
 
-// AppService describes the minimal fields needed to clone/pull an application repository.
 type AppService struct {
 	ID            string
 	ProjectID     string
@@ -27,19 +26,16 @@ type AppService struct {
 	ContainerID   string
 }
 
-// ProjectService is the caller-supplied interface for listing application services by project.
 type ProjectService interface {
 	ListAppServicesByProject(projectID string) ([]*AppService, error)
 }
 
-// Service handles Git provider connections and repository operations.
 type Service struct {
 	repo       Repository
 	httpClient *http.Client
-	projects   ProjectService // optional; needed only for CloneOrPullRepository
+	projects   ProjectService
 }
 
-// NewService creates a new git Service. If httpClient is nil, a default client with a 15s timeout is used.
 func NewService(repo Repository, httpClient *http.Client) *Service {
 	if httpClient == nil {
 		httpClient = &http.Client{Timeout: 15 * time.Second}
@@ -47,12 +43,10 @@ func NewService(repo Repository, httpClient *http.Client) *Service {
 	return &Service{repo: repo, httpClient: httpClient}
 }
 
-// WithProjectService attaches the optional ProjectService needed for CloneOrPullRepository.
 func (svc *Service) WithProjectService(ps ProjectService) {
 	svc.projects = ps
 }
 
-// SaveProvider stores a user's GitHub or GitLab access token and account name.
 func (svc *Service) SaveProvider(ctx context.Context, userID string, req *GitConnectRequest) (*GitProviderConfig, error) {
 	switch req.Provider {
 	case "github", "gitlab":
@@ -76,7 +70,6 @@ func (svc *Service) SaveProvider(ctx context.Context, userID string, req *GitCon
 	return gp, nil
 }
 
-// GetConnectedProviders returns the connection status for GitHub and GitLab for a specific user.
 func (svc *Service) GetConnectedProviders(ctx context.Context, userID string) ([]map[string]any, error) {
 	providers, err := svc.repo.ListProvidersByUser(ctx, userID)
 	if err != nil {
@@ -106,12 +99,10 @@ func (svc *Service) GetConnectedProviders(ctx context.Context, userID string) ([
 	return results, nil
 }
 
-// DisconnectProvider removes a stored OAuth/PAT connection for a specific user and provider.
 func (svc *Service) DisconnectProvider(ctx context.Context, userID, provider string) error {
 	return svc.repo.DeleteProvider(ctx, userID, provider)
 }
 
-// ListRepositories retrieves public and private repositories for the user from GitHub or GitLab API.
 func (svc *Service) ListRepositories(ctx context.Context, userID, provider string) ([]GitRepository, error) {
 	gp, err := svc.repo.GetProvider(ctx, userID, provider)
 	if err != nil {
@@ -226,7 +217,6 @@ func (svc *Service) listGitLabRepos(ctx context.Context, token string) ([]GitRep
 	return results, nil
 }
 
-// CloneOrPullRepository checks out or updates the codebase from the project's first application service.
 func (svc *Service) CloneOrPullRepository(ctx context.Context, projectID, targetDir string, logWriter io.Writer) error {
 	if svc.projects == nil {
 		return errors.New("project service not configured")
@@ -238,7 +228,6 @@ func (svc *Service) CloneOrPullRepository(ctx context.Context, projectID, target
 	return svc.CloneOrPullAppRepository(ctx, apps[0], targetDir, logWriter)
 }
 
-// CloneOrPullAppRepository checks out or updates the codebase from an application service's RepositoryURL.
 func (svc *Service) CloneOrPullAppRepository(ctx context.Context, app *AppService, targetDir string, logWriter io.Writer) error {
 	repoURL := strings.TrimSpace(app.RepositoryURL)
 	if repoURL == "" {

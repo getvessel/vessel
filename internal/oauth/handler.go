@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-// Handler manages HTTP concerns for OAuth providers and TOTP 2FA.
 type Handler struct {
 	service       *Service
 	extractClaims func(r *http.Request) (userID, email string)

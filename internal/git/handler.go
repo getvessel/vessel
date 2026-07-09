@@ -5,13 +5,11 @@ import (
 	"net/http"
 )
 
-// Handler serves the HTTP endpoints for git provider management.
 type Handler struct {
 	service       *Service
 	extractUserID func(r *http.Request) string
 }
 
-// NewHandler creates a new git Handler.
 func NewHandler(service *Service, extractUserID func(r *http.Request) string) *Handler {
 	return &Handler{
 		service:       service,
@@ -19,7 +17,6 @@ func NewHandler(service *Service, extractUserID func(r *http.Request) string) *H
 	}
 }
 
-// Connect handles POST /api/git/connect — saves a user's Git provider credentials.
 func (h *Handler) Connect(w http.ResponseWriter, r *http.Request) {
 	userID := h.extractUserID(r)
 	if userID == "" {
@@ -42,7 +39,6 @@ func (h *Handler) Connect(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, gp)
 }
 
-// Status handles GET /api/git/status — returns connection status for GitHub and GitLab.
 func (h *Handler) Status(w http.ResponseWriter, r *http.Request) {
 	userID := h.extractUserID(r)
 	if userID == "" {
@@ -59,7 +55,6 @@ func (h *Handler) Status(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, status)
 }
 
-// Disconnect handles DELETE /api/git/connect/{provider} — removes a Git provider connection.
 func (h *Handler) Disconnect(w http.ResponseWriter, r *http.Request) {
 	userID := h.extractUserID(r)
 	if userID == "" {
@@ -81,7 +76,6 @@ func (h *Handler) Disconnect(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "disconnected"})
 }
 
-// ListRepos handles GET /api/git/repos — lists repositories for a given provider.
 func (h *Handler) ListRepos(w http.ResponseWriter, r *http.Request) {
 	userID := h.extractUserID(r)
 	if userID == "" {

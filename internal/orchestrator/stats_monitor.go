@@ -26,7 +26,6 @@ func NewStatsMonitor(dockerClient *client.Client) *StatsMonitor {
 	return &StatsMonitor{dockerClient: dockerClient}
 }
 
-// GetHealth fetches one-shot statistical metrics for a running container and returns a formatted ContainerHealth record.
 func (s *StatsMonitor) GetHealth(ctx context.Context, containerIDOrName string) (*ContainerHealth, error) {
 	inspectResp, err := s.dockerClient.ContainerInspect(ctx, containerIDOrName)
 	if err != nil {

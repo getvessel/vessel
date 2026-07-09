@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-// SQLiteRepository is the concrete SQLite adapter that implicitly satisfies settings.Repository.
 type SQLiteRepository struct {
 	db *sql.DB
 	mu sync.Mutex

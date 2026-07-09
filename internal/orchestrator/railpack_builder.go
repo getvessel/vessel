@@ -11,18 +11,14 @@ import (
 	"github.com/docker/docker/client"
 )
 
-// RailpackBuilder performs automated multi-language container image builds (Node.js, Python, Go, Rust, PHP, Java)
-// without requiring a user-provided Dockerfile, utilizing Railpack/Nixpacks or fallback OCI synthesis.
 type RailpackBuilder struct {
 	dockerClient *client.Client
 }
 
-// NewRailpackBuilder creates a new RailpackBuilder wired to the provided Docker daemon client.
 func NewRailpackBuilder(dockerClient *client.Client) *RailpackBuilder {
 	return &RailpackBuilder{dockerClient: dockerClient}
 }
 
-// Build auto-detects the repository stack and compiles an OCI container image while streaming build logs.
 func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions) (string, error) {
 	imageTag := fmt.Sprintf("vessel-app-%s:latest", strings.ToLower(opts.ProjectID))
 	if opts.LogWriter != nil {

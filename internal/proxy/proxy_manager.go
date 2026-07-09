@@ -46,7 +46,6 @@ func NewProxyManager(config *CaddyConfig, projects ProjectLister, services AppSe
 	}
 }
 
-// Reload recomputes the entire reverse proxy configuration table and applies it to the running Caddy instance without downtime.
 func (m *ProxyManager) Reload(ctx context.Context) error {
 	projects, err := m.projects.ListProjects()
 	if err != nil {

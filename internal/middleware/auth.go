@@ -25,7 +25,6 @@ type AuthGuard struct {
 	Settings     SettingsProvider
 }
 
-// NewAuthGuard initializes a new AuthGuard with the provided token service and settings provider.
 func NewAuthGuard(ts *services.TokenService, sp SettingsProvider) *AuthGuard {
 	return &AuthGuard{TokenService: ts, Settings: sp}
 }
@@ -79,7 +78,6 @@ func (g *AuthGuard) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// IsIPAllowed verifies whether clientIP matches any exact IP or CIDR in the comma-separated allowlist.
 func IsIPAllowed(clientIPStr string, allowlistStr string) bool {
 	clientIP := net.ParseIP(clientIPStr)
 	if clientIP == nil {
@@ -105,7 +103,6 @@ func IsIPAllowed(clientIPStr string, allowlistStr string) bool {
 	return false
 }
 
-// ExtractClientIP parses real client IP from reverse proxy headers or RemoteAddr.
 func ExtractClientIP(r *http.Request) string {
 	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
 		parts := strings.Split(xff, ",")
@@ -184,7 +181,6 @@ func GetUserClaimsFromContext(ctx context.Context) *user.UserClaims {
 	return claims
 }
 
-// ExtractTokenFromRequest extracts a JWT or PAT from the Authorization header, cookie, or query parameters.
 func ExtractTokenFromRequest(r *http.Request) string {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {

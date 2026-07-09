@@ -13,21 +13,16 @@ import (
 	"vessel.dev/vessel/internal/storage"
 )
 
-// SQLiteRepository implements Repository against a SQLite database.
 type SQLiteRepository struct {
 	db           *sql.DB
 	mu           sync.Mutex
 	environments environment.Repository
 }
 
-// NewSQLiteRepository constructs a SQLiteRepository backed by the given db and environment repository.
 func NewSQLiteRepository(db *sql.DB, envRepo environment.Repository) *SQLiteRepository {
 	return &SQLiteRepository{db: db, environments: envRepo}
 }
 
-// ── Canvas read model ────────────────────────────────────────────────────────
-
-// ListCanvasSummaries returns dashboard summaries for every project without N+1 queries.
 func (r *SQLiteRepository) ListCanvasSummaries(ctx context.Context) ([]CanvasSummary, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -133,7 +128,6 @@ func (r *SQLiteRepository) ListCanvasSummaries(ctx context.Context) ([]CanvasSum
 	return summaries, nil
 }
 
-// GetCanvasSummary returns a canvas summary for a single project.
 func (r *SQLiteRepository) GetCanvasSummary(ctx context.Context, id string) (*CanvasSummary, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -202,7 +196,6 @@ func (r *SQLiteRepository) GetCanvasSummary(ctx context.Context, id string) (*Ca
 	return summary, nil
 }
 
-// GetEnvironmentCanvas retrieves all apps, databases, and storage for a given environment.
 func (r *SQLiteRepository) GetEnvironmentCanvas(_ context.Context, environmentID string) (*EnvironmentCanvas, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -241,8 +234,6 @@ func (r *SQLiteRepository) GetEnvironmentCanvas(_ context.Context, environmentID
 		Storage:     storagePtrs,
 	}, nil
 }
-
-// ── Internal helpers ─────────────────────────────────────────────────────────
 
 type projectRow struct {
 	ID          string

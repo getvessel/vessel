@@ -2,7 +2,6 @@ package notification
 
 import "context"
 
-// Repository defines the persistence operations for notification configuration.
 type Repository interface {
 	GetIntegration(ctx context.Context) (*NotificationIntegration, error)
 	SaveIntegration(ctx context.Context, n *NotificationIntegration) error

@@ -7,17 +7,14 @@ import (
 	"time"
 )
 
-// SQLiteRepository implements Repository using a SQLite database.
 type SQLiteRepository struct {
 	db *sql.DB
 }
 
-// NewSQLiteRepository creates a new SQLiteRepository backed by the given *sql.DB.
 func NewSQLiteRepository(db *sql.DB) *SQLiteRepository {
 	return &SQLiteRepository{db: db}
 }
 
-// GetIntegration retrieves the global notification integration settings.
 func (r *SQLiteRepository) GetIntegration(ctx context.Context) (*NotificationIntegration, error) {
 	query := `SELECT id, smtp_enabled, COALESCE(smtp_host, ''), COALESCE(smtp_port, 587), COALESCE(smtp_user, ''), COALESCE(smtp_password, ''), COALESCE(smtp_from_name, ''), COALESCE(smtp_from_address, ''), resend_enabled, COALESCE(resend_api_key, ''), slack_enabled, COALESCE(slack_webhook_url, ''), discord_enabled, COALESCE(discord_webhook_url, ''), discord_ping_enabled, telegram_enabled, COALESCE(telegram_bot_token, ''), COALESCE(telegram_chat_id, ''), pushover_enabled, COALESCE(pushover_user_key, ''), COALESCE(pushover_api_token, ''), webhook_enabled, COALESCE(webhook_url, ''), COALESCE(updated_at, '') FROM notification_integrations WHERE id = 'global'`
 
@@ -60,7 +57,6 @@ func (r *SQLiteRepository) GetIntegration(ctx context.Context) (*NotificationInt
 	return &n, nil
 }
 
-// SaveIntegration upserts the global notification integration settings.
 func (r *SQLiteRepository) SaveIntegration(ctx context.Context, n *NotificationIntegration) error {
 	n.ID = "global"
 	n.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
@@ -113,7 +109,6 @@ func (r *SQLiteRepository) SaveIntegration(ctx context.Context, n *NotificationI
 	return nil
 }
 
-// GetProjectPref retrieves notification preferences for a project.
 func (r *SQLiteRepository) GetProjectPref(ctx context.Context, projectID string) (*ProjectNotificationPref, error) {
 	query := `SELECT project_id, email_enabled, slack_enabled, discord_enabled, telegram_enabled, pushover_enabled, webhook_enabled, COALESCE(events, 'deploy.success,deploy.failure,invite'), updated_at FROM project_notification_prefs WHERE project_id = ?`
 
@@ -140,7 +135,6 @@ func (r *SQLiteRepository) GetProjectPref(ctx context.Context, projectID string)
 	return &pref, nil
 }
 
-// SaveProjectPref upserts notification preferences for a project.
 func (r *SQLiteRepository) SaveProjectPref(ctx context.Context, pref *ProjectNotificationPref) error {
 	pref.UpdatedAt = time.Now().UTC()
 

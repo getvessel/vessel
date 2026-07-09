@@ -11,7 +11,6 @@ import (
 	"time"
 )
 
-// ExchangeCode contacts the provider's token endpoint and returns the authenticated user's email.
 func ExchangeCode(p *Provider, code string) (string, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
 
@@ -25,7 +24,6 @@ func ExchangeCode(p *Provider, code string) (string, error) {
 	}
 }
 
-// GetAuthorizationURL builds the provider-specific OAuth redirect URL.
 func GetAuthorizationURL(p *Provider, state string) (string, error) {
 	if !p.Enabled || p.ClientID == "" {
 		return "", fmt.Errorf("oauth provider %s is not enabled or configured", p.ProviderName)

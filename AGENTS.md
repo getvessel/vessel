@@ -2,10 +2,11 @@
 
 ## Code Style
 
+- **Max 350 lines per file.** If a file exceeds this, extract helpers, adapters, or types into separate files.
 - **One component per file.** Never cram thousands of lines into a single file. Break components down into individual files.
 - **Name files in `kebab-case`** (e.g. `project-card.tsx`, `use-logs-stream.ts`).
 - Use named exports over default exports.
-- Prefer concise code. No inline `//` comments allowed. Only JSDoc/TSDoc (`/** */`) for TS/JS and GoDoc (`// PackageName`) for Go types/funcs, and only when the logic is non-obvious. Do not write GoDoc on types that are self-explanatory (e.g., `// User represents a user`) or on HTTP handlers (handler names already describe what they do).
+- **No comments or GoDoc/JSDoc allowed.** Code should be self-explanatory. If logic is truly non-obvious, refactor to make it clear rather than adding a comment.
 
 ## Workflow
 
@@ -38,9 +39,8 @@
 
 ## Go Conventions & Architecture
 
-- **Feature/Domain Packaging (`internal/<domain>/`):** Modern Go code inside `internal/` must be organized by feature/domain (e.g., `internal/auth/`, `internal/projects/`, `internal/cron/`) rather than rigid horizontal layers (`api/`, `services/`, `store/`). Each domain package encapsulates its own `model.go`, `dto.go`, `handler.go`, `service.go`, `repository.go` (if needed), and database implementation (`sqlite.go`).
-- **Consumer-Defined Interfaces:** Define interfaces where they are _consumed_, not where they are implemented (`Accept interfaces, return structs`). Services define narrow `Repository` interfaces (e.g., `type Repository interface { GetByID(ctx, id) (*Job, error) }`) specifying exact dependencies. Concrete database adapters (`*SQLiteRepository`) satisfy them implicitly without `implements` clauses.
-- **Incremental Migration:** New features (e.g. `apikeys/`, `dns/`) must adopt feature-based packaging immediately. Existing legacy modules (`internal/api`, `internal/store`) should be migrated incrementally ("Boy Scout rule") when touched, avoiding massive all-at-once rewrites.
+- **Feature/Domain Packaging (`internal/<domain>/`):** All Go code inside `internal/` must be organized by feature/domain (each domain package encapsulates its own `model.go`, `dto.go`, `handler.go`, `service.go`, `repository.go`, and `sqlite.go`).
+- **Consumer-Defined Interfaces:** Define interfaces where they are _consumed_, not where they are implemented (`Accept interfaces, return structs`). Services define narrow `Repository` interfaces. Concrete database adapters (`*SQLiteRepository`) satisfy them implicitly without `implements` clauses.
 - **File naming:** lowercase snake_case (`container_health.go`).
 - **Package naming:** short, lowercase, single word (`cron`, `auth`, `apikeys`).
 - **Error handling:** always check errors; wrap with `fmt.Errorf("context: %w", err)`.
@@ -49,4 +49,4 @@
 - Use `modernc.org/sqlite` (CGO-free) for SQLite. No `database/sql` driver imports for `mattn/go-sqlite3`.
 - Use official `github.com/docker/docker/client` for Docker SDK. Use `gorilla/websocket` for WebSocket upgrades.
 - Avoid `init()` functions. Use explicit constructor functions instead.
-- **Testing:** Integration and end-to-end tests go in `internal/tests/`, grouped by domain in subdirectories (e.g. `internal/tests/auth/`, `internal/tests/database/`). Unit tests (`Service` logic testing via consumer mocks) stay co-located with their source files (`service_test.go`).
+- **Testing:** Unit tests stay co-located with their source files (`service_test.go`). New domain packages must include tests for their service/handler logic.

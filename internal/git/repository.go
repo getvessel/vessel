@@ -2,7 +2,6 @@ package git
 
 import "context"
 
-// Repository defines the persistence contract for Git provider configurations.
 type Repository interface {
 	SaveProvider(ctx context.Context, gp *GitProviderConfig) error
 	GetProvider(ctx context.Context, userID, provider string) (*GitProviderConfig, error)

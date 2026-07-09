@@ -8,24 +8,20 @@ import (
 	"github.com/google/uuid"
 )
 
-// Vault encrypts and decrypts sensitive env-var values.
 type Vault interface {
 	Encrypt(plaintext string) (string, error)
 	Decrypt(ciphertext string) (string, error)
 }
 
-// SQLiteRepository implements Repository using a SQLite database.
 type SQLiteRepository struct {
 	db    *sql.DB
 	vault Vault
 }
 
-// NewSQLiteRepository creates a new SQLiteRepository backed by the given db and vault.
 func NewSQLiteRepository(db *sql.DB, vault Vault) *SQLiteRepository {
 	return &SQLiteRepository{db: db, vault: vault}
 }
 
-// GetVars retrieves and decrypts all environment variables for a project.
 func (r *SQLiteRepository) GetVars(_ context.Context, projectID string) (map[string]string, error) {
 	rows, err := r.db.Query(`SELECT key, encrypted_value FROM env_vars WHERE project_id = ?`, projectID)
 	if err != nil {
@@ -48,7 +44,6 @@ func (r *SQLiteRepository) GetVars(_ context.Context, projectID string) (map[str
 	return envs, rows.Err()
 }
 
-// SetVar encrypts and upserts a single environment variable.
 func (r *SQLiteRepository) SetVar(_ context.Context, projectID, key, plaintextValue string) error {
 	encrypted, err := r.vault.Encrypt(plaintextValue)
 	if err != nil {

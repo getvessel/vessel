@@ -255,8 +255,6 @@ func GetUserClaimsFromContext(ctx context.Context) *user.UserClaims {
 	return middleware.GetUserClaimsFromContext(ctx)
 }
 
-// ── Legacy adapters ────────────────────────────────────────────────────
-
 type gitProjectAdapter struct {
 	svcRepo *service.SQLiteRepository
 }
@@ -419,7 +417,6 @@ func (a *settingsProviderAdapter) GetServerSettings() (*settings.ServerSettings,
 	return a.repo.GetServerSettings(context.Background())
 }
 
-// storeAdapter implements all legacy store interfaces consumed by orchestrator, services, and git.
 type storeAdapter struct {
 	db             *sql.DB
 	vault          *vault.Vault
@@ -435,13 +432,9 @@ type storeAdapter struct {
 	userRepo       *user.SQLiteRepository
 }
 
-// ── ContainerManagerStore ─────────────────────────────────────────────
-
 func (a *storeAdapter) GetServerSettings() (*settings.ServerSettings, error) {
 	return a.settingsRepo.GetServerSettings(context.Background())
 }
-
-// ── DeployerStore ────────────────────────────────────────────────────
 
 func (a *storeAdapter) ListAppServicesByProject(projectID string) ([]*service.AppService, error) {
 	return a.serviceRepo.ListByProject(context.Background(), projectID)
@@ -456,8 +449,6 @@ func (a *storeAdapter) ListServiceVariables(serviceID string) ([]*service_var.Va
 	return svVarRepo.ListByService(context.Background(), serviceID)
 }
 
-// ── DatabaseDeployerStore ────────────────────────────────────────────
-
 func (a *storeAdapter) UpdateDatabaseStatus(id string, status string, containerID string) error {
 	_, err := a.db.Exec(`UPDATE databases SET status = ?, container_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, status, containerID, id)
 	return err
@@ -467,8 +458,6 @@ func (a *storeAdapter) GetDatabase(id string) (*database.Database, error) {
 	return a.databaseRepo.GetByID(context.Background(), id)
 }
 
-// ── StorageDeployerStore ─────────────────────────────────────────────
-
 func (a *storeAdapter) UpdateStorageStatus(id string, status string, containerID string) error {
 	_, err := a.db.Exec(`UPDATE storage SET status = ?, container_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, status, containerID, id)
 	return err
@@ -477,8 +466,6 @@ func (a *storeAdapter) UpdateStorageStatus(id string, status string, containerID
 func (a *storeAdapter) GetStorage(id string) (*storage.Storage, error) {
 	return a.storageRepo.GetByID(context.Background(), id)
 }
-
-// ── CronManagerStore ─────────────────────────────────────────────────
 
 func (a *storeAdapter) ListJobs() ([]job.Job, error) {
 	return a.jobRepo.ListByProject(context.Background(), "")
@@ -495,8 +482,6 @@ func (a *storeAdapter) GetProject(id string) (*project.ProjectConfig, error) {
 func (a *storeAdapter) UpdateJobStatusAndOutput(id string, status string, lastRunAt *time.Time, output string) error {
 	return a.jobRepo.UpdateStatus(context.Background(), id, status, lastRunAt, output)
 }
-
-// ── BackupManagerStore ───────────────────────────────────────────────
 
 func (a *storeAdapter) ListAllActiveBackupConfigs() ([]*backup.BackupConfig, error) {
 	return a.backupRepo.ListAllActiveConfigs(context.Background())
@@ -524,8 +509,6 @@ func (a *storeAdapter) ListBackupRecords(backupConfigID string) ([]*backup.Backu
 	return a.backupRepo.ListRecordsByConfig(context.Background(), backupConfigID)
 }
 
-// ── services.JobStore ────────────────────────────────────────────────
-
 func (a *storeAdapter) CreateJob(j *job.Job) error {
 	return a.jobRepo.Create(context.Background(), j)
 }
@@ -537,12 +520,6 @@ func (a *storeAdapter) ListJobsByProject(projectID string) ([]job.Job, error) {
 func (a *storeAdapter) DeleteJob(id string) error {
 	return a.jobRepo.Delete(context.Background(), id)
 }
-
-// ── services.ProjectStore ────────────────────────────────────────────
-
-// GetProject is already defined above for CronManagerStore.
-
-// ── services.DatabaseLister ──────────────────────────────────────────
 
 func (a *storeAdapter) ListDatabasesByProject(projectID string) ([]database.Database, error) {
 	rows, err := a.db.Query(`SELECT id, COALESCE(project_id, ''), COALESCE(environment_id, ''), name, engine, version, port, username, encrypted_password, database_name, volume_path, COALESCE(container_id, ''), status, COALESCE(internal_dns, ''), COALESCE(external_dns, ''), created_at, updated_at FROM databases WHERE project_id = ?`, projectID)
@@ -563,8 +540,6 @@ func (a *storeAdapter) ListDatabasesByProject(projectID string) ([]database.Data
 	return list, rows.Err()
 }
 
-// ── services.StorageLister ───────────────────────────────────────────
-
 func (a *storeAdapter) ListStorageByProject(projectID string) ([]storage.Storage, error) {
 	rows, err := a.db.Query(`SELECT id, COALESCE(project_id, ''), COALESCE(environment_id, ''), name, type, api_port, console_port, access_key, encrypted_secret_key, bucket_name, COALESCE(volume_path, ''), COALESCE(container_id, ''), COALESCE(status, 'stopped'), COALESCE(internal_dns, ''), COALESCE(external_dns, ''), created_at, updated_at FROM storage WHERE project_id = ?`, projectID)
 	if err != nil {
@@ -583,8 +558,6 @@ func (a *storeAdapter) ListStorageByProject(projectID string) ([]storage.Storage
 	}
 	return list, rows.Err()
 }
-
-// ── git.Store ────────────────────────────────────────────────────────
 
 func (a *storeAdapter) GetAppService(id string) (*service.AppService, error) {
 	return a.serviceRepo.GetByID(context.Background(), id)

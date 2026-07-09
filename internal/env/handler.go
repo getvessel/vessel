@@ -5,12 +5,10 @@ import (
 	"net/http"
 )
 
-// Handler serves HTTP requests for project-level environment variables.
 type Handler struct {
 	service *Service
 }
 
-// NewHandler creates a new env Handler.
 func NewHandler(service *Service) *Handler {
 	return &Handler{service: service}
 }
@@ -25,7 +23,6 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 	writeJSON(w, status, map[string]string{"error": msg})
 }
 
-// GetVars handles GET /api/projects/{id}/env.
 func (h *Handler) GetVars(w http.ResponseWriter, r *http.Request) {
 	projectID := r.PathValue("id")
 	envs, err := h.service.GetVars(r.Context(), projectID)
@@ -39,7 +36,6 @@ func (h *Handler) GetVars(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, envs)
 }
 
-// SetVars handles PUT /api/projects/{id}/env.
 func (h *Handler) SetVars(w http.ResponseWriter, r *http.Request) {
 	projectID := r.PathValue("id")
 	var payload VarsRequest
