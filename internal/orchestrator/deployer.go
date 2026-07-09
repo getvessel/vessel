@@ -11,7 +11,6 @@ import (
 	"github.com/solomonolatunji/vessel/internal/utils"
 )
 
-// Deployer orchestrates full zero-downtime application builds, secret injection, and container switchover.
 type Deployer struct {
 	builder          Builder
 	containerManager *ContainerManager
@@ -19,7 +18,6 @@ type Deployer struct {
 	EnvProvider      func(projectID string) (map[string]string, error)
 }
 
-// NewDeployer initializes a Deployer wired to the container build engine, Docker lifecycle manager, and store.
 func NewDeployer(dockerClient *client.Client, s *store.Store) *Deployer {
 	return &Deployer{
 		builder:          NewBuilder(dockerClient),

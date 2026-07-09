@@ -10,13 +10,11 @@ import (
 	"github.com/solomonolatunji/vessel/internal/types"
 )
 
-// CronService provides business logic for creating, validating, scheduling, and triggering background cron jobs.
 type CronService struct {
 	store       *store.Store
 	cronManager *orchestrator.CronManager
 }
 
-// NewCronService initializes a CronService wired to the store and orchestrator cron manager.
 func NewCronService(s *store.Store, cm *orchestrator.CronManager) *CronService {
 	return &CronService{
 		store:       s,

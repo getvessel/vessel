@@ -1,11 +1,10 @@
 package types
 
-// BackupConfig defines an automated database or storage volume backup schedule.
 type BackupConfig struct {
 	ID              string `json:"id"`
 	ProjectID       string `json:"projectId"`
-	DatabaseID      string `json:"databaseId,omitempty"` // Target database container ID (if backing up DB)
-	StorageID       string `json:"storageId,omitempty"`  // Target storage container ID (if backing up S3/volume)
+	DatabaseID      string `json:"databaseId,omitempty"`      // Target database container ID (if backing up DB)
+	StorageID       string `json:"storageId,omitempty"`       // Target storage container ID (if backing up S3/volume)
 	S3DestinationID string `json:"s3DestinationId,omitempty"` // Optional external S3 offsite upload target
 	Name            string `json:"name"`
 	Schedule        string `json:"schedule"` // Cron expression, e.g. "0 2 * * *" for daily at 2am
@@ -15,7 +14,6 @@ type BackupConfig struct {
 	UpdatedAt       string `json:"updatedAt"`
 }
 
-// BackupRecord represents an execution history entry for a completed or failed backup run.
 type BackupRecord struct {
 	ID             string `json:"id"`
 	BackupConfigID string `json:"backupConfigId"`
@@ -30,7 +28,6 @@ type BackupRecord struct {
 	CompletedAt    string `json:"completedAt"`
 }
 
-// S3Destination represents an external or internal S3/MinIO bucket credentials for offsite backups.
 type S3Destination struct {
 	ID              string `json:"id"`
 	ProjectID       string `json:"projectId"`

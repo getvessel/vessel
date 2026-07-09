@@ -96,17 +96,17 @@ func TestServiceSettingsAndProjectSettings(t *testing.T) {
 
 	// Step 3: Create App Service (Backend API)
 	appPayload := map[string]interface{}{
-		"name":           "Backend API",
-		"repositoryUrl":  "https://github.com/solomonolatunji/xdrive-backend.git",
-		"branch":         "main",
-		"rootDirectory":  "/src",
-		"buildCommand":   "npm run build",
-		"startCommand":   "npm run start:prod",
-		"containerPort":  3000,
-		"replicas":       2,
-		"cpuRequest":     0.5,
-		"memoryLimitMb":  512,
-		"restartPolicy":  "always",
+		"name":          "Backend API",
+		"repositoryUrl": "https://github.com/solomonolatunji/xdrive-backend.git",
+		"branch":        "main",
+		"rootDirectory": "/src",
+		"buildCommand":  "npm run build",
+		"startCommand":  "npm run start:prod",
+		"containerPort": 3000,
+		"replicas":      2,
+		"cpuRequest":    0.5,
+		"memoryLimitMb": 512,
+		"restartPolicy": "always",
 	}
 	appBytes, _ := json.Marshal(appPayload)
 	createAppReq := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/api/environments/%s/apps", env.ID), bytes.NewReader(appBytes))
@@ -235,7 +235,7 @@ func TestServiceSettingsAndProjectSettings(t *testing.T) {
 	}
 
 	tokPayload := map[string]interface{}{
-		"name":      "CI Deployment Token",
+		"name":        "CI Deployment Token",
 		"permissions": []string{"deploy", "read"},
 	}
 	tokBytes, _ := json.Marshal(tokPayload)

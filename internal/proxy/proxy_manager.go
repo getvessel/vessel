@@ -12,7 +12,6 @@ import (
 	"github.com/solomonolatunji/vessel/internal/store"
 )
 
-// ProxyManager coordinates the generation and zero-downtime hot reloading of Caddy reverse proxy routing rules.
 type ProxyManager struct {
 	config    *CaddyConfig
 	generator *CaddyfileGenerator
@@ -20,7 +19,6 @@ type ProxyManager struct {
 	docker    *client.Client
 }
 
-// NewProxyManager returns a ProxyManager wired to the provided configuration, data store, and Docker daemon client.
 func NewProxyManager(config *CaddyConfig, s *store.Store, docker *client.Client) *ProxyManager {
 	return &ProxyManager{
 		config:    config,

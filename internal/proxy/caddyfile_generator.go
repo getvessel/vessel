@@ -9,12 +9,10 @@ import (
 	"github.com/solomonolatunji/vessel/internal/utils"
 )
 
-// CaddyfileGenerator transforms project definitions and custom domain configurations into valid Caddy v2 configuration rules.
 type CaddyfileGenerator struct {
 	config *CaddyConfig
 }
 
-// NewCaddyfileGenerator creates a CaddyfileGenerator using the provided proxy configuration.
 func NewCaddyfileGenerator(config *CaddyConfig) *CaddyfileGenerator {
 	return &CaddyfileGenerator{config: config}
 }

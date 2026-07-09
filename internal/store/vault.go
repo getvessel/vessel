@@ -11,12 +11,10 @@ import (
 	"path/filepath"
 )
 
-// Vault handles AES-256-GCM encryption and decryption for sensitive project secrets.
 type Vault struct {
 	key []byte
 }
 
-// NewVault initializes or loads the 256-bit encryption key stored in the persistent data directory.
 func NewVault(dataDir string) (*Vault, error) {
 	keyPath := filepath.Join(dataDir, ".vault_key")
 

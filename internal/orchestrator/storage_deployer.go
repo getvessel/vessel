@@ -17,13 +17,11 @@ import (
 	"github.com/solomonolatunji/vessel/internal/utils"
 )
 
-// StorageDeployer provisions and manages isolated MinIO S3-compatible object storage containers.
 type StorageDeployer struct {
 	dockerClient *client.Client
 	store        *store.Store
 }
 
-// NewStorageDeployer initializes a StorageDeployer wired to the Docker daemon and state store.
 func NewStorageDeployer(dockerClient *client.Client, s *store.Store) *StorageDeployer {
 	return &StorageDeployer{
 		dockerClient: dockerClient,

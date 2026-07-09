@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 )
 
-// CaddyConfig encapsulates global file paths, network settings, and administration endpoints for the Caddy reverse proxy.
 type CaddyConfig struct {
 	CaddyfilePath    string
 	AdminAPIEndpoint string
@@ -13,7 +12,6 @@ type CaddyConfig struct {
 	TLSEmail         string
 }
 
-// NewCaddyConfig returns a CaddyConfig initialized with standard default paths and administrative endpoints.
 func NewCaddyConfig(baseDataDir string, tlsEmail string) *CaddyConfig {
 	if baseDataDir == "" {
 		baseDataDir = "data"

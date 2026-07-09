@@ -6,12 +6,10 @@ import (
 	"github.com/solomonolatunji/vessel/internal/store"
 )
 
-// ServiceLinker dynamically calculates and injects database and storage environment variables into linked project containers.
 type ServiceLinker struct {
 	store *store.Store
 }
 
-// NewServiceLinker initializes a new ServiceLinker with the underlying SQLite metadata store.
 func NewServiceLinker(s *store.Store) *ServiceLinker {
 	return &ServiceLinker{store: s}
 }

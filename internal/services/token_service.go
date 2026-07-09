@@ -8,12 +8,10 @@ import (
 	"github.com/solomonolatunji/vessel/internal/types"
 )
 
-// TokenService handles generation and validation of cryptographic JWT access tokens.
 type TokenService struct {
 	secretKey []byte
 }
 
-// NewTokenService initializes a TokenService using the vessel JWT secret key.
 func NewTokenService() *TokenService {
 	return &TokenService{
 		secretKey: []byte("vessel-super-secret-jwt-signing-key-change-in-prod"),

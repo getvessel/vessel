@@ -10,14 +10,12 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-// Store encapsulates the embedded SQLite 3 database and AES secret vault.
 type Store struct {
 	mu    sync.RWMutex
 	db    *sql.DB
 	vault *Vault
 }
 
-// NewStore initializes modernc pure-Go SQLite inside the specified data directory and runs schema migrations.
 func NewStore(dataDir string) (*Store, error) {
 	vault, err := NewVault(dataDir)
 	if err != nil {

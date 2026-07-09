@@ -53,8 +53,8 @@ func (h *SettingsHandler) UpdateServerSettings(w http.ResponseWriter, r *http.Re
 func (h *SettingsHandler) TriggerSystemPrune(w http.ResponseWriter, r *http.Request) {
 	if h.dockerClient == nil {
 		writeJSON(w, http.StatusOK, map[string]any{
-			"status":            "simulated",
-			"message":           "Docker client not initialized in standalone mode; simulated clean system prune.",
+			"status":              "simulated",
+			"message":             "Docker client not initialized in standalone mode; simulated clean system prune.",
 			"spaceReclaimedBytes": 104857600, // 100MB simulation
 		})
 		return
@@ -77,8 +77,8 @@ func (h *SettingsHandler) TriggerSystemPrune(w http.ResponseWriter, r *http.Requ
 	}
 
 	writeJSON(w, http.StatusOK, map[string]any{
-		"status":            "success",
-		"message":           "Docker system prune executed cleanly.",
+		"status":              "success",
+		"message":             "Docker system prune executed cleanly.",
 		"spaceReclaimedBytes": totalReclaimed,
 	})
 }

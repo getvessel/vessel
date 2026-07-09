@@ -11,12 +11,10 @@ import (
 	vesseltypes "github.com/solomonolatunji/vessel/internal/types"
 )
 
-// StatsMonitor polls real-time container CPU, RAM, and uptime metrics using the Docker engine statistics API.
 type StatsMonitor struct {
 	dockerClient *client.Client
 }
 
-// NewStatsMonitor initializes a StatsMonitor wired to the provided Docker daemon client.
 func NewStatsMonitor(dockerClient *client.Client) *StatsMonitor {
 	return &StatsMonitor{dockerClient: dockerClient}
 }

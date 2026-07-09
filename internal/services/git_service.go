@@ -19,13 +19,11 @@ import (
 	"github.com/solomonolatunji/vessel/internal/types"
 )
 
-// GitService handles Git provider API integration, repository listing, and automated local cloning and pulling.
 type GitService struct {
 	store      *store.Store
 	httpClient *http.Client
 }
 
-// NewGitService initializes a GitService wired to the underlying store and an HTTP client.
 func NewGitService(s *store.Store) *GitService {
 	return &GitService{
 		store: s,

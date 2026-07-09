@@ -31,6 +31,7 @@ type Server struct {
 	backupManager          *orchestrator.BackupManager
 	backupHandler          *BackupHandler
 	teamHandler            *TeamHandler
+	workspaceHandler       *WorkspaceHandler
 	settingsHandler        *SettingsHandler
 }
 
@@ -61,6 +62,7 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 		backupManager:          backupMgr,
 		backupHandler:          NewBackupHandler(s, backupMgr),
 		teamHandler:            NewTeamHandler(s),
+		workspaceHandler:       NewWorkspaceHandler(s),
 		settingsHandler:        NewSettingsHandler(s, dockerClient),
 	}
 	if srv.deployer != nil {
@@ -175,6 +177,15 @@ func (s *Server) registerRoutes() {
 	s.router.HandleFunc("DELETE /api/teams/{id}/members/{userId}", s.RequireAuth(s.teamHandler.RemoveMember))
 	s.router.HandleFunc("GET /api/team-invites/{token}", s.teamHandler.GetInvite)
 	s.router.HandleFunc("POST /api/team-invites/{token}/accept", s.RequireAuth(s.teamHandler.AcceptInvite))
+
+	// --- Workspace Level Settings (Trusted Domains, SSH Keys, Audit Logs) ---
+	s.router.HandleFunc("GET /api/teams/{teamId}/trusted-domains", s.RequireAuth(s.workspaceHandler.ListTrustedDomains))
+	s.router.HandleFunc("POST /api/teams/{teamId}/trusted-domains", s.RequireAuth(s.workspaceHandler.CreateTrustedDomain))
+	s.router.HandleFunc("DELETE /api/trusted-domains/{id}", s.RequireAuth(s.workspaceHandler.DeleteTrustedDomain))
+	s.router.HandleFunc("GET /api/teams/{teamId}/ssh-keys", s.RequireAuth(s.workspaceHandler.ListSSHKeys))
+	s.router.HandleFunc("POST /api/teams/{teamId}/ssh-keys", s.RequireAuth(s.workspaceHandler.CreateSSHKey))
+	s.router.HandleFunc("DELETE /api/ssh-keys/{id}", s.RequireAuth(s.workspaceHandler.DeleteSSHKey))
+	s.router.HandleFunc("GET /api/teams/{teamId}/audit-logs", s.RequireAuth(s.workspaceHandler.ListAuditLogs))
 
 	// --- Global Server Settings, System Prune, Profile & PATs ---
 	s.router.HandleFunc("GET /api/settings", s.RequireAuth(s.settingsHandler.GetServerSettings))

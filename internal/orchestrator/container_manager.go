@@ -12,12 +12,10 @@ import (
 	"github.com/solomonolatunji/vessel/internal/utils"
 )
 
-// ContainerManager wraps the Docker SDK to control container creation, execution lifecycle, and health diagnostics.
 type ContainerManager struct {
 	dockerClient *client.Client
 }
 
-// NewContainerManager initializes a ContainerManager using the supplied Docker client instance.
 func NewContainerManager(dockerClient *client.Client) *ContainerManager {
 	return &ContainerManager{dockerClient: dockerClient}
 }

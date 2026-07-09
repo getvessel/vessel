@@ -104,7 +104,7 @@ func (h *ProjectSettingsHandler) CreateToken(w http.ResponseWriter, r *http.Requ
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"token":      tok,
+		"token":       tok,
 		"secretToken": fullSecret, // Displayed only once
 	})
 }

@@ -2,7 +2,6 @@ package types
 
 import "time"
 
-// ServiceVariable represents an environment variable scoped specifically to a Service inside an Environment.
 type ServiceVariable struct {
 	ID            string    `json:"id"`
 	ServiceID     string    `json:"serviceId"`
@@ -14,7 +13,6 @@ type ServiceVariable struct {
 	UpdatedAt     time.Time `json:"updatedAt"`
 }
 
-// ProjectWebhook represents a webhook configured in Project Settings -> Webhooks tab.
 type ProjectWebhook struct {
 	ID                    string    `json:"id"`
 	ProjectID             string    `json:"projectId"`
@@ -25,7 +23,6 @@ type ProjectWebhook struct {
 	UpdatedAt             time.Time `json:"updatedAt"`
 }
 
-// ProjectToken represents an API token created inside Project Settings -> Tokens tab.
 type ProjectToken struct {
 	ID            string    `json:"id"`
 	ProjectID     string    `json:"projectId"`
@@ -35,7 +32,6 @@ type ProjectToken struct {
 	CreatedAt     time.Time `json:"createdAt"`
 }
 
-// ProjectMember represents an invited or active collaborator inside Project Settings -> Members tab.
 type ProjectMember struct {
 	ID         string    `json:"id"`
 	ProjectID  string    `json:"projectId"`

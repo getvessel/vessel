@@ -2,7 +2,6 @@ package types
 
 import "time"
 
-// DeploymentRecord represents a specific deployment run for a service inside an environment.
 type DeploymentRecord struct {
 	ID            string    `json:"id"`
 	ServiceID     string    `json:"serviceId"`
@@ -20,7 +19,6 @@ type DeploymentRecord struct {
 	FinishedAt    time.Time `json:"finishedAt,omitempty"`
 }
 
-// ServiceMetric represents time-series telemetry data for a deployed container instance.
 type ServiceMetric struct {
 	Timestamp  string  `json:"timestamp"`
 	CPUPercent float64 `json:"cpuPercent"`

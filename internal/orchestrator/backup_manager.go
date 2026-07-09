@@ -23,7 +23,6 @@ import (
 	"github.com/solomonolatunji/vessel/internal/utils"
 )
 
-// BackupManager orchestrates scheduled database/volume backups, executes dumps via Docker SDK, and handles retention & offsite S3 uploads.
 type BackupManager struct {
 	dockerClient *client.Client
 	store        *store.Store
@@ -33,7 +32,6 @@ type BackupManager struct {
 	mu           sync.Mutex
 }
 
-// NewBackupManager creates and initializes a BackupManager wired to Docker and local storage.
 func NewBackupManager(dockerClient *client.Client, s *store.Store, backupDir string) *BackupManager {
 	if backupDir == "" {
 		backupDir = filepath.Join("data", "backups")

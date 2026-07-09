@@ -77,4 +77,3 @@ func (s *Store) UpdateUser(u *types.User) error {
 		u.Email, u.PasswordHash, u.Role, u.UpdatedAt, u.ID)
 	return err
 }
-

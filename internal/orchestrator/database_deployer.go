@@ -18,13 +18,11 @@ import (
 	"github.com/solomonolatunji/vessel/internal/utils"
 )
 
-// DatabaseDeployer manages the automated provisioning, lifecycle, and network isolation of stateful database engines.
 type DatabaseDeployer struct {
 	dockerClient *client.Client
 	store        *store.Store
 }
 
-// NewDatabaseDeployer initializes a DatabaseDeployer wired to the Docker SDK and state store.
 func NewDatabaseDeployer(dockerClient *client.Client, s *store.Store) *DatabaseDeployer {
 	return &DatabaseDeployer{
 		dockerClient: dockerClient,

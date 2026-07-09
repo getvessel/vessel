@@ -20,7 +20,6 @@ import (
 	"github.com/solomonolatunji/vessel/internal/utils"
 )
 
-// CronManager orchestrates background job schedules and executes terminal commands inside active project containers.
 type CronManager struct {
 	dockerClient *client.Client
 	store        *store.Store
@@ -29,7 +28,6 @@ type CronManager struct {
 	mu           sync.Mutex
 }
 
-// NewCronManager initializes a CronManager with Docker client and store dependencies.
 func NewCronManager(dockerClient *client.Client, s *store.Store) *CronManager {
 	return &CronManager{
 		dockerClient: dockerClient,

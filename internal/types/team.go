@@ -2,7 +2,6 @@ package types
 
 import "time"
 
-// Team represents an organization or collaboration workspace.
 type Team struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
@@ -11,7 +10,6 @@ type Team struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-// TeamMember represents a user's membership and role within a team (`Owner`, `Admin`, or `Member`).
 type TeamMember struct {
 	ID        string    `json:"id"`
 	TeamID    string    `json:"teamId"`
@@ -21,7 +19,6 @@ type TeamMember struct {
 	JoinedAt  time.Time `json:"joinedAt"`
 }
 
-// TeamInvite represents a pending invitation to join a team.
 type TeamInvite struct {
 	ID        string    `json:"id"`
 	TeamID    string    `json:"teamId"`
