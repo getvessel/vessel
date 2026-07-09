@@ -154,46 +154,38 @@
 
 ---
 
-## ☁️ Phase 6: Commercial SaaS — Vessel Cloud (`cloud.vessel.dev` & BYOS Agent Mode)
+## ☁️ Phase 6: Commercial SaaS — Vessel Cloud (`internal/cloud/` & `cloud/`)
 
-> The cloud control plane lives in a separate private repository (`vessel-cloud`). The open-source repo (`vessel`) contains the self-hosted daemon, dashboard, marketing site, and agent — the cloud backend is proprietary. The cloud reuses the open-source dashboard (users connect to cloud-hosted instances with the same UI) and adds a lightweight staff admin panel.
+> The cloud control plane lives inside the same monorepo under `internal/cloud/` (Go backend) and `cloud/` (React admin dashboard). Shared domain models and repositories in `internal/models/` and `internal/repositories/` are used by both OSS and cloud code. The open-source dashboard (`dashboard/`) and web marketing site (`web/`) remain unchanged.
 
 ```text
-vessel-cloud/
-├── cmd/apid/                  # Cloud API server entrypoint
-├── internal/                  # Core Go packages (horizontal layers)
-│   ├── handlers/              # HTTP handlers (instances, teams, billing, admin)
-│   ├── server/               # Server setup, routes, middleware, tenant isolation
-│   ├── middleware/            # API key auth, multi-tenant guards, rate limiting
-│   ├── models/                # Domain structs (team, instance, subscription, etc.)
-│   ├── repositories/          # PostgreSQL data access layer
-│   ├── services/              # Business logic
-│   │   ├── agent/             # Agent tunnel connection acceptor
-│   │   ├── billing/           # Stripe checkout, invoicing, metering
-│   │   ├── mailer/            # SES transactional email
-│   │   ├── auth/              # OAuth, SSO/SAML, JWT
-│   │   ├── featureflags/      # GrowthBook evaluation
-│   │   └── audit/             # Immutable audit log
-│   └── utils/                 # Shared utilities
-├── migrations/                # PostgreSQL schema migrations (sqlc)
-├── dashboard/                 # Staff admin dashboard (React)
-├── scripts/                   # DB migrations, seed, deploy
-├── Dockerfile
-├── docker-compose.yml         # API + Postgres + Redis
-└── Makefile
+internal/cloud/             # Cloud Go backend
+├── server/                 # Server setup, routes, middleware, tenant isolation
+├── handlers/               # Admin & billing HTTP handlers
+├── services/
+│   ├── billing/            # Stripe, Paddle, Paystack integration
+│   ├── mailer/             # SES transactional email
+│   └── audit/              # Immutable audit log
+├── middleware/             # API key auth, multi-tenant guards, rate limiting
+└── repos/                  # PostgreSQL repositories (cloud-specific)
+
+cloud/                      # Staff admin dashboard (TanStack + React)
+├── src/
+│   ├── routes/             # TanStack Router routes
+│   ├── components/         # Admin UI components
+│   └── lib/                # Utilities
+
+migrations/                 # PostgreSQL schema migrations
 ```
 
-- [ ] **Private Cloud Repository (`vessel-cloud`)**:
-  - Initialize private repo with Go API server, multi-tenant PostgreSQL database.
-  - Staff admin dashboard for managing customers, instances, billing.
-  - Stripe integration for checkout, billing, invoicing, and seat management.
-  - GrowthBook feature flag evaluation for per-tier feature gating.
-- [ ] **Go Daemon Agent Mode (`cmd/vesseld --agent`)**:
-  - The `--agent` flag ships in the open-source daemon (see Phase 2). Phase 6 adds the cloud-side connection acceptor.
-- [ ] **Vessel Cloud Control Plane**:
-  - Agent connection acceptor (`internal/agent/`) — accepts inbound WebSocket tunnels from `vesseld --agent` instances and routes commands.
-  - "Connect Server" 1-Click Wizard generating unique install tokens: `curl -fsSL https://get.vessel.dev/agent | sh -s -- --token=vsl_live_xyz`.
-  - Multi-server fleet deployment dashboard allowing 1-click deployments to multiple geographic VPS regions.
+- [ ] **Vessel Cloud Backend (`internal/cloud/`)**:
+  - Initialize cloud API server with PostgreSQL database
+  - Agent connection acceptor — accepts inbound WebSocket tunnels from `vesseld --agent` instances
+  - Stripe, Paddle, and Paystack billing integration
+  - SES transactional email
+  - Immutable audit log
+  - "Connect Server" 1-Click Wizard generating unique install tokens: `curl -fsSL https://get.vessel.dev/agent | sh -s -- --token=vsl_live_xyz`
+  - Multi-server fleet deployment dashboard allowing 1-click deployments to multiple geographic VPS regions
 - [ ] **Billing & Subscription Integration**:
   - Integrate Stripe checkout and subscription management (`Hobby / Pro / Team` tiers).
   - Implement automated BYOS seat limits and deployment rate limiting.

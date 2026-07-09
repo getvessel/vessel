@@ -24,16 +24,18 @@ vessel/
 ├── cmd/vesseld/          # Go Daemon entrypoint (`main.go`)
 ├── internal/             # Core Go packages (horizontal layers)
 │   ├── agent/            # Agent mode for remote cloud connectivity
+│   ├── cloud/            # Cloud backend (billing, agent acceptor, admin API)
 │   ├── engine/           # Docker engine lifecycle, build strategies, deployer
 │   ├── handlers/         # HTTP handlers (auth, backup, canvas, database, deployment, etc.)
 │   ├── http/             # HTTP server setup, routes, CORS, auth middleware
 │   ├── middleware/       # Authentication guards & CORS configuration
-│   ├── models/           # Domain model structs (auth, project, database, deployment, etc.)
+│   ├── models/           # Domain model structs (project, database, user, etc.)
 │   ├── notifier/         # Multi-channel notification dispatcher
 │   ├── proxy/            # Caddy v2 reverse proxy controller
 │   ├── repositories/     # SQLite data access layer (per-domain repositories)
 │   ├── services/         # Business logic services (auth, cron, deploy, git, etc.)
-│   ├── vault/            # AES-256-GCM encryption vault for secrets
+│   └── vault/            # AES-256-GCM encryption vault for secrets
+├── cloud/                # ☁️ Staff Admin Dashboard (TanStack Router + React SPA)
 ├── dashboard/            # 💻 Main Panel Dashboard (TanStack Router + React SPA)
 ├── web/                  # 🌐 Public Marketing Landing Page (vessel.dev)
 ├── bootstrap/            # 📦 One-line install server (`install.sh`, `upgrade.sh`)
