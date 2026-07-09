@@ -66,7 +66,7 @@ Vessel includes a comprehensive root-level `Makefile` to streamline local develo
 | `make dev`             | Launches the backend daemon and dashboard dev servers concurrently (`npx concurrently`).     |
 | `make dev-daemon`      | Runs the standalone Go backend server (`go run ./cmd/vesseld`).                              |
 | `make dev-dashboard`   | Runs the standalone Vite frontend dev server on port `3000`.                                 |
-| `make dev-web`        | Runs the Astro marketing landing page dev server (`web/`).                               |
+| `make dev-web`         | Runs the Astro marketing landing page dev server (`web/`).                                   |
 | `make docker-build`    | Builds the all-in-one Vessel container image via Docker Compose.                             |
 | `make docker-up`       | Starts the container stack (`vesseld` + `docker.sock` mount) in detached mode (`-d`).        |
 | `make docker-down`     | Stops and removes the running Vessel container stack.                                        |

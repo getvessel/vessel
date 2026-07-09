@@ -24,7 +24,7 @@
 | Backend              | Go (`cmd/vesseld`, `internal/`)                                              |
 | State (dashboard)    | TanStack Store, TanStack Query, Zod validation                               |
 | Styling (dashboard)  | `tailwind-merge` + `clsx` + `class-variance-authority` for class composition |
-| Monorepo             | npm workspaces (`dashboard/`, `web/`, `docs/`)                              |
+| Monorepo             | npm workspaces (`dashboard/`, `web/`, `docs/`)                               |
 
 ## Conventions
 
