@@ -79,7 +79,12 @@ Vessel includes a comprehensive root-level `Makefile` to streamline local develo
 ### Option A: Using Makefile & Native Tooling
 
 1. **Prerequisites**: Ensure Go 1.23+ and Node.js 20+ are installed.
-2. **Start Dev Environment**:
+2. **Environment**: Copy `.env.example` to `.env` and adjust if needed:
+
+   ```bash
+   cp .env.example .env
+   ```
+3. **Start Dev Environment**:
 
    ```bash
    make dev

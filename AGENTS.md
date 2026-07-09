@@ -34,7 +34,7 @@
 - **Lib/utils** go in `dashboard/src/lib/`.
 - **Marketing pages** live in `web/src/pages/`, components in `web/src/components/`.
 - Use Tailwind CSS v4 `@theme` directives for design tokens; avoid custom CSS where Tailwind utilities suffice.
-- Format with Prettier (root `.prettierrc` + `.prettierignore`).
+- Format with Biome (root `biome.json`).
 
 ## Go Conventions
 

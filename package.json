@@ -1,6 +1,9 @@
 {
-  "name": "vessel-monorepo",
+  "name": "vessel",
   "private": true,
+  "version": "0.1.0",
+  "description": "Self-hosted PaaS — turn any bare-metal VPS into your own private Vercel & Railway.",
+  "license": "MIT",
   "workspaces": [
     "dashboard",
     "web",
@@ -13,9 +16,14 @@
     "build:dashboard": "npm --workspace=dashboard run build",
     "build:web": "npm --workspace=web run build",
     "build:all": "npm run build:dashboard && npm run build:web",
+    "build:docs": "npm --workspace=docs run build",
     "test:dashboard": "npm --workspace=dashboard run test",
     "typecheck": "npm --workspace=dashboard run generate-routes && tsc -b dashboard",
-    "format": "prettier --check .",
-    "format:fix": "prettier --write ."
+    "format": "biome check .",
+    "format:fix": "biome check --write .",
+    "lint": "biome check . && gofmt -l ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.3"
   }
 }

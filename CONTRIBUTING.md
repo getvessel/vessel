@@ -21,13 +21,19 @@ Thank you for your interest in contributing to **Vessel**! We are building the m
    cd vessel
    ```
 
-2. **Run the Go Orchestrator (`cmd/vesseld`)**:
+2. **Set up environment**:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Run the Go Orchestrator (`cmd/vesseld`)**:
 
    ```bash
    go run ./cmd/vesseld
    ```
 
-3. **Run the Dashboard (`dashboard/`)**:
+4. **Run the Dashboard (`dashboard/`)**:
 
    ```bash
    cd dashboard
@@ -35,7 +41,7 @@ Thank you for your interest in contributing to **Vessel**! We are building the m
    npm run dev
    ```
 
-4. **Run the Marketing Landing Page (`web/`)**:
+5. **Run the Marketing Landing Page (`web/`)**:
 
    ```bash
    cd web

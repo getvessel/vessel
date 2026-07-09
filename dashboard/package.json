@@ -1,6 +1,9 @@
 {
-  "name": "dashboard",
+  "name": "@vessel/dashboard",
   "private": true,
+  "version": "0.1.0",
+  "description": "Vessel control panel GUI — React 19, TanStack Router, Tailwind CSS v4.",
+  "license": "MIT",
   "type": "module",
   "imports": {
     "#/*": "./src/*"
@@ -11,8 +14,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "format": "prettier --check src",
-    "format:fix": "prettier --write src"
+    "format": "biome check src",
+    "format:fix": "biome check --write src"
   },
   "dependencies": {
     "@faker-js/faker": "^10.5.0",
@@ -58,7 +61,6 @@
     "@vitejs/plugin-react": "^6.0.3",
     "babel-plugin-react-compiler": "^1.0.0",
     "jsdom": "^29.1.1",
-    "prettier": "^3.9.4",
     "typescript": "^7.0.2",
     "vite": "^8.1.4",
     "vitest": "^4.1.10"
