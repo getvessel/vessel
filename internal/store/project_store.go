@@ -16,8 +16,8 @@ func (s *Store) CreateProject(p *types.ProjectConfig) error {
 	p.CreatedAt = now
 	p.UpdatedAt = now
 
-	_, err := s.db.Exec(`INSERT INTO projects (id, team_id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`,
-		p.ID, p.TeamID, p.Name, p.Description, p.CreatedAt, p.UpdatedAt,
+	_, err := s.db.Exec(`INSERT INTO projects (id, workspace_id, team_id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		p.ID, p.WorkspaceID, p.TeamID, p.Name, p.Description, p.CreatedAt, p.UpdatedAt,
 	)
 	if err != nil {
 		return err
@@ -37,10 +37,10 @@ func (s *Store) CreateProject(p *types.ProjectConfig) error {
 
 // GetProject retrieves a ProjectConfig record by its ID.
 func (s *Store) GetProject(id string) (*types.ProjectConfig, error) {
-	row := s.db.QueryRow(`SELECT id, team_id, name, description, created_at, updated_at FROM projects WHERE id = ?`, id)
+	row := s.db.QueryRow(`SELECT id, COALESCE(workspace_id, ''), team_id, name, description, created_at, updated_at FROM projects WHERE id = ?`, id)
 
 	var p types.ProjectConfig
-	err := row.Scan(&p.ID, &p.TeamID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt)
+	err := row.Scan(&p.ID, &p.WorkspaceID, &p.TeamID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (s *Store) GetProject(id string) (*types.ProjectConfig, error) {
 
 // ListProjects retrieves all ProjectConfig records ordered by creation date descending.
 func (s *Store) ListProjects() ([]types.ProjectConfig, error) {
-	rows, err := s.db.Query(`SELECT id, team_id, name, description, created_at, updated_at FROM projects ORDER BY created_at DESC`)
+	rows, err := s.db.Query(`SELECT id, COALESCE(workspace_id, ''), team_id, name, description, created_at, updated_at FROM projects ORDER BY created_at DESC`)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (s *Store) ListProjects() ([]types.ProjectConfig, error) {
 	var projects []types.ProjectConfig
 	for rows.Next() {
 		var p types.ProjectConfig
-		if err := rows.Scan(&p.ID, &p.TeamID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.WorkspaceID, &p.TeamID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt); err != nil {
 			return nil, err
 		}
 		projects = append(projects, p)
@@ -66,11 +66,33 @@ func (s *Store) ListProjects() ([]types.ProjectConfig, error) {
 	return projects, nil
 }
 
+// ListProjectsByWorkspace retrieves all ProjectConfig records belonging to a specific workspace ID or team ID.
+func (s *Store) ListProjectsByWorkspace(id string) ([]types.ProjectConfig, error) {
+	rows, err := s.db.Query(`SELECT id, COALESCE(workspace_id, ''), team_id, name, description, created_at, updated_at FROM projects WHERE workspace_id = ? OR team_id = ? ORDER BY created_at DESC`, id, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var projects []types.ProjectConfig
+	for rows.Next() {
+		var p types.ProjectConfig
+		if err := rows.Scan(&p.ID, &p.WorkspaceID, &p.TeamID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt); err != nil {
+			return nil, err
+		}
+		projects = append(projects, p)
+	}
+	if projects == nil {
+		projects = []types.ProjectConfig{}
+	}
+	return projects, nil
+}
+
 // UpdateProject updates an existing ProjectConfig record in SQLite.
 func (s *Store) UpdateProject(p *types.ProjectConfig) error {
 	p.UpdatedAt = time.Now().UTC()
-	_, err := s.db.Exec(`UPDATE projects SET team_id = ?, name = ?, description = ?, updated_at = ? WHERE id = ?`,
-		p.TeamID, p.Name, p.Description, p.UpdatedAt, p.ID,
+	_, err := s.db.Exec(`UPDATE projects SET workspace_id = ?, team_id = ?, name = ?, description = ?, updated_at = ? WHERE id = ?`,
+		p.WorkspaceID, p.TeamID, p.Name, p.Description, p.UpdatedAt, p.ID,
 	)
 	return err
 }

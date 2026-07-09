@@ -269,19 +269,10 @@ func (h *WorkspaceHandler) ListWorkspaceProjects(w http.ResponseWriter, r *http.
 		http.Error(w, "missing id parameter", http.StatusBadRequest)
 		return
 	}
-	projects, err := h.store.ListProjects()
+	filtered, err := h.store.ListProjectsByWorkspace(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}
-	var filtered []types.ProjectConfig
-	for _, p := range projects {
-		if p.WorkspaceID == id || p.TeamID == id {
-			filtered = append(filtered, p)
-		}
-	}
-	if filtered == nil {
-		filtered = []types.ProjectConfig{}
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(filtered)
