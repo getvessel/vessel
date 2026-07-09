@@ -35,10 +35,10 @@ Thank you for your interest in contributing to **Vessel**! We are building the m
    npm run dev
    ```
 
-4. **Run the Marketing Landing Page (`website/`)**:
+4. **Run the Marketing Landing Page (`web/`)**:
 
    ```bash
-   cd website
+   cd web
    npm install
    npm run dev
    ```
@@ -49,14 +49,14 @@ Thank you for your interest in contributing to **Vessel**! We are building the m
 
 - **`cmd/vesseld` & `internal/`**: Written in **Go**. Handles Docker socket execution, Caddy proxy configurations, `.env` encryption, and WebSocket streaming.
 - **`dashboard/`**: Written in **TypeScript (TanStack + Vite + Tailwind v4)**. The self-hosted web UI where users deploy and manage their projects.
-- **`website/`**: Written in **Astro 7**. The public marketing and documentation landing page (`vessel.dev`).
+- **`web/`**: Written in **Astro 7**. The public marketing and documentation landing page (`vessel.dev`).
 
 ---
 
 ## 🔒 Code Style & Standards
 
 - **Go**: Ensure `go fmt ./...` and `go vet ./...` pass cleanly before submitting PRs.
-- **TypeScript**: Ensure `npm run check` or `tsc --noEmit` runs without type errors in `dashboard/` and `website/`.
+- **TypeScript**: Ensure `npm run check` or `tsc --noEmit` runs without type errors in `dashboard/` and `web/`.
 - **Commits**: Follow [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat(daemon): add container CPU usage websocket stream`).
 
 ---

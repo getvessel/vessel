@@ -19,12 +19,12 @@
 | Layer                | Tech                                                                         |
 | -------------------- | ---------------------------------------------------------------------------- |
 | Frontend (dashboard) | React 19, TanStack Router, TanStack Query, Radix UI, Tailwind CSS v4, Vite   |
-| Marketing (website)  | Astro 7, Tailwind CSS v4                                                     |
+| Marketing (web)      | Astro 7, Tailwind CSS v4                                                     |
 | Docs                 | Astro 7, Starlight                                                           |
 | Backend              | Go (`cmd/vesseld`, `internal/`)                                              |
 | State (dashboard)    | TanStack Store, TanStack Query, Zod validation                               |
 | Styling (dashboard)  | `tailwind-merge` + `clsx` + `class-variance-authority` for class composition |
-| Monorepo             | npm workspaces (`dashboard/`, `website/`, `docs/`)                           |
+| Monorepo             | npm workspaces (`dashboard/`, `web/`, `docs/`)                              |
 
 ## Conventions
 
@@ -32,7 +32,7 @@
 - **Dashboard components** go in `dashboard/src/components/`, grouped by domain (e.g. `projects/`, `databases/`, `ui/`).
 - **Hooks** go in `dashboard/src/hooks/`.
 - **Lib/utils** go in `dashboard/src/lib/`.
-- **Marketing pages** live in `website/src/pages/`, components in `website/src/components/`.
+- **Marketing pages** live in `web/src/pages/`, components in `web/src/components/`.
 - Use Tailwind CSS v4 `@theme` directives for design tokens; avoid custom CSS where Tailwind utilities suffice.
 - Format with Prettier (root `.prettierrc` + `.prettierignore`).
 

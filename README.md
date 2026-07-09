@@ -31,7 +31,7 @@ vessel/
 │   ├── store/            # SQLite embedded database and state management
 │   └── types/            # DTOs, API payloads, and internal data structures
 ├── dashboard/            # 💻 Main Panel Dashboard (TanStack Router + React SPA)
-├── website/              # 🌐 Public Marketing Landing Page (vessel.dev)
+├── web/                 # 🌐 Public Marketing Landing Page (vessel.dev)
 ├── get-vessel/           # 📦 Installation host (`install.sh`, `upgrade.sh`)
 ├── scripts/              # 🛠️ System automation (`upgrade.sh`, `backup.sh`, `restore.sh`)
 ├── Dockerfile            # Multi-stage container build uniting `dashboard/` and `vesseld`
@@ -66,7 +66,7 @@ Vessel includes a comprehensive root-level `Makefile` to streamline local develo
 | `make dev`             | Launches the backend daemon and dashboard dev servers concurrently (`npx concurrently`).     |
 | `make dev-daemon`      | Runs the standalone Go backend server (`go run ./cmd/vesseld`).                              |
 | `make dev-dashboard`   | Runs the standalone Vite frontend dev server on port `3000`.                                 |
-| `make dev-website`     | Runs the Astro marketing landing page dev server (`website/`).                               |
+| `make dev-web`        | Runs the Astro marketing landing page dev server (`web/`).                               |
 | `make docker-build`    | Builds the all-in-one Vessel container image via Docker Compose.                             |
 | `make docker-up`       | Starts the container stack (`vesseld` + `docker.sock` mount) in detached mode (`-d`).        |
 | `make docker-down`     | Stops and removes the running Vessel container stack.                                        |
