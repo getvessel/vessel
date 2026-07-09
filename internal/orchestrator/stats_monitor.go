@@ -49,9 +49,9 @@ func (s *StatsMonitor) GetHealth(ctx context.Context, containerIDOrName string) 
 	}
 
 	cpuPercent := CalculateCPUPercentage(&stats)
-	memoryUsage := stats.MemoryStats.Usage - stats.MemoryStats.Stats["cache"]
-	if memoryUsage < 0 {
-		memoryUsage = stats.MemoryStats.Usage
+	memoryUsage := stats.MemoryStats.Usage
+	if cache, exists := stats.MemoryStats.Stats["cache"]; exists && cache <= memoryUsage {
+		memoryUsage -= cache
 	}
 
 	startedAt, _ := time.Parse(time.RFC3339Nano, inspectResp.State.StartedAt)
