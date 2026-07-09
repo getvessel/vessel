@@ -84,6 +84,7 @@ Vessel includes a comprehensive root-level `Makefile` to streamline local develo
    ```bash
    cp .env.example .env
    ```
+
 3. **Start Dev Environment**:
 
    ```bash
