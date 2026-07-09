@@ -21,6 +21,7 @@ type ServerSettings struct {
 	DNSValidationEnabled        bool   `json:"dnsValidationEnabled"`
 	IPAllowlist                 string `json:"ipAllowlist"`
 	MCPServerEnabled            bool   `json:"mcpServerEnabled"`
+	DefaultWildcardDomain       string `json:"defaultWildcardDomain,omitempty"`
 
 	UpdateCheckCron   string `json:"updateCheckCron"`
 	AutoUpdateEnabled bool   `json:"autoUpdateEnabled"`

@@ -24,22 +24,28 @@ type DomainLister interface {
 	ListAllDomains() ([]models.DomainConfig, error)
 }
 
+type SettingsLister interface {
+	GetServerSettings(ctx context.Context) (*models.ServerSettings, error)
+}
+
 type ProxyManager struct {
 	config    *CaddyConfig
 	generator *CaddyfileGenerator
 	projects  ProjectLister
 	services  AppServiceLister
 	domains   DomainLister
+	settings  SettingsLister
 	docker    *client.Client
 }
 
-func NewProxyManager(config *CaddyConfig, projects ProjectLister, services AppServiceLister, domains DomainLister, docker *client.Client) *ProxyManager {
+func NewProxyManager(config *CaddyConfig, projects ProjectLister, services AppServiceLister, domains DomainLister, settings SettingsLister, docker *client.Client) *ProxyManager {
 	return &ProxyManager{
 		config:    config,
 		generator: NewCaddyfileGenerator(config),
 		projects:  projects,
 		services:  services,
 		domains:   domains,
+		settings:  settings,
 		docker:    docker,
 	}
 }
@@ -57,7 +63,14 @@ func (m *ProxyManager) Reload(ctx context.Context) error {
 		return fmt.Errorf("failed to load custom domains for caddy reload: %w", err)
 	}
 
-	caddyfileContent, err := m.generator.Generate(projects, services, domains)
+	var wildcardDomain string
+	if m.settings != nil {
+		if settings, err := m.settings.GetServerSettings(ctx); err == nil && settings != nil {
+			wildcardDomain = settings.DefaultWildcardDomain
+		}
+	}
+
+	caddyfileContent, err := m.generator.Generate(projects, services, domains, wildcardDomain)
 	if err != nil {
 		return fmt.Errorf("failed to generate caddyfile syntax: %w", err)
 	}

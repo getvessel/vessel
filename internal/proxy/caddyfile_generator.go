@@ -17,7 +17,7 @@ func NewCaddyfileGenerator(config *CaddyConfig) *CaddyfileGenerator {
 	return &CaddyfileGenerator{config: config}
 }
 
-func (g *CaddyfileGenerator) Generate(projects []models.ProjectConfig, services []models.AppService, domains []models.DomainConfig) (string, error) {
+func (g *CaddyfileGenerator) Generate(projects []models.ProjectConfig, services []models.AppService, domains []models.DomainConfig, wildcardDomain string) (string, error) {
 	var buf bytes.Buffer
 
 	buf.WriteString("{\n")
@@ -31,14 +31,14 @@ func (g *CaddyfileGenerator) Generate(projects []models.ProjectConfig, services 
 	projectMap := make(map[string]*models.ProjectConfig)
 	for i := range projects {
 		projectMap[projects[i].ID] = &projects[i]
-		g.writeProjectBlock(&buf, &projects[i])
+		g.writeProjectBlock(&buf, &projects[i], wildcardDomain)
 	}
 
 	serviceMap := make(map[string]*models.AppService)
 	for i := range services {
 		s := &services[i]
 		serviceMap[s.ID] = s
-		g.writeAppServiceBlock(&buf, s)
+		g.writeAppServiceBlock(&buf, s, wildcardDomain)
 	}
 
 	for i := range domains {
@@ -58,7 +58,7 @@ func (g *CaddyfileGenerator) Generate(projects []models.ProjectConfig, services 
 	return buf.String(), nil
 }
 
-func (g *CaddyfileGenerator) writeProjectBlock(buf *bytes.Buffer, p *models.ProjectConfig) {
+func (g *CaddyfileGenerator) writeProjectBlock(buf *bytes.Buffer, p *models.ProjectConfig, wildcardDomain string) {
 	if p.Name == "" {
 		return
 	}
@@ -68,6 +68,9 @@ func (g *CaddyfileGenerator) writeProjectBlock(buf *bytes.Buffer, p *models.Proj
 
 	cleanName := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(p.Name), " ", "-"))
 	hostnames := []string{fmt.Sprintf("http://%s.vessel.local", cleanName)}
+	if wildcardDomain != "" {
+		hostnames = append(hostnames, fmt.Sprintf("%s.%s", cleanName, wildcardDomain))
+	}
 
 	buf.WriteString(strings.Join(hostnames, ", ") + " {\n")
 	buf.WriteString(fmt.Sprintf("\treverse_proxy %s:%d {\n", containerHost, targetPort))
@@ -78,7 +81,7 @@ func (g *CaddyfileGenerator) writeProjectBlock(buf *bytes.Buffer, p *models.Proj
 	buf.WriteString("}\n\n")
 }
 
-func (g *CaddyfileGenerator) writeAppServiceBlock(buf *bytes.Buffer, s *models.AppService) {
+func (g *CaddyfileGenerator) writeAppServiceBlock(buf *bytes.Buffer, s *models.AppService, wildcardDomain string) {
 	if s.Domain == "" && s.Name == "" {
 		return
 	}
@@ -99,6 +102,9 @@ func (g *CaddyfileGenerator) writeAppServiceBlock(buf *bytes.Buffer, s *models.A
 	if s.Name != "" {
 		cleanName := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(s.Name), " ", "-"))
 		hostnames = append(hostnames, fmt.Sprintf("http://%s.vessel.local", cleanName))
+		if wildcardDomain != "" {
+			hostnames = append(hostnames, fmt.Sprintf("%s.%s", cleanName, wildcardDomain))
+		}
 	}
 
 	if len(hostnames) == 0 {

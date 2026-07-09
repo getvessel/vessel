@@ -53,7 +53,7 @@ func TestCaddyfileGenerator(t *testing.T) {
 		},
 	}
 
-	caddyfile, err := gen.Generate(projects, services, domains)
+	caddyfile, err := gen.Generate(projects, services, domains, "apps.local")
 	if err != nil {
 		t.Fatalf("expected no error generating caddyfile, got: %v", err)
 	}
@@ -61,8 +61,8 @@ func TestCaddyfileGenerator(t *testing.T) {
 	if !strings.Contains(caddyfile, "email ops@vessel.local") {
 		t.Errorf("expected global email block, got:\n%s", caddyfile)
 	}
-	if !strings.Contains(caddyfile, "app.solomon.com, http://frontend-app.vessel.local {") {
-		t.Errorf("expected project hostnames block, got:\n%s", caddyfile)
+	if !strings.Contains(caddyfile, "http://frontend-app.vessel.local, frontend-app.apps.local {") {
+		t.Errorf("expected project hostnames block with wildcard, got:\n%s", caddyfile)
 	}
 	if !strings.Contains(caddyfile, "reverse_proxy vessel-test-id-123:3000") {
 		t.Errorf("expected upstream container proxying, got:\n%s", caddyfile)

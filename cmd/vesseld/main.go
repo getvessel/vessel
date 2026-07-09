@@ -144,7 +144,8 @@ func main() {
 	}
 
 	proxyCfg := proxy.NewCaddyConfig(dataDir, os.Getenv("VESSEL_TLS_EMAIL"))
-	proxyMgr := proxy.NewProxyManager(proxyCfg, &dbProjectLister{db: db}, &dbServiceLister{db: db}, &dbDomainLister{db: db}, dockerClient)
+	settingsRepo := repositories.NewSettingsSQLiteRepository(db)
+	proxyMgr := proxy.NewProxyManager(proxyCfg, &dbProjectLister{db: db}, &dbServiceLister{db: db}, &dbDomainLister{db: db}, settingsRepo, dockerClient)
 	_ = proxyMgr.Reload(context.Background())
 
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
@@ -491,12 +492,13 @@ func runMigrations(db *sql.DB) error {
 			smtp_password TEXT,
 			smtp_from_name TEXT DEFAULT '',
 			smtp_from_address TEXT DEFAULT '',
-			notification_alerts BOOLEAN DEFAULT TRUE,
 			registration_enabled BOOLEAN DEFAULT TRUE,
+			registration_domain_allowlist TEXT DEFAULT '',
 			custom_dns_resolvers TEXT DEFAULT '',
 			dns_validation_enabled BOOLEAN DEFAULT TRUE,
 			ip_allowlist TEXT DEFAULT '',
 			mcp_server_enabled BOOLEAN DEFAULT TRUE,
+			default_wildcard_domain TEXT DEFAULT '',
 			update_check_cron TEXT DEFAULT '0 * * * *',
 			auto_update_enabled BOOLEAN DEFAULT FALSE,
 			current_version TEXT DEFAULT '0.1.0',
@@ -588,6 +590,7 @@ func runMigrations(db *sql.DB) error {
 		"ALTER TABLE server_settings ADD COLUMN dns_validation_enabled BOOLEAN DEFAULT TRUE;",
 		"ALTER TABLE server_settings ADD COLUMN ip_allowlist TEXT DEFAULT '';",
 		"ALTER TABLE server_settings ADD COLUMN mcp_server_enabled BOOLEAN DEFAULT TRUE;",
+		"ALTER TABLE server_settings ADD COLUMN default_wildcard_domain TEXT DEFAULT '';",
 		"ALTER TABLE server_settings ADD COLUMN update_check_cron TEXT DEFAULT '0 * * * *';",
 		"ALTER TABLE server_settings ADD COLUMN auto_update_enabled BOOLEAN DEFAULT FALSE;",
 		"ALTER TABLE server_settings ADD COLUMN current_version TEXT DEFAULT '0.1.0';",
