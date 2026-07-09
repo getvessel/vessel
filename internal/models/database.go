@@ -54,3 +54,13 @@ type Storage struct {
 	CreatedAt     time.Time `json:"createdAt"`
 	UpdatedAt     time.Time `json:"updatedAt"`
 }
+
+type DatabaseQueryRequest struct {
+	Query string `json:"query"`
+}
+
+type DatabaseQueryResponse struct {
+	Columns []string         `json:"columns,omitempty"`
+	Rows    []map[string]any `json:"rows,omitempty"`
+	Result  any              `json:"result,omitempty"` // For Redis or non-tabular results
+}

@@ -324,6 +324,19 @@ func runMigrations(db *sql.DB) error {
 			updated_at DATETIME NOT NULL,
 			finished_at DATETIME
 		);`,
+		`CREATE TABLE IF NOT EXISTS pr_previews (
+			id TEXT PRIMARY KEY,
+			service_id TEXT,
+			project_id TEXT,
+			pr_number INTEGER,
+			branch TEXT,
+			commit_hash TEXT,
+			status TEXT,
+			preview_domain TEXT,
+			container_id TEXT,
+			created_at DATETIME,
+			updated_at DATETIME
+		);`,
 		`CREATE TABLE IF NOT EXISTS service_vars (
 			id TEXT PRIMARY KEY,
 			service_id TEXT NOT NULL,

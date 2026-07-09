@@ -20,6 +20,7 @@ type WebhookHandler struct {
 	projectService    *services.ProjectService
 	appService        *services.AppService
 	deploymentService *services.DeploymentService
+	prPreviewService  *services.PRPreviewService
 }
 
 func NewWebhookHandler(
@@ -27,12 +28,14 @@ func NewWebhookHandler(
 	projectService *services.ProjectService,
 	appService *services.AppService,
 	deploymentService *services.DeploymentService,
+	prPreviewService *services.PRPreviewService,
 ) *WebhookHandler {
 	return &WebhookHandler{
 		gitService:        gitService,
 		projectService:    projectService,
 		appService:        appService,
 		deploymentService: deploymentService,
+		prPreviewService:  prPreviewService,
 	}
 }
 
@@ -102,4 +105,50 @@ func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 		"status":  "accepted",
 		"message": fmt.Sprintf("triggering background build & rollout for service %s", appSvc.Name),
 	})
+}
+
+// HandleGitHubWebhook receives payloads directly from GitHub
+func (h *WebhookHandler) HandleGitHubWebhook(c echo.Context) error {
+	serviceID := c.Param("serviceId")
+	if serviceID == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing serviceId parameter"})
+	}
+
+	event := c.Request().Header.Get("X-GitHub-Event")
+	if event == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing X-GitHub-Event header"})
+	}
+
+	var payload struct {
+		Action      string `json:"action"`
+		Number      int    `json:"number"`
+		PullRequest struct {
+			Head struct {
+				Ref string `json:"ref"`
+				Sha string `json:"sha"`
+			} `json:"head"`
+		} `json:"pull_request"`
+	}
+
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
+	}
+
+	if event == "pull_request" {
+		if payload.Action == "opened" || payload.Action == "synchronize" {
+			go func() {
+				ctx := context.Background()
+				_, _ = h.prPreviewService.DeployPRPreview(ctx, serviceID, payload.Number, payload.PullRequest.Head.Sha, payload.PullRequest.Head.Ref)
+			}()
+			return c.JSON(http.StatusAccepted, map[string]string{"message": "Deploying PR preview"})
+		} else if payload.Action == "closed" {
+			go func() {
+				ctx := context.Background()
+				_ = h.prPreviewService.DestroyPRPreview(ctx, serviceID, payload.Number)
+			}()
+			return c.JSON(http.StatusAccepted, map[string]string{"message": "Destroying PR preview"})
+		}
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "Event ignored"})
 }

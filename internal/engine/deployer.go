@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/utils"
@@ -122,4 +123,17 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 	}
 
 	return containerID, nil
+}
+
+func (d *Deployer) Stop(ctx context.Context, containerID string) error {
+	stopTimeout := 10
+	return d.containerManager.dockerClient.ContainerStop(ctx, containerID, container.StopOptions{Timeout: &stopTimeout})
+}
+
+func (d *Deployer) Remove(ctx context.Context, containerID string) error {
+	err := d.containerManager.dockerClient.ContainerRemove(ctx, containerID, container.RemoveOptions{Force: true})
+	if err != nil && !client.IsErrNotFound(err) {
+		return err
+	}
+	return nil
 }

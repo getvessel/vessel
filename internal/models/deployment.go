@@ -155,3 +155,17 @@ type S3Destination struct {
 	SecretAccessKey string `json:"secretAccessKey"`
 	CreatedAt       string `json:"createdAt"`
 }
+
+type PRPreview struct {
+	ID            string    `json:"id"`
+	ServiceID     string    `json:"serviceId"`
+	ProjectID     string    `json:"projectId"`
+	PRNumber      int       `json:"prNumber"`
+	Branch        string    `json:"branch"`
+	CommitHash    string    `json:"commitHash"`
+	Status        string    `json:"status"`
+	PreviewDomain string    `json:"previewDomain"`
+	ContainerID   string    `json:"containerId"`
+	CreatedAt     time.Time `json:"createdAt"`
+	UpdatedAt     time.Time `json:"updatedAt"`
+}

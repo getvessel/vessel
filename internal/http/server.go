@@ -80,6 +80,7 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 	psRepo := repositories.NewProjectSettingsSQLiteRepository(db)
 	svVarRepo := repositories.NewServiceVarSQLiteRepository(db)
 	s3Repo := repositories.NewS3DestinationSQLiteRepository(db)
+	prPreviewRepo := repositories.NewPRPreviewRepository(db)
 
 	// Engine adapter
 	ea := newEngineAdapter(settingsRepo, serviceRepo, envRepo, databaseRepo, storageRepo, projectRepo, jobRepo, backupRepo, s3Repo, svVarRepo)
@@ -119,6 +120,7 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 	psService := services.NewProjectSettingsService(psRepo, userRepo)
 	notificationService := services.NewNotificationService(notifRepo, notifierService)
 	deploymentService := services.NewDeploymentService(deploymentRepo, serviceRepo, projectRepo, deployer)
+	prPreviewService := services.NewPRPreviewService(prPreviewRepo, appService, gitService, deployer)
 
 	// Auth Guard
 	authGuard := middleware.NewAuthGuard(tokenService, settingsService)
@@ -158,7 +160,7 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 		authHandler:            handlers.NewAuthHandler(authService),
 		oauthHandler:           handlers.NewOAuthHandler(oauthService),
 		gitHandler:             handlers.NewGitHandler(gitService),
-		webhookHandler:         handlers.NewWebhookHandler(gitService, projectService, appService, deploymentService),
+		webhookHandler:         handlers.NewWebhookHandler(gitService, projectService, appService, deploymentService, prPreviewService),
 		projectHandler:         handlers.NewProjectHandler(projectService, proxyManager),
 		environmentHandler:     handlers.NewEnvironmentHandler(environmentService),
 		domainHandler:          handlers.NewDomainHandler(environmentService),

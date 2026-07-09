@@ -85,3 +85,22 @@ func (h *DatabaseHandler) StopDatabase(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, map[string]string{"status": "stopped"})
 }
+
+func (h *DatabaseHandler) QueryDatabase(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing database id parameter"})
+	}
+
+	var req models.DatabaseQueryRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
+	}
+
+	res, err := h.databaseService.QueryDatabase(c.Request().Context(), id, req.Query)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, res)
+}
