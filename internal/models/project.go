@@ -85,12 +85,15 @@ type Webhook struct {
 }
 
 type ProjectToken struct {
-	ID            string    `json:"id"`
-	ProjectID     string    `json:"projectId"`
-	EnvironmentID string    `json:"environmentId"`
-	Name          string    `json:"name"`
-	TokenPrefix   string    `json:"tokenPrefix"`
-	CreatedAt     time.Time `json:"createdAt"`
+	ID            string     `json:"id"`
+	ProjectID     string     `json:"projectId"`
+	EnvironmentID string     `json:"environmentId"`
+	Name          string     `json:"name"`
+	TokenPrefix   string     `json:"tokenPrefix"`
+	Scopes        []string   `json:"scopes"`
+	IPAllowlist   []string   `json:"ipAllowlist"`
+	ExpiresAt     *time.Time `json:"expiresAt,omitempty"`
+	CreatedAt     time.Time  `json:"createdAt"`
 }
 
 type ProjectMember struct {
@@ -111,8 +114,11 @@ type CreateWebhookRequest struct {
 }
 
 type CreateTokenRequest struct {
-	Name          string `json:"name"`
-	EnvironmentID string `json:"environmentId"`
+	Name          string     `json:"name"`
+	EnvironmentID string     `json:"environmentId"`
+	Scopes        []string   `json:"scopes"`
+	IPAllowlist   []string   `json:"ipAllowlist,omitempty"`
+	ExpiresAt     *time.Time `json:"expiresAt,omitempty"`
 }
 
 type AddMemberRequest struct {

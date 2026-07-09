@@ -363,9 +363,12 @@ func runMigrations(db *sql.DB) error {
 		`CREATE TABLE IF NOT EXISTS project_tokens (
 			id TEXT PRIMARY KEY,
 			project_id TEXT NOT NULL,
+			environment_id TEXT NOT NULL,
 			name TEXT NOT NULL,
-			token TEXT NOT NULL,
+			token_prefix TEXT NOT NULL,
+			token_hash TEXT NOT NULL,
 			scopes TEXT DEFAULT '',
+			ip_allowlist TEXT DEFAULT '',
 			expires_at TEXT,
 			last_used_at TEXT,
 			created_at TEXT
@@ -609,6 +612,10 @@ func runMigrations(db *sql.DB) error {
 		"ALTER TABLE notification_integrations ADD COLUMN smtp_from_address TEXT DEFAULT '';",
 		"ALTER TABLE teams ADD COLUMN avatar_url TEXT DEFAULT '';",
 		"ALTER TABLE teams ADD COLUMN preferred_deployment_region TEXT DEFAULT 'local';",
+		"ALTER TABLE project_tokens ADD COLUMN environment_id TEXT DEFAULT '';",
+		"ALTER TABLE project_tokens ADD COLUMN token_prefix TEXT DEFAULT '';",
+		"ALTER TABLE project_tokens ADD COLUMN token_hash TEXT DEFAULT '';",
+		"ALTER TABLE project_tokens ADD COLUMN ip_allowlist TEXT DEFAULT '';",
 	}
 
 	for _, q := range alterQueries {

@@ -120,9 +120,6 @@ func (a *engineAdapter) CreateBackupRecord(rec *models.BackupRecord) error {
 }
 
 func (a *engineAdapter) UpdateBackupRecord(id, status, filePath, s3URL, logs string, fileSizeBytes int64, completedAt string) error {
-	// The interface requires a direct update query, but our repository might not have it.
-	// Let's get the record, update fields, and save if there's an UpdateRecord method.
-	// We'll write this and check if we need to add a method to BackupRepository later.
 	rec, err := a.backupRepo.GetRecordByID(context.Background(), id)
 	if err != nil {
 		return err

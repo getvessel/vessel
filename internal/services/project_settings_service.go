@@ -65,6 +65,14 @@ func (s *ProjectSettingsService) CreateToken(ctx context.Context, t *models.Proj
 	return t, raw, nil
 }
 
+func (s *ProjectSettingsService) GetTokenByHash(ctx context.Context, tokenHash string) (*models.ProjectToken, error) {
+	return s.repo.GetTokenByHash(ctx, tokenHash)
+}
+
+func (s *ProjectSettingsService) UpdateTokenLastUsed(ctx context.Context, id string) error {
+	return s.repo.UpdateTokenLastUsed(ctx, id)
+}
+
 func (s *ProjectSettingsService) ListTokens(ctx context.Context, projectID string) ([]*models.ProjectToken, error) {
 	if projectID == "" {
 		return nil, errors.New("projectId required")

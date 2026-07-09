@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 
@@ -21,13 +22,19 @@ type SettingsProvider interface {
 	GetSettings(context.Context) (*models.ServerSettings, error)
 }
 
-type AuthGuard struct {
-	TokenService *services.TokenService
-	Settings     SettingsProvider
+type ProjectTokenProvider interface {
+	GetTokenByHash(ctx context.Context, tokenHash string) (*models.ProjectToken, error)
+	UpdateTokenLastUsed(ctx context.Context, id string) error
 }
 
-func NewAuthGuard(ts *services.TokenService, sp SettingsProvider) *AuthGuard {
-	return &AuthGuard{TokenService: ts, Settings: sp}
+type AuthGuard struct {
+	TokenService  *services.TokenService
+	Settings      SettingsProvider
+	ProjectTokens ProjectTokenProvider
+}
+
+func NewAuthGuard(ts *services.TokenService, sp SettingsProvider, pt ProjectTokenProvider) *AuthGuard {
+	return &AuthGuard{TokenService: ts, Settings: sp, ProjectTokens: pt}
 }
 
 func (g *AuthGuard) RequireAuth() echo.MiddlewareFunc {
@@ -43,19 +50,50 @@ func (g *AuthGuard) RequireAuth() echo.MiddlewareFunc {
 				}
 			}
 
-			if g.TokenService == nil {
-				userClaims := &models.UserClaims{
-					UserID: "default",
-					Email:  "default@vessel.dev",
-					Role:   "admin",
-				}
-				c.Set("user", userClaims)
-				return next(c)
-			}
-
 			tokenStr := ExtractTokenFromRequest(c)
 			if tokenStr == "" {
+				if g.TokenService == nil {
+					userClaims := &models.UserClaims{
+						UserID: "default",
+						Email:  "default@vessel.dev",
+						Role:   "admin",
+					}
+					c.Set("user", userClaims)
+					return next(c)
+				}
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "missing authentication token"})
+			}
+
+			if strings.HasPrefix(tokenStr, "vsl_tok_") {
+				if g.ProjectTokens == nil {
+					return c.JSON(http.StatusUnauthorized, map[string]string{"error": "API tokens not supported"})
+				}
+				pt, err := g.ProjectTokens.GetTokenByHash(c.Request().Context(), tokenStr)
+				if err != nil {
+					return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid or revoked API token"})
+				}
+				importTime := time.Now()
+				if pt.ExpiresAt != nil && pt.ExpiresAt.Before(importTime) {
+					return c.JSON(http.StatusUnauthorized, map[string]string{"error": "API token has expired"})
+				}
+				if len(pt.IPAllowlist) > 0 {
+					clientIP := c.RealIP()
+					if !IsIPAllowed(clientIP, strings.Join(pt.IPAllowlist, ",")) {
+						return c.JSON(http.StatusForbidden, map[string]string{"error": "IP address not allowed for this API token"})
+					}
+				}
+				_ = g.ProjectTokens.UpdateTokenLastUsed(c.Request().Context(), pt.ID)
+
+				userClaims := &models.UserClaims{
+					UserID: "api-token-" + pt.ID,
+					Email:  "api@" + pt.ProjectID + ".vessel.local",
+					Role:   "api",
+				}
+				c.Set("user", userClaims)
+				c.Set("api_scopes", pt.Scopes)
+				c.Set("project_id", pt.ProjectID)
+				c.Set("environment_id", pt.EnvironmentID)
+				return next(c)
 			}
 
 			claimsMap, err := g.TokenService.ValidateToken(tokenStr)
@@ -106,6 +144,38 @@ func ExtractClientIP(c echo.Context) string {
 	return c.RealIP()
 }
 
+func (g *AuthGuard) RequireScope(requiredScope string) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			userClaims, ok := c.Get("user").(*models.UserClaims)
+			if !ok {
+				// RequireAuth has not been called or failed, but typically RequireScope is used AFTER RequireAuth or wraps it.
+				// For safety, if user is missing, we abort.
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "unauthorized"})
+			}
+
+			if userClaims.Role == "api" {
+				scopes, ok := c.Get("api_scopes").([]string)
+				if !ok {
+					return c.JSON(http.StatusForbidden, map[string]string{"error": "insufficient scopes"})
+				}
+				hasScope := false
+				for _, s := range scopes {
+					if s == requiredScope || s == "admin" || s == "*" {
+						hasScope = true
+						break
+					}
+				}
+				if !hasScope {
+					return c.JSON(http.StatusForbidden, map[string]string{"error": "missing required scope: " + requiredScope})
+				}
+			}
+
+			return next(c)
+		}
+	}
+}
+
 func (g *AuthGuard) RequireRole(requiredRole string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -132,6 +202,12 @@ func (g *AuthGuard) RequireRole(requiredRole string) echo.MiddlewareFunc {
 			tokenStr := ExtractTokenFromRequest(c)
 			if tokenStr == "" {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "missing authentication token"})
+			}
+
+			if strings.HasPrefix(tokenStr, "vsl_tok_") {
+				// API tokens bypass RequireRole logic since they are verified via RequireAuth/RequireScope
+				// Alternatively, we could fail them if this endpoint strictly requires a user role
+				return c.JSON(http.StatusForbidden, map[string]string{"error": "API tokens cannot access role-restricted endpoints"})
 			}
 
 			claimsMap, err := g.TokenService.ValidateToken(tokenStr)

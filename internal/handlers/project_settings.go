@@ -75,20 +75,32 @@ func (h *ProjectSettingsHandler) CreateToken(c echo.Context) error {
 	if projectID == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing projectId"})
 	}
-	var req models.ProjectToken
+	var req models.CreateTokenRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
-	req.ProjectID = projectID
-	token, raw, err := h.settingsService.CreateToken(c.Request().Context(), &req)
+
+	t := &models.ProjectToken{
+		ProjectID:     projectID,
+		Name:          req.Name,
+		EnvironmentID: req.EnvironmentID,
+		Scopes:        req.Scopes,
+		IPAllowlist:   req.IPAllowlist,
+		ExpiresAt:     req.ExpiresAt,
+	}
+
+	token, raw, err := h.settingsService.CreateToken(c.Request().Context(), t)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusCreated, map[string]any{
-		"id":        token.ID,
-		"name":      token.Name,
-		"token":     raw,
-		"createdAt": token.CreatedAt,
+		"id":          token.ID,
+		"name":        token.Name,
+		"token":       raw,
+		"scopes":      token.Scopes,
+		"ipAllowlist": token.IPAllowlist,
+		"expiresAt":   token.ExpiresAt,
+		"createdAt":   token.CreatedAt,
 	})
 }
 

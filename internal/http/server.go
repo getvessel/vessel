@@ -123,7 +123,7 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 	prPreviewService := services.NewPRPreviewService(prPreviewRepo, appService, gitService, deployer)
 
 	// Auth Guard
-	authGuard := middleware.NewAuthGuard(tokenService, settingsService)
+	authGuard := middleware.NewAuthGuard(tokenService, settingsService, psService)
 
 	// 3. Handlers
 	e := echo.New()
