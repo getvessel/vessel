@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"vessel.dev/vessel/internal/services/oauth"
+	"vessel.dev/vessel/internal/oauth"
 )
 
 func TestGenerateTOTPSecret(t *testing.T) {

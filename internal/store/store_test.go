@@ -6,6 +6,7 @@ import (
 
 	"vessel.dev/vessel/internal/store"
 	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/user"
 )
 
 func TestStoreAndVault(t *testing.T) {
@@ -76,7 +77,7 @@ func TestStoreAndVault(t *testing.T) {
 		t.Errorf("expected decrypted secret, got %s", envs["DATABASE_URL"])
 	}
 
-	user := &types.User{
+	user := &user.User{
 		Email:        "admin@vessel.dev",
 		PasswordHash: "hashed-pass",
 		Role:         "owner",

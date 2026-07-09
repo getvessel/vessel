@@ -1,7 +1,6 @@
-package types
+package settings
 
-import "time"
-
+// ServerSettings represents the global daemon and server configuration.
 type ServerSettings struct {
 	ID                 string `json:"id"`
 	CaddyWildcardIP    string `json:"caddyWildcardIp"`
@@ -17,11 +16,12 @@ type ServerSettings struct {
 	SMTPFromAddress    string `json:"smtpFromAddress,omitempty"`
 	NotificationAlerts bool   `json:"notificationAlerts"`
 
-	RegistrationEnabled  bool   `json:"registrationEnabled"`
-	CustomDNSResolvers   string `json:"customDnsResolvers"`
-	DNSValidationEnabled bool   `json:"dnsValidationEnabled"`
-	IPAllowlist          string `json:"ipAllowlist"`
-	MCPServerEnabled     bool   `json:"mcpServerEnabled"`
+	RegistrationEnabled         bool   `json:"registrationEnabled"`
+	RegistrationDomainAllowlist string `json:"registrationDomainAllowlist,omitempty"`
+	CustomDNSResolvers          string `json:"customDnsResolvers"`
+	DNSValidationEnabled        bool   `json:"dnsValidationEnabled"`
+	IPAllowlist                 string `json:"ipAllowlist"`
+	MCPServerEnabled            bool   `json:"mcpServerEnabled"`
 
 	UpdateCheckCron   string `json:"updateCheckCron"`
 	AutoUpdateEnabled bool   `json:"autoUpdateEnabled"`
@@ -30,14 +30,4 @@ type ServerSettings struct {
 	LastUpdateCheck   string `json:"lastUpdateCheck"`
 
 	UpdatedAt string `json:"updatedAt"`
-}
-
-type PersonalAccessToken struct {
-	ID        string    `json:"id"`
-	UserID    string    `json:"userId"`
-	Name      string    `json:"name"`
-	TokenHash string    `json:"-"`
-	Prefix    string    `json:"prefix"`
-	ExpiresAt time.Time `json:"expiresAt"`
-	CreatedAt time.Time `json:"createdAt"`
 }

@@ -5,15 +5,17 @@ import (
 	"net/http"
 
 	"github.com/docker/docker/client"
+	"vessel.dev/vessel/internal/auth"
 	"vessel.dev/vessel/internal/middleware"
 	"vessel.dev/vessel/internal/notifier"
+	"vessel.dev/vessel/internal/oauth"
 	"vessel.dev/vessel/internal/orchestrator"
 	"vessel.dev/vessel/internal/proxy"
 	"vessel.dev/vessel/internal/services"
-	"vessel.dev/vessel/internal/services/oauth"
+	"vessel.dev/vessel/internal/settings"
 	"vessel.dev/vessel/internal/store"
-	"vessel.dev/vessel/internal/types"
 	"vessel.dev/vessel/internal/updater"
+	"vessel.dev/vessel/internal/user"
 )
 
 // Server encapsulates HTTP routing, API handler dependencies, and authentication guards for the Vessel control plane.
@@ -38,11 +40,13 @@ type Server struct {
 	backupHandler          *BackupHandler
 	teamHandler            *TeamHandler
 	workspaceHandler       *WorkspaceHandler
-	settingsHandler        *SettingsHandler
+	settingsHandler        *settings.Handler
+	updaterHandler         *updater.Handler
+	userHandler            *user.Handler
+	authHandler            *auth.Handler
+	oauthHandler           *oauth.Handler
 	notifierService        *notifier.NotifierService
 	notificationHandler    *NotificationHandler
-	oauthService           *oauth.OAuthService
-	oauthHandler           *OAuthHandler
 	updaterService         *updater.UpdaterService
 }
 
@@ -56,10 +60,34 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 
 	tokenService := services.NewTokenService()
 	notifierService := notifier.NewNotifierService(s)
-	oauthService := oauth.NewOAuthService()
 
-	updaterService := updater.NewUpdaterService(s)
+	// Domain repositories
+	settingsRepo := settings.NewSQLiteRepository(s.DB())
+	userRepo := user.NewSQLiteRepository(s.DB())
+	oauthRepo := oauth.NewSQLiteRepository(s.DB())
+
+	// Domain services
+	settingsService := settings.NewService(settingsRepo)
+	userService := user.NewService(userRepo)
+	authService := auth.NewService(userRepo, settingsRepo, tokenService)
+	oauthService := oauth.NewService(oauthRepo, userRepo, tokenService)
+
+	updaterService := updater.NewUpdaterService(settingsRepo)
 	updaterService.Start(context.Background())
+
+	// Claims extractor helpers
+	extractUserID := func(r *http.Request) string {
+		if c := GetUserClaimsFromContext(r.Context()); c != nil {
+			return c.UserID
+		}
+		return ""
+	}
+	extractClaims := func(r *http.Request) (userID, email string) {
+		if c := GetUserClaimsFromContext(r.Context()); c != nil {
+			return c.UserID, c.Email
+		}
+		return "", ""
+	}
 
 	srv := &Server{
 		router:                 http.NewServeMux(),
@@ -82,11 +110,13 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 		backupHandler:          NewBackupHandler(s, backupMgr),
 		teamHandler:            NewTeamHandler(s),
 		workspaceHandler:       NewWorkspaceHandler(s),
-		settingsHandler:        NewSettingsHandler(s, dockerClient, updaterService),
+		settingsHandler:        settings.NewHandler(settingsService, dockerClient),
+		updaterHandler:         updater.NewHandler(updaterService),
+		userHandler:            user.NewHandler(userService, extractUserID),
+		authHandler:            auth.NewHandler(authService, extractUserID),
+		oauthHandler:           oauth.NewHandler(oauthService, extractClaims),
 		notifierService:        notifierService,
 		notificationHandler:    NewNotificationHandler(s, notifierService),
-		oauthService:           oauthService,
-		oauthHandler:           NewOAuthHandler(s, oauthService, tokenService),
 		updaterService:         updaterService,
 	}
 	if srv.deployer != nil {
@@ -94,6 +124,11 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 	}
 	srv.registerRoutes()
 	return srv
+}
+
+// ServeHTTP satisfies the http.Handler interface, routing through the registered mux with CORS middleware.
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	middleware.CORSMiddleware(s.router).ServeHTTP(w, r)
 }
 
 // Handler returns the root HTTP handler wrapped with global CORS and authentication middleware.
@@ -112,6 +147,6 @@ func (s *Server) RequireRole(requiredRole string, next http.HandlerFunc) http.Ha
 }
 
 // GetUserClaimsFromContext retrieves the authenticated user's claims from request context via middleware.
-func GetUserClaimsFromContext(ctx context.Context) *types.UserClaims {
+func GetUserClaimsFromContext(ctx context.Context) *user.UserClaims {
 	return middleware.GetUserClaimsFromContext(ctx)
 }

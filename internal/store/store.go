@@ -36,6 +36,11 @@ func NewStore(dataDir string) (*Store, error) {
 	return s, nil
 }
 
+// DB exposes the underlying SQLite database connection for domain-specific repository adapters.
+func (s *Store) DB() *sql.DB {
+	return s.db
+}
+
 func (s *Store) migrate() error {
 	queries := []string{
 		`CREATE TABLE IF NOT EXISTS projects (

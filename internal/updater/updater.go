@@ -8,8 +8,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"vessel.dev/vessel/internal/store"
 )
 
 const (
@@ -29,15 +27,15 @@ type UpdateInfo struct {
 }
 
 type UpdaterService struct {
-	store      *store.Store
+	repo       Repository
 	httpClient *http.Client
 	mu         sync.Mutex
 	stopCh     chan struct{}
 }
 
-func NewUpdaterService(s *store.Store) *UpdaterService {
+func NewUpdaterService(repo Repository) *UpdaterService {
 	return &UpdaterService{
-		store: s,
+		repo: repo,
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
@@ -53,8 +51,8 @@ func (u *UpdaterService) Start(ctx context.Context) {
 
 		go func() {
 			time.Sleep(30 * time.Second)
-			settings, err := u.store.GetServerSettings()
-			if err == nil && strings.TrimSpace(settings.LastUpdateCheck) == "" {
+			settingsCfg, err := u.repo.GetServerSettings(ctx)
+			if err == nil && strings.TrimSpace(settingsCfg.LastUpdateCheck) == "" {
 				_, _ = u.CheckForUpdate(ctx)
 			}
 		}()
@@ -84,15 +82,15 @@ func (u *UpdaterService) CheckForUpdate(ctx context.Context) (*UpdateInfo, error
 	u.mu.Lock()
 	defer u.mu.Unlock()
 
-	settings, err := u.store.GetServerSettings()
+	settingsCfg, err := u.repo.GetServerSettings(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed fetching server settings: %w", err)
 	}
 
-	currentVer := settings.CurrentVersion
+	currentVer := settingsCfg.CurrentVersion
 	if strings.TrimSpace(currentVer) == "" {
 		currentVer = defaultVersion
-		settings.CurrentVersion = currentVer
+		settingsCfg.CurrentVersion = currentVer
 	}
 
 	latestVer := currentVer
@@ -128,10 +126,10 @@ func (u *UpdaterService) CheckForUpdate(ctx context.Context) (*UpdateInfo, error
 	}
 
 	hasUpdate := isNewerVersion(currentVer, latestVer)
-	settings.LatestVersion = latestVer
-	settings.LastUpdateCheck = time.Now().Format(time.RFC3339)
+	settingsCfg.LatestVersion = latestVer
+	settingsCfg.LastUpdateCheck = time.Now().Format(time.RFC3339)
 
-	if err := u.store.UpdateServerSettings(settings); err != nil {
+	if err := u.repo.UpdateServerSettings(ctx, settingsCfg); err != nil {
 		return nil, fmt.Errorf("failed saving updated version info: %w", err)
 	}
 
@@ -141,9 +139,9 @@ func (u *UpdaterService) CheckForUpdate(ctx context.Context) (*UpdateInfo, error
 		HasUpdate:       hasUpdate,
 		ReleaseNotes:    releaseNotes,
 		DownloadURL:     downloadURL,
-		LastChecked:     settings.LastUpdateCheck,
-		AutoUpdate:      settings.AutoUpdateEnabled,
-		UpdateCheckCron: settings.UpdateCheckCron,
+		LastChecked:     settingsCfg.LastUpdateCheck,
+		AutoUpdate:      settingsCfg.AutoUpdateEnabled,
+		UpdateCheckCron: settingsCfg.UpdateCheckCron,
 	}, nil
 }
 
@@ -152,19 +150,19 @@ func (u *UpdaterService) DeployUpdate(ctx context.Context) error {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 
-	settings, err := u.store.GetServerSettings()
+	settingsCfg, err := u.repo.GetServerSettings(ctx)
 	if err != nil {
 		return fmt.Errorf("failed loading server settings: %w", err)
 	}
 
-	if settings.LatestVersion == "" || settings.LatestVersion == settings.CurrentVersion {
+	if settingsCfg.LatestVersion == "" || settingsCfg.LatestVersion == settingsCfg.CurrentVersion {
 		return nil
 	}
 
-	settings.CurrentVersion = settings.LatestVersion
-	settings.LastUpdateCheck = time.Now().Format(time.RFC3339)
+	settingsCfg.CurrentVersion = settingsCfg.LatestVersion
+	settingsCfg.LastUpdateCheck = time.Now().Format(time.RFC3339)
 
-	if err := u.store.UpdateServerSettings(settings); err != nil {
+	if err := u.repo.UpdateServerSettings(ctx, settingsCfg); err != nil {
 		return fmt.Errorf("failed finalizing update deployment: %w", err)
 	}
 

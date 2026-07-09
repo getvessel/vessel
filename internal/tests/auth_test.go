@@ -11,71 +11,93 @@ import (
 
 	"vessel.dev/vessel/internal/api"
 	"vessel.dev/vessel/internal/store"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/user"
 )
 
-func TestAuthEndpointsAndRBAC(t *testing.T) {
-	tempDir := filepath.Join(os.TempDir(), "vessel_auth_test")
-	_ = os.RemoveAll(tempDir)
-	_ = os.MkdirAll(tempDir, 0755)
-	defer os.RemoveAll(tempDir)
+func TestAuthEndpoints(t *testing.T) {
+	tmpDir, err := os.MkdirTemp("", "vessel-test-auth-*")
+	if err != nil {
+		t.Fatalf("failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tmpDir)
 
-	dbPath := filepath.Join(tempDir, "vessel.db")
+	dbPath := filepath.Join(tmpDir, "vessel.db")
 	s, err := store.NewStore(dbPath)
 	if err != nil {
-		t.Fatalf("failed to init store: %v", err)
+		t.Fatalf("failed to create store: %v", err)
 	}
-	defer s.Close()
 
 	srv := api.NewServer(s, nil, nil, nil)
 
-	registerPayload := []byte(`{"email":"solomon@vessel.dev","password":"securepassword123","role":"admin"}`)
-	req := httptest.NewRequest(http.MethodPost, "/api/auth/register", bytes.NewReader(registerPayload))
+	// Test Signup
+	signupPayload := map[string]string{
+		"email":    "solomon@vessel.dev",
+		"password": "strongpassword123",
+		"role":     "admin",
+	}
+	body, _ := json.Marshal(signupPayload)
+	req := httptest.NewRequest(http.MethodPost, "/api/auth/signup", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 
-	srv.Handler().ServeHTTP(rec, req)
+	srv.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusCreated {
-		t.Fatalf("expected 201 Created on register, got %d. Body: %s", rec.Code, rec.Body.String())
+		t.Fatalf("expected 201 Created for signup, got %d. Body: %s", rec.Code, rec.Body.String())
 	}
 
-	var registerResp map[string]any
-	if err := json.NewDecoder(rec.Body).Decode(&registerResp); err != nil {
-		t.Fatalf("failed to decode register response: %v", err)
+	// Test Login
+	loginPayload := map[string]string{
+		"email":    "solomon@vessel.dev",
+		"password": "strongpassword123",
+	}
+	body, _ = json.Marshal(loginPayload)
+	loginReq := httptest.NewRequest(http.MethodPost, "/api/auth/signin", bytes.NewReader(body))
+	loginReq.Header.Set("Content-Type", "application/json")
+	loginRec := httptest.NewRecorder()
+
+	srv.ServeHTTP(loginRec, loginReq)
+
+	if loginRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK for login, got %d. Body: %s", loginRec.Code, loginRec.Body.String())
 	}
 
-	tokenStr, ok := registerResp["token"].(string)
-	if !ok || tokenStr == "" {
-		t.Fatalf("expected valid token string, got: %v", registerResp["token"])
+	var loginResp map[string]any
+	if err := json.NewDecoder(loginRec.Body).Decode(&loginResp); err != nil {
+		t.Fatalf("failed to decode login response: %v", err)
 	}
 
-	meReqNoAuth := httptest.NewRequest(http.MethodGet, "/api/auth/me", nil)
-	meRecNoAuth := httptest.NewRecorder()
-	srv.Handler().ServeHTTP(meRecNoAuth, meReqNoAuth)
+	token, ok := loginResp["token"].(string)
+	if !ok || token == "" {
+		t.Fatalf("expected JWT token in login response, got: %v", loginResp["token"])
+	}
 
-	if meRecNoAuth.Code != http.StatusUnauthorized {
-		t.Fatalf("expected 401 Unauthorized for unauthenticated /api/auth/me, got %d", meRecNoAuth.Code)
+	// Test /api/auth/me with Token
+	meReq := httptest.NewRequest(http.MethodGet, "/api/auth/me", nil)
+	meRec := httptest.NewRecorder()
+	srv.ServeHTTP(meRec, meReq)
+	if meRec.Code != http.StatusUnauthorized {
+		t.Fatalf("expected 401 Unauthorized for unauthenticated /api/auth/me, got %d", meRec.Code)
 	}
 
 	meReqAuth := httptest.NewRequest(http.MethodGet, "/api/auth/me", nil)
-	meReqAuth.Header.Set("Authorization", "Bearer "+tokenStr)
+	meReqAuth.Header.Set("Authorization", "Bearer "+token)
 	meRecAuth := httptest.NewRecorder()
-	srv.Handler().ServeHTTP(meRecAuth, meReqAuth)
+	srv.ServeHTTP(meRecAuth, meReqAuth)
 
 	if meRecAuth.Code != http.StatusOK {
 		t.Fatalf("expected 200 OK for authenticated /api/auth/me, got %d. Body: %s", meRecAuth.Code, meRecAuth.Body.String())
 	}
 
-	var user types.User
-	if err := json.NewDecoder(meRecAuth.Body).Decode(&user); err != nil {
+	var u user.User
+	if err := json.NewDecoder(meRecAuth.Body).Decode(&u); err != nil {
 		t.Fatalf("failed to decode user profile: %v", err)
 	}
 
-	if user.Email != "solomon@vessel.dev" || user.Role != "admin" {
-		t.Errorf("expected solomon@vessel.dev [admin], got %s [%s]", user.Email, user.Role)
+	if u.Email != "solomon@vessel.dev" || u.Role != "admin" {
+		t.Errorf("expected solomon@vessel.dev [admin], got %s [%s]", u.Email, u.Role)
 	}
-	if user.PasswordHash != "" {
-		t.Errorf("expected PasswordHash to be stripped in API response, got: %s", user.PasswordHash)
+	if u.PasswordHash != "" {
+		t.Errorf("expected PasswordHash to be stripped in API response, got: %s", u.PasswordHash)
 	}
 }

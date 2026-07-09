@@ -9,7 +9,7 @@ import (
 
 	"vessel.dev/vessel/internal/services"
 	"vessel.dev/vessel/internal/store"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/user"
 )
 
 type contextKey string
@@ -40,7 +40,7 @@ func (g *AuthGuard) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if g.TokenService == nil {
-			userClaims := &types.UserClaims{
+			userClaims := &user.UserClaims{
 				UserID: "default",
 				Email:  "default@vessel.dev",
 				Role:   "admin",
@@ -63,7 +63,7 @@ func (g *AuthGuard) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		totpEnabled, _ := claimsMap["totpEnabled"].(bool)
-		userClaims := &types.UserClaims{
+		userClaims := &user.UserClaims{
 			UserID:      fmt.Sprintf("%v", claimsMap["sub"]),
 			Email:       fmt.Sprintf("%v", claimsMap["email"]),
 			Role:        fmt.Sprintf("%v", claimsMap["role"]),
@@ -118,24 +118,62 @@ func ExtractClientIP(r *http.Request) string {
 }
 
 func (g *AuthGuard) RequireRole(requiredRole string, next http.HandlerFunc) http.HandlerFunc {
-	return g.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
-		claims := GetUserClaimsFromContext(r.Context())
-		if claims == nil {
-			writeError(w, http.StatusUnauthorized, "unauthorized access")
+	return func(w http.ResponseWriter, r *http.Request) {
+		if g.Store != nil {
+			settings, _ := g.Store.GetServerSettings()
+			if settings != nil && strings.TrimSpace(settings.IPAllowlist) != "" {
+				clientIP := ExtractClientIP(r)
+				if !IsIPAllowed(clientIP, settings.IPAllowlist) {
+					writeError(w, http.StatusForbidden, fmt.Sprintf("access denied from IP address %s by server allowlist policy", clientIP))
+					return
+				}
+			}
+		}
+
+		if g.TokenService == nil {
+			userClaims := &user.UserClaims{
+				UserID: "default",
+				Email:  "default@vessel.dev",
+				Role:   "admin",
+			}
+			ctx := context.WithValue(r.Context(), userClaimsKey, userClaims)
+			next(w, r.WithContext(ctx))
 			return
 		}
 
-		if claims.Role != requiredRole && claims.Role != "admin" {
-			writeError(w, http.StatusForbidden, "insufficient role privileges for this operation")
+		tokenStr := ExtractTokenFromRequest(r)
+		if tokenStr == "" {
+			writeError(w, http.StatusUnauthorized, "missing authentication token")
 			return
 		}
 
-		next(w, r)
-	})
+		claimsMap, err := g.TokenService.ValidateToken(tokenStr)
+		if err != nil {
+			writeError(w, http.StatusUnauthorized, "invalid authentication token: "+err.Error())
+			return
+		}
+
+		role := fmt.Sprintf("%v", claimsMap["role"])
+		if role != requiredRole && role != "admin" {
+			writeError(w, http.StatusForbidden, "insufficient permissions")
+			return
+		}
+
+		totpEnabled, _ := claimsMap["totpEnabled"].(bool)
+		userClaims := &user.UserClaims{
+			UserID:      fmt.Sprintf("%v", claimsMap["sub"]),
+			Email:       fmt.Sprintf("%v", claimsMap["email"]),
+			Role:        role,
+			TOTPEnabled: totpEnabled,
+		}
+
+		ctx := context.WithValue(r.Context(), userClaimsKey, userClaims)
+		next(w, r.WithContext(ctx))
+	}
 }
 
-func GetUserClaimsFromContext(ctx context.Context) *types.UserClaims {
-	claims, ok := ctx.Value(userClaimsKey).(*types.UserClaims)
+func GetUserClaimsFromContext(ctx context.Context) *user.UserClaims {
+	claims, ok := ctx.Value(userClaimsKey).(*user.UserClaims)
 	if !ok {
 		return nil
 	}

@@ -6,17 +6,18 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"vessel.dev/vessel/internal/types"
+	"vessel.dev/vessel/internal/user"
 )
 
 type TokenService struct {
 	secretKey []byte
 }
 
+// NewTokenService initializes a TokenService with the signing key from environment or default fallback.
 func NewTokenService() *TokenService {
-	secret := os.Getenv("VESSEL_JWT_SECRET")
+	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		secret = os.Getenv("JWT_SECRET")
+		secret = os.Getenv("VESSEL_JWT_SECRET")
 	}
 	if secret == "" {
 		secret = "vessel-super-secret-jwt-signing-key-change-in-prod"
@@ -27,7 +28,7 @@ func NewTokenService() *TokenService {
 }
 
 // GenerateToken creates an HMAC-SHA256 JWT access token for a validated user identity.
-func (ts *TokenService) GenerateToken(user *types.User) (string, error) {
+func (ts *TokenService) GenerateToken(user *user.User) (string, error) {
 	if user == nil {
 		return "", errors.New("user cannot be nil when generating token")
 	}

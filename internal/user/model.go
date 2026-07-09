@@ -1,4 +1,4 @@
-package types
+package user
 
 import "time"
 
@@ -18,4 +18,14 @@ type UserClaims struct {
 	Email       string `json:"email"`
 	Role        string `json:"role"`
 	TOTPEnabled bool   `json:"totpEnabled"`
+}
+
+type PersonalAccessToken struct {
+	ID        string    `json:"id"`
+	UserID    string    `json:"userId"`
+	Name      string    `json:"name"`
+	TokenHash string    `json:"-"`
+	Prefix    string    `json:"prefix"`
+	ExpiresAt time.Time `json:"expiresAt"`
+	CreatedAt time.Time `json:"createdAt"`
 }
