@@ -24,8 +24,8 @@ func GenerateTOTPSecret() (string, error) {
 func GenerateTOTPQRUri(accountName, secret string) string {
 	issuer := "Vessel"
 	return fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s",
-		url.PathEscape(issuer),
-		url.PathEscape(accountName),
+		url.QueryEscape(issuer),
+		url.QueryEscape(accountName),
 		url.QueryEscape(secret),
 		url.QueryEscape(issuer),
 	)
@@ -34,11 +34,11 @@ func GenerateTOTPQRUri(accountName, secret string) string {
 func GenerateRecoveryCodes(count int) ([]string, error) {
 	var codes []string
 	for i := 0; i < count; i++ {
-		buf := make([]byte, 5)
+		buf := make([]byte, 4)
 		if _, err := rand.Read(buf); err != nil {
 			return nil, err
 		}
-		code := fmt.Sprintf("%05x-%05x", buf[:2], buf[2:4])
+		code := fmt.Sprintf("%04x-%04x", buf[:2], buf[2:4])
 		codes = append(codes, strings.ToUpper(code))
 	}
 	return codes, nil
@@ -62,14 +62,14 @@ func ValidateTOTP(secret, passcode string) bool {
 	now := time.Now().Unix() / 30
 	// Check window of -1, 0, +1 time steps to allow small clock drift
 	for step := -1; step <= 1; step++ {
-		if generateTOTPCode(secretBytes, now+int64(step)) == passcode {
+		if GenerateTOTPCode(secretBytes, now+int64(step)) == passcode {
 			return true
 		}
 	}
 	return false
 }
 
-func generateTOTPCode(secret []byte, timeStep int64) string {
+func GenerateTOTPCode(secret []byte, timeStep int64) string {
 	buf := make([]byte, 8)
 	binary.BigEndian.PutUint64(buf, uint64(timeStep))
 

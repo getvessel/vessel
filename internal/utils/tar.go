@@ -3,6 +3,7 @@ package utils
 import (
 	"archive/tar"
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -19,41 +20,54 @@ func CreateTarContext(sourceDir string) (io.Reader, error) {
 		}
 		relPath, err := filepath.Rel(sourceDir, path)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to determine relative path for %s: %w", path, err)
 		}
 		if relPath == "." {
 			return nil
 		}
-
-		header, err := tar.FileInfoHeader(info, info.Name())
-		if err != nil {
-			return err
-		}
-		header.Name = relPath
-
-		if err := tw.WriteHeader(header); err != nil {
-			return err
-		}
-
-		if !info.IsDir() {
-			file, err := os.Open(path)
-			if err != nil {
-				return err
-			}
-			if _, err := io.Copy(tw, file); err != nil {
-				file.Close()
-				return err
-			}
-			file.Close()
-		}
-		return nil
+		return addFileToTar(tw, path, info, relPath)
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	if err := tw.Close(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to close tar writer: %w", err)
 	}
 	return &buf, nil
+}
+
+func addFileToTar(tw *tar.Writer, path string, info os.FileInfo, relPath string) error {
+	if err := writeTarHeader(tw, info, relPath); err != nil {
+		return err
+	}
+	if info.IsDir() {
+		return nil
+	}
+	return writeTarFileContent(tw, path)
+}
+
+func writeTarHeader(tw *tar.Writer, info os.FileInfo, relPath string) error {
+	header, err := tar.FileInfoHeader(info, info.Name())
+	if err != nil {
+		return fmt.Errorf("failed to create tar header for %s: %w", relPath, err)
+	}
+	header.Name = relPath
+	if err := tw.WriteHeader(header); err != nil {
+		return fmt.Errorf("failed to write tar header for %s: %w", relPath, err)
+	}
+	return nil
+}
+
+func writeTarFileContent(tw *tar.Writer, path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("failed to open file %s: %w", path, err)
+	}
+	defer file.Close()
+
+	if _, err := io.Copy(tw, file); err != nil {
+		return fmt.Errorf("failed to copy file %s into tar: %w", path, err)
+	}
+	return nil
 }

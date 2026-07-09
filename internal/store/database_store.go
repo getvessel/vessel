@@ -99,6 +99,29 @@ func (s *Store) ListDatabasesByProject(projectID string) ([]types.DatabaseConfig
 	return databases, nil
 }
 
+// ListAllDatabases retrieves all managed databases across all projects.
+func (s *Store) ListAllDatabases() ([]types.DatabaseConfig, error) {
+	rows, err := s.db.Query(`SELECT id, COALESCE(project_id, ''), COALESCE(environment_id, ''), name, engine, version, port, username, encrypted_password, database_name, volume_path, COALESCE(container_id, ''), status, COALESCE(internal_dns, ''), COALESCE(external_dns, ''), created_at, updated_at FROM databases ORDER BY created_at ASC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var databases []types.DatabaseConfig
+	for rows.Next() {
+		var db types.DatabaseConfig
+		var encryptedPassword string
+		if err := rows.Scan(&db.ID, &db.ProjectID, &db.EnvironmentID, &db.Name, &db.Engine, &db.Version, &db.Port, &db.Username, &encryptedPassword, &db.DatabaseName, &db.VolumePath, &db.ContainerID, &db.Status, &db.InternalDNS, &db.ExternalDNS, &db.CreatedAt, &db.UpdatedAt); err != nil {
+			return nil, err
+		}
+		if plainPassword, err := s.vault.Decrypt(encryptedPassword); err == nil {
+			db.Password = plainPassword
+		}
+		databases = append(databases, db)
+	}
+	return databases, nil
+}
+
 // ListDatabasesByEnvironment retrieves all managed databases linked to a specific environment identifier.
 func (s *Store) ListDatabasesByEnvironment(environmentID string) ([]types.DatabaseConfig, error) {
 	rows, err := s.db.Query(`SELECT id, COALESCE(project_id, ''), COALESCE(environment_id, ''), name, engine, version, port, username, encrypted_password, database_name, volume_path, COALESCE(container_id, ''), status, COALESCE(internal_dns, ''), COALESCE(external_dns, ''), created_at, updated_at FROM databases WHERE environment_id = ? ORDER BY created_at ASC`, environmentID)

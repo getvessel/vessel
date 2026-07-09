@@ -241,44 +241,7 @@ func (s *Store) ListAppServicesByProject(projectID string) ([]*types.AppServiceC
 	return apps, nil
 }
 
-// UpdateAppService modifies existing service settings (`Settings` tab in UI).
-func (s *Store) UpdateAppService(service *types.AppServiceConfig) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	service.UpdatedAt = time.Now().UTC()
-	query := `UPDATE app_services SET
-		name = ?, icon = ?, repository_url = ?, branch = ?, root_directory = ?, build_command = ?,
-		start_command = ?, dockerfile_path = ?, internal_port = ?, domain = ?,
-		auto_deploy_webhook = ?, git_repo_full_name = ?, wait_for_ci = ?, auto_deploy_branch = ?,
-		public_networking_domain = ?, private_networking_internal = ?, enable_outbound_ipv6 = ?,
-		cpu_request = ?, memory_limit_mb = ?, replicas = ?, restart_policy = ?,
-		teardown_timeout = ?, serverless = ?, cron_schedule = ?, health_check_path = ?, updated_at = ?
-		WHERE id = ?`
-
-	_, err := s.db.Exec(query,
-		service.Name, service.Icon, service.RepositoryURL, service.Branch, service.RootDirectory, service.BuildCommand,
-		service.StartCommand, service.DockerfilePath, service.InternalPort, service.Domain,
-		service.AutoDeployWebhook, service.GitRepoFullName, service.WaitForCI, service.AutoDeployBranch,
-		service.PublicNetworkingDomain, service.PrivateNetworkingInternal, service.EnableOutboundIPv6,
-		service.CPURequest, service.MemoryLimitMB, service.Replicas, service.RestartPolicy,
-		service.TeardownTimeout, service.Serverless, service.CronSchedule, service.HealthCheckPath, service.UpdatedAt,
-		service.ID,
-	)
-	return err
-}
-
-// UpdateAppServiceStatus updates the container status and container ID of an application service.
-func (s *Store) UpdateAppServiceStatus(id, status, containerID string) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	query := `UPDATE app_services SET status = ?, container_id = ?, updated_at = ? WHERE id = ?`
-	_, err := s.db.Exec(query, status, containerID, time.Now().UTC(), id)
-	return err
-}
-
-// ListAllAppServices returns all application container services across the entire platform.
+// ListAllAppServices returns all application container services across all projects and environments.
 func (s *Store) ListAllAppServices() ([]*types.AppServiceConfig, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -321,6 +284,43 @@ func (s *Store) ListAllAppServices() ([]*types.AppServiceConfig, error) {
 		return nil, err
 	}
 	return apps, nil
+}
+
+// UpdateAppService modifies existing service settings (`Settings` tab in UI).
+func (s *Store) UpdateAppService(service *types.AppServiceConfig) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	service.UpdatedAt = time.Now().UTC()
+	query := `UPDATE app_services SET
+		name = ?, icon = ?, repository_url = ?, branch = ?, root_directory = ?, build_command = ?,
+		start_command = ?, dockerfile_path = ?, internal_port = ?, domain = ?,
+		auto_deploy_webhook = ?, git_repo_full_name = ?, wait_for_ci = ?, auto_deploy_branch = ?,
+		public_networking_domain = ?, private_networking_internal = ?, enable_outbound_ipv6 = ?,
+		cpu_request = ?, memory_limit_mb = ?, replicas = ?, restart_policy = ?,
+		teardown_timeout = ?, serverless = ?, cron_schedule = ?, health_check_path = ?, updated_at = ?
+		WHERE id = ?`
+
+	_, err := s.db.Exec(query,
+		service.Name, service.Icon, service.RepositoryURL, service.Branch, service.RootDirectory, service.BuildCommand,
+		service.StartCommand, service.DockerfilePath, service.InternalPort, service.Domain,
+		service.AutoDeployWebhook, service.GitRepoFullName, service.WaitForCI, service.AutoDeployBranch,
+		service.PublicNetworkingDomain, service.PrivateNetworkingInternal, service.EnableOutboundIPv6,
+		service.CPURequest, service.MemoryLimitMB, service.Replicas, service.RestartPolicy,
+		service.TeardownTimeout, service.Serverless, service.CronSchedule, service.HealthCheckPath, service.UpdatedAt,
+		service.ID,
+	)
+	return err
+}
+
+// UpdateAppServiceStatus updates the container status and container ID of an application service.
+func (s *Store) UpdateAppServiceStatus(id, status, containerID string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	query := `UPDATE app_services SET status = ?, container_id = ?, updated_at = ? WHERE id = ?`
+	_, err := s.db.Exec(query, status, containerID, time.Now().UTC(), id)
+	return err
 }
 
 // DeleteAppService deletes an application service configuration.

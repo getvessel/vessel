@@ -99,6 +99,29 @@ func (s *Store) ListStorageByProject(projectID string) ([]types.StorageConfig, e
 	return storages, nil
 }
 
+// ListAllStorage retrieves all managed object storage instances across all projects.
+func (s *Store) ListAllStorage() ([]types.StorageConfig, error) {
+	rows, err := s.db.Query(`SELECT id, COALESCE(project_id, ''), COALESCE(environment_id, ''), name, type, api_port, console_port, access_key, encrypted_secret_key, bucket_name, volume_path, COALESCE(container_id, ''), status, COALESCE(internal_dns, ''), COALESCE(external_dns, ''), created_at, updated_at FROM storage ORDER BY created_at ASC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var storages []types.StorageConfig
+	for rows.Next() {
+		var st types.StorageConfig
+		var encryptedSecretKey string
+		if err := rows.Scan(&st.ID, &st.ProjectID, &st.EnvironmentID, &st.Name, &st.Type, &st.APIPort, &st.ConsolePort, &st.AccessKey, &encryptedSecretKey, &st.BucketName, &st.VolumePath, &st.ContainerID, &st.Status, &st.InternalDNS, &st.ExternalDNS, &st.CreatedAt, &st.UpdatedAt); err != nil {
+			return nil, err
+		}
+		if plainSecretKey, err := s.vault.Decrypt(encryptedSecretKey); err == nil {
+			st.SecretKey = plainSecretKey
+		}
+		storages = append(storages, st)
+	}
+	return storages, nil
+}
+
 // ListStorageByEnvironment retrieves all managed object storage instances linked to a specific environment identifier.
 func (s *Store) ListStorageByEnvironment(environmentID string) ([]types.StorageConfig, error) {
 	rows, err := s.db.Query(`SELECT id, COALESCE(project_id, ''), COALESCE(environment_id, ''), name, type, api_port, console_port, access_key, encrypted_secret_key, bucket_name, volume_path, COALESCE(container_id, ''), status, COALESCE(internal_dns, ''), COALESCE(external_dns, ''), created_at, updated_at FROM storage WHERE environment_id = ? ORDER BY created_at ASC`, environmentID)

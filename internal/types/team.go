@@ -15,7 +15,7 @@ type TeamMember struct {
 	TeamID    string    `json:"teamId"`
 	UserID    string    `json:"userId"`
 	UserEmail string    `json:"userEmail"`
-	Role      string    `json:"role"` // Owner, Admin, Member
+	Role      string    `json:"role"`
 	JoinedAt  time.Time `json:"joinedAt"`
 }
 

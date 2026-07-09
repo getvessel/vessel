@@ -7,11 +7,11 @@ type DeploymentRecord struct {
 	ServiceID     string    `json:"serviceId"`
 	EnvironmentID string    `json:"environmentId"`
 	ProjectID     string    `json:"projectId"`
-	Status        string    `json:"status"` // "ACTIVE", "BUILDING", "FAILED", "SLEPT", "REMOVED", "QUEUED", "NEEDS_APPROVAL"
+	Status        string    `json:"status"`
 	CommitHash    string    `json:"commitHash,omitempty"`
 	CommitMessage string    `json:"commitMessage,omitempty"`
 	Branch        string    `json:"branch,omitempty"`
-	Trigger       string    `json:"trigger,omitempty"` // e.g. "Git Push", "Manual", "API"
+	Trigger       string    `json:"trigger,omitempty"`
 	BuildLogs     string    `json:"buildLogs,omitempty"`
 	ContainerID   string    `json:"containerId,omitempty"`
 	CreatedAt     time.Time `json:"createdAt"`

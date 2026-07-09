@@ -78,7 +78,6 @@ func (s *Store) GetDefaultEnvironment(projectID string) (*types.EnvironmentConfi
 	var isDefault int
 	err := row.Scan(&env.ID, &env.ProjectID, &env.Name, &isDefault, &env.CreatedAt, &env.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
-		// Fallback check: if no default flag is set, return the first created environment
 		fallbackQuery := `SELECT id, project_id, name, is_default, created_at, updated_at FROM environments WHERE project_id = ? ORDER BY created_at ASC LIMIT 1`
 		fallbackRow := s.db.QueryRow(fallbackQuery, projectID)
 		err = fallbackRow.Scan(&env.ID, &env.ProjectID, &env.Name, &isDefault, &env.CreatedAt, &env.UpdatedAt)
@@ -129,4 +128,32 @@ func (s *Store) DeleteEnvironment(id string) error {
 
 	_, err := s.db.Exec(`DELETE FROM environments WHERE id = ?`, id)
 	return err
+}
+
+// ListAllEnvironments returns all environments across all projects.
+func (s *Store) ListAllEnvironments() ([]*types.EnvironmentConfig, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	query := `SELECT id, project_id, name, is_default, created_at, updated_at FROM environments ORDER BY is_default DESC, created_at ASC`
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list all environments: %w", err)
+	}
+	defer rows.Close()
+
+	var envs []*types.EnvironmentConfig
+	for rows.Next() {
+		var env types.EnvironmentConfig
+		var isDefault int
+		if err := rows.Scan(&env.ID, &env.ProjectID, &env.Name, &isDefault, &env.CreatedAt, &env.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan environment row: %w", err)
+		}
+		env.IsDefault = isDefault == 1
+		envs = append(envs, &env)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return envs, nil
 }

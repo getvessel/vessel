@@ -1,6 +1,8 @@
 package store
 
 import (
+	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -28,20 +30,19 @@ func (s *Store) CreateProject(p *types.ProjectConfig) error {
 		Name:      "production",
 		IsDefault: true,
 	}
-	if err := s.CreateEnvironment(defaultEnv); err != nil {
-		return err
-	}
-
-	return nil
+	return s.CreateEnvironment(defaultEnv)
 }
 
-// GetProject retrieves a ProjectConfig record by its ID.
+// GetProject retrieves a ProjectConfig by its ID from SQLite.
 func (s *Store) GetProject(id string) (*types.ProjectConfig, error) {
 	row := s.db.QueryRow(`SELECT id, COALESCE(workspace_id, ''), team_id, name, description, created_at, updated_at FROM projects WHERE id = ?`, id)
 
 	var p types.ProjectConfig
 	err := row.Scan(&p.ID, &p.WorkspaceID, &p.TeamID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return &p, nil

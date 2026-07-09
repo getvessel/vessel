@@ -41,7 +41,7 @@ func (s *StatsMonitor) GetHealth(ctx context.Context, containerIDOrName string) 
 		return nil, fmt.Errorf("failed to decode stats json: %w", err)
 	}
 
-	cpuPercent := calculateCPUPercentage(&stats)
+	cpuPercent := CalculateCPUPercentage(&stats)
 	memoryUsage := stats.MemoryStats.Usage - stats.MemoryStats.Stats["cache"]
 	if memoryUsage < 0 {
 		memoryUsage = stats.MemoryStats.Usage
@@ -62,7 +62,7 @@ func (s *StatsMonitor) GetHealth(ctx context.Context, containerIDOrName string) 
 	}, nil
 }
 
-func calculateCPUPercentage(stats *types.StatsJSON) float64 {
+func CalculateCPUPercentage(stats *types.StatsJSON) float64 {
 	cpuDelta := float64(stats.CPUStats.CPUUsage.TotalUsage) - float64(stats.PreCPUStats.CPUUsage.TotalUsage)
 	systemDelta := float64(stats.CPUStats.SystemUsage) - float64(stats.PreCPUStats.SystemUsage)
 	if systemDelta > 0.0 && cpuDelta > 0.0 {

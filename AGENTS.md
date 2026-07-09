@@ -47,3 +47,4 @@
 - Use official `github.com/docker/docker/client` for Docker SDK. Use `gorilla/websocket` for WebSocket upgrades.
 - Hashicorp-style Go layout: `internal/` packages are private, `cmd/` binaries are thin entrypoints.
 - Avoid `init()` functions. Use explicit constructor functions instead.
+- **Testing:** Integration and end-to-end tests go in `internal/tests/`, grouped by domain in subdirectories (e.g. `internal/tests/auth/`, `internal/tests/database/`). Unit tests stay co-located with their source files (`store_test.go`, `proxy_test.go`).

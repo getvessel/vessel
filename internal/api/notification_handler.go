@@ -62,7 +62,7 @@ func (h *NotificationHandler) TestNotification(w http.ResponseWriter, r *http.Re
 	}
 
 	var req struct {
-		Channel   string `json:"channel"` // e.g. "smtp", "slack", "discord", "telegram", "pushover", "webhook"
+		Channel   string `json:"channel"`
 		ProjectID string `json:"projectId,omitempty"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

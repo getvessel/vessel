@@ -48,10 +48,9 @@ func NewUpdaterService(s *store.Store) *UpdaterService {
 // Start initiates the background loop checking for updates based on UpdateCheckCron interval.
 func (u *UpdaterService) Start(ctx context.Context) {
 	go func() {
-		ticker := time.NewTicker(1 * time.Hour) // default check every hour (matching 0 * * * *)
+		ticker := time.NewTicker(1 * time.Hour)
 		defer ticker.Stop()
 
-		// Initial check shortly after startup if never checked before
 		go func() {
 			time.Sleep(30 * time.Second)
 			settings, err := u.store.GetServerSettings()
@@ -124,7 +123,6 @@ func (u *UpdaterService) CheckForUpdate(ctx context.Context) (*UpdateInfo, error
 		}
 	}
 
-	// Fallback simulation if offline or no release tag found yet
 	if latestVer == currentVer && strings.HasSuffix(currentVer, "-dev") {
 		latestVer = strings.TrimSuffix(currentVer, "-dev")
 	}
@@ -160,10 +158,9 @@ func (u *UpdaterService) DeployUpdate(ctx context.Context) error {
 	}
 
 	if settings.LatestVersion == "" || settings.LatestVersion == settings.CurrentVersion {
-		return nil // Already up to date
+		return nil
 	}
 
-	// Perform update deployment step (updating CurrentVersion upon successful restart/deploy)
 	settings.CurrentVersion = settings.LatestVersion
 	settings.LastUpdateCheck = time.Now().Format(time.RFC3339)
 

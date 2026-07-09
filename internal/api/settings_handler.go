@@ -58,7 +58,7 @@ func (h *SettingsHandler) TriggerSystemPrune(w http.ResponseWriter, r *http.Requ
 		writeJSON(w, http.StatusOK, map[string]any{
 			"status":              "simulated",
 			"message":             "Docker client not initialized in standalone mode; simulated clean system prune.",
-			"spaceReclaimedBytes": 104857600, // 100MB simulation
+			"spaceReclaimedBytes": 104857600,
 		})
 		return
 	}
