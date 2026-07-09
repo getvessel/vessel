@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"github.com/labstack/echo/v4"
+
 	"encoding/json"
 	"net/http"
 
@@ -16,59 +18,57 @@ func NewNotificationHandler(ns *services.NotificationService) *NotificationHandl
 	return &NotificationHandler{notificationService: ns}
 }
 
-func (h *NotificationHandler) GetIntegrations(w http.ResponseWriter, r *http.Request) {
+func (h *NotificationHandler) GetIntegrations(c echo.Context) error {
 	if r.Method != http.MethodGet {
 		WriteError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
+		return nil
 	}
 
 	integ, err := h.notificationService.GetIntegration(r.Context())
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 
 	WriteJSON(w, http.StatusOK, integ)
 }
 
-func (h *NotificationHandler) SaveIntegrations(w http.ResponseWriter, r *http.Request) {
+func (h *NotificationHandler) SaveIntegrations(c echo.Context) error {
 	if r.Method != http.MethodPut && r.Method != http.MethodPost {
 		WriteError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
+		return nil
 	}
 
 	var integ models.NotificationIntegration
-	if err := json.NewDecoder(r.Body).Decode(&integ); err != nil {
-		WriteError(w, http.StatusBadRequest, "Invalid request payload")
-		return
+	if err := c.Bind(&integ); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
 
 	if err := h.notificationService.SaveIntegration(r.Context(), &integ); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 
 	WriteJSON(w, http.StatusOK, integ)
 }
 
-func (h *NotificationHandler) TestNotification(w http.ResponseWriter, r *http.Request) {
+func (h *NotificationHandler) TestNotification(c echo.Context) error {
 	if r.Method != http.MethodPost {
 		WriteError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
+		return nil
 	}
 
 	var req struct {
 		Channel   string `json:"channel"`
 		ProjectID string `json:"projectId,omitempty"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		WriteError(w, http.StatusBadRequest, "Invalid request payload")
-		return
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
 
 	if err := h.notificationService.SendTest(req.Channel, req.ProjectID); err != nil {
 		WriteError(w, http.StatusBadRequest, err.Error())
-		return
+		return nil
 	}
 
 	WriteJSON(w, http.StatusOK, map[string]string{
@@ -77,49 +77,48 @@ func (h *NotificationHandler) TestNotification(w http.ResponseWriter, r *http.Re
 	})
 }
 
-func (h *NotificationHandler) GetProjectPreferences(w http.ResponseWriter, r *http.Request) {
+func (h *NotificationHandler) GetProjectPreferences(c echo.Context) error {
 	if r.Method != http.MethodGet {
 		WriteError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
+		return nil
 	}
 
-	projectID := r.PathValue("id")
+	projectID := c.Param("id")
 	if projectID == "" {
 		WriteError(w, http.StatusBadRequest, "Missing project id parameter")
-		return
+		return nil
 	}
 
 	pref, err := h.notificationService.GetProjectPref(r.Context(), projectID)
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 
 	WriteJSON(w, http.StatusOK, pref)
 }
 
-func (h *NotificationHandler) SaveProjectPreferences(w http.ResponseWriter, r *http.Request) {
+func (h *NotificationHandler) SaveProjectPreferences(c echo.Context) error {
 	if r.Method != http.MethodPut && r.Method != http.MethodPost {
 		WriteError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
+		return nil
 	}
 
-	projectID := r.PathValue("id")
+	projectID := c.Param("id")
 	if projectID == "" {
 		WriteError(w, http.StatusBadRequest, "Missing project id parameter")
-		return
+		return nil
 	}
 
 	var pref models.ProjectNotificationPref
-	if err := json.NewDecoder(r.Body).Decode(&pref); err != nil {
-		WriteError(w, http.StatusBadRequest, "Invalid request payload")
-		return
+	if err := c.Bind(&pref); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
 	pref.ProjectID = projectID
 
 	if err := h.notificationService.SaveProjectPref(r.Context(), &pref); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 
 	WriteJSON(w, http.StatusOK, pref)

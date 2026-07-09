@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"github.com/labstack/echo/v4"
+
 	"context"
 	"encoding/json"
 	"net/http"
@@ -22,25 +24,24 @@ func NewProjectHandler(s *services.ProjectService, p ProxyReloader) *ProjectHand
 	return &ProjectHandler{projectService: s, proxy: p}
 }
 
-func (h *ProjectHandler) ListProjects(w http.ResponseWriter, r *http.Request) {
+func (h *ProjectHandler) ListProjects(c echo.Context) error {
 	projects, err := h.projectService.ListProjects(r.Context())
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, projects)
 }
 
-func (h *ProjectHandler) CreateProject(w http.ResponseWriter, r *http.Request) {
+func (h *ProjectHandler) CreateProject(c echo.Context) error {
 	var req models.CreateProjectRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		WriteError(w, http.StatusBadRequest, "invalid project configuration payload")
-		return
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
 	p, err := h.projectService.CreateProjectFromRequest(r.Context(), &req)
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	if h.proxy != nil {
 		_ = h.proxy.Reload(r.Context())
@@ -48,29 +49,29 @@ func (h *ProjectHandler) CreateProject(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, http.StatusCreated, p)
 }
 
-func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
+func (h *ProjectHandler) GetProject(c echo.Context) error {
+	id := c.Param("id")
 	if id == "" {
 		WriteError(w, http.StatusBadRequest, "missing project id parameter")
-		return
+		return nil
 	}
 	p, err := h.projectService.GetProject(r.Context(), id)
 	if err != nil {
 		WriteError(w, http.StatusNotFound, "project not found")
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, p)
 }
 
-func (h *ProjectHandler) DeleteProject(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
+func (h *ProjectHandler) DeleteProject(c echo.Context) error {
+	id := c.Param("id")
 	if id == "" {
 		WriteError(w, http.StatusBadRequest, "missing project id parameter")
-		return
+		return nil
 	}
 	if err := h.projectService.DeleteProject(r.Context(), id); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	if h.proxy != nil {
 		_ = h.proxy.Reload(r.Context())

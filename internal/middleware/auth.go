@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"net/http"
 	"strings"
+
+	"github.com/labstack/echo/v4"
 
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/services"
@@ -28,52 +29,50 @@ func NewAuthGuard(ts *services.TokenService, sp SettingsProvider) *AuthGuard {
 	return &AuthGuard{TokenService: ts, Settings: sp}
 }
 
-func (g *AuthGuard) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if g.Settings != nil {
-			settings, _ := g.Settings.GetSettings(r.Context())
-			if settings != nil && strings.TrimSpace(settings.IPAllowlist) != "" {
-				clientIP := ExtractClientIP(r)
-				if !IsIPAllowed(clientIP, settings.IPAllowlist) {
-					writeError(w, http.StatusForbidden, fmt.Sprintf("access denied from IP address %s by server allowlist policy", clientIP))
-					return
+func (g *AuthGuard) RequireAuth() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if g.Settings != nil {
+				settings, _ := g.Settings.GetSettings(c.Request().Context())
+				if settings != nil && strings.TrimSpace(settings.IPAllowlist) != "" {
+					clientIP := c.RealIP()
+					if !IsIPAllowed(clientIP, settings.IPAllowlist) {
+						return c.JSON(http.StatusForbidden, map[string]string{"error": fmt.Sprintf("access denied from IP address %s by server allowlist policy", clientIP)})
+					}
 				}
 			}
-		}
 
-		if g.TokenService == nil {
-			userClaims := &models.UserClaims{
-				UserID: "default",
-				Email:  "default@vessel.dev",
-				Role:   "admin",
+			if g.TokenService == nil {
+				userClaims := &models.UserClaims{
+					UserID: "default",
+					Email:  "default@vessel.dev",
+					Role:   "admin",
+				}
+				c.Set("user", userClaims)
+				return next(c)
 			}
-			ctx := context.WithValue(r.Context(), userClaimsKey, userClaims)
-			next(w, r.WithContext(ctx))
-			return
-		}
 
-		tokenStr := ExtractTokenFromRequest(r)
-		if tokenStr == "" {
-			writeError(w, http.StatusUnauthorized, "missing authentication token")
-			return
-		}
+			tokenStr := ExtractTokenFromRequest(c)
+			if tokenStr == "" {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "missing authentication token"})
+			}
 
-		claimsMap, err := g.TokenService.ValidateToken(tokenStr)
-		if err != nil {
-			writeError(w, http.StatusUnauthorized, "invalid authentication token: "+err.Error())
-			return
-		}
+			claimsMap, err := g.TokenService.ValidateToken(tokenStr)
+			if err != nil {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid authentication token: " + err.Error()})
+			}
 
-		totpEnabled, _ := claimsMap["totpEnabled"].(bool)
-		userClaims := &models.UserClaims{
-			UserID:      fmt.Sprintf("%v", claimsMap["sub"]),
-			Email:       fmt.Sprintf("%v", claimsMap["email"]),
-			Role:        fmt.Sprintf("%v", claimsMap["role"]),
-			TOTPEnabled: totpEnabled,
-		}
+			totpEnabled, _ := claimsMap["totpEnabled"].(bool)
+			userClaims := &models.UserClaims{
+				UserID:      fmt.Sprintf("%v", claimsMap["sub"]),
+				Email:       fmt.Sprintf("%v", claimsMap["email"]),
+				Role:        fmt.Sprintf("%v", claimsMap["role"]),
+				TOTPEnabled: totpEnabled,
+			}
 
-		ctx := context.WithValue(r.Context(), userClaimsKey, userClaims)
-		next(w, r.WithContext(ctx))
+			c.Set("user", userClaims)
+			return next(c)
+		}
 	}
 }
 
@@ -102,73 +101,59 @@ func IsIPAllowed(clientIPStr string, allowlistStr string) bool {
 	return false
 }
 
-func ExtractClientIP(r *http.Request) string {
-	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
-		parts := strings.Split(xff, ",")
-		return strings.TrimSpace(parts[0])
-	}
-	if xri := r.Header.Get("X-Real-IP"); xri != "" {
-		return strings.TrimSpace(xri)
-	}
-	host, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		return r.RemoteAddr
-	}
-	return host
+func ExtractClientIP(c echo.Context) string {
+	return c.RealIP()
 }
 
-func (g *AuthGuard) RequireRole(requiredRole string, next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if g.Settings != nil {
-			settings, _ := g.Settings.GetSettings(r.Context())
-			if settings != nil && strings.TrimSpace(settings.IPAllowlist) != "" {
-				clientIP := ExtractClientIP(r)
-				if !IsIPAllowed(clientIP, settings.IPAllowlist) {
-					writeError(w, http.StatusForbidden, fmt.Sprintf("access denied from IP address %s by server allowlist policy", clientIP))
-					return
+func (g *AuthGuard) RequireRole(requiredRole string) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if g.Settings != nil {
+				settings, _ := g.Settings.GetSettings(c.Request().Context())
+				if settings != nil && strings.TrimSpace(settings.IPAllowlist) != "" {
+					clientIP := c.RealIP()
+					if !IsIPAllowed(clientIP, settings.IPAllowlist) {
+						return c.JSON(http.StatusForbidden, map[string]string{"error": fmt.Sprintf("access denied from IP address %s by server allowlist policy", clientIP)})
+					}
 				}
 			}
-		}
 
-		if g.TokenService == nil {
-			userClaims := &models.UserClaims{
-				UserID: "default",
-				Email:  "default@vessel.dev",
-				Role:   "admin",
+			if g.TokenService == nil {
+				userClaims := &models.UserClaims{
+					UserID: "default",
+					Email:  "default@vessel.dev",
+					Role:   "admin",
+				}
+				c.Set("user", userClaims)
+				return next(c)
 			}
-			ctx := context.WithValue(r.Context(), userClaimsKey, userClaims)
-			next(w, r.WithContext(ctx))
-			return
-		}
 
-		tokenStr := ExtractTokenFromRequest(r)
-		if tokenStr == "" {
-			writeError(w, http.StatusUnauthorized, "missing authentication token")
-			return
-		}
+			tokenStr := ExtractTokenFromRequest(c)
+			if tokenStr == "" {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "missing authentication token"})
+			}
 
-		claimsMap, err := g.TokenService.ValidateToken(tokenStr)
-		if err != nil {
-			writeError(w, http.StatusUnauthorized, "invalid authentication token: "+err.Error())
-			return
-		}
+			claimsMap, err := g.TokenService.ValidateToken(tokenStr)
+			if err != nil {
+				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid authentication token: " + err.Error()})
+			}
 
-		role := fmt.Sprintf("%v", claimsMap["role"])
-		if role != requiredRole && role != "admin" {
-			writeError(w, http.StatusForbidden, "insufficient permissions")
-			return
-		}
+			role := fmt.Sprintf("%v", claimsMap["role"])
+			if role != requiredRole && role != "admin" {
+				return c.JSON(http.StatusForbidden, map[string]string{"error": "insufficient permissions"})
+			}
 
-		totpEnabled, _ := claimsMap["totpEnabled"].(bool)
-		userClaims := &models.UserClaims{
-			UserID:      fmt.Sprintf("%v", claimsMap["sub"]),
-			Email:       fmt.Sprintf("%v", claimsMap["email"]),
-			Role:        role,
-			TOTPEnabled: totpEnabled,
-		}
+			totpEnabled, _ := claimsMap["totpEnabled"].(bool)
+			userClaims := &models.UserClaims{
+				UserID:      fmt.Sprintf("%v", claimsMap["sub"]),
+				Email:       fmt.Sprintf("%v", claimsMap["email"]),
+				Role:        role,
+				TOTPEnabled: totpEnabled,
+			}
 
-		ctx := context.WithValue(r.Context(), userClaimsKey, userClaims)
-		next(w, r.WithContext(ctx))
+			c.Set("user", userClaims)
+			return next(c)
+		}
 	}
 }
 
@@ -179,27 +164,21 @@ func GetUserClaimsFromContext(ctx context.Context) *models.UserClaims {
 	return nil
 }
 
-func ExtractTokenFromRequest(r *http.Request) string {
-	authHeader := r.Header.Get("Authorization")
+func ExtractTokenFromRequest(c echo.Context) string {
+	authHeader := c.Request().Header.Get("Authorization")
 	if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
 		return strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
 	}
 
-	cookie, err := r.Cookie("vessel_token")
+	cookie, err := c.Cookie("vessel_token")
 	if err == nil && cookie.Value != "" {
 		return strings.TrimSpace(cookie.Value)
 	}
 
-	queryToken := r.URL.Query().Get("token")
+	queryToken := c.QueryParam("token")
 	if queryToken != "" {
 		return strings.TrimSpace(queryToken)
 	}
 
 	return ""
-}
-
-func writeError(w http.ResponseWriter, status int, message string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	_, _ = fmt.Fprintf(w, `{"error":"%s"}`, message)
 }

@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"github.com/labstack/echo/v4"
+
 	"context"
 	"io"
 	"net/http"
@@ -42,23 +44,23 @@ func NewTerminalHandler(
 	}
 }
 
-func (h *TerminalHandler) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+func (h *TerminalHandler) HandleWebSocket(c echo.Context) error {
 	if h.tokenService != nil {
 		tokenStr := middleware.ExtractTokenFromRequest(r)
 		if tokenStr == "" {
 			WriteError(w, http.StatusUnauthorized, "missing authentication token for terminal access")
-			return
+			return nil
 		}
 		if _, err := h.tokenService.ValidateToken(tokenStr); err != nil {
 			WriteError(w, http.StatusUnauthorized, "invalid authentication token for terminal access")
-			return
+			return nil
 		}
 	}
 
-	id := r.PathValue("id")
+	id := c.Param("id")
 	if id == "" {
 		WriteError(w, http.StatusBadRequest, "missing id parameter")
-		return
+		return nil
 	}
 
 	containerName := h.normalizeName(id)
@@ -82,25 +84,25 @@ func (h *TerminalHandler) HandleWebSocket(w http.ResponseWriter, r *http.Request
 
 	if h.dockerClient == nil {
 		WriteError(w, http.StatusInternalServerError, "docker client unavailable")
-		return
+		return nil
 	}
 
 	resp, err := h.dockerClient.ContainerExecCreate(context.Background(), containerName, execConfig)
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, "failed to create exec instance: "+err.Error())
-		return
+		return nil
 	}
 
 	hijackedResp, err := h.dockerClient.ContainerExecAttach(context.Background(), resp.ID, types.ExecStartCheck{Tty: true})
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, "failed to attach to exec instance: "+err.Error())
-		return
+		return nil
 	}
 	defer hijackedResp.Close()
 
 	ws, err := terminalUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		return
+		return nil
 	}
 	defer ws.Close()
 
@@ -122,7 +124,7 @@ func (h *TerminalHandler) HandleWebSocket(w http.ResponseWriter, r *http.Request
 	go func() {
 		for range ticker.C {
 			if err := ws.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(10*time.Second)); err != nil {
-				return
+				return nil
 			}
 		}
 	}()
@@ -137,11 +139,11 @@ func (h *TerminalHandler) wsToReader(ws *websocket.Conn) io.Reader {
 			_, message, err := ws.ReadMessage()
 			if err != nil {
 				w.CloseWithError(err)
-				return
+				return nil
 			}
 			_, err = w.Write(message)
 			if err != nil {
-				return
+				return nil
 			}
 		}
 	}()
@@ -156,11 +158,11 @@ func (h *TerminalHandler) wsToWriter(ws *websocket.Conn) io.Writer {
 			n, err := r.Read(buf)
 			if n > 0 {
 				if err := ws.WriteMessage(websocket.BinaryMessage, buf[:n]); err != nil {
-					return
+					return nil
 				}
 			}
 			if err != nil {
-				return
+				return nil
 			}
 		}
 	}()

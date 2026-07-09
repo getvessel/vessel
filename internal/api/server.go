@@ -5,6 +5,9 @@ import (
 	"database/sql"
 	"net/http"
 
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
 	"github.com/docker/docker/client"
 	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/handlers"
@@ -18,7 +21,7 @@ import (
 )
 
 type Server struct {
-	router                 *http.ServeMux
+	router                 *echo.Echo
 	deployer               *engine.Deployer
 	proxyManager           *proxy.ProxyManager
 	dockerClient           *client.Client
@@ -123,8 +126,13 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 
 
 	// 3. Handlers
+	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
+
 	srv := &Server{
-		router:                 http.NewServeMux(),
+		router:                 e,
 		deployer:               deployer,
 		proxyManager:           proxyManager,
 		dockerClient:           dockerClient,
@@ -170,11 +178,11 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	middleware.CORSMiddleware(s.router).ServeHTTP(w, r)
+	s.router.ServeHTTP(w, r)
 }
 
 func (s *Server) Handler() http.Handler {
-	return middleware.CORSMiddleware(s.router)
+	return s.router
 }
 
 func (s *Server) RequireAuth(next http.HandlerFunc) http.HandlerFunc {

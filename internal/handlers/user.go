@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"github.com/labstack/echo/v4"
+
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -17,11 +19,11 @@ func NewUserHandler(s *services.UserService) *UserHandler {
 	return &UserHandler{userService: s}
 }
 
-func (h *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) ListUsers(c echo.Context) error {
 	users, err := h.userService.ListUsers(r.Context())
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	var out []models.User
 	for _, u := range users {
@@ -31,40 +33,39 @@ func (h *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, http.StatusOK, out)
 }
 
-func (h *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) GetProfile(c echo.Context) error {
 	userID := ExtractUserID(r)
 	if userID == "" {
 		WriteError(w, http.StatusUnauthorized, "unauthorized access")
-		return
+		return nil
 	}
 	u, err := h.userService.GetUserByID(r.Context(), userID)
 	if err != nil || u == nil {
 		WriteError(w, http.StatusNotFound, "user profile not found")
-		return
+		return nil
 	}
 	uCopy := *u
 	uCopy.PasswordHash = ""
 	WriteJSON(w, http.StatusOK, &uCopy)
 }
 
-func (h *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) UpdateProfile(c echo.Context) error {
 	userID := ExtractUserID(r)
 	if userID == "" {
 		WriteError(w, http.StatusUnauthorized, "unauthorized access")
-		return
+		return nil
 	}
 	u, err := h.userService.GetUserByID(r.Context(), userID)
 	if err != nil || u == nil {
 		WriteError(w, http.StatusNotFound, "user profile not found")
-		return
+		return nil
 	}
 	var payload struct {
 		Email string `json:"email"`
 		Role  string `json:"role"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		WriteError(w, http.StatusBadRequest, "invalid request payload")
-		return
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
 	if payload.Email != "" {
 		u.Email = payload.Email
@@ -74,30 +75,30 @@ func (h *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := h.userService.UpdateUser(r.Context(), u); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	uCopy := *u
 	uCopy.PasswordHash = ""
 	WriteJSON(w, http.StatusOK, &uCopy)
 }
 
-func (h *UserHandler) CreatePAT(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) CreatePAT(c echo.Context) error {
 	userID := ExtractUserID(r)
 	if userID == "" {
 		WriteError(w, http.StatusUnauthorized, "unauthorized access")
-		return
+		return nil
 	}
 	var payload struct {
 		Name string `json:"name"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil || payload.Name == "" {
 		WriteError(w, http.StatusBadRequest, "token name is required")
-		return
+		return nil
 	}
 	pat, rawToken, err := h.userService.CreatePAT(r.Context(), userID, payload.Name, nil)
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, map[string]any{
 		"token": rawToken,
@@ -105,37 +106,37 @@ func (h *UserHandler) CreatePAT(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *UserHandler) ListPATs(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) ListPATs(c echo.Context) error {
 	userID := ExtractUserID(r)
 	if userID == "" {
 		WriteError(w, http.StatusUnauthorized, "unauthorized access")
-		return
+		return nil
 	}
 	pats, err := h.userService.ListPATs(r.Context(), userID)
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, pats)
 }
 
-func (h *UserHandler) DeletePAT(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) DeletePAT(c echo.Context) error {
 	userID := ExtractUserID(r)
 	if userID == "" {
 		WriteError(w, http.StatusUnauthorized, "unauthorized access")
-		return
+		return nil
 	}
-	tokenID := r.PathValue("id")
+	tokenID := c.Param("id")
 	if tokenID == "" {
 		tokenID = strings.TrimPrefix(r.URL.Path, "/api/auth/pat/")
 	}
 	if tokenID == "" || tokenID == r.URL.Path {
 		WriteError(w, http.StatusBadRequest, "invalid personal access token id")
-		return
+		return nil
 	}
 	if err := h.userService.DeletePAT(r.Context(), tokenID, userID); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, map[string]string{"status": "deleted"})
 }

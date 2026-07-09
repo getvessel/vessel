@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"github.com/labstack/echo/v4"
+
 	"context"
 	"fmt"
 	"log"
@@ -34,17 +36,17 @@ func NewWebhookHandler(
 	}
 }
 
-func (h *WebhookHandler) HandleProjectWebhook(w http.ResponseWriter, r *http.Request) {
-	projectID := r.PathValue("projectId")
+func (h *WebhookHandler) HandleProjectWebhook(c echo.Context) error {
+	projectID := c.Param("projectId")
 	if projectID == "" {
 		WriteError(w, http.StatusBadRequest, "missing projectId parameter")
-		return
+		return nil
 	}
 
 	project, err := h.projectService.GetProject(r.Context(), projectID)
 	if err != nil || project == nil {
 		WriteError(w, http.StatusNotFound, "project not found")
-		return
+		return nil
 	}
 
 	WriteJSON(w, http.StatusAccepted, map[string]string{
@@ -59,17 +61,17 @@ func (h *WebhookHandler) HandleProjectWebhook(w http.ResponseWriter, r *http.Req
 	}()
 }
 
-func (h *WebhookHandler) HandleServiceWebhook(w http.ResponseWriter, r *http.Request) {
-	serviceID := r.PathValue("serviceId")
+func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
+	serviceID := c.Param("serviceId")
 	if serviceID == "" {
 		WriteError(w, http.StatusBadRequest, "missing serviceId parameter")
-		return
+		return nil
 	}
 
 	appSvc, err := h.appService.GetAppService(r.Context(), serviceID)
 	if err != nil || appSvc == nil {
 		WriteError(w, http.StatusNotFound, "service not found")
-		return
+		return nil
 	}
 
 	WriteJSON(w, http.StatusAccepted, map[string]string{
@@ -98,7 +100,7 @@ func (h *WebhookHandler) HandleServiceWebhook(w http.ResponseWriter, r *http.Req
 			if err := h.gitService.CloneOrPullAppRepository(ctx, appSvc, sourceDir, nil); err != nil {
 				log.Printf("[ServiceGitWebhook] Git clone/pull failed for service %s (%s): %v", appSvc.Name, appSvc.ID, err)
 				_ = h.deploymentService.UpdateStatus(ctx, dep.ID, "FAILED", dep.BuildLogs+fmt.Sprintf("Error cloning repository: %v\n", err), "")
-				return
+				return nil
 			}
 		}
 

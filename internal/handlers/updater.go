@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"github.com/labstack/echo/v4"
+
 	"net/http"
 
 	"vessel.dev/vessel/internal/services"
@@ -14,36 +16,36 @@ func NewUpdaterHandler(s *services.UpdaterService) *UpdaterHandler {
 	return &UpdaterHandler{updaterService: s}
 }
 
-func (h *UpdaterHandler) GetUpdateStatus(w http.ResponseWriter, r *http.Request) {
+func (h *UpdaterHandler) GetUpdateStatus(c echo.Context) error {
 	if h.updaterService == nil {
 		WriteError(w, http.StatusInternalServerError, "updater service not initialized")
-		return
+		return nil
 	}
 	status := h.updaterService.GetStatus()
 	WriteJSON(w, http.StatusOK, status)
 }
 
-func (h *UpdaterHandler) CheckUpdate(w http.ResponseWriter, r *http.Request) {
+func (h *UpdaterHandler) CheckUpdate(c echo.Context) error {
 	if h.updaterService == nil {
 		WriteError(w, http.StatusInternalServerError, "updater service not initialized")
-		return
+		return nil
 	}
 	if _, err := h.updaterService.CheckForUpdates(r.Context()); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	status := h.updaterService.GetStatus()
 	WriteJSON(w, http.StatusOK, status)
 }
 
-func (h *UpdaterHandler) DeployUpdate(w http.ResponseWriter, r *http.Request) {
+func (h *UpdaterHandler) DeployUpdate(c echo.Context) error {
 	if h.updaterService == nil {
 		WriteError(w, http.StatusInternalServerError, "updater service not initialized")
-		return
+		return nil
 	}
 	if err := h.updaterService.DeployUpdate(r.Context()); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusAccepted, map[string]string{
 		"message": "update deployment triggered",

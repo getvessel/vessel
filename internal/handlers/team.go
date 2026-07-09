@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"github.com/labstack/echo/v4"
+
 	"encoding/json"
 	"net/http"
 
@@ -15,92 +17,92 @@ func NewTeamHandler(s *services.TeamService) *TeamHandler {
 	return &TeamHandler{teamService: s}
 }
 
-func (h *TeamHandler) List(w http.ResponseWriter, r *http.Request) {
+func (h *TeamHandler) List(c echo.Context) error {
 	userID := ExtractUserID(r)
 	if userID == "" {
 		WriteError(w, http.StatusUnauthorized, "unauthorized")
-		return
+		return nil
 	}
 	teams, err := h.teamService.ListTeamsByUser(r.Context(), userID)
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, teams)
 }
 
-func (h *TeamHandler) Create(w http.ResponseWriter, r *http.Request) {
+func (h *TeamHandler) Create(c echo.Context) error {
 	userID := ExtractUserID(r)
 	if userID == "" {
 		WriteError(w, http.StatusUnauthorized, "unauthorized")
-		return
+		return nil
 	}
 	var req struct {
 		Name string `json:"name"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Name == "" {
 		WriteError(w, http.StatusBadRequest, "valid team name required")
-		return
+		return nil
 	}
 	team, err := h.teamService.CreateTeam(r.Context(), req.Name, userID)
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusCreated, team)
 }
 
-func (h *TeamHandler) Get(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
+func (h *TeamHandler) Get(c echo.Context) error {
+	id := c.Param("id")
 	if id == "" {
 		WriteError(w, http.StatusBadRequest, "missing team id")
-		return
+		return nil
 	}
 	team, err := h.teamService.GetTeam(r.Context(), id)
 	if err != nil || team == nil {
 		WriteError(w, http.StatusNotFound, "team not found")
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, team)
 }
 
-func (h *TeamHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (h *TeamHandler) Delete(c echo.Context) error {
 	userID := ExtractUserID(r)
 	if userID == "" {
 		WriteError(w, http.StatusUnauthorized, "unauthorized")
-		return
+		return nil
 	}
-	id := r.PathValue("id")
+	id := c.Param("id")
 	if id == "" {
 		WriteError(w, http.StatusBadRequest, "missing team id")
-		return
+		return nil
 	}
 	if err := h.teamService.DeleteTeam(r.Context(), id, userID); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *TeamHandler) ListMembers(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
+func (h *TeamHandler) ListMembers(c echo.Context) error {
+	id := c.Param("id")
 	if id == "" {
 		WriteError(w, http.StatusBadRequest, "missing team id")
-		return
+		return nil
 	}
 	members, err := h.teamService.ListMembers(r.Context(), id)
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, members)
 }
 
-func (h *TeamHandler) InviteMember(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
+func (h *TeamHandler) InviteMember(c echo.Context) error {
+	id := c.Param("id")
 	if id == "" {
 		WriteError(w, http.StatusBadRequest, "missing team id")
-		return
+		return nil
 	}
 	var req struct {
 		Email string `json:"email"`
@@ -108,58 +110,58 @@ func (h *TeamHandler) InviteMember(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Email == "" {
 		WriteError(w, http.StatusBadRequest, "valid email required")
-		return
+		return nil
 	}
 	inv, err := h.teamService.InviteMember(r.Context(), id, req.Email, req.Role)
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusCreated, inv)
 }
 
-func (h *TeamHandler) RemoveMember(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	targetUserID := r.PathValue("userId")
+func (h *TeamHandler) RemoveMember(c echo.Context) error {
+	id := c.Param("id")
+	targetUserID := c.Param("userId")
 	if id == "" || targetUserID == "" {
 		WriteError(w, http.StatusBadRequest, "missing team id or userId")
-		return
+		return nil
 	}
 	if err := h.teamService.RemoveMember(r.Context(), id, targetUserID); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *TeamHandler) GetInvite(w http.ResponseWriter, r *http.Request) {
-	token := r.PathValue("token")
+func (h *TeamHandler) GetInvite(c echo.Context) error {
+	token := c.Param("token")
 	if token == "" {
 		WriteError(w, http.StatusBadRequest, "missing invite token")
-		return
+		return nil
 	}
 	inv, err := h.teamService.GetInvite(r.Context(), token)
 	if err != nil || inv == nil {
 		WriteError(w, http.StatusNotFound, "invite not found or expired")
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, inv)
 }
 
-func (h *TeamHandler) AcceptInvite(w http.ResponseWriter, r *http.Request) {
+func (h *TeamHandler) AcceptInvite(c echo.Context) error {
 	userID := ExtractUserID(r)
 	if userID == "" {
 		WriteError(w, http.StatusUnauthorized, "unauthorized")
-		return
+		return nil
 	}
-	token := r.PathValue("token")
+	token := c.Param("token")
 	if token == "" {
 		WriteError(w, http.StatusBadRequest, "missing invite token")
-		return
+		return nil
 	}
 	if err := h.teamService.AcceptInvite(r.Context(), token, userID); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, map[string]string{"status": "accepted"})
 }

@@ -2,28 +2,14 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 
+	"github.com/labstack/echo/v4"
 	"vessel.dev/vessel/internal/models"
 )
 
-type claimsKeyType struct{}
-
-var claimsKey = claimsKeyType{}
-
-func WriteJSON(w http.ResponseWriter, status int, v any) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(v)
-}
-
-func WriteError(w http.ResponseWriter, status int, msg string) {
-	WriteJSON(w, status, map[string]string{"error": msg})
-}
-
-func SetAuthCookie(w http.ResponseWriter, token string) {
-	http.SetCookie(w, &http.Cookie{
+func SetAuthCookie(c echo.Context, token string) {
+	c.SetCookie(&http.Cookie{
 		Name:     "vessel_token",
 		Value:    token,
 		Path:     "/",
@@ -34,8 +20,8 @@ func SetAuthCookie(w http.ResponseWriter, token string) {
 	})
 }
 
-func ClearAuthCookie(w http.ResponseWriter) {
-	http.SetCookie(w, &http.Cookie{
+func ClearAuthCookie(c echo.Context) {
+	c.SetCookie(&http.Cookie{
 		Name:     "vessel_token",
 		Value:    "",
 		Path:     "/",
@@ -45,20 +31,21 @@ func ClearAuthCookie(w http.ResponseWriter) {
 	})
 }
 
-func ExtractClaims(r *http.Request) *models.UserClaims {
-	if c, ok := r.Context().Value(claimsKey).(*models.UserClaims); ok {
-		return c
+func ExtractClaims(c echo.Context) *models.UserClaims {
+	if claims, ok := c.Get("user").(*models.UserClaims); ok {
+		return claims
 	}
 	return nil
 }
 
-func ExtractUserID(r *http.Request) string {
-	if c := ExtractClaims(r); c != nil {
-		return c.UserID
+func ExtractUserID(c echo.Context) string {
+	if claims := ExtractClaims(c); claims != nil {
+		return claims.UserID
 	}
 	return ""
 }
 
-func WithUserClaims(ctx context.Context, claims *models.UserClaims) context.Context {
-	return context.WithValue(ctx, claimsKey, claims)
+func GetUserClaimsFromContext(ctx context.Context) *models.UserClaims {
+	// For compat if needed somewhere
+	return nil
 }

@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"github.com/labstack/echo/v4"
+
 	"net/http"
 
 	"vessel.dev/vessel/internal/services"
@@ -14,39 +16,39 @@ func NewCanvasHandler(s *services.CanvasService) *CanvasHandler {
 	return &CanvasHandler{canvasService: s}
 }
 
-func (h *CanvasHandler) ListCanvasSummaries(w http.ResponseWriter, r *http.Request) {
+func (h *CanvasHandler) ListCanvasSummaries(c echo.Context) error {
 	summaries, err := h.canvasService.ListSummaries(r.Context())
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, summaries)
 }
 
-func (h *CanvasHandler) GetCanvasSummary(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
+func (h *CanvasHandler) GetCanvasSummary(c echo.Context) error {
+	id := c.Param("id")
 	if id == "" {
 		WriteError(w, http.StatusBadRequest, "missing id parameter")
-		return
+		return nil
 	}
 	summary, err := h.canvasService.GetSummary(r.Context(), id)
 	if err != nil || summary == nil {
 		WriteError(w, http.StatusNotFound, "canvas summary not found")
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, summary)
 }
 
-func (h *CanvasHandler) GetEnvironmentCanvas(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
+func (h *CanvasHandler) GetEnvironmentCanvas(c echo.Context) error {
+	id := c.Param("id")
 	if id == "" {
 		WriteError(w, http.StatusBadRequest, "missing id parameter")
-		return
+		return nil
 	}
 	canvas, err := h.canvasService.GetEnvironmentCanvas(r.Context(), id)
 	if err != nil || canvas == nil {
 		WriteError(w, http.StatusNotFound, "environment canvas not found")
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, canvas)
 }

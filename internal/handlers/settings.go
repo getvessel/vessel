@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"github.com/labstack/echo/v4"
+
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -17,85 +19,82 @@ func NewSettingsHandler(s *services.SettingsService) *SettingsHandler {
 	return &SettingsHandler{settingsService: s}
 }
 
-func (h *SettingsHandler) GetSettings(w http.ResponseWriter, r *http.Request) {
+func (h *SettingsHandler) GetSettings(c echo.Context) error {
 	s, err := h.settingsService.GetSettings(r.Context())
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, s)
 }
 
-func (h *SettingsHandler) UpdateSettings(w http.ResponseWriter, r *http.Request) {
+func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
 	var payload models.ServerSettings
-	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		WriteError(w, http.StatusBadRequest, "invalid request payload")
-		return
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
 	if err := h.settingsService.UpdateSettings(r.Context(), &payload); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, payload)
 }
 
-func (h *SettingsHandler) GetNotificationIntegration(w http.ResponseWriter, r *http.Request) {
+func (h *SettingsHandler) GetNotificationIntegration(c echo.Context) error {
 	n, err := h.settingsService.GetNotificationIntegration(r.Context())
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, n)
 }
 
-func (h *SettingsHandler) SaveNotificationIntegration(w http.ResponseWriter, r *http.Request) {
+func (h *SettingsHandler) SaveNotificationIntegration(c echo.Context) error {
 	var payload models.NotificationIntegration
-	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		WriteError(w, http.StatusBadRequest, "invalid request payload")
-		return
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
 	if err := h.settingsService.SaveNotificationIntegration(r.Context(), &payload); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, payload)
 }
 
-func (h *SettingsHandler) GetProjectNotificationPref(w http.ResponseWriter, r *http.Request) {
+func (h *SettingsHandler) GetProjectNotificationPref(c echo.Context) error {
 	projectID := strings.TrimPrefix(r.URL.Path, "/api/settings/notifications/project/")
 	if projectID == "" || projectID == r.URL.Path {
 		WriteError(w, http.StatusBadRequest, "missing project id parameter")
-		return
+		return nil
 	}
 	pref, err := h.settingsService.GetProjectNotificationPref(r.Context(), projectID)
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, pref)
 }
 
-func (h *SettingsHandler) SaveProjectNotificationPref(w http.ResponseWriter, r *http.Request) {
+func (h *SettingsHandler) SaveProjectNotificationPref(c echo.Context) error {
 	var payload models.ProjectNotificationPref
-	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		WriteError(w, http.StatusBadRequest, "invalid request payload")
-		return
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
 	if err := h.settingsService.SaveProjectNotificationPref(r.Context(), &payload); err != nil {
 		WriteError(w, http.StatusInternalServerError, err.Error())
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, payload)
 }
 
-func (h *SettingsHandler) HandleMCPRequest(w http.ResponseWriter, r *http.Request) {
+func (h *SettingsHandler) HandleMCPRequest(c echo.Context) error {
 	if r.Method != http.MethodPost {
 		WriteError(w, http.StatusMethodNotAllowed, "Only POST requests allowed for MCP JSON-RPC")
-		return
+		return nil
 	}
 	if err := h.settingsService.CheckMCPEnabled(r.Context()); err != nil {
 		WriteError(w, http.StatusForbidden, err.Error())
-		return
+		return nil
 	}
 	var req struct {
 		JSONRPC string `json:"jsonrpc"`
@@ -105,13 +104,12 @@ func (h *SettingsHandler) HandleMCPRequest(w http.ResponseWriter, r *http.Reques
 			Name string `json:"name"`
 		} `json:"params"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		WriteError(w, http.StatusBadRequest, "Invalid JSON-RPC 2.0 payload")
-		return
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
 	if req.JSONRPC != "2.0" {
 		WriteError(w, http.StatusBadRequest, "Only JSON-RPC 2.0 is supported")
-		return
+		return nil
 	}
 	if req.Method == "tools/list" {
 		WriteJSON(w, http.StatusOK, map[string]any{
@@ -138,7 +136,7 @@ func (h *SettingsHandler) HandleMCPRequest(w http.ResponseWriter, r *http.Reques
 				},
 			},
 		})
-		return
+		return nil
 	}
 	if req.Method == "tools/call" {
 		content, err := h.settingsService.ExecuteMCPTool(r.Context(), req.Params.Name)
@@ -151,7 +149,7 @@ func (h *SettingsHandler) HandleMCPRequest(w http.ResponseWriter, r *http.Reques
 					"message": err.Error(),
 				},
 			})
-			return
+			return nil
 		}
 		WriteJSON(w, http.StatusOK, map[string]any{
 			"jsonrpc": "2.0",
@@ -160,7 +158,7 @@ func (h *SettingsHandler) HandleMCPRequest(w http.ResponseWriter, r *http.Reques
 				"content": content,
 			},
 		})
-		return
+		return nil
 	}
 	WriteJSON(w, http.StatusOK, map[string]any{
 		"jsonrpc": "2.0",
