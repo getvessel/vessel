@@ -3,7 +3,7 @@
 ## 📌 Phase 1: Foundation & Core Layout (COMPLETED ✅)
 
 - [x] Establish standard Go Cloud Monorepo architecture (`cmd/`, `internal/`, `dashboard/`, `web/`, `bootstrap/`, `scripts/`, `data/`)
-- [x] Initialize Go daemon skeleton (`cmd/vesseld/main.go` + `internal/types/types.go`)
+- [x] Initialize Go daemon skeleton (`cmd/vesseld/main.go` + `internal/models/` + `internal/http/` + `internal/store/`)
 - [x] Initialize Dashboard GUI (`dashboard/`) with TanStack Start/Router + Vite + Tailwind CSS v4 + Radix UI + Lucide
 - [x] Initialize Marketing Landing Page (`web/`) with Astro 7 + Tailwind CSS
 - [x] Create automated zero-downtime self-upgrade and backup scripts (`scripts/upgrade.sh`, `scripts/backup.sh`, `scripts/restore.sh`)
@@ -44,7 +44,7 @@
 - [x] **Embedded SQLite Store & `.env` Vault (`internal/store/`)**:
   - [x] Initialize `CGO_ENABLED=0` modernc.org/sqlite database instance in `data/vessel.db` (`store.go`).
   - [x] Create modular repositories following strict `snake_case` and one-component-per-file (`project_store.go`, `domain_store.go`, `user_store.go`, `invite_store.go`, `env_var_store.go`).
-  - [x] Implement AES-256-GCM encryption/decryption for `.env` secrets at rest (`vault.go`).
+  - [x] Implement AES-256-GCM encryption/decryption for `.env` secrets at rest (`internal/vault/vault.go`).
   - [x] Verify complete CRUD capabilities and schema initialization via unit tests (`store_test.go`).
 - [x] **REST & WebSocket API Handlers (`internal/api/`)**:
   - [x] `GET /api/projects` / `POST /api/projects` (with auto `sslip.io` wildcard domain generation) / `DELETE /api/projects/:id` (`project_handler.go`)

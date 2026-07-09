@@ -22,17 +22,21 @@ Turn any bare-metal Linux VPS into your own private Vercel, Railway, or Heroku i
 ```text
 vessel/
 ├── cmd/vesseld/          # Go Daemon entrypoint (`main.go`)
-├── internal/             # Core Go packages
-│   ├── api/              # HTTP handlers & route registration (`server.go`, `routes.go`)
-│   ├── middleware/       # Authentication guards (`auth.go`) & CORS configuration (`cors.go`)
-│   ├── engine/           # Container, database, storage & cron job lifecycle managers
+├── internal/             # Core Go packages (horizontal layers)
+│   ├── agent/            # Agent mode for remote cloud connectivity
+│   ├── engine/           # Docker engine lifecycle, build strategies, deployer
+│   ├── handlers/         # HTTP handlers (auth, backup, canvas, database, deployment, etc.)
+│   ├── http/             # HTTP server setup, routes, CORS, auth middleware
+│   ├── middleware/       # Authentication guards & CORS configuration
+│   ├── models/           # Domain model structs (auth, project, database, deployment, etc.)
+│   ├── notifier/         # Multi-channel notification dispatcher
 │   ├── proxy/            # Caddy v2 reverse proxy controller
-│   ├── services/         # Token, Git, Cron, and Service Linker services
-│   ├── store/            # SQLite embedded database and state management
-│   └── types/            # DTOs, API payloads, and internal data structures
+│   ├── repositories/     # SQLite data access layer (per-domain repositories)
+│   ├── services/         # Business logic services (auth, cron, deploy, git, etc.)
+│   ├── vault/            # AES-256-GCM encryption vault for secrets
 ├── dashboard/            # 💻 Main Panel Dashboard (TanStack Router + React SPA)
-├── web/                 # 🌐 Public Marketing Landing Page (vessel.dev)
-├── bootstrap/           # 📦 One-line install server (`install.sh`, `upgrade.sh`)
+├── web/                  # 🌐 Public Marketing Landing Page (vessel.dev)
+├── bootstrap/            # 📦 One-line install server (`install.sh`, `upgrade.sh`)
 ├── scripts/              # 🛠️ System automation (`upgrade.sh`, `backup.sh`, `restore.sh`)
 ├── Dockerfile            # Multi-stage container build uniting `dashboard/` and `vesseld`
 ├── docker-compose.yml    # Production/dev container stack with Docker socket mounting

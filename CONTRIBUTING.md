@@ -53,7 +53,7 @@ Thank you for your interest in contributing to **Vessel**! We are building the m
 
 ## 📂 Architecture Overview
 
-- **`cmd/vesseld` & `internal/`**: Written in **Go**. Handles Docker socket execution, Caddy proxy configurations, `.env` encryption, and WebSocket streaming.
+- **`cmd/vesseld` & `internal/`**: Written in **Go**. Handles Docker engine lifecycle, Caddy proxy configurations, SQLite persistence, AES-256 `.env` vault, HTTP routing with auth middleware, and WebSocket terminal streaming.
 - **`dashboard/`**: Written in **TypeScript (TanStack + Vite + Tailwind v4)**. The self-hosted web UI where users deploy and manage their projects.
 - **`web/`**: Written in **Astro 7**. The public marketing and documentation landing page (`vessel.dev`).
 
