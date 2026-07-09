@@ -125,7 +125,10 @@ func (h *UserHandler) DeletePAT(w http.ResponseWriter, r *http.Request) {
 		WriteError(w, http.StatusUnauthorized, "unauthorized access")
 		return
 	}
-	tokenID := strings.TrimPrefix(r.URL.Path, "/api/auth/pat/")
+	tokenID := r.PathValue("id")
+	if tokenID == "" {
+		tokenID = strings.TrimPrefix(r.URL.Path, "/api/auth/pat/")
+	}
 	if tokenID == "" || tokenID == r.URL.Path {
 		WriteError(w, http.StatusBadRequest, "invalid personal access token id")
 		return

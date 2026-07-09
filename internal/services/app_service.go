@@ -98,6 +98,14 @@ func (s *AppService) CreateVariable(ctx context.Context, v *models.Variable) (*m
 	return v, nil
 }
 
+func (s *AppService) UpdateVariable(ctx context.Context, v *models.Variable) error {
+	if v == nil || v.ID == "" {
+		return errors.New("valid variable with id required")
+	}
+	v.UpdatedAt = time.Now()
+	return s.varRepo.Update(ctx, v)
+}
+
 func (s *AppService) GetVariable(ctx context.Context, id string) (*models.Variable, error) {
 	if id == "" {
 		return nil, errors.New("id required")

@@ -124,3 +124,10 @@ func (s *WorkspaceService) DeleteSSHKey(ctx context.Context, id string) error {
 	}
 	return s.repo.DeleteSSHKey(ctx, id)
 }
+
+func (s *WorkspaceService) ListAuditLogs(ctx context.Context, teamID string, limit int) ([]*models.AuditLog, error) {
+	if teamID == "" {
+		return nil, errors.New("teamId required")
+	}
+	return s.repo.ListAuditLogs(ctx, teamID, limit)
+}

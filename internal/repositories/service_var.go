@@ -13,6 +13,7 @@ import (
 
 type ServiceVarRepository interface {
 	Create(ctx context.Context, v *models.Variable) error
+	Update(ctx context.Context, v *models.Variable) error
 	GetByID(ctx context.Context, id string) (*models.Variable, error)
 	ListByService(ctx context.Context, serviceID string) ([]*models.Variable, error)
 	Delete(ctx context.Context, id string) error
@@ -49,6 +50,20 @@ func (r *ServiceVarSQLiteRepository) Create(_ context.Context, v *models.Variabl
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(service_id, key, environment_id) DO UPDATE SET value = excluded.value, is_secret = excluded.is_secret, updated_at = excluded.updated_at`,
 		v.ID, v.ServiceID, v.EnvironmentID, v.Key, v.Value, isSecretInt, v.CreatedAt, v.UpdatedAt)
+	return err
+}
+
+func (r *ServiceVarSQLiteRepository) Update(_ context.Context, v *models.Variable) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	v.UpdatedAt = time.Now().UTC()
+	isSecretInt := 0
+	if v.IsSecret {
+		isSecretInt = 1
+	}
+	_, err := r.db.Exec(`UPDATE service_vars SET key = ?, value = ?, is_secret = ?, updated_at = ? WHERE id = ?`,
+		v.Key, v.Value, isSecretInt, v.UpdatedAt, v.ID)
 	return err
 }
 

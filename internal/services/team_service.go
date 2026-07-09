@@ -132,6 +132,13 @@ func (s *TeamService) InviteMember(ctx context.Context, teamID, email, role stri
 	return invite, nil
 }
 
+func (s *TeamService) GetInvite(ctx context.Context, token string) (*models.TeamInvite, error) {
+	if token == "" {
+		return nil, errors.New("token required")
+	}
+	return s.teamRepo.GetInviteByToken(ctx, token)
+}
+
 func (s *TeamService) AcceptInvite(ctx context.Context, token, userID string) error {
 	if token == "" || userID == "" {
 		return errors.New("token and userId are required")
