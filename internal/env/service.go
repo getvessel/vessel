@@ -1,4 +1,4 @@
-package project_env
+package env
 
 import "context"
 
@@ -7,7 +7,7 @@ type Service struct {
 	repo Repository
 }
 
-// NewService creates a new project_env Service.
+// NewService creates a new env Service.
 func NewService(repo Repository) *Service {
 	return &Service{repo: repo}
 }

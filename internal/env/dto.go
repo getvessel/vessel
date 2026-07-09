@@ -1,3 +1,3 @@
-package project_env
+package env
 
 type VarsRequest map[string]string

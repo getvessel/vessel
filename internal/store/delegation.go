@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"vessel.dev/vessel/internal/domain"
+	"vessel.dev/vessel/internal/env"
 	"vessel.dev/vessel/internal/environment"
 	"vessel.dev/vessel/internal/project"
-	"vessel.dev/vessel/internal/project_env"
 	"vessel.dev/vessel/internal/settings"
 	"vessel.dev/vessel/internal/types"
 	"vessel.dev/vessel/internal/user"
@@ -80,8 +80,8 @@ func (s *Store) domainRepo() domain.Repository {
 	return domain.NewSQLiteRepository(s.db)
 }
 
-func (s *Store) projectEnvRepo() project_env.Repository {
-	return project_env.NewSQLiteRepository(s.db, s.vault)
+func (s *Store) projectEnvRepo() env.Repository {
+	return env.NewSQLiteRepository(s.db, s.vault)
 }
 
 // ── Projects ─────────────────────────────────────────────────────────────────

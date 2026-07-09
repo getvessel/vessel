@@ -7,6 +7,7 @@ import (
 	"github.com/docker/docker/client"
 	"vessel.dev/vessel/internal/auth"
 	"vessel.dev/vessel/internal/domain"
+	"vessel.dev/vessel/internal/env"
 	"vessel.dev/vessel/internal/environment"
 	"vessel.dev/vessel/internal/git"
 	"vessel.dev/vessel/internal/middleware"
@@ -15,7 +16,6 @@ import (
 	"vessel.dev/vessel/internal/oauth"
 	"vessel.dev/vessel/internal/orchestrator"
 	"vessel.dev/vessel/internal/project"
-	"vessel.dev/vessel/internal/project_env"
 	"vessel.dev/vessel/internal/proxy"
 	"vessel.dev/vessel/internal/services"
 	"vessel.dev/vessel/internal/settings"
@@ -53,10 +53,11 @@ type Server struct {
 	authHandler            *auth.Handler
 	oauthHandler           *oauth.Handler
 	gitHandler             *git.Handler
+	webhookHandler         *git.WebhookHandler
 	projectHandler         *project.Handler
 	environmentHandler     *environment.Handler
 	domainHandler          *domain.Handler
-	projectEnvHandler      *project_env.Handler
+	projectEnvHandler      *env.Handler
 	notifierService        *notifier.NotifierService
 	notificationHandler    *notification.Handler
 	updaterService         *updater.UpdaterService
@@ -118,9 +119,9 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 	domainService := domain.NewService(domainRepo)
 	domainHandler := domain.NewHandler(domainService, proxyManager)
 
-	projectEnvRepo := project_env.NewSQLiteRepository(s.DB(), s.Vault())
-	projectEnvService := project_env.NewService(projectEnvRepo)
-	projectEnvHandler := project_env.NewHandler(projectEnvService)
+	projectEnvRepo := env.NewSQLiteRepository(s.DB(), s.Vault())
+	projectEnvService := env.NewService(projectEnvRepo)
+	projectEnvHandler := env.NewHandler(projectEnvService)
 
 	projectRepo := project.NewSQLiteRepository(s.DB(), envRepo)
 	projectService := project.NewService(projectRepo, &appServiceRepoAdapter{store: s})
@@ -152,6 +153,7 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 		authHandler:            auth.NewHandler(authService, extractUserID),
 		oauthHandler:           oauth.NewHandler(oauthService, extractClaims),
 		gitHandler:             gitHandler,
+		webhookHandler:         git.NewWebhookHandler(s, gitService, deployer, proxyManager),
 		projectHandler:         projectHandler,
 		environmentHandler:     envHandler,
 		domainHandler:          domainHandler,

@@ -1,4 +1,4 @@
-package project_env
+package env
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ type Handler struct {
 	service *Service
 }
 
-// NewHandler creates a new project_env Handler.
+// NewHandler creates a new env Handler.
 func NewHandler(service *Service) *Handler {
 	return &Handler{service: service}
 }

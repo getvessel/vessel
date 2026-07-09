@@ -1,4 +1,4 @@
-package project_env
+package env
 
 import "context"
 

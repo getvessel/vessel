@@ -58,8 +58,8 @@ func (s *Server) registerRoutes() {
 	s.router.HandleFunc("GET /api/git/status", s.RequireAuth(s.gitHandler.Status))
 	s.router.HandleFunc("DELETE /api/git/connect/{provider}", s.RequireAuth(s.gitHandler.Disconnect))
 	s.router.HandleFunc("GET /api/git/repos", s.RequireAuth(s.gitHandler.ListRepos))
-	s.router.HandleFunc("POST /api/webhooks/git/{projectId}", s.handleGitWebhook)
-	s.router.HandleFunc("POST /api/webhooks/git/services/{serviceId}", s.handleServiceGitWebhook)
+	s.router.HandleFunc("POST /api/webhooks/git/{projectId}", s.webhookHandler.HandleProjectWebhook)
+	s.router.HandleFunc("POST /api/webhooks/git/services/{serviceId}", s.webhookHandler.HandleServiceWebhook)
 
 	// --- Canvas ---
 	s.router.HandleFunc("GET /api/canvas/projects", s.RequireAuth(s.projectHandler.ListCanvasSummaries))
