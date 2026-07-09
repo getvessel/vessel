@@ -28,6 +28,8 @@ node_modules/
 .astro/
 
 # Local personal development trackers
-TODO.md
 VESSEL_PAAS_BLUEPRINT.md
+
+# CI workflows (billing issues — not running)
+.github/workflows/
 
