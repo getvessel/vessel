@@ -103,7 +103,7 @@ func (a *dbDeployerStore) ListServiceVariables(serviceID string) ([]*models.Vari
 }
 
 func main() {
-	// Attempt to load .env file if it exists, but don't fail if it doesn't
+
 	_ = godotenv.Load()
 
 	log.Printf(" Booting Vessel Daemon (`vesseld`) v%s [%s/%s]...", vesselVersion, runtime.GOOS, runtime.GOARCH)
