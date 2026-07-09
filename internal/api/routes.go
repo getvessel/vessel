@@ -139,6 +139,22 @@ func (s *Server) registerRoutes() {
 	s.router.HandleFunc("POST /api/profile/tokens", s.RequireAuth(s.settingsHandler.CreatePAT))
 	s.router.HandleFunc("DELETE /api/profile/tokens/{id}", s.RequireAuth(s.settingsHandler.DeletePAT))
 
+	// --- Multi-Channel Notification Integrations & Project Preferences ---
+	s.router.HandleFunc("GET /api/settings/notifications", s.RequireAuth(s.notificationHandler.GetIntegrations))
+	s.router.HandleFunc("PUT /api/settings/notifications", s.RequireRole("admin", s.notificationHandler.SaveIntegrations))
+	s.router.HandleFunc("POST /api/settings/notifications/test", s.RequireRole("admin", s.notificationHandler.TestNotification))
+	s.router.HandleFunc("GET /api/projects/{id}/notifications", s.RequireAuth(s.notificationHandler.GetProjectPreferences))
+	s.router.HandleFunc("PUT /api/projects/{id}/notifications", s.RequireAuth(s.notificationHandler.SaveProjectPreferences))
+
+	// --- OAuth 2.0 / OpenID Connect & TOTP 2FA Authentication ---
+	s.router.HandleFunc("GET /api/settings/oauth/providers", s.RequireAuth(s.oauthHandler.ListProviders))
+	s.router.HandleFunc("PUT /api/settings/oauth/providers", s.RequireRole("admin", s.oauthHandler.SaveProvider))
+	s.router.HandleFunc("GET /api/auth/oauth/{provider}", s.oauthHandler.OAuthRedirect)
+	s.router.HandleFunc("GET /api/auth/oauth/{provider}/callback", s.oauthHandler.OAuthCallback)
+	s.router.HandleFunc("POST /api/auth/2fa/setup", s.RequireAuth(s.oauthHandler.Setup2FA))
+	s.router.HandleFunc("POST /api/auth/2fa/verify", s.RequireAuth(s.oauthHandler.Verify2FA))
+	s.router.HandleFunc("POST /api/auth/2fa/disable", s.RequireAuth(s.oauthHandler.Disable2FA))
+
 	s.router.HandleFunc("GET /ws/terminal/{id}", s.handleTerminalWebSocket)
 	s.router.HandleFunc("GET /ws/services/{id}/terminal", s.handleTerminalWebSocket)
 

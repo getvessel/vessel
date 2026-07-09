@@ -48,10 +48,12 @@ func (g *AuthGuard) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
+		totpEnabled, _ := claimsMap["totpEnabled"].(bool)
 		userClaims := &types.UserClaims{
-			UserID: fmt.Sprintf("%v", claimsMap["sub"]),
-			Email:  fmt.Sprintf("%v", claimsMap["email"]),
-			Role:   fmt.Sprintf("%v", claimsMap["role"]),
+			UserID:      fmt.Sprintf("%v", claimsMap["sub"]),
+			Email:       fmt.Sprintf("%v", claimsMap["email"]),
+			Role:        fmt.Sprintf("%v", claimsMap["role"]),
+			TOTPEnabled: totpEnabled,
 		}
 
 		ctx := context.WithValue(r.Context(), userClaimsKey, userClaims)

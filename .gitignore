@@ -12,10 +12,12 @@ build/
 
 # Runtime data & secrets
 data/vessel.db*
+**/data/vessel.db*
 data/backups/
 data/caddy/
 data/builds/
 tests/data/
+internal/tests/data/
 *.env
 *.env.local
 
@@ -28,7 +30,6 @@ node_modules/
 .astro/
 
 # Local personal development trackers
-VESSEL_PAAS_BLUEPRINT.md
 
 # CI workflows (billing issues — not running)
 .github/workflows/

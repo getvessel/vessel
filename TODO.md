@@ -69,7 +69,7 @@
   - [x] **Teams, Organizations & Invitations (`team_handler.go`, `team_store.go`)**: Multi-tenant collaboration with `Owner`, `Admin`, and `Member` roles (`GET/POST /api/teams`, `POST /api/teams/:id/invite`, `DELETE /api/teams/:id/members/:userId`).
   - [x] **Server Settings & Profile (`settings_handler.go`)**: System configurations (Docker system prune, Caddy wildcard IP, Notification Webhooks: Discord/Slack/Telegram/Email) and Personal Access Tokens (PATs) for CLI.
   - [ ] **Wildcard Root Domain & Automatic Subdomain Provisioning (`domain_handler.go`, `caddyfile_generator.go`)**: Support a global `DefaultWildcardDomain` (e.g. `apps.yourdomain.com`). When a new service or project is launched, automatically provision `my-app.apps.yourdomain.com` with Caddy v2 Let's Encrypt wildcard certificates alongside `sslip.io` fallback.
-  - [ ] **Notification Integrations (`internal/notifier/`, `internal/api/`)**:
+  - [x] **Notification Integrations (`internal/notifier/`, `internal/api/`)**:
   - **Email (SMTP / Resend)**: SMTP host, port, user, password; or Resend API key. Send templated emails for team/project member invitations (with copy-link fallback) and deployment success/failure alerts. Commercial cloud will use AWS SES instead.
   - **Slack**: Enabled toggle, webhook URL, send test notification.
   - **Discord**: Enabled toggle, webhook URL, ping enable/disable, send test notification.
@@ -77,7 +77,7 @@
   - **Pushover**: Enabled toggle, user key, API token, send test notification.
   - **Generic Webhook**: Enabled toggle, POST webhook URL, send test notification.
   - **Notification Preferences**: Per-project toggle to enable/disable each channel independently for deployment events.
-- [ ] **OAuth 2.0 Authentication Providers & 2FA (`internal/api/auth_handler.go`, `internal/services/oauth/`)**:
+- [x] **OAuth 2.0 Authentication Providers & 2FA (`internal/api/auth_handler.go`, `internal/services/oauth/`)**:
   - Admin-configurable OAuth providers with enable/disable toggle, client ID, client secret, redirect URI, and provider-specific fields (base URL, tenant).
   - Supported providers: GitHub, GitLab, Google, Azure AD, Discord, Authentik, Bitbucket, Clerk, Infomaniak, Zitadel.
   - Member login via OAuth — users authenticate with their chosen provider to access the dashboard.

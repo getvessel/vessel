@@ -62,6 +62,10 @@ func (s *Store) migrate() error {
 			email TEXT UNIQUE NOT NULL,
 			password_hash TEXT NOT NULL,
 			role TEXT DEFAULT 'developer',
+			totp_enabled BOOLEAN DEFAULT FALSE,
+			totp_secret TEXT DEFAULT '',
+			recovery_codes TEXT DEFAULT '',
+			oauth_provider TEXT DEFAULT '',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
@@ -158,6 +162,10 @@ func (s *Store) migrate() error {
 	_, _ = s.db.Exec("ALTER TABLE storage ADD COLUMN environment_id TEXT DEFAULT '';")
 	_, _ = s.db.Exec("ALTER TABLE projects ADD COLUMN team_id TEXT DEFAULT '';")
 	_, _ = s.db.Exec("ALTER TABLE projects ADD COLUMN description TEXT DEFAULT '';")
+	_, _ = s.db.Exec("ALTER TABLE users ADD COLUMN totp_enabled BOOLEAN DEFAULT FALSE;")
+	_, _ = s.db.Exec("ALTER TABLE users ADD COLUMN totp_secret TEXT DEFAULT '';")
+	_, _ = s.db.Exec("ALTER TABLE users ADD COLUMN recovery_codes TEXT DEFAULT '';")
+	_, _ = s.db.Exec("ALTER TABLE users ADD COLUMN oauth_provider TEXT DEFAULT '';")
 
 	if err := s.initEnvironmentTable(); err != nil {
 		return fmt.Errorf("failed to initialize environments table: %w", err)
@@ -192,8 +200,84 @@ func (s *Store) migrate() error {
 	if err := s.initSettingsTables(); err != nil {
 		return fmt.Errorf("failed to initialize settings tables: %w", err)
 	}
+	if err := s.initNotificationTables(); err != nil {
+		return fmt.Errorf("failed to initialize notification tables: %w", err)
+	}
+	if err := s.initOAuthTables(); err != nil {
+		return fmt.Errorf("failed to initialize oauth tables: %w", err)
+	}
 
 	log.Println("✅ Vessel SQLite schema initialized successfully (`data/vessel.db`)")
+	return nil
+}
+
+func (s *Store) initNotificationTables() error {
+	queries := []string{
+		`CREATE TABLE IF NOT EXISTS notification_integrations (
+			id TEXT PRIMARY KEY,
+			smtp_enabled BOOLEAN DEFAULT FALSE,
+			smtp_host TEXT,
+			smtp_port INTEGER DEFAULT 587,
+			smtp_user TEXT,
+			smtp_password TEXT,
+			resend_enabled BOOLEAN DEFAULT FALSE,
+			resend_api_key TEXT,
+			slack_enabled BOOLEAN DEFAULT FALSE,
+			slack_webhook_url TEXT,
+			discord_enabled BOOLEAN DEFAULT FALSE,
+			discord_webhook_url TEXT,
+			discord_ping_enabled BOOLEAN DEFAULT FALSE,
+			telegram_enabled BOOLEAN DEFAULT FALSE,
+			telegram_bot_token TEXT,
+			telegram_chat_id TEXT,
+			pushover_enabled BOOLEAN DEFAULT FALSE,
+			pushover_user_key TEXT,
+			pushover_api_token TEXT,
+			webhook_enabled BOOLEAN DEFAULT FALSE,
+			webhook_url TEXT,
+			updated_at TEXT
+		);`,
+		`CREATE TABLE IF NOT EXISTS project_notification_prefs (
+			project_id TEXT PRIMARY KEY,
+			email_enabled BOOLEAN DEFAULT TRUE,
+			slack_enabled BOOLEAN DEFAULT TRUE,
+			discord_enabled BOOLEAN DEFAULT TRUE,
+			telegram_enabled BOOLEAN DEFAULT TRUE,
+			pushover_enabled BOOLEAN DEFAULT TRUE,
+			webhook_enabled BOOLEAN DEFAULT TRUE,
+			events TEXT DEFAULT 'deploy.success,deploy.failure,invite',
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+		);`,
+	}
+	for _, q := range queries {
+		if _, err := s.db.Exec(q); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *Store) initOAuthTables() error {
+	queries := []string{
+		`CREATE TABLE IF NOT EXISTS oauth_providers (
+			id TEXT PRIMARY KEY,
+			provider_name TEXT UNIQUE NOT NULL,
+			enabled BOOLEAN DEFAULT FALSE,
+			client_id TEXT DEFAULT '',
+			client_secret TEXT DEFAULT '',
+			redirect_uri TEXT DEFAULT '',
+			base_url TEXT DEFAULT '',
+			tenant TEXT DEFAULT '',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		);`,
+	}
+	for _, q := range queries {
+		if _, err := s.db.Exec(q); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

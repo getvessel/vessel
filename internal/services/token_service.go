@@ -25,12 +25,13 @@ func (ts *TokenService) GenerateToken(user *types.User) (string, error) {
 	}
 
 	claims := jwt.MapClaims{
-		"sub":   user.ID,
-		"email": user.Email,
-		"role":  user.Role,
-		"exp":   time.Now().Add(72 * time.Hour).Unix(),
-		"iat":   time.Now().Unix(),
-		"iss":   "vessel-auth",
+		"sub":         user.ID,
+		"email":       user.Email,
+		"role":        user.Role,
+		"totpEnabled": user.TOTPEnabled,
+		"exp":         time.Now().Add(72 * time.Hour).Unix(),
+		"iat":         time.Now().Unix(),
+		"iss":         "vessel-auth",
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

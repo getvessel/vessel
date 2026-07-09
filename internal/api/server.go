@@ -6,9 +6,11 @@ import (
 
 	"github.com/docker/docker/client"
 	"vessel.dev/vessel/internal/middleware"
+	"vessel.dev/vessel/internal/notifier"
 	"vessel.dev/vessel/internal/orchestrator"
 	"vessel.dev/vessel/internal/proxy"
 	"vessel.dev/vessel/internal/services"
+	"vessel.dev/vessel/internal/services/oauth"
 	"vessel.dev/vessel/internal/store"
 	"vessel.dev/vessel/internal/types"
 )
@@ -36,6 +38,10 @@ type Server struct {
 	teamHandler            *TeamHandler
 	workspaceHandler       *WorkspaceHandler
 	settingsHandler        *SettingsHandler
+	notifierService        *notifier.NotifierService
+	notificationHandler    *NotificationHandler
+	oauthService           *oauth.OAuthService
+	oauthHandler           *OAuthHandler
 }
 
 // NewServer initializes a Server wired to the database store, container orchestrator, reverse proxy, and Docker client.
@@ -47,6 +53,9 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 	_ = backupMgr.Start()
 
 	tokenService := services.NewTokenService()
+	notifierService := notifier.NewNotifierService(s)
+	oauthService := oauth.NewOAuthService()
+
 	srv := &Server{
 		router:                 http.NewServeMux(),
 		store:                  s,
@@ -69,6 +78,10 @@ func NewServer(s *store.Store, deployer *orchestrator.Deployer, proxyManager *pr
 		teamHandler:            NewTeamHandler(s),
 		workspaceHandler:       NewWorkspaceHandler(s),
 		settingsHandler:        NewSettingsHandler(s, dockerClient),
+		notifierService:        notifierService,
+		notificationHandler:    NewNotificationHandler(s, notifierService),
+		oauthService:           oauthService,
+		oauthHandler:           NewOAuthHandler(s, oauthService, tokenService),
 	}
 	if srv.deployer != nil {
 		srv.deployer.EnvProvider = srv.serviceLinker.GetLinkedEnvironmentVariables
