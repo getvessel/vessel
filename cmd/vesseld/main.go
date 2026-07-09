@@ -13,8 +13,8 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/joho/godotenv"
 	_ "modernc.org/sqlite"
-	"vessel.dev/vessel/internal/api"
 	"vessel.dev/vessel/internal/engine"
+	vesselhttp "vessel.dev/vessel/internal/http"
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/proxy"
 	"vessel.dev/vessel/internal/repositories"
@@ -149,7 +149,7 @@ func main() {
 
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
 
-	apiServer := api.NewServer(db, vlt, deployer, proxyMgr, dockerClient)
+	apiServer := vesselhttp.NewServer(db, vlt, deployer, proxyMgr, dockerClient)
 
 	log.Printf(" Vessel control plane listening on :%s", port)
 	if err := http.ListenAndServe(":"+port, apiServer.Handler()); err != nil {
