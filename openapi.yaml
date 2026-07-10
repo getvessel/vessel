@@ -1,17 +1,18 @@
 openapi: 3.1.0
 info:
   title: Vessel
-  version: '0.1'
-  description: Self-hosted PaaS — turn any bare-metal VPS into your own private Vercel
+  version: "0.1"
+  description:
+    Self-hosted PaaS — turn any bare-metal VPS into your own private Vercel
     & Railway.
 servers:
-- url: http://localhost:8080
-  description: Local development.
+  - url: http://localhost:8080
+    description: Local development.
 paths:
   /api/auth/signup:
     post:
       tags:
-      - Authentication
+        - Authentication
       summary: Signup
       operationId: signup
       requestBody:
@@ -20,8 +21,8 @@ paths:
           application/json:
             schema:
               required:
-              - email
-              - password
+                - email
+                - password
               properties:
                 email:
                   type: string
@@ -31,14 +32,14 @@ paths:
                   minLength: 8
               type: object
       responses:
-        '201':
+        "201":
           description: User created.
-        '400':
+        "400":
           $ref: "#/components/responses/400"
   /api/auth/signin:
     post:
       tags:
-      - Authentication
+        - Authentication
       summary: Signin
       operationId: signin
       requestBody:
@@ -47,8 +48,8 @@ paths:
           application/json:
             schema:
               required:
-              - email
-              - password
+                - email
+                - password
               properties:
                 email:
                   type: string
@@ -56,31 +57,31 @@ paths:
                   type: string
               type: object
       responses:
-        '200':
+        "200":
           description: JWT token returned.
-        '401':
+        "401":
           $ref: "#/components/responses/401"
   /api/auth/me:
     get:
       tags:
-      - Authentication
+        - Authentication
       summary: Me
       operationId: getMe
       responses:
-        '200':
+        "200":
           description: User profile.
-        '401':
+        "401":
           $ref: "#/components/responses/401"
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /api/projects:
     get:
       tags:
-      - Projects
+        - Projects
       summary: List projects
       operationId: listProjects
       responses:
-        '200':
+        "200":
           description: List of projects.
           content:
             application/json:
@@ -88,13 +89,13 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Project"
-        '401':
+        "401":
           $ref: "#/components/responses/401"
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     post:
       tags:
-      - Projects
+        - Projects
       summary: Create project
       operationId: createProject
       requestBody:
@@ -109,98 +110,98 @@ paths:
                   type: string
               type: object
       responses:
-        '201':
+        "201":
           description: Project created.
-        '400':
+        "400":
           $ref: "#/components/responses/400"
-        '401':
+        "401":
           $ref: "#/components/responses/401"
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /api/projects/{id}:
     get:
       tags:
-      - Projects
+        - Projects
       summary: Get project
       operationId: getProject
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
-        '200':
+        "200":
           description: Project details.
-        '404':
+        "404":
           $ref: "#/components/responses/404"
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     delete:
       tags:
-      - Projects
+        - Projects
       summary: Delete project
       operationId: deleteProject
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
-        '200':
+        "200":
           description: Project deleted.
-        '404':
+        "404":
           $ref: "#/components/responses/404"
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /api/projects/{id}/deploy:
     post:
       tags:
-      - Projects
+        - Projects
       summary: Deploy project
       operationId: deployProject
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
-        '200':
+        "200":
           description: Deployment started.
-        '404':
+        "404":
           $ref: "#/components/responses/404"
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /api/projects/{id}/domains:
     get:
       tags:
-      - Domains
+        - Domains
       summary: List domains
       operationId: listDomains
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
-        '200':
+        "200":
           description: List of custom domains.
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     post:
       tags:
-      - Domains
+        - Domains
       summary: Add domain
       operationId: addDomain
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -214,18 +215,18 @@ paths:
                   default: /
               type: object
       responses:
-        '201':
+        "201":
           description: Domain added.
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /api/databases:
     get:
       tags:
-      - Databases
+        - Databases
       summary: List databases
       operationId: listDatabases
       responses:
-        '200':
+        "200":
           description: List of managed databases.
           content:
             application/json:
@@ -234,10 +235,10 @@ paths:
                 items:
                   $ref: "#/components/schemas/Database"
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     post:
       tags:
-      - Databases
+        - Databases
       summary: Create database
       operationId: createDatabase
       requestBody:
@@ -246,30 +247,30 @@ paths:
           application/json:
             schema:
               required:
-              - name
-              - engine
+                - name
+                - engine
               properties:
                 name:
                   type: string
                 engine:
                   type: string
                   enum:
-                  - postgres
-                  - mysql
-                  - redis
-                  - mongodb
+                    - postgres
+                    - mysql
+                    - redis
+                    - mongodb
               type: object
       responses:
-        '201':
+        "201":
           description: Database created.
-        '400':
+        "400":
           $ref: "#/components/responses/400"
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /api/git/connect:
     post:
       tags:
-      - Git
+        - Git
       summary: Connect Git provider
       operationId: connectGit
       requestBody:
@@ -281,41 +282,41 @@ paths:
                 provider:
                   type: string
                   enum:
-                  - github
-                  - gitlab
+                    - github
+                    - gitlab
                 token:
                   type: string
               type: object
       responses:
-        '200':
+        "200":
           description: Connected.
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /api/git/repos:
     get:
       tags:
-      - Git
+        - Git
       summary: List repositories
       operationId: listGitRepos
       responses:
-        '200':
+        "200":
           description: List of repositories.
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /api/teams:
     get:
       tags:
-      - Teams
+        - Teams
       summary: List teams
       operationId: listTeams
       responses:
-        '200':
+        "200":
           description: List of teams.
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     post:
       tags:
-      - Teams
+        - Teams
       summary: Create team
       operationId: createTeam
       requestBody:
@@ -324,44 +325,44 @@ paths:
           application/json:
             schema:
               required:
-              - name
+                - name
               properties:
                 name:
                   type: string
               type: object
       responses:
-        '201':
+        "201":
           description: Team created.
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /api/settings:
     get:
       tags:
-      - Settings
+        - Settings
       summary: Get server settings
       operationId: getServerSettings
       responses:
-        '200':
+        "200":
           description: Server settings.
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /ws/terminal/{id}:
     get:
       tags:
-      - Terminal
+        - Terminal
       summary: WebSocket terminal
       operationId: terminal
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
-        '101':
+        "101":
           description: WebSocket upgrade.
       security:
-      - bearerAuth: []
+        - bearerAuth: []
 components:
   schemas:
     Project:
@@ -398,7 +399,7 @@ components:
           type: string
           format: date-time
   responses:
-    '400':
+    "400":
       description: Bad request.
       content:
         application/json:
@@ -407,7 +408,7 @@ components:
             properties:
               error:
                 type: string
-    '401':
+    "401":
       description: Unauthenticated.
       content:
         application/json:
@@ -416,7 +417,7 @@ components:
             properties:
               error:
                 type: string
-    '404':
+    "404":
       description: Resource not found.
       content:
         application/json:
@@ -431,11 +432,11 @@ components:
       scheme: bearer
       description: JWT token from /api/auth/signin.
 tags:
-- name: Authentication
-- name: Projects
-- name: Domains
-- name: Databases
-- name: Git
-- name: Teams
-- name: Settings
-- name: Terminal
+  - name: Authentication
+  - name: Projects
+  - name: Domains
+  - name: Databases
+  - name: Git
+  - name: Teams
+  - name: Settings
+  - name: Terminal

@@ -6,7 +6,16 @@ services:
       is_database: true
       connection_string: "clickhouse://${db.username}:${db.password}@${host}:${port}/${db.database_name}"
       backup:
-        command: ["clickhouse-client", "--user", "${db.username}", "--password", "${db.password}", "--query", "BACKUP TABLE ${db.database_name}.* TO Disk('backups', 'backup.zip')"]
+        command:
+          [
+            "clickhouse-client",
+            "--user",
+            "${db.username}",
+            "--password",
+            "${db.password}",
+            "--query",
+            "BACKUP TABLE ${db.database_name}.* TO Disk('backups', 'backup.zip')",
+          ]
         file_extension: ".zip"
     environment:
       - CLICKHOUSE_USER=${db.username}

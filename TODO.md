@@ -4,10 +4,10 @@
 
 ## ⚙️ Phase 2: Go Backend Engine (`cmd/vesseld` & `internal/`)
 
-- [ ] **GitHub App Manifest API Endpoint (`internal/api/git_handler.go`)**: Handle the GitHub redirect, exchange the temporary `code` for App configuration, and securely store `client_id`, `private_key`, and `webhook_secret`.
 - [ ] **Vercel Project Imports Backend**: Vercel OAuth integration, endpoints to fetch Vercel projects, parse their env vars, and map them to Vessel projects.
-- [ ] **AI-Powered Deployment Diagnostics Endpoint**: Backend service to securely call LLM APIs (OpenAI/Anthropic/Gemini) with deployment logs and stream the explanation.
+  - _Schema Update_: Add `user_vercel_accounts` table (or integrate into `user_git_providers`) to store Vercel access tokens.
 - [ ] **Serverless Functions Engine**: Endpoints to save function code snippets and a backend builder to package and run serverless functions as containers.
+  - _Schema Update_: Add `serverless_functions_code` table to store `service_id`, `runtime`, and `code_content`.
 
   **How `deployer.go`, `container_manager.go` & `stats_monitor.go` complete the deployment:**
 

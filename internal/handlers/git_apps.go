@@ -19,6 +19,28 @@ func NewGitAppsHandler(gs *services.GitAppsService) *GitAppsHandler {
 
 // ---- GitHub Apps ----
 
+func (h *GitAppsHandler) ExchangeGithubManifestCode(c echo.Context) error {
+	var payload struct {
+		Code   string `json:"code"`
+		TeamID string `json:"teamId"`
+	}
+
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
+	}
+
+	if payload.Code == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "code is required"})
+	}
+
+	app, err := h.gitAppsService.ExchangeGithubManifestCode(c.Request().Context(), payload.Code, payload.TeamID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, app)
+}
+
 func (h *GitAppsHandler) ListGithubApps(c echo.Context) error {
 	teamID := c.QueryParam("teamId")
 	if teamID == "" {

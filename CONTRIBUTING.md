@@ -144,12 +144,12 @@ npm run dev
 
 ## 6. Start Developing
 
-| Tool        | URL                            | Purpose               |
-| ----------- | ------------------------------ | --------------------- |
-| Dashboard   | `http://localhost:3000`        | Main UI (HMR enabled) |
-| API         | `http://localhost:8080`        | Go REST API           |
-| Health      | `http://localhost:8080/health` | API health check      |
-| Marketing   | `http://localhost:4321`        | Public site           |
+| Tool            | URL                            | Purpose                                                |
+| --------------- | ------------------------------ | ------------------------------------------------------ |
+| Dashboard       | `http://localhost:3000`        | Main UI (HMR enabled)                                  |
+| API             | `http://localhost:8080`        | Go REST API                                            |
+| Health          | `http://localhost:8080/health` | API health check                                       |
+| Marketing       | `http://localhost:4321`        | Public site                                            |
 | Cloud Dashboard | `http://localhost:3002`        | Cloud user dashboard (signup, login, projects, /admin) |
 
 ---

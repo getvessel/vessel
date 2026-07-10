@@ -1,5 +1,15 @@
 package models
 
+import "time"
+
+type TeamAISettings struct {
+	ID        string    `json:"id"`
+	TeamID    string    `json:"teamId"`
+	Provider  string    `json:"provider"`
+	APIKey    string    `json:"apiKey,omitempty"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
 type ServerSettings struct {
 	ID                          string `json:"id"`
 	CaddyWildcardIP             string `json:"caddyWildcardIp"`

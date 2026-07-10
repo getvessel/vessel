@@ -15,6 +15,7 @@ require (
 	github.com/lib/pq v1.12.3
 	github.com/redis/go-redis/v9 v9.21.0
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/sashabaranov/go-openai v1.41.2
 	golang.org/x/crypto v0.53.0
 	gopkg.in/yaml.v3 v3.0.1
 	modernc.org/sqlite v1.53.0

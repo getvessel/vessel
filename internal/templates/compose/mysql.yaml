@@ -6,7 +6,8 @@ services:
       is_database: true
       connection_string: "mysql://${db.username}:${db.password}@${host}:${port}/${db.database_name}"
       backup:
-        command: ["mysqldump", "-u", "root", "-p${db.password}", "${db.database_name}"]
+        command:
+          ["mysqldump", "-u", "root", "-p${db.password}", "${db.database_name}"]
         file_extension: ".sql"
     environment:
       - MYSQL_ROOT_PASSWORD=${db.password}

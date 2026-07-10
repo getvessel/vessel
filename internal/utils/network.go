@@ -20,9 +20,9 @@ func EnsureVesselNetwork(ctx context.Context, cli *client.Client) error {
 	if cli == nil {
 		return nil
 	}
-	
+
 	netName := GetRuntimeNetwork()
-	
+
 	networks, err := cli.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
 		return err

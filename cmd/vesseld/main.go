@@ -104,7 +104,7 @@ func main() {
 	}
 
 	host := os.Getenv("HOST")
-	
+
 	addr := host + ":" + port
 
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})

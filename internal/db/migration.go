@@ -433,6 +433,14 @@ func RunMigrations(db *sql.DB) error {
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
+		`CREATE TABLE IF NOT EXISTS team_ai_settings (
+			id TEXT PRIMARY KEY,
+			team_id TEXT UNIQUE NOT NULL,
+			provider TEXT NOT NULL,
+			encrypted_api_key TEXT NOT NULL,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		);`,
 	}
 	for _, q := range queries {
 		if _, err := db.Exec(q); err != nil {
