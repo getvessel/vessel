@@ -187,7 +187,8 @@ func runMigrations(db *sql.DB) error {
 			description TEXT DEFAULT '',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);`,
+		,
+			workspace_id TEXT DEFAULT '');`,
 		`CREATE TABLE IF NOT EXISTS domains (
 			id TEXT PRIMARY KEY,
 			project_id TEXT NOT NULL,
@@ -248,7 +249,8 @@ func runMigrations(db *sql.DB) error {
 			external_dns TEXT,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);`,
+		,
+			environment_id TEXT DEFAULT '');`,
 		`CREATE TABLE IF NOT EXISTS storage (
 			id TEXT PRIMARY KEY,
 			project_id TEXT DEFAULT '',
@@ -266,7 +268,8 @@ func runMigrations(db *sql.DB) error {
 			external_dns TEXT,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);`,
+		,
+			environment_id TEXT DEFAULT '');`,
 		`CREATE TABLE IF NOT EXISTS jobs (
 			id TEXT PRIMARY KEY,
 			project_id TEXT NOT NULL,
@@ -327,7 +330,13 @@ func runMigrations(db *sql.DB) error {
 			status TEXT DEFAULT 'building',
 			container_id TEXT DEFAULT '',
 			created_at DATETIME NOT NULL,
-			updated_at DATETIME NOT NULL,
+			updated_at DATETIME NOT NULL,,
+			git_repo_full_name TEXT DEFAULT '',
+			wait_for_ci BOOLEAN DEFAULT 1,
+			auto_deploy_branch BOOLEAN DEFAULT 1,
+			public_networking_domain TEXT DEFAULT '',
+			private_networking_internal TEXT DEFAULT '',
+			enable_outbound_ipv6 BOOLEAN DEFAULT 0
 			UNIQUE(environment_id, name)
 		);`,
 		`CREATE TABLE IF NOT EXISTS deployments (
@@ -444,11 +453,12 @@ func runMigrations(db *sql.DB) error {
 			id TEXT PRIMARY KEY,
 			name TEXT NOT NULL,
 			avatar_url TEXT DEFAULT '',
-			preferred_deployment_region TEXT DEFAULT 'local',
+			preferred_region TEXT DEFAULT 'local',
 			owner_id TEXT NOT NULL,
 			created_at TEXT,
 			updated_at TEXT
-		);`,
+		,
+			preferred_region TEXT DEFAULT 'local');`,
 		`CREATE TABLE IF NOT EXISTS team_members (
 			id TEXT PRIMARY KEY,
 			team_id TEXT NOT NULL,
@@ -593,58 +603,7 @@ func runMigrations(db *sql.DB) error {
 		}
 	}
 
-	alterQueries := []string{
-		"ALTER TABLE databases ADD COLUMN project_id TEXT DEFAULT '';",
-		"ALTER TABLE storage ADD COLUMN project_id TEXT DEFAULT '';",
-		"ALTER TABLE databases ADD COLUMN environment_id TEXT DEFAULT '';",
-		"ALTER TABLE storage ADD COLUMN environment_id TEXT DEFAULT '';",
-		"ALTER TABLE projects ADD COLUMN team_id TEXT DEFAULT '';",
-		"ALTER TABLE projects ADD COLUMN description TEXT DEFAULT '';",
-		"ALTER TABLE projects ADD COLUMN workspace_id TEXT DEFAULT '';",
-		"ALTER TABLE users ADD COLUMN totp_enabled BOOLEAN DEFAULT FALSE;",
-		"ALTER TABLE users ADD COLUMN totp_secret TEXT DEFAULT '';",
-		"ALTER TABLE users ADD COLUMN recovery_codes TEXT DEFAULT '';",
-		"ALTER TABLE users ADD COLUMN oauth_provider TEXT DEFAULT '';",
-		"ALTER TABLE server_settings ADD COLUMN registration_enabled BOOLEAN DEFAULT TRUE;",
-		"ALTER TABLE server_settings ADD COLUMN custom_dns_resolvers TEXT DEFAULT '';",
-		"ALTER TABLE server_settings ADD COLUMN dns_validation_enabled BOOLEAN DEFAULT TRUE;",
-		"ALTER TABLE server_settings ADD COLUMN ip_allowlist TEXT DEFAULT '';",
-		"ALTER TABLE server_settings ADD COLUMN mcp_server_enabled BOOLEAN DEFAULT TRUE;",
-		"ALTER TABLE server_settings ADD COLUMN default_wildcard_domain TEXT DEFAULT '';",
-		"ALTER TABLE server_settings ADD COLUMN update_check_cron TEXT DEFAULT '0 * * * *';",
-		"ALTER TABLE server_settings ADD COLUMN auto_update_enabled BOOLEAN DEFAULT FALSE;",
-		"ALTER TABLE server_settings ADD COLUMN current_version TEXT DEFAULT '0.1.0';",
-		"ALTER TABLE server_settings ADD COLUMN latest_version TEXT DEFAULT '0.1.0';",
-		"ALTER TABLE server_settings ADD COLUMN last_update_check TEXT DEFAULT '';",
-		"ALTER TABLE server_settings ADD COLUMN smtp_from_name TEXT DEFAULT '';",
-		"ALTER TABLE server_settings ADD COLUMN smtp_from_address TEXT DEFAULT '';",
-		"ALTER TABLE app_services ADD COLUMN icon TEXT DEFAULT 'git';",
-		"ALTER TABLE app_services ADD COLUMN root_directory TEXT DEFAULT '/';",
-		"ALTER TABLE app_services ADD COLUMN replicas INTEGER DEFAULT 1;",
-		"ALTER TABLE app_services ADD COLUMN restart_policy TEXT DEFAULT 'on_failure';",
-		"ALTER TABLE app_services ADD COLUMN teardown_timeout INTEGER DEFAULT 30;",
-		"ALTER TABLE app_services ADD COLUMN serverless BOOLEAN DEFAULT 0;",
-		"ALTER TABLE app_services ADD COLUMN cron_schedule TEXT DEFAULT '';",
-		"ALTER TABLE app_services ADD COLUMN git_repo_full_name TEXT DEFAULT '';",
-		"ALTER TABLE app_services ADD COLUMN wait_for_ci BOOLEAN DEFAULT 1;",
-		"ALTER TABLE app_services ADD COLUMN auto_deploy_branch BOOLEAN DEFAULT 1;",
-		"ALTER TABLE app_services ADD COLUMN public_networking_domain TEXT DEFAULT '';",
-		"ALTER TABLE app_services ADD COLUMN private_networking_internal TEXT DEFAULT '';",
-		"ALTER TABLE app_services ADD COLUMN enable_outbound_ipv6 BOOLEAN DEFAULT 0;",
-		"ALTER TABLE notification_integrations ADD COLUMN smtp_from_name TEXT DEFAULT '';",
-		"ALTER TABLE notification_integrations ADD COLUMN smtp_from_address TEXT DEFAULT '';",
-		"ALTER TABLE teams ADD COLUMN avatar_url TEXT DEFAULT '';",
-		"ALTER TABLE teams ADD COLUMN preferred_deployment_region TEXT DEFAULT 'local';",
-		"ALTER TABLE project_tokens ADD COLUMN environment_id TEXT DEFAULT '';",
-		"ALTER TABLE project_tokens ADD COLUMN token_prefix TEXT DEFAULT '';",
-		"ALTER TABLE project_tokens ADD COLUMN token_hash TEXT DEFAULT '';",
-		"ALTER TABLE project_tokens ADD COLUMN ip_allowlist TEXT DEFAULT '';",
-	}
-
-	for _, q := range alterQueries {
-		_, _ = db.Exec(q)
-	}
-
+	
 	log.Println(" Vessel SQLite schema initialized successfully (`data/vessel.db`)")
 	return nil
 }
