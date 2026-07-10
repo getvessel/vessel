@@ -31,6 +31,12 @@ func (h *UserHandler) ListUsers(c echo.Context) error {
 	return c.JSON(http.StatusOK, out)
 }
 
+// @Summary GetProfile endpoint
+// @Description GetProfile endpoint
+// @Tags Profile
+// @Accept json
+// @Produce json
+// @Router /api/profile [get]
 func (h *UserHandler) GetProfile(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {
@@ -45,6 +51,12 @@ func (h *UserHandler) GetProfile(c echo.Context) error {
 	return c.JSON(http.StatusOK, &uCopy)
 }
 
+// @Summary UpdateProfile endpoint
+// @Description UpdateProfile endpoint
+// @Tags Profile
+// @Accept json
+// @Produce json
+// @Router /api/profile [put]
 func (h *UserHandler) UpdateProfile(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {
@@ -75,6 +87,12 @@ func (h *UserHandler) UpdateProfile(c echo.Context) error {
 	return c.JSON(http.StatusOK, &uCopy)
 }
 
+// @Summary CreatePAT endpoint
+// @Description CreatePAT endpoint
+// @Tags Profile
+// @Accept json
+// @Produce json
+// @Router /api/profile/tokens [post]
 func (h *UserHandler) CreatePAT(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {
@@ -96,6 +114,12 @@ func (h *UserHandler) CreatePAT(c echo.Context) error {
 	})
 }
 
+// @Summary ListPATs endpoint
+// @Description ListPATs endpoint
+// @Tags Profile
+// @Accept json
+// @Produce json
+// @Router /api/profile/tokens [get]
 func (h *UserHandler) ListPATs(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {
@@ -108,6 +132,13 @@ func (h *UserHandler) ListPATs(c echo.Context) error {
 	return c.JSON(http.StatusOK, pats)
 }
 
+// @Summary DeletePAT endpoint
+// @Description DeletePAT endpoint
+// @Tags Profile
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/profile/tokens/{id} [delete]
 func (h *UserHandler) DeletePAT(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {

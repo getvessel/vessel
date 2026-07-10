@@ -17,6 +17,12 @@ func NewVercelHandler(vs *services.VercelService) *VercelHandler {
 }
 
 // Callback endpoint (GET /api/v1/oauth/vercel/callback)
+// @Summary Callback endpoint
+// @Description Callback endpoint
+// @Tags Oauth
+// @Accept json
+// @Produce json
+// @Router /api/oauth/vercel/callback [get]
 func (h *VercelHandler) Callback(c echo.Context) error {
 	code := c.QueryParam("code")
 	if code == "" {
@@ -40,6 +46,12 @@ func (h *VercelHandler) Callback(c echo.Context) error {
 }
 
 // List Projects (GET /api/v1/vercel/projects)
+// @Summary ListProjects endpoint
+// @Description ListProjects endpoint
+// @Tags Vercel
+// @Accept json
+// @Produce json
+// @Router /api/vercel/projects [get]
 func (h *VercelHandler) ListProjects(c echo.Context) error {
 	user := GetUserClaimsFromContext(c.Request().Context())
 	if user == nil {
@@ -63,6 +75,13 @@ func (h *VercelHandler) ListProjects(c echo.Context) error {
 }
 
 // Get Env Vars (GET /api/v1/vercel/projects/:id/env)
+// @Summary GetProjectEnv endpoint
+// @Description GetProjectEnv endpoint
+// @Tags Vercel
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/vercel/projects/{id}/env [get]
 func (h *VercelHandler) GetProjectEnv(c echo.Context) error {
 	user := GetUserClaimsFromContext(c.Request().Context())
 	if user == nil {

@@ -17,6 +17,12 @@ func NewBackupHandler(s *services.BackupService) *BackupHandler {
 	return &BackupHandler{backupService: s}
 }
 
+// @Summary List endpoint
+// @Description List endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Router /api/workspaces [get]
 func (h *BackupHandler) List(c echo.Context) error {
 	projectID := c.QueryParam("projectId")
 	if projectID == "" {
@@ -29,6 +35,12 @@ func (h *BackupHandler) List(c echo.Context) error {
 	return c.JSON(http.StatusOK, list)
 }
 
+// @Summary Create endpoint
+// @Description Create endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Router /api/workspaces [post]
 func (h *BackupHandler) Create(c echo.Context) error {
 	var cfg models.BackupConfig
 	if err := c.Bind(&cfg); err != nil {
@@ -40,6 +52,13 @@ func (h *BackupHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, cfg)
 }
 
+// @Summary Get endpoint
+// @Description Get endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param teamId path string true "teamId"
+// @Router /api/teams/{teamId}/ai_settings [get]
 func (h *BackupHandler) Get(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -52,6 +71,13 @@ func (h *BackupHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, cfg)
 }
 
+// @Summary Delete endpoint
+// @Description Delete endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/workspaces/{id} [delete]
 func (h *BackupHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
 	projectID := c.QueryParam("projectId")
@@ -64,6 +90,13 @@ func (h *BackupHandler) Delete(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// @Summary Trigger endpoint
+// @Description Trigger endpoint
+// @Tags Backups
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/backups/{id}/trigger [post]
 func (h *BackupHandler) Trigger(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -76,6 +109,13 @@ func (h *BackupHandler) Trigger(c echo.Context) error {
 	return c.JSON(http.StatusOK, rec)
 }
 
+// @Summary ListRecords endpoint
+// @Description ListRecords endpoint
+// @Tags Backups
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/backups/{id}/records [get]
 func (h *BackupHandler) ListRecords(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -88,6 +128,12 @@ func (h *BackupHandler) ListRecords(c echo.Context) error {
 	return c.JSON(http.StatusOK, recs)
 }
 
+// @Summary ListS3Destinations endpoint
+// @Description ListS3Destinations endpoint
+// @Tags S3-destinations
+// @Accept json
+// @Produce json
+// @Router /api/s3-destinations [get]
 func (h *BackupHandler) ListS3Destinations(c echo.Context) error {
 	projectID := c.QueryParam("projectId")
 	if projectID == "" {
@@ -100,6 +146,12 @@ func (h *BackupHandler) ListS3Destinations(c echo.Context) error {
 	return c.JSON(http.StatusOK, list)
 }
 
+// @Summary CreateS3Destination endpoint
+// @Description CreateS3Destination endpoint
+// @Tags S3-destinations
+// @Accept json
+// @Produce json
+// @Router /api/s3-destinations [post]
 func (h *BackupHandler) CreateS3Destination(c echo.Context) error {
 	var dest models.S3Destination
 	if err := c.Bind(&dest); err != nil {
@@ -111,6 +163,13 @@ func (h *BackupHandler) CreateS3Destination(c echo.Context) error {
 	return c.JSON(http.StatusCreated, dest)
 }
 
+// @Summary DeleteS3Destination endpoint
+// @Description DeleteS3Destination endpoint
+// @Tags S3-destinations
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/s3-destinations/{id} [delete]
 func (h *BackupHandler) DeleteS3Destination(c echo.Context) error {
 	id := c.Param("id")
 	projectID := c.QueryParam("projectId")

@@ -17,6 +17,12 @@ func NewNotificationHandler(ns *services.NotificationService) *NotificationHandl
 	return &NotificationHandler{notificationService: ns}
 }
 
+// @Summary ListChannels endpoint
+// @Description ListChannels endpoint
+// @Tags Settings
+// @Accept json
+// @Produce json
+// @Router /api/settings/notifications [get]
 func (h *NotificationHandler) ListChannels(c echo.Context) error {
 	if c.Request().Method != http.MethodGet {
 		return c.JSON(http.StatusMethodNotAllowed, map[string]string{"error": "Method not allowed"})
@@ -33,6 +39,12 @@ func (h *NotificationHandler) ListChannels(c echo.Context) error {
 	return c.JSON(http.StatusOK, channels)
 }
 
+// @Summary SaveChannel endpoint
+// @Description SaveChannel endpoint
+// @Tags Settings
+// @Accept json
+// @Produce json
+// @Router /api/settings/notifications [put]
 func (h *NotificationHandler) SaveChannel(c echo.Context) error {
 	if c.Request().Method != http.MethodPut && c.Request().Method != http.MethodPost {
 		return c.JSON(http.StatusMethodNotAllowed, map[string]string{"error": "Method not allowed"})
@@ -50,6 +62,13 @@ func (h *NotificationHandler) SaveChannel(c echo.Context) error {
 	return c.JSON(http.StatusOK, channel)
 }
 
+// @Summary DeleteChannel endpoint
+// @Description DeleteChannel endpoint
+// @Tags Settings
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/settings/notifications/{id} [delete]
 func (h *NotificationHandler) DeleteChannel(c echo.Context) error {
 	if c.Request().Method != http.MethodDelete {
 		return c.JSON(http.StatusMethodNotAllowed, map[string]string{"error": "Method not allowed"})
@@ -64,6 +83,12 @@ func (h *NotificationHandler) DeleteChannel(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
 }
 
+// @Summary TestNotification endpoint
+// @Description TestNotification endpoint
+// @Tags Settings
+// @Accept json
+// @Produce json
+// @Router /api/settings/notifications/test [post]
 func (h *NotificationHandler) TestNotification(c echo.Context) error {
 	if c.Request().Method != http.MethodPost {
 		return c.JSON(http.StatusMethodNotAllowed, map[string]string{"error": "Method not allowed"})

@@ -17,6 +17,12 @@ func NewJobHandler(s *services.JobService) *JobHandler {
 	return &JobHandler{jobService: s}
 }
 
+// @Summary ListProjectJobs endpoint
+// @Description ListProjectJobs endpoint
+// @Tags Jobs
+// @Accept json
+// @Produce json
+// @Router /api/jobs [get]
 func (h *JobHandler) ListProjectJobs(c echo.Context) error {
 	projectID := c.QueryParam("projectId")
 	if projectID == "" {
@@ -29,6 +35,12 @@ func (h *JobHandler) ListProjectJobs(c echo.Context) error {
 	return c.JSON(http.StatusOK, jobs)
 }
 
+// @Summary Create endpoint
+// @Description Create endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Router /api/workspaces [post]
 func (h *JobHandler) Create(c echo.Context) error {
 	var j models.Job
 	if err := c.Bind(&j); err != nil {
@@ -41,6 +53,13 @@ func (h *JobHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, created)
 }
 
+// @Summary Get endpoint
+// @Description Get endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param teamId path string true "teamId"
+// @Router /api/teams/{teamId}/ai_settings [get]
 func (h *JobHandler) Get(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -53,6 +72,13 @@ func (h *JobHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, j)
 }
 
+// @Summary Delete endpoint
+// @Description Delete endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/workspaces/{id} [delete]
 func (h *JobHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -64,6 +90,13 @@ func (h *JobHandler) Delete(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// @Summary Run endpoint
+// @Description Run endpoint
+// @Tags Jobs
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/jobs/{id}/trigger [post]
 func (h *JobHandler) Run(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {

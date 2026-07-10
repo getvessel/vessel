@@ -17,6 +17,12 @@ func NewSettingsHandler(s *services.SettingsService) *SettingsHandler {
 	return &SettingsHandler{settingsService: s}
 }
 
+// @Summary GetSettings endpoint
+// @Description GetSettings endpoint
+// @Tags Settings
+// @Accept json
+// @Produce json
+// @Router /api/settings [get]
 func (h *SettingsHandler) GetSettings(c echo.Context) error {
 	s, err := h.settingsService.GetSettings(c.Request().Context())
 	if err != nil {
@@ -25,6 +31,12 @@ func (h *SettingsHandler) GetSettings(c echo.Context) error {
 	return c.JSON(http.StatusOK, s)
 }
 
+// @Summary UpdateSettings endpoint
+// @Description UpdateSettings endpoint
+// @Tags Settings
+// @Accept json
+// @Produce json
+// @Router /api/settings [put]
 func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
 	var payload models.ServerSettings
 	if err := c.Bind(&payload); err != nil {
@@ -62,6 +74,13 @@ func (h *SettingsHandler) SaveTeamNotificationChannel(c echo.Context) error {
 	return c.JSON(http.StatusOK, payload)
 }
 
+// @Summary GetTeamNotificationChannel endpoint
+// @Description GetTeamNotificationChannel endpoint
+// @Tags Settings
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/settings/notifications/{id} [get]
 func (h *SettingsHandler) GetTeamNotificationChannel(c echo.Context) error {
 	id := c.Param("id")
 	channel, err := h.settingsService.GetTeamNotificationChannel(c.Request().Context(), id)
@@ -79,6 +98,12 @@ func (h *SettingsHandler) DeleteTeamNotificationChannel(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
 }
 
+// @Summary HandleMCPRequest endpoint
+// @Description HandleMCPRequest endpoint
+// @Tags Mcp
+// @Accept json
+// @Produce json
+// @Router /api/mcp [post]
 func (h *SettingsHandler) HandleMCPRequest(c echo.Context) error {
 	if c.Request().Method != http.MethodPost {
 		return c.JSON(http.StatusMethodNotAllowed, map[string]string{"error": "Only POST requests allowed for MCP JSON-RPC"})

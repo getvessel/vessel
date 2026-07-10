@@ -17,6 +17,12 @@ func NewAppHandler(s *services.AppService) *AppHandler {
 	return &AppHandler{appService: s}
 }
 
+// @Summary Create endpoint
+// @Description Create endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Router /api/workspaces [post]
 func (h *AppHandler) Create(c echo.Context) error {
 	envID := c.Param("id")
 	var req models.AppService
@@ -37,6 +43,13 @@ func (h *AppHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, created)
 }
 
+// @Summary ListByEnvironment endpoint
+// @Description ListByEnvironment endpoint
+// @Tags Environments
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/environments/{id}/apps [get]
 func (h *AppHandler) ListByEnvironment(c echo.Context) error {
 	envID := c.Param("id")
 	apps, err := h.appService.ListByEnvironment(c.Request().Context(), envID)
@@ -46,6 +59,13 @@ func (h *AppHandler) ListByEnvironment(c echo.Context) error {
 	return c.JSON(http.StatusOK, apps)
 }
 
+// @Summary ListByProject endpoint
+// @Description ListByProject endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/projects/{id}/apps [get]
 func (h *AppHandler) ListByProject(c echo.Context) error {
 	projectID := c.Param("id")
 	apps, err := h.appService.ListByProject(c.Request().Context(), projectID)
@@ -55,6 +75,13 @@ func (h *AppHandler) ListByProject(c echo.Context) error {
 	return c.JSON(http.StatusOK, apps)
 }
 
+// @Summary Get endpoint
+// @Description Get endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param teamId path string true "teamId"
+// @Router /api/teams/{teamId}/ai_settings [get]
 func (h *AppHandler) Get(c echo.Context) error {
 	id := c.Param("id")
 	svc, err := h.appService.GetAppService(c.Request().Context(), id)
@@ -64,6 +91,13 @@ func (h *AppHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, svc)
 }
 
+// @Summary Update endpoint
+// @Description Update endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/workspaces/{id} [put]
 func (h *AppHandler) Update(c echo.Context) error {
 	id := c.Param("id")
 	existing, err := h.appService.GetAppService(c.Request().Context(), id)
@@ -93,6 +127,13 @@ func (h *AppHandler) Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, existing)
 }
 
+// @Summary Delete endpoint
+// @Description Delete endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/workspaces/{id} [delete]
 func (h *AppHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
 	if err := h.appService.DeleteAppService(c.Request().Context(), id); err != nil {
@@ -109,6 +150,12 @@ func NewServiceVarHandler(s *services.AppService) *ServiceVarHandler {
 	return &ServiceVarHandler{appService: s}
 }
 
+// @Summary List endpoint
+// @Description List endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Router /api/workspaces [get]
 func (h *ServiceVarHandler) List(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	list, err := h.appService.ListVariablesByService(c.Request().Context(), serviceID)
@@ -118,6 +165,12 @@ func (h *ServiceVarHandler) List(c echo.Context) error {
 	return c.JSON(http.StatusOK, list)
 }
 
+// @Summary Create endpoint
+// @Description Create endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Router /api/workspaces [post]
 func (h *ServiceVarHandler) Create(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	var req models.Variable
@@ -138,6 +191,13 @@ func (h *ServiceVarHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, created)
 }
 
+// @Summary Update endpoint
+// @Description Update endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/workspaces/{id} [put]
 func (h *ServiceVarHandler) Update(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	id := c.Param("id")
@@ -153,6 +213,13 @@ func (h *ServiceVarHandler) Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, req)
 }
 
+// @Summary Delete endpoint
+// @Description Delete endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/workspaces/{id} [delete]
 func (h *ServiceVarHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
 	if err := h.appService.DeleteVariable(c.Request().Context(), id); err != nil {

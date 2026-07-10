@@ -39,6 +39,13 @@ func NewAIDiagnosticsHandler(ai *services.AISettingsService, ds *services.Deploy
 	}
 }
 
+// @Summary Analyze endpoint
+// @Description Analyze endpoint
+// @Tags Deployments
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/deployments/{id}/diagnostics [post]
 func (h *AIDiagnosticsHandler) Analyze(c echo.Context) error {
 	deploymentID := c.Param("id")
 	if deploymentID == "" {

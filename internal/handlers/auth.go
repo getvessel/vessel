@@ -16,6 +16,12 @@ func NewAuthHandler(s *services.AuthService) *AuthHandler {
 	return &AuthHandler{authService: s}
 }
 
+// @Summary Register endpoint
+// @Description Register endpoint
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Router /api/auth/signup [post]
 func (h *AuthHandler) Register(c echo.Context) error {
 	var payload struct {
 		Email    string `json:"email"`
@@ -35,6 +41,12 @@ func (h *AuthHandler) Register(c echo.Context) error {
 	})
 }
 
+// @Summary Login endpoint
+// @Description Login endpoint
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Router /api/auth/signin [post]
 func (h *AuthHandler) Login(c echo.Context) error {
 	var payload struct {
 		Email    string `json:"email"`
@@ -54,6 +66,12 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	})
 }
 
+// @Summary Logout endpoint
+// @Description Logout endpoint
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Router /api/auth/logout [post]
 func (h *AuthHandler) Logout(c echo.Context) error {
 	ClearAuthCookie(c)
 	return c.JSON(http.StatusOK, map[string]string{"status": "logged out"})

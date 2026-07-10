@@ -17,6 +17,13 @@ func NewEnvironmentHandler(s *services.EnvironmentService) *EnvironmentHandler {
 	return &EnvironmentHandler{envService: s}
 }
 
+// @Summary ListByProject endpoint
+// @Description ListByProject endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/projects/{id}/apps [get]
 func (h *EnvironmentHandler) ListByProject(c echo.Context) error {
 	projectID := c.Param("id")
 	if projectID == "" {
@@ -29,6 +36,12 @@ func (h *EnvironmentHandler) ListByProject(c echo.Context) error {
 	return c.JSON(http.StatusOK, envs)
 }
 
+// @Summary Create endpoint
+// @Description Create endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Router /api/workspaces [post]
 func (h *EnvironmentHandler) Create(c echo.Context) error {
 	projectID := c.Param("id")
 	if projectID == "" {
@@ -49,6 +62,13 @@ func (h *EnvironmentHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, created)
 }
 
+// @Summary Delete endpoint
+// @Description Delete endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/workspaces/{id} [delete]
 func (h *EnvironmentHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -68,6 +88,13 @@ func NewDomainHandler(s *services.EnvironmentService) *DomainHandler {
 	return &DomainHandler{envService: s}
 }
 
+// @Summary ListByProject endpoint
+// @Description ListByProject endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/projects/{id}/apps [get]
 func (h *DomainHandler) ListByProject(c echo.Context) error {
 	projectID := c.Param("id")
 	if projectID == "" {
@@ -80,6 +107,12 @@ func (h *DomainHandler) ListByProject(c echo.Context) error {
 	return c.JSON(http.StatusOK, domains)
 }
 
+// @Summary Create endpoint
+// @Description Create endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Router /api/workspaces [post]
 func (h *DomainHandler) Create(c echo.Context) error {
 	projectID := c.Param("id")
 	if projectID == "" {
@@ -100,6 +133,13 @@ func (h *DomainHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, created)
 }
 
+// @Summary Delete endpoint
+// @Description Delete endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/workspaces/{id} [delete]
 func (h *DomainHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -119,6 +159,13 @@ func NewProjectEnvHandler(s *services.EnvironmentService) *ProjectEnvHandler {
 	return &ProjectEnvHandler{envService: s}
 }
 
+// @Summary GetVars endpoint
+// @Description GetVars endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/projects/{id}/env [get]
 func (h *ProjectEnvHandler) GetVars(c echo.Context) error {
 	projectID := c.Param("id")
 	if projectID == "" {
@@ -134,6 +181,13 @@ func (h *ProjectEnvHandler) GetVars(c echo.Context) error {
 	return c.JSON(http.StatusOK, vars)
 }
 
+// @Summary SetVars endpoint
+// @Description SetVars endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/projects/{id}/env [put]
 func (h *ProjectEnvHandler) SetVars(c echo.Context) error {
 	projectID := c.Param("id")
 	if projectID == "" {

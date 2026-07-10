@@ -17,6 +17,13 @@ func NewProjectSettingsHandler(s *services.ProjectSettingsService) *ProjectSetti
 	return &ProjectSettingsHandler{settingsService: s}
 }
 
+// @Summary ListWebhooks endpoint
+// @Description ListWebhooks endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param projectId path string true "projectId"
+// @Router /api/projects/{projectId}/webhooks [get]
 func (h *ProjectSettingsHandler) ListWebhooks(c echo.Context) error {
 	projectID := c.Param("projectId")
 	if projectID == "" {
@@ -29,6 +36,13 @@ func (h *ProjectSettingsHandler) ListWebhooks(c echo.Context) error {
 	return c.JSON(http.StatusOK, list)
 }
 
+// @Summary CreateWebhook endpoint
+// @Description CreateWebhook endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param projectId path string true "projectId"
+// @Router /api/projects/{projectId}/webhooks [post]
 func (h *ProjectSettingsHandler) CreateWebhook(c echo.Context) error {
 	projectID := c.Param("projectId")
 	if projectID == "" {
@@ -46,6 +60,14 @@ func (h *ProjectSettingsHandler) CreateWebhook(c echo.Context) error {
 	return c.JSON(http.StatusCreated, created)
 }
 
+// @Summary DeleteWebhook endpoint
+// @Description DeleteWebhook endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param projectId path string true "projectId"
+// @Param id path string true "id"
+// @Router /api/projects/{projectId}/webhooks/{id} [delete]
 func (h *ProjectSettingsHandler) DeleteWebhook(c echo.Context) error {
 	projectID := c.Param("projectId")
 	id := c.Param("id")
@@ -58,6 +80,13 @@ func (h *ProjectSettingsHandler) DeleteWebhook(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// @Summary ListTokens endpoint
+// @Description ListTokens endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param projectId path string true "projectId"
+// @Router /api/projects/{projectId}/tokens [get]
 func (h *ProjectSettingsHandler) ListTokens(c echo.Context) error {
 	projectID := c.Param("projectId")
 	if projectID == "" {
@@ -70,6 +99,13 @@ func (h *ProjectSettingsHandler) ListTokens(c echo.Context) error {
 	return c.JSON(http.StatusOK, list)
 }
 
+// @Summary CreateToken endpoint
+// @Description CreateToken endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param projectId path string true "projectId"
+// @Router /api/projects/{projectId}/tokens [post]
 func (h *ProjectSettingsHandler) CreateToken(c echo.Context) error {
 	projectID := c.Param("projectId")
 	if projectID == "" {
@@ -102,6 +138,14 @@ func (h *ProjectSettingsHandler) CreateToken(c echo.Context) error {
 	})
 }
 
+// @Summary DeleteToken endpoint
+// @Description DeleteToken endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param projectId path string true "projectId"
+// @Param id path string true "id"
+// @Router /api/projects/{projectId}/tokens/{id} [delete]
 func (h *ProjectSettingsHandler) DeleteToken(c echo.Context) error {
 	projectID := c.Param("projectId")
 	id := c.Param("id")
@@ -114,6 +158,13 @@ func (h *ProjectSettingsHandler) DeleteToken(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// @Summary ListMembers endpoint
+// @Description ListMembers endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/teams/{id}/members [get]
 func (h *ProjectSettingsHandler) ListMembers(c echo.Context) error {
 	projectID := c.Param("projectId")
 	if projectID == "" {
@@ -126,6 +177,13 @@ func (h *ProjectSettingsHandler) ListMembers(c echo.Context) error {
 	return c.JSON(http.StatusOK, list)
 }
 
+// @Summary AddMember endpoint
+// @Description AddMember endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param projectId path string true "projectId"
+// @Router /api/projects/{projectId}/members [post]
 func (h *ProjectSettingsHandler) AddMember(c echo.Context) error {
 	projectID := c.Param("projectId")
 	if projectID == "" {
@@ -143,6 +201,14 @@ func (h *ProjectSettingsHandler) AddMember(c echo.Context) error {
 	return c.JSON(http.StatusCreated, added)
 }
 
+// @Summary RemoveMember endpoint
+// @Description RemoveMember endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Param userId path string true "userId"
+// @Router /api/teams/{id}/members/{userId} [delete]
 func (h *ProjectSettingsHandler) RemoveMember(c echo.Context) error {
 	projectID := c.Param("projectId")
 	id := c.Param("id")

@@ -17,6 +17,13 @@ func NewAISettingsHandler(s *services.AISettingsService) *AISettingsHandler {
 	return &AISettingsHandler{aiService: s}
 }
 
+// @Summary Get endpoint
+// @Description Get endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param teamId path string true "teamId"
+// @Router /api/teams/{teamId}/ai_settings [get]
 func (h *AISettingsHandler) Get(c echo.Context) error {
 	teamID := c.Param("teamId")
 	if teamID == "" {
@@ -33,6 +40,13 @@ func (h *AISettingsHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, settings)
 }
 
+// @Summary Save endpoint
+// @Description Save endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param teamId path string true "teamId"
+// @Router /api/teams/{teamId}/ai_settings [put]
 func (h *AISettingsHandler) Save(c echo.Context) error {
 	teamID := c.Param("teamId")
 	if teamID == "" {

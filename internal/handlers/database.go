@@ -17,6 +17,12 @@ func NewDatabaseHandler(s *services.DatabaseService) *DatabaseHandler {
 	return &DatabaseHandler{databaseService: s}
 }
 
+// @Summary ListDatabases endpoint
+// @Description ListDatabases endpoint
+// @Tags Databases
+// @Accept json
+// @Produce json
+// @Router /api/databases [get]
 func (h *DatabaseHandler) ListDatabases(c echo.Context) error {
 	databases, err := h.databaseService.ListDatabases(c.Request().Context())
 	if err != nil {
@@ -28,6 +34,12 @@ func (h *DatabaseHandler) ListDatabases(c echo.Context) error {
 	return c.JSON(http.StatusOK, databases)
 }
 
+// @Summary CreateDatabase endpoint
+// @Description CreateDatabase endpoint
+// @Tags Databases
+// @Accept json
+// @Produce json
+// @Router /api/databases [post]
 func (h *DatabaseHandler) CreateDatabase(c echo.Context) error {
 	var req models.CreateDatabaseRequest
 	if err := c.Bind(&req); err != nil {
@@ -40,6 +52,13 @@ func (h *DatabaseHandler) CreateDatabase(c echo.Context) error {
 	return c.JSON(http.StatusCreated, db)
 }
 
+// @Summary GetDatabase endpoint
+// @Description GetDatabase endpoint
+// @Tags Databases
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/databases/{id} [get]
 func (h *DatabaseHandler) GetDatabase(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -52,6 +71,13 @@ func (h *DatabaseHandler) GetDatabase(c echo.Context) error {
 	return c.JSON(http.StatusOK, db)
 }
 
+// @Summary DeleteDatabase endpoint
+// @Description DeleteDatabase endpoint
+// @Tags Databases
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/databases/{id} [delete]
 func (h *DatabaseHandler) DeleteDatabase(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -63,6 +89,13 @@ func (h *DatabaseHandler) DeleteDatabase(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
 }
 
+// @Summary StartDatabase endpoint
+// @Description StartDatabase endpoint
+// @Tags Databases
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/databases/{id}/start [post]
 func (h *DatabaseHandler) StartDatabase(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -75,6 +108,13 @@ func (h *DatabaseHandler) StartDatabase(c echo.Context) error {
 	return c.JSON(http.StatusOK, db)
 }
 
+// @Summary StopDatabase endpoint
+// @Description StopDatabase endpoint
+// @Tags Databases
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/databases/{id}/stop [post]
 func (h *DatabaseHandler) StopDatabase(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -86,6 +126,13 @@ func (h *DatabaseHandler) StopDatabase(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"status": "stopped"})
 }
 
+// @Summary QueryDatabase endpoint
+// @Description QueryDatabase endpoint
+// @Tags Databases
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/databases/{id}/query [post]
 func (h *DatabaseHandler) QueryDatabase(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {

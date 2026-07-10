@@ -17,6 +17,12 @@ func NewWorkspaceHandler(s *services.WorkspaceService) *WorkspaceHandler {
 	return &WorkspaceHandler{workspaceService: s}
 }
 
+// @Summary List endpoint
+// @Description List endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Router /api/workspaces [get]
 func (h *WorkspaceHandler) List(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {
@@ -29,6 +35,12 @@ func (h *WorkspaceHandler) List(c echo.Context) error {
 	return c.JSON(http.StatusOK, wsList)
 }
 
+// @Summary Create endpoint
+// @Description Create endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Router /api/workspaces [post]
 func (h *WorkspaceHandler) Create(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {
@@ -47,6 +59,13 @@ func (h *WorkspaceHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, ws)
 }
 
+// @Summary Get endpoint
+// @Description Get endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param teamId path string true "teamId"
+// @Router /api/teams/{teamId}/ai_settings [get]
 func (h *WorkspaceHandler) Get(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -59,6 +78,13 @@ func (h *WorkspaceHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, ws)
 }
 
+// @Summary Update endpoint
+// @Description Update endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/workspaces/{id} [put]
 func (h *WorkspaceHandler) Update(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -75,6 +101,13 @@ func (h *WorkspaceHandler) Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, ws)
 }
 
+// @Summary Delete endpoint
+// @Description Delete endpoint
+// @Tags Workspaces
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/workspaces/{id} [delete]
 func (h *WorkspaceHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
 	userID := ExtractUserID(c)
@@ -87,6 +120,13 @@ func (h *WorkspaceHandler) Delete(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// @Summary ListTrustedDomains endpoint
+// @Description ListTrustedDomains endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param teamId path string true "teamId"
+// @Router /api/teams/{teamId}/trusted-domains [get]
 func (h *WorkspaceHandler) ListTrustedDomains(c echo.Context) error {
 	teamID := c.Param("teamId")
 	if teamID == "" {
@@ -99,6 +139,13 @@ func (h *WorkspaceHandler) ListTrustedDomains(c echo.Context) error {
 	return c.JSON(http.StatusOK, domains)
 }
 
+// @Summary CreateTrustedDomain endpoint
+// @Description CreateTrustedDomain endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param teamId path string true "teamId"
+// @Router /api/teams/{teamId}/trusted-domains [post]
 func (h *WorkspaceHandler) CreateTrustedDomain(c echo.Context) error {
 	teamID := c.Param("teamId")
 	if teamID == "" {
@@ -117,6 +164,13 @@ func (h *WorkspaceHandler) CreateTrustedDomain(c echo.Context) error {
 	return c.JSON(http.StatusCreated, td)
 }
 
+// @Summary DeleteTrustedDomain endpoint
+// @Description DeleteTrustedDomain endpoint
+// @Tags Trusted-domains
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/trusted-domains/{id} [delete]
 func (h *WorkspaceHandler) DeleteTrustedDomain(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -128,6 +182,13 @@ func (h *WorkspaceHandler) DeleteTrustedDomain(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// @Summary ListSSHKeys endpoint
+// @Description ListSSHKeys endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param teamId path string true "teamId"
+// @Router /api/teams/{teamId}/ssh-keys [get]
 func (h *WorkspaceHandler) ListSSHKeys(c echo.Context) error {
 	teamID := c.Param("teamId")
 	if teamID == "" {
@@ -140,6 +201,13 @@ func (h *WorkspaceHandler) ListSSHKeys(c echo.Context) error {
 	return c.JSON(http.StatusOK, keys)
 }
 
+// @Summary CreateSSHKey endpoint
+// @Description CreateSSHKey endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param teamId path string true "teamId"
+// @Router /api/teams/{teamId}/ssh-keys [post]
 func (h *WorkspaceHandler) CreateSSHKey(c echo.Context) error {
 	teamID := c.Param("teamId")
 	if teamID == "" {
@@ -159,6 +227,13 @@ func (h *WorkspaceHandler) CreateSSHKey(c echo.Context) error {
 	return c.JSON(http.StatusCreated, key)
 }
 
+// @Summary DeleteSSHKey endpoint
+// @Description DeleteSSHKey endpoint
+// @Tags Ssh-keys
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/ssh-keys/{id} [delete]
 func (h *WorkspaceHandler) DeleteSSHKey(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -170,6 +245,13 @@ func (h *WorkspaceHandler) DeleteSSHKey(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// @Summary ListAuditLogs endpoint
+// @Description ListAuditLogs endpoint
+// @Tags Teams
+// @Accept json
+// @Produce json
+// @Param teamId path string true "teamId"
+// @Router /api/teams/{teamId}/audit-logs [get]
 func (h *WorkspaceHandler) ListAuditLogs(c echo.Context) error {
 	teamID := c.Param("teamId")
 	if teamID == "" {

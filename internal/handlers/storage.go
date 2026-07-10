@@ -17,6 +17,12 @@ func NewStorageHandler(s *services.StorageService) *StorageHandler {
 	return &StorageHandler{storageService: s}
 }
 
+// @Summary ListStorage endpoint
+// @Description ListStorage endpoint
+// @Tags Storage
+// @Accept json
+// @Produce json
+// @Router /api/storage [get]
 func (h *StorageHandler) ListStorage(c echo.Context) error {
 	storages, err := h.storageService.ListStorage(c.Request().Context())
 	if err != nil {
@@ -28,6 +34,12 @@ func (h *StorageHandler) ListStorage(c echo.Context) error {
 	return c.JSON(http.StatusOK, storages)
 }
 
+// @Summary CreateStorage endpoint
+// @Description CreateStorage endpoint
+// @Tags Storage
+// @Accept json
+// @Produce json
+// @Router /api/storage [post]
 func (h *StorageHandler) CreateStorage(c echo.Context) error {
 	var st models.Storage
 	if err := c.Bind(&st); err != nil {
@@ -40,6 +52,13 @@ func (h *StorageHandler) CreateStorage(c echo.Context) error {
 	return c.JSON(http.StatusCreated, created)
 }
 
+// @Summary GetStorage endpoint
+// @Description GetStorage endpoint
+// @Tags Storage
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/storage/{id} [get]
 func (h *StorageHandler) GetStorage(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -52,6 +71,13 @@ func (h *StorageHandler) GetStorage(c echo.Context) error {
 	return c.JSON(http.StatusOK, st)
 }
 
+// @Summary DeleteStorage endpoint
+// @Description DeleteStorage endpoint
+// @Tags Storage
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/storage/{id} [delete]
 func (h *StorageHandler) DeleteStorage(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -63,6 +89,13 @@ func (h *StorageHandler) DeleteStorage(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
 }
 
+// @Summary StartStorage endpoint
+// @Description StartStorage endpoint
+// @Tags Storage
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/storage/{id}/start [post]
 func (h *StorageHandler) StartStorage(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -75,6 +108,13 @@ func (h *StorageHandler) StartStorage(c echo.Context) error {
 	return c.JSON(http.StatusOK, st)
 }
 
+// @Summary StopStorage endpoint
+// @Description StopStorage endpoint
+// @Tags Storage
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/storage/{id}/stop [post]
 func (h *StorageHandler) StopStorage(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {

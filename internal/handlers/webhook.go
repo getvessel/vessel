@@ -39,6 +39,13 @@ func NewWebhookHandler(
 	}
 }
 
+// @Summary HandleProjectWebhook endpoint
+// @Description HandleProjectWebhook endpoint
+// @Tags Webhooks
+// @Accept json
+// @Produce json
+// @Param projectId path string true "projectId"
+// @Router /api/webhooks/git/{projectId} [post]
 func (h *WebhookHandler) HandleProjectWebhook(c echo.Context) error {
 	projectID := c.Param("projectId")
 	if projectID == "" {
@@ -59,6 +66,13 @@ func (h *WebhookHandler) HandleProjectWebhook(c echo.Context) error {
 	})
 }
 
+// @Summary HandleServiceWebhook endpoint
+// @Description HandleServiceWebhook endpoint
+// @Tags Webhooks
+// @Accept json
+// @Produce json
+// @Param serviceId path string true "serviceId"
+// @Router /api/webhooks/git/services/{serviceId} [post]
 func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	if serviceID == "" {
@@ -99,6 +113,13 @@ func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 	})
 }
 
+// @Summary HandleGitHubWebhook endpoint
+// @Description HandleGitHubWebhook endpoint
+// @Tags Webhooks
+// @Accept json
+// @Produce json
+// @Param serviceId path string true "serviceId"
+// @Router /api/webhooks/github/services/{serviceId} [post]
 func (h *WebhookHandler) HandleGitHubWebhook(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	if serviceID == "" {

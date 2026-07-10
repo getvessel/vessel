@@ -17,6 +17,12 @@ func NewProjectHandler(s *services.ProjectService) *ProjectHandler {
 	return &ProjectHandler{projectService: s}
 }
 
+// @Summary ListProjects endpoint
+// @Description ListProjects endpoint
+// @Tags Vercel
+// @Accept json
+// @Produce json
+// @Router /api/vercel/projects [get]
 func (h *ProjectHandler) ListProjects(c echo.Context) error {
 	projects, err := h.projectService.ListProjects(c.Request().Context())
 	if err != nil {
@@ -25,6 +31,12 @@ func (h *ProjectHandler) ListProjects(c echo.Context) error {
 	return c.JSON(http.StatusOK, projects)
 }
 
+// @Summary CreateProject endpoint
+// @Description CreateProject endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Router /api/projects [post]
 func (h *ProjectHandler) CreateProject(c echo.Context) error {
 	var req models.CreateProjectRequest
 	if err := c.Bind(&req); err != nil {
@@ -37,6 +49,13 @@ func (h *ProjectHandler) CreateProject(c echo.Context) error {
 	return c.JSON(http.StatusCreated, p)
 }
 
+// @Summary GetProject endpoint
+// @Description GetProject endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/projects/{id} [get]
 func (h *ProjectHandler) GetProject(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -49,6 +68,13 @@ func (h *ProjectHandler) GetProject(c echo.Context) error {
 	return c.JSON(http.StatusOK, p)
 }
 
+// @Summary DeleteProject endpoint
+// @Description DeleteProject endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/projects/{id} [delete]
 func (h *ProjectHandler) DeleteProject(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {

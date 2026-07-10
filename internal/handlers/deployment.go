@@ -23,6 +23,13 @@ func NewDeploymentHandler(ds *services.DeploymentService, as *services.AppServic
 	}
 }
 
+// @Summary ListServiceDeployments endpoint
+// @Description ListServiceDeployments endpoint
+// @Tags Services
+// @Accept json
+// @Produce json
+// @Param serviceId path string true "serviceId"
+// @Router /api/services/{serviceId}/deployments [get]
 func (h *DeploymentHandler) ListServiceDeployments(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	if serviceID == "" {
@@ -35,6 +42,13 @@ func (h *DeploymentHandler) ListServiceDeployments(c echo.Context) error {
 	return c.JSON(http.StatusOK, deps)
 }
 
+// @Summary Trigger endpoint
+// @Description Trigger endpoint
+// @Tags Backups
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/backups/{id}/trigger [post]
 func (h *DeploymentHandler) Trigger(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	if serviceID == "" {
@@ -60,6 +74,13 @@ func (h *DeploymentHandler) Trigger(c echo.Context) error {
 	return c.JSON(http.StatusAccepted, created)
 }
 
+// @Summary Rollback endpoint
+// @Description Rollback endpoint
+// @Tags Deployments
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/deployments/{id}/rollback [post]
 func (h *DeploymentHandler) Rollback(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -87,6 +108,13 @@ func (h *DeploymentHandler) Rollback(c echo.Context) error {
 	return c.JSON(http.StatusAccepted, created)
 }
 
+// @Summary GetLogs endpoint
+// @Description GetLogs endpoint
+// @Tags Deployments
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/deployments/{id}/logs [get]
 func (h *DeploymentHandler) GetLogs(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -103,6 +131,13 @@ func (h *DeploymentHandler) GetLogs(c echo.Context) error {
 	})
 }
 
+// @Summary GetMetrics endpoint
+// @Description GetMetrics endpoint
+// @Tags Services
+// @Accept json
+// @Produce json
+// @Param serviceId path string true "serviceId"
+// @Router /api/services/{serviceId}/metrics [get]
 func (h *DeploymentHandler) GetMetrics(c echo.Context) error {
 	now := time.Now().UTC()
 	metrics := []map[string]any{
@@ -115,6 +150,13 @@ func (h *DeploymentHandler) GetMetrics(c echo.Context) error {
 	return c.JSON(http.StatusOK, metrics)
 }
 
+// @Summary DeployProject endpoint
+// @Description DeployProject endpoint
+// @Tags Projects
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /api/projects/{id}/deploy [post]
 func (h *DeploymentHandler) DeployProject(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
