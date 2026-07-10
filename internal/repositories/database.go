@@ -55,13 +55,13 @@ func (r *DatabaseSQLiteRepository) Create(_ context.Context, db *models.Database
 		return err
 	}
 	_, err = r.db.Exec(`INSERT INTO databases (
-		id, project_id, environment_id, name, engine, version, port, username, encrypted_password, database_name, volume_path, container_id, status, internal_dns, external_dns, created_at, updated_at
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		db.ID, db.ProjectID, db.EnvironmentID, db.Name, db.Engine, db.Version, db.Port, db.Username, encryptedPassword, db.DatabaseName, db.VolumePath, db.ContainerID, db.Status, db.InternalDNS, db.ExternalDNS, db.CreatedAt, db.UpdatedAt)
+		id, project_id, environment_id, name, engine, version, port, username, encrypted_password, database_name, volume_path, container_id, status, internal_dns, external_dns, custom_args, created_at, updated_at
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		db.ID, db.ProjectID, db.EnvironmentID, db.Name, db.Engine, db.Version, db.Port, db.Username, encryptedPassword, db.DatabaseName, db.VolumePath, db.ContainerID, db.Status, db.InternalDNS, db.ExternalDNS, db.CustomArgs, db.CreatedAt, db.UpdatedAt)
 	return err
 }
 
-const listDatabaseQuery = `SELECT id, COALESCE(project_id, ''), COALESCE(environment_id, ''), name, engine, version, port, username, encrypted_password, database_name, volume_path, COALESCE(container_id, ''), status, COALESCE(internal_dns, ''), COALESCE(external_dns, ''), created_at, updated_at FROM databases`
+const listDatabaseQuery = `SELECT id, COALESCE(project_id, ''), COALESCE(environment_id, ''), name, engine, version, port, username, encrypted_password, database_name, volume_path, COALESCE(container_id, ''), status, COALESCE(internal_dns, ''), COALESCE(external_dns, ''), COALESCE(custom_args, ''), created_at, updated_at FROM databases`
 
 func scanDatabase(scanner interface {
 	Scan(dest ...any) error
@@ -70,7 +70,7 @@ func scanDatabase(scanner interface {
 	return scanner.Scan(
 		&d.ID, &d.ProjectID, &d.EnvironmentID, &d.Name, &d.Engine, &d.Version,
 		&d.Port, &d.Username, encryptedPassword, &d.DatabaseName, &d.VolumePath,
-		&d.ContainerID, &d.Status, &d.InternalDNS, &d.ExternalDNS, &d.CreatedAt, &d.UpdatedAt,
+		&d.ContainerID, &d.Status, &d.InternalDNS, &d.ExternalDNS, &d.CustomArgs, &d.CreatedAt, &d.UpdatedAt,
 	)
 }
 
@@ -153,8 +153,8 @@ func (r *DatabaseSQLiteRepository) Update(_ context.Context, db *models.Database
 	if err != nil {
 		return err
 	}
-	_, err = r.db.Exec(`UPDATE databases SET project_id = ?, environment_id = ?, name = ?, engine = ?, version = ?, port = ?, username = ?, encrypted_password = ?, database_name = ?, volume_path = ?, container_id = ?, status = ?, internal_dns = ?, external_dns = ?, updated_at = ? WHERE id = ?`,
-		db.ProjectID, db.EnvironmentID, db.Name, db.Engine, db.Version, db.Port, db.Username, encryptedPassword, db.DatabaseName, db.VolumePath, db.ContainerID, db.Status, db.InternalDNS, db.ExternalDNS, db.UpdatedAt, db.ID)
+	_, err = r.db.Exec(`UPDATE databases SET project_id = ?, environment_id = ?, name = ?, engine = ?, version = ?, port = ?, username = ?, encrypted_password = ?, database_name = ?, volume_path = ?, container_id = ?, status = ?, internal_dns = ?, external_dns = ?, custom_args = ?, updated_at = ? WHERE id = ?`,
+		db.ProjectID, db.EnvironmentID, db.Name, db.Engine, db.Version, db.Port, db.Username, encryptedPassword, db.DatabaseName, db.VolumePath, db.ContainerID, db.Status, db.InternalDNS, db.ExternalDNS, db.CustomArgs, db.UpdatedAt, db.ID)
 	return err
 }
 

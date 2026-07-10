@@ -131,6 +131,6 @@ func (d *DispatcherService) sendGlobalTest(event *models.NotificationEvent) erro
 			return d.sendWebhook(settings.GenericWebhookURL, event)
 		}
 	}
-	
+
 	return fmt.Errorf("provider not enabled or configured")
 }

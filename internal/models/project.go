@@ -32,7 +32,6 @@ type ServerlessFunctionCode struct {
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
-
 type EnvironmentConfig struct {
 	ID        string    `json:"id"`
 	ProjectID string    `json:"projectId"`

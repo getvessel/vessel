@@ -79,12 +79,23 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 	}
 
 	// Resolve Command overrides
-	for _, c := range tmplService.Command {
+	for i := 0; i < len(tmplService.Command); i++ {
+		c := tmplService.Command[i]
+		if c == "--requirepass" && dbConfig.Password == "" {
+			// Skip both --requirepass and the password placeholder if password is not set
+			i++
+			continue
+		}
 		resolved := strings.ReplaceAll(c, "${db.password}", dbConfig.Password)
 		resolved = strings.ReplaceAll(resolved, "${db.username}", dbConfig.Username)
 		if resolved != "" {
 			cmd = append(cmd, resolved)
 		}
+	}
+
+	if dbConfig.CustomArgs != "" {
+		args := strings.Fields(dbConfig.CustomArgs)
+		cmd = append(cmd, args...)
 	}
 
 	// Mount path (assume first volume defined in template)

@@ -18,6 +18,7 @@ type Database struct {
 	Status        string    `json:"status"`
 	InternalDNS   string    `json:"internalDns"`
 	ExternalDNS   string    `json:"externalDns"`
+	CustomArgs    string    `json:"customArgs"`
 	CreatedAt     time.Time `json:"createdAt"`
 	UpdatedAt     time.Time `json:"updatedAt"`
 }
@@ -33,6 +34,7 @@ type CreateDatabaseRequest struct {
 	Password      string `json:"password"`
 	DatabaseName  string `json:"databaseName"`
 	VolumePath    string `json:"volumePath"`
+	CustomArgs    string `json:"customArgs"`
 }
 
 type Storage struct {

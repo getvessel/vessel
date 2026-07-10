@@ -92,6 +92,7 @@ func (s *DatabaseService) CreateDatabaseFromRequest(ctx context.Context, req *mo
 		Password:      req.Password,
 		DatabaseName:  req.DatabaseName,
 		VolumePath:    req.VolumePath,
+		CustomArgs:    req.CustomArgs,
 		Status:        "stopped",
 	}
 	return s.CreateDatabase(ctx, db)

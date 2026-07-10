@@ -75,6 +75,7 @@ func RunMigrations(db *sql.DB) error {
 			status TEXT DEFAULT 'stopped',
 			internal_dns TEXT,
 			external_dns TEXT,
+			custom_args TEXT DEFAULT '',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		,
