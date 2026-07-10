@@ -9,8 +9,8 @@
 - [ ] **AI-Powered Deployment Diagnostics Endpoint**: Backend service to securely call LLM APIs (OpenAI/Anthropic/Gemini) with deployment logs and stream the explanation.
 - [ ] **Serverless Functions Engine**: Endpoints to save function code snippets and a backend builder to package and run serverless functions as containers.
 
-
   **How `deployer.go`, `container_manager.go` & `stats_monitor.go` complete the deployment:**
+
 - [ ] **Enterprise PaaS Core Services & Advanced API (`internal/api/` & `internal/engine/`)**:
   - **Email (SMTP / Resend)**: SMTP host, port, user, password; or Resend API key. Send templated emails for team/project member invitations (with copy-link fallback) and deployment success/failure alerts. Commercial cloud will use AWS SES instead.
   - **Slack**: Enabled toggle, webhook URL, send test notification.
@@ -27,6 +27,7 @@
   - `internal/actions/` — single-purpose CQRS operations (create project, invite member, rollback, etc.)
   - Keep `internal/engine/` for Docker-specific orchestration (builders, container manager, deployer coordinator, stats monitor)
   - Keep `internal/services/` for remaining cross-cutting business logic (token service, service linker)
+
 ---
 
 ## 💻 Phase 3: Control Panel Dashboard (`dashboard/`)
@@ -38,14 +39,13 @@
 - [ ] **Shared Confirmation Dialogs**: Robust shared components to prevent accidental deletions of services, databases, domains, and env vars.
 - [ ] **Guard Active Deployments**: UI logic to disable system updates or conflicting actions while an active deployment is running.
 
-
 - [ ] **Navigation & Shell Layout**:
   - Responsive dark-mode glassmorphism sidebar
- (`Dashboard`, `Projects`, `Databases & Storage`, `Jobs & Backups`, `Teams`, `Settings`).
+    (`Dashboard`, `Projects`, `Databases & Storage`, `Jobs & Backups`, `Teams`, `Settings`).
   - System health indicator header (`CPU %`, `RAM %`, `Docker Status`, `Upgrade Available banner`).
 - [ ] **Project Management & Deployment Pages**:
   - "New Project" Wizard
- (`Connect GitHub/GitLab OAuth/PAT`, `Select from authenticated public/private repositories` OR `paste public Git URL` -> `Select Branch` -> `Configure Build Port`).
+    (`Connect GitHub/GitLab OAuth/PAT`, `Select from authenticated public/private repositories` OR `paste public Git URL` -> `Select Branch` -> `Configure Build Port`).
   - Project Details View with Tab Navigation (`Overview`, `Live Logs`, `Environment Variables`, `Settings`).
   - **Pull Request (PR) Previews Tab (`/projects/:id/previews`)**: Monitor active ephemeral PR preview environments, inspect Git commit links, view isolated logs, and trigger 1-click manual teardown.
   - **Service Build Strategy Configurator**: Dropdown in Service Settings to select build engine (`Dockerfile`, `Nixpacks`, `Buildpacks`, or `Railpack`) and toggle BuildKit layer caching (`--cache-from`).
