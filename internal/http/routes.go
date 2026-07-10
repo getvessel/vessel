@@ -5,10 +5,16 @@ import (
 	"path/filepath"
 
 	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
+	_ "vessel.dev/vessel/docs"
 )
 
 func (s *Server) registerRoutes() {
 	apiGroup := s.router.Group("/api")
+
+	// Swagger UI
+	apiGroup.GET("/swagger/*", echoSwagger.WrapHandler)
+
 	authGroup := apiGroup.Group("")
 	authGroup.Use(s.authGuard.RequireAuth())
 	apiGroup.POST("/auth/signup", s.authHandler.Register)
