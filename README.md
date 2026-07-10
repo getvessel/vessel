@@ -40,8 +40,8 @@ vessel/
 ├── dashboard/            # 💻 Self-hosted dashboard — served by daemon binary
 ├── web/                  # 🌐 Marketing site — `vessel.dev`
 ├── docs/                 # 📖 Documentation — `docs.vessel.dev`
-├── bootstrap/            # 📦 One-line install server (`install.sh`, `upgrade.sh`)
-├── scripts/              # 🛠️ System automation (`upgrade.sh`, `backup.sh`, `restore.sh`)
+├── bootstrap/            # 📦 One-line install server (`install.sh`)
+├── scripts/              # 🛠️ System automation (`upgrade.sh`, `backup.sh`, `restore.sh`, `downgrade.sh`)
 ├── Dockerfile            # Multi-stage container build uniting `dashboard/` and `vesseld`
 ├── docker-compose.yml    # Production/dev container stack with Docker socket mounting
 └── Makefile              # Build, test, lint, and development automation commands
