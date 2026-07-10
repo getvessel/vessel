@@ -5,6 +5,8 @@ import (
 	"net"
 	"os"
 	"strconv"
+
+	"vessel.dev/vessel/internal/utils"
 )
 
 // GetAvailablePort finds an open port on the host within the configured bounds.
@@ -40,5 +42,5 @@ func GetAvailablePort() (int, error) {
 		}
 	}
 
-	return 0, fmt.Errorf("no available ports found between %d and %d", start, end)
+	return 0, &utils.NonReportableError{Message: fmt.Sprintf("no available ports found between %d and %d", start, end)}
 }

@@ -10,6 +10,8 @@ services:
       - "8080:8080" # API and Dashboard GUI
       - "80:80" # Automatic reverse proxy HTTP
       - "443:443" # Automatic reverse proxy HTTPS / TLS
+    env_file:
+      - .env
     environment:
       - PORT=8080
       - VESSEL_DATA_DIR=/var/www/vessel/data

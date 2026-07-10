@@ -31,9 +31,18 @@ fi
 # --- Directory setup ---
 mkdir -p "$VESSEL_DIR"/data/{backups,caddy,builds}
 
-# --- Pull compose file ---
-echo "⬇️  Fetching docker-compose.yml..."
+# --- Pull files ---
+echo "⬇️  Fetching configuration files..."
 curl -fsSL "$COMPOSE_URL" -o "$VESSEL_DIR/docker-compose.yml"
+
+if [ ! -f "$VESSEL_DIR/.env" ]; then
+  echo "🔑 Generating .env file..."
+  ENV_URL="https://raw.githubusercontent.com/solomonolatunji/vessel/main/.env.example"
+  curl -fsSL "$ENV_URL" -o "$VESSEL_DIR/.env"
+  # Generate a random 32-character string for JWT secret
+  JWT_SECRET=$(head -c 24 /dev/urandom | base64)
+  sed -i "s/VESSEL_JWT_SECRET=.*/VESSEL_JWT_SECRET=${JWT_SECRET}/" "$VESSEL_DIR/.env"
+fi
 
 # --- Pull & start ---
 echo "🐳 Pulling vessel:v${RELEASE}..."
