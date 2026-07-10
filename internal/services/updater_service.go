@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 	"sync"
 	"time"
@@ -171,11 +172,26 @@ func (u *UpdaterService) DeployUpdate(ctx context.Context) error {
 	if settingsCfg.LatestVersion == "" || settingsCfg.LatestVersion == settingsCfg.CurrentVersion {
 		return nil
 	}
+	
+	targetVersion := settingsCfg.LatestVersion
+
 	settingsCfg.CurrentVersion = settingsCfg.LatestVersion
 	settingsCfg.LastUpdateCheck = time.Now().Format(time.RFC3339)
 	if err := u.repo.UpdateServerSettings(ctx, settingsCfg); err != nil {
 		return fmt.Errorf("failed finalizing update deployment: %w", err)
 	}
+
+	// Trigger the shell script asynchronously. 
+	// The container will be recreated, killing this process mid-execution, which is expected.
+	go func() {
+		scriptPath := "/vessel/scripts/upgrade.sh"
+		if _, err := os.Stat(scriptPath); os.IsNotExist(err) {
+			scriptPath = "./scripts/upgrade.sh"
+		}
+		cmd := exec.Command("bash", scriptPath, targetVersion)
+		_ = cmd.Start()
+	}()
+
 	return nil
 }
 
