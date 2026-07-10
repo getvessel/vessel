@@ -1,6 +1,7 @@
 package http
 
 import (
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -13,7 +14,10 @@ func (s *Server) registerRoutes() {
 	apiGroup := s.router.Group("/api")
 
 	// Swagger UI
-	apiGroup.GET("/swagger/*", echoSwagger.WrapHandler)
+	s.router.GET("/docs", func(c echo.Context) error {
+		return c.Redirect(http.StatusMovedPermanently, "/docs/index.html")
+	})
+	s.router.GET("/docs/*", echoSwagger.WrapHandler)
 
 	authGroup := apiGroup.Group("")
 	authGroup.Use(s.authGuard.RequireAuth())
