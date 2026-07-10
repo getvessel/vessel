@@ -101,8 +101,8 @@
   - `internal/actions/` — single-purpose CQRS operations (create project, invite member, rollback, etc.)
   - Keep `internal/engine/` for Docker-specific orchestration (builders, container manager, deployer coordinator, stats monitor)
   - Keep `internal/services/` for remaining cross-cutting business logic (token service, service linker)
-- [ ] **`internal/events/` + `internal/listeners/`**: Lightweight pub/sub bus for decoupled side effects (e.g., `deployment.completed` → notify Slack, update audit log, trigger webhook; `backup.failed` → send alert, retry).
-- [ ] **Move email templates to `internal/views/emails/`**: Use `//go:embed` + `html/template` instead of hardcoded HTML strings in `internal/notifier/`. Equivalent to Laravel's `resources/views/`.
+- [x] **`internal/events/` + `internal/listeners/`**: Lightweight pub/sub bus for decoupled side effects (e.g., `deployment.completed` → notify Slack, update audit log, trigger webhook; `backup.failed` → send alert, retry).
+- [x] **Move email templates to `internal/views/emails/`**: Use `//go:embed` + `html/template` instead of hardcoded HTML strings in `internal/notifier/`. Equivalent to Laravel's `resources/views/`.
 
 ---
 

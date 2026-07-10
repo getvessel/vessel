@@ -13,8 +13,10 @@ import (
 	"vessel.dev/vessel/internal/handlers"
 	"vessel.dev/vessel/internal/middleware"
 	"vessel.dev/vessel/internal/models"
-	"vessel.dev/vessel/internal/notifier"
+	"vessel.dev/vessel/internal/dispatch"
 	"vessel.dev/vessel/internal/proxy"
+	"vessel.dev/vessel/internal/events"
+	"vessel.dev/vessel/internal/listeners"
 	"vessel.dev/vessel/internal/repositories"
 	"vessel.dev/vessel/internal/services"
 	"vessel.dev/vessel/internal/vault"
@@ -29,7 +31,7 @@ type Server struct {
 	authGuard       *middleware.AuthGuard
 	cronManager     *engine.CronManager
 	serviceLinker   *services.ServiceLinker
-	notifierService *notifier.NotifierService
+	dispatcherService *dispatch.DispatcherService
 
 	appServiceHandler      *handlers.AppHandler
 	dbHandler              *handlers.DatabaseHandler
@@ -97,7 +99,10 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 	svcLinker := services.NewServiceLinker(databaseRepo, storageRepo)
 
 	// 2. Services
-	notifierService := notifier.NewNotifierService(notifRepo)
+	dispatcherSvc := dispatch.NewDispatcherService(notifRepo)
+	eventBus := events.NewEventBus()
+	listeners.RegisterAll(eventBus, dispatcherSvc)
+
 	settingsService := services.NewSettingsService(settingsRepo, notifRepo)
 	userService := services.NewUserService(userRepo)
 	tokenService := services.NewTokenService()
@@ -118,7 +123,7 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 	teamService := services.NewTeamService(teamRepo, userRepo)
 	wsService := services.NewWorkspaceService(wsRepo)
 	psService := services.NewProjectSettingsService(psRepo, userRepo)
-	notificationService := services.NewNotificationService(notifRepo, notifierService)
+	notificationService := services.NewNotificationService(notifRepo, dispatcherSvc)
 	deploymentService := services.NewDeploymentService(deploymentRepo, serviceRepo, projectRepo, deployer)
 	prPreviewService := services.NewPRPreviewService(prPreviewRepo, appService, gitService, deployer)
 
@@ -132,15 +137,15 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 	e.Use(echomiddleware.CORS())
 
 	srv := &Server{
-		router:          e,
-		deployer:        deployer,
-		proxyManager:    proxyManager,
-		dockerClient:    dockerClient,
-		tokenService:    tokenService,
-		authGuard:       authGuard,
-		cronManager:     cronMgr,
-		serviceLinker:   svcLinker,
-		notifierService: notifierService,
+		router:            e,
+		deployer:          deployer,
+		proxyManager:      proxyManager,
+		dockerClient:      dockerClient,
+		tokenService:      tokenService,
+		authGuard:         authGuard,
+		cronManager:       cronMgr,
+		serviceLinker:     svcLinker,
+		dispatcherService: dispatcherSvc,
 
 		appServiceHandler:      handlers.NewAppHandler(appService),
 		dbHandler:              handlers.NewDatabaseHandler(dbService),

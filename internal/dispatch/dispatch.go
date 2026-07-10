@@ -1,4 +1,4 @@
-package notifier
+package dispatch
 
 import (
 	"bytes"
@@ -14,33 +14,34 @@ import (
 
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/repositories"
+	"vessel.dev/vessel/internal/views"
 )
 
-type NotifierService struct {
+type DispatcherService struct {
 	repo repositories.NotificationRepository
 }
 
-func NewNotifierService(repo repositories.NotificationRepository) *NotifierService {
-	return &NotifierService{repo: repo}
+func NewDispatcherService(repo repositories.NotificationRepository) *DispatcherService {
+	return &DispatcherService{repo: repo}
 }
 
-func (n *NotifierService) Dispatch(event *models.NotificationEvent) {
+func (d *DispatcherService) Dispatch(event *models.NotificationEvent) {
 	go func() {
-		if err := n.Send(event); err != nil {
-			log.Printf("[Notifier] Failed to dispatch event '%s': %v", event.Title, err)
+		if err := d.Send(event); err != nil {
+			log.Printf("[Dispatcher] Failed to dispatch event '%s': %v", event.Title, err)
 		}
 	}()
 }
 
-func (n *NotifierService) Send(event *models.NotificationEvent) error {
-	integ, err := n.repo.GetIntegration(context.Background())
+func (d *DispatcherService) Send(event *models.NotificationEvent) error {
+	integ, err := d.repo.GetIntegration(context.Background())
 	if err != nil || integ == nil {
 		return fmt.Errorf("could not load notification integrations: %w", err)
 	}
 
 	var pref *models.ProjectNotificationPref
 	if event.ProjectID != "" {
-		p, err := n.repo.GetProjectPref(context.Background(), event.ProjectID)
+		p, err := d.repo.GetProjectPref(context.Background(), event.ProjectID)
 		if err == nil {
 			pref = p
 		}
@@ -48,36 +49,36 @@ func (n *NotifierService) Send(event *models.NotificationEvent) error {
 
 	if pref == nil || pref.EmailEnabled {
 		if integ.SMTPEnabled && integ.SMTPHost != "" {
-			_ = n.sendSMTP(integ, event)
+			_ = d.sendSMTP(integ, event)
 		} else if integ.ResendEnabled && integ.ResendAPIKey != "" {
-			_ = n.sendResend(integ, event)
+			_ = d.sendResend(integ, event)
 		}
 	}
 
 	if (pref == nil || pref.SlackEnabled) && integ.SlackEnabled && integ.SlackWebhookURL != "" {
-		_ = n.sendSlack(integ.SlackWebhookURL, event)
+		_ = d.sendSlack(integ.SlackWebhookURL, event)
 	}
 
 	if (pref == nil || pref.DiscordEnabled) && integ.DiscordEnabled && integ.DiscordWebhookURL != "" {
-		_ = n.sendDiscord(integ.DiscordWebhookURL, integ.DiscordPingEnabled, event)
+		_ = d.sendDiscord(integ.DiscordWebhookURL, integ.DiscordPingEnabled, event)
 	}
 
 	if (pref == nil || pref.TelegramEnabled) && integ.TelegramEnabled && integ.TelegramBotToken != "" && integ.TelegramChatID != "" {
-		_ = n.sendTelegram(integ.TelegramBotToken, integ.TelegramChatID, event)
+		_ = d.sendTelegram(integ.TelegramBotToken, integ.TelegramChatID, event)
 	}
 
 	if (pref == nil || pref.PushoverEnabled) && integ.PushoverEnabled && integ.PushoverUserKey != "" && integ.PushoverAPIToken != "" {
-		_ = n.sendPushover(integ.PushoverUserKey, integ.PushoverAPIToken, event)
+		_ = d.sendPushover(integ.PushoverUserKey, integ.PushoverAPIToken, event)
 	}
 
 	if (pref == nil || pref.WebhookEnabled) && integ.WebhookEnabled && integ.WebhookURL != "" {
-		_ = n.sendWebhook(integ.WebhookURL, event)
+		_ = d.sendWebhook(integ.WebhookURL, event)
 	}
 
 	return nil
 }
 
-func (n *NotifierService) sendSMTP(integ *models.NotificationIntegration, event *models.NotificationEvent) error {
+func (d *DispatcherService) sendSMTP(integ *models.NotificationIntegration, event *models.NotificationEvent) error {
 	var auth smtp.Auth
 	if integ.SMTPUser != "" && integ.SMTPPassword != "" {
 		auth = smtp.PlainAuth("", integ.SMTPUser, integ.SMTPPassword, integ.SMTPHost)
@@ -101,13 +102,18 @@ func (n *NotifierService) sendSMTP(integ *models.NotificationIntegration, event 
 		fromHeader = fmt.Sprintf("%s <%s>", integ.SMTPFromName, fromAddr)
 	}
 
-	msg := []byte(fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: [Vessel %s] %s\r\n\r\n%s\r\n\r\nURL: %s\r\n",
-		fromHeader, toAddr, strings.ToUpper(event.Level), event.Title, event.Message, event.URL))
+	var htmlBody bytes.Buffer
+	if err := views.HTMLTemplates.ExecuteTemplate(&htmlBody, "notification.html", event); err != nil {
+		htmlBody.WriteString(fmt.Sprintf("<p><strong>%s</strong></p><p>%s</p><p><a href=\"%s\">View in Dashboard</a></p>", event.Title, event.Message, event.URL))
+	}
+
+	msg := []byte(fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: [Vessel %s] %s\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n%s",
+		fromHeader, toAddr, strings.ToUpper(event.Level), event.Title, htmlBody.String()))
 
 	return smtp.SendMail(addr, auth, fromAddr, to, msg)
 }
 
-func (n *NotifierService) sendResend(integ *models.NotificationIntegration, event *models.NotificationEvent) error {
+func (d *DispatcherService) sendResend(integ *models.NotificationIntegration, event *models.NotificationEvent) error {
 	fromStr := "Vessel Notifications <alerts@vessel.dev>"
 	if integ.SMTPFromAddress != "" {
 		if integ.SMTPFromName != "" {
@@ -116,11 +122,16 @@ func (n *NotifierService) sendResend(integ *models.NotificationIntegration, even
 			fromStr = integ.SMTPFromAddress
 		}
 	}
+	var htmlBody bytes.Buffer
+	if err := views.HTMLTemplates.ExecuteTemplate(&htmlBody, "notification.html", event); err != nil {
+		htmlBody.WriteString(fmt.Sprintf("<p><strong>%s</strong></p><p>%s</p><p><a href=\"%s\">View in Dashboard</a></p>", event.Title, event.Message, event.URL))
+	}
+
 	payload := map[string]interface{}{
 		"from":    fromStr,
 		"to":      []string{"admin@localhost"},
 		"subject": fmt.Sprintf("[Vessel] %s", event.Title),
-		"html":    fmt.Sprintf("<p><strong>%s</strong></p><p>%s</p><p><a href=\"%s\">View in Dashboard</a></p>", event.Title, event.Message, event.URL),
+		"html":    htmlBody.String(),
 	}
 	body, _ := json.Marshal(payload)
 	req, _ := http.NewRequest("POST", "https://api.resend.com/emails", bytes.NewBuffer(body))
@@ -136,7 +147,7 @@ func (n *NotifierService) sendResend(integ *models.NotificationIntegration, even
 	return nil
 }
 
-func (n *NotifierService) sendSlack(webhookURL string, event *models.NotificationEvent) error {
+func (d *DispatcherService) sendSlack(webhookURL string, event *models.NotificationEvent) error {
 	payload := map[string]string{
 		"text": fmt.Sprintf("🚀 *%s*\n%s\n<%s|View Details>", event.Title, event.Message, event.URL),
 	}
@@ -149,7 +160,7 @@ func (n *NotifierService) sendSlack(webhookURL string, event *models.Notificatio
 	return nil
 }
 
-func (n *NotifierService) sendDiscord(webhookURL string, ping bool, event *models.NotificationEvent) error {
+func (d *DispatcherService) sendDiscord(webhookURL string, ping bool, event *models.NotificationEvent) error {
 	content := fmt.Sprintf("**%s**\n%s\n[View Details](%s)", event.Title, event.Message, event.URL)
 	if ping && event.Level == "error" {
 		content = "@everyone " + content
@@ -164,7 +175,7 @@ func (n *NotifierService) sendDiscord(webhookURL string, ping bool, event *model
 	return nil
 }
 
-func (n *NotifierService) sendTelegram(botToken, chatID string, event *models.NotificationEvent) error {
+func (d *DispatcherService) sendTelegram(botToken, chatID string, event *models.NotificationEvent) error {
 	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", botToken)
 	text := fmt.Sprintf("🛰 *%s*\n%s\n%s", event.Title, event.Message, event.URL)
 	payload := map[string]string{
@@ -181,7 +192,7 @@ func (n *NotifierService) sendTelegram(botToken, chatID string, event *models.No
 	return nil
 }
 
-func (n *NotifierService) sendPushover(userKey, apiToken string, event *models.NotificationEvent) error {
+func (d *DispatcherService) sendPushover(userKey, apiToken string, event *models.NotificationEvent) error {
 	values := url.Values{
 		"token":   {apiToken},
 		"user":    {userKey},
@@ -196,7 +207,7 @@ func (n *NotifierService) sendPushover(userKey, apiToken string, event *models.N
 	return nil
 }
 
-func (n *NotifierService) sendWebhook(webhookURL string, event *models.NotificationEvent) error {
+func (d *DispatcherService) sendWebhook(webhookURL string, event *models.NotificationEvent) error {
 	body, _ := json.Marshal(event)
 	resp, err := http.Post(webhookURL, "application/json", bytes.NewBuffer(body))
 	if err != nil {
