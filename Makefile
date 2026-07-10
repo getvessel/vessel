@@ -2,9 +2,31 @@ SERVICES = dashboard cloud web docs
 BINARY_NAME = vesseld
 BUILD_DIR = bin
 
-.PHONY: all build build-daemon build-dashboard dev dev-daemon dev-dashboard clean check fmt test install update organize-imports deploy deploy-web deploy-cloud deploy-docs docker-build docker-up docker-down
+.PHONY: help all build build-daemon build-dashboard dev dev-daemon dev-dashboard clean check fmt test install update organize-imports deploy deploy-web deploy-cloud deploy-docs docker-build docker-up docker-down
 
 all: check build
+
+help:
+	@echo "Vessel — available commands:"
+	@echo ""
+	@echo "  make install           Install all npm dependencies"
+	@echo "  make check             Run Go fmt + vet"
+	@echo "  make fmt               Run Go fmt only"
+	@echo "  make test              Run Go tests"
+	@echo "  make build             Build daemon binary + dashboard"
+	@echo "  make dev               Run daemon + dashboard concurrently"
+	@echo "  make dev-daemon        Run Go daemon in dev mode"
+	@echo "  make dev-dashboard     Run dashboard dev server"
+	@echo "  make clean             Remove build artifacts"
+	@echo "  make update            Check npm dependency updates"
+	@echo "  make organize-imports  Organize TS import order"
+	@echo "  make deploy-web        Deploy web to Cloudflare Pages"
+	@echo "  make deploy-cloud      Deploy cloud to Cloudflare Pages"
+	@echo "  make deploy-docs       Deploy docs to Cloudflare Pages"
+	@echo "  make deploy            Deploy all frontends"
+	@echo "  make docker-build      Build Docker image"
+	@echo "  make docker-up         Start Docker stack"
+	@echo "  make docker-down       Stop Docker stack"
 
 install:
 	@echo "📦 Installing all dependencies..."
