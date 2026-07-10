@@ -3,11 +3,13 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
 	"vessel.dev/vessel/internal/models"
+	"vessel.dev/vessel/internal/utils"
 )
 
 type OAuthRepository interface {
@@ -49,8 +51,8 @@ func (r *OAuthSQLiteRepository) GetProvider(ctx context.Context, idOrName string
 	row := r.db.QueryRowContext(ctx, query, idOrName, idOrName)
 	var p models.OAuthProviderConfig
 	if err := row.Scan(&p.ID, &p.ProviderName, &p.Enabled, &p.ClientID, &p.ClientSecret, &p.RedirectURI, &p.BaseURL, &p.Tenant, &p.CreatedAt, &p.UpdatedAt); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.NewNotFoundError("Provider", idOrName)
 		}
 		return nil, fmt.Errorf("failed to get oauth provider: %w", err)
 	}

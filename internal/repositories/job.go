@@ -6,6 +6,7 @@ import (
 	"errors"
 	"sync"
 	"time"
+	"vessel.dev/vessel/internal/utils"
 
 	"github.com/google/uuid"
 
@@ -58,7 +59,7 @@ func (r *JobSQLiteRepository) GetByID(_ context.Context, id string) (*models.Job
 		&j.ID, &j.ProjectID, &j.Name, &j.Schedule, &j.Command, &j.Status, &lastRunAt, &j.LastOutput, &j.CreatedAt, &j.UpdatedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
+		return nil, utils.NewNotFoundError("Entity", id)
 	}
 	if err != nil {
 		return nil, err

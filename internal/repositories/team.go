@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"vessel.dev/vessel/internal/utils"
 
 	"github.com/google/uuid"
 
@@ -118,7 +119,7 @@ func (r *TeamSQLiteRepository) GetTeamByID(ctx context.Context, id string) (*mod
 	err := r.db.QueryRowContext(ctx, `SELECT id, name, avatar_url, preferred_region, owner_id, created_at, updated_at FROM teams WHERE id = ?`, id).
 		Scan(&t.ID, &t.Name, &t.AvatarURL, &t.PreferredRegion, &t.OwnerID, &createdStr, &updatedStr)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
+		return nil, utils.NewNotFoundError("Team", id)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("get team %s: %w", id, err)

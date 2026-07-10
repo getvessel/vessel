@@ -3,10 +3,12 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
 	"vessel.dev/vessel/internal/models"
+	"vessel.dev/vessel/internal/utils"
 )
 
 func (r *CanvasSQLiteRepository) GetEnvironmentCanvas(_ context.Context, environmentID string) (*models.EnvironmentCanvas, error) {
@@ -75,8 +77,8 @@ func (r *CanvasSQLiteRepository) getProject(id string) (*projectRow, error) {
 	row := r.db.QueryRow(`SELECT id, COALESCE(workspace_id, ''), COALESCE(team_id,''), name, COALESCE(description,''), created_at, updated_at FROM projects WHERE id = ?`, id)
 	var p projectRow
 	err := row.Scan(&p.ID, &p.WorkspaceID, &p.TeamID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt)
-	if err == sql.ErrNoRows {
-		return nil, nil
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, utils.NewNotFoundError("CanvasEnvironment", id)
 	}
 	if err != nil {
 		return nil, err

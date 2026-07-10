@@ -6,6 +6,7 @@ import (
 	"errors"
 	"sync"
 	"time"
+	"vessel.dev/vessel/internal/utils"
 
 	"github.com/google/uuid"
 
@@ -87,7 +88,7 @@ func (r *DatabaseSQLiteRepository) GetByID(_ context.Context, id string) (*model
 	var encryptedPassword string
 	if err := scanDatabase(row, &d, &encryptedPassword); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
+			return nil, utils.NewNotFoundError("Entity", id)
 		}
 		return nil, err
 	}
@@ -222,7 +223,7 @@ func (r *StorageSQLiteRepository) GetByID(_ context.Context, id string) (*models
 	var encryptedSecretKey string
 	if err := scanStorage(row, &s, &encryptedSecretKey); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
+			return nil, utils.NewNotFoundError("Entity", id)
 		}
 		return nil, err
 	}

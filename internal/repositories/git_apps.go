@@ -3,9 +3,11 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 
 	"vessel.dev/vessel/internal/models"
+	"vessel.dev/vessel/internal/utils"
 )
 
 type GitAppRepository interface {
@@ -65,8 +67,8 @@ func (r *GitAppSQLiteRepository) GetGithubApp(ctx context.Context, id string) (*
 	var a models.GithubApp
 	var cs, ws, pk string
 	if err := row.Scan(&a.ID, &a.TeamID, &a.Name, &a.AppID, &a.InstallationID, &a.ClientID, &cs, &ws, &pk, &a.IsPublic, &a.CreatedAt, &a.UpdatedAt); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.NewNotFoundError("GithubApp", id)
 		}
 		return nil, err
 	}
@@ -152,8 +154,8 @@ func (r *GitAppSQLiteRepository) GetGitlabApp(ctx context.Context, id string) (*
 	var a models.GitlabApp
 	var as, ws string
 	if err := row.Scan(&a.ID, &a.TeamID, &a.Name, &a.AppID, &as, &ws, &a.APIURL, &a.IsPublic, &a.CreatedAt, &a.UpdatedAt); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.NewNotFoundError("GitlabApp", id)
 		}
 		return nil, err
 	}
@@ -231,8 +233,8 @@ func (r *GitAppSQLiteRepository) GetBitbucketApp(ctx context.Context, id string)
 	var a models.BitbucketApp
 	var cs, ws string
 	if err := row.Scan(&a.ID, &a.TeamID, &a.Name, &a.Workspace, &a.ClientID, &cs, &ws, &a.IsPublic, &a.CreatedAt, &a.UpdatedAt); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.NewNotFoundError("BitbucketApp", id)
 		}
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"sync"
 	"time"
+	"vessel.dev/vessel/internal/utils"
 
 	"github.com/google/uuid"
 
@@ -73,7 +74,7 @@ func (r *ServiceVarSQLiteRepository) GetByID(_ context.Context, id string) (*mod
 		&v.ID, &v.ServiceID, &v.EnvironmentID, &v.Key, &v.Value, &isSecretInt, &v.CreatedAt, &v.UpdatedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
+		return nil, utils.NewNotFoundError("Entity", id)
 	}
 	if err != nil {
 		return nil, err

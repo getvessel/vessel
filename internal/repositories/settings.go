@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"vessel.dev/vessel/internal/utils"
 
 	"vessel.dev/vessel/internal/models"
 )
@@ -187,8 +188,8 @@ func (r *NotificationSQLiteRepository) GetChannel(ctx context.Context, id string
 	var c models.TeamNotificationChannel
 	var configStr, eventsStr string
 	if err := row.Scan(&c.ID, &c.TeamID, &c.Provider, &configStr, &eventsStr, &c.IsEnabled, &c.CreatedAt, &c.UpdatedAt); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.NewNotFoundError("Channel", id)
 		}
 		return nil, fmt.Errorf("failed to get channel: %w", err)
 	}

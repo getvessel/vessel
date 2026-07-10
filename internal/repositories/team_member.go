@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"vessel.dev/vessel/internal/utils"
 
 	"github.com/google/uuid"
 
@@ -119,7 +120,7 @@ func (r *TeamSQLiteRepository) GetInviteByToken(ctx context.Context, token strin
 	err := r.db.QueryRowContext(ctx, `SELECT id, team_id, email, role, token, invited_by, expires_at, created_at FROM team_invites WHERE token = ?`, token).
 		Scan(&inv.ID, &inv.TeamID, &inv.Email, &inv.Role, &inv.Token, &inv.InvitedBy, &expStr, &createdStr)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
+		return nil, utils.NewNotFoundError("Invite", token)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("get team invite: %w", err)

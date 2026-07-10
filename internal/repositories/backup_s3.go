@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"vessel.dev/vessel/internal/utils"
 
 	"github.com/google/uuid"
 
@@ -75,7 +76,7 @@ func (r *S3DestinationSQLiteRepository) GetS3Destination(_ context.Context, id s
 	var dest models.S3Destination
 	err := row.Scan(&dest.ID, &dest.ProjectID, &dest.Name, &dest.Endpoint, &dest.Bucket, &dest.Region, &dest.AccessKeyID, &dest.SecretAccessKey, &dest.CreatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
+		return nil, utils.NewNotFoundError("S3Destination", id)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to get s3 destination %s: %w", id, err)

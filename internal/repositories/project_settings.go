@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"vessel.dev/vessel/internal/utils"
 
 	"github.com/google/uuid"
 
@@ -194,8 +195,8 @@ func (r *ProjectSettingsSQLiteRepository) GetTokenByHash(ctx context.Context, to
 		 FROM project_tokens WHERE token_hash = ?`, tokenHash).
 		Scan(&t.ID, &t.ProjectID, &t.EnvironmentID, &t.Name, &t.TokenPrefix, &scopesStr, &ipStr, &expiresAtStr, &createdAtStr)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.New("invalid or revoked token")
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.NewNotFoundError("Token", tokenHash)
 		}
 		return nil, fmt.Errorf("get token by hash: %w", err)
 	}

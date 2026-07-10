@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"time"
+	"vessel.dev/vessel/internal/utils"
 
 	"github.com/google/uuid"
 
@@ -79,7 +80,7 @@ func (r *GitSQLiteRepository) GetAnyProviderByType(_ context.Context, provider s
 	err := row.Scan(&gp.ID, &gp.UserID, &gp.Provider, &encryptedToken, &gp.AccountName, &gp.CreatedAt, &gp.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
+			return nil, utils.NewNotFoundError("AnyProvider", provider)
 		}
 		return nil, err
 	}

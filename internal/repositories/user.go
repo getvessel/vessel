@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"vessel.dev/vessel/internal/utils"
 
 	"github.com/google/uuid"
 
@@ -54,7 +55,7 @@ func (r *UserSQLiteRepository) GetUserByEmail(ctx context.Context, email string)
 	err := r.db.QueryRowContext(ctx, `SELECT id, email, password_hash, role, created_at, updated_at
 		FROM users WHERE email = ?`, email).Scan(&u.ID, &u.Email, &u.PasswordHash, &u.Role, &u.CreatedAt, &u.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
+		return nil, utils.NewNotFoundError("User", email)
 	}
 	if err != nil {
 		return nil, err
@@ -69,7 +70,7 @@ func (r *UserSQLiteRepository) GetUserByID(ctx context.Context, id string) (*mod
 	err := r.db.QueryRowContext(ctx, `SELECT id, email, password_hash, role, created_at, updated_at
 		FROM users WHERE id = ?`, id).Scan(&u.ID, &u.Email, &u.PasswordHash, &u.Role, &u.CreatedAt, &u.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
+		return nil, utils.NewNotFoundError("User", id)
 	}
 	if err != nil {
 		return nil, err

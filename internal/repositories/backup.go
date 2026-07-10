@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"vessel.dev/vessel/internal/utils"
 
 	"github.com/google/uuid"
 
@@ -115,7 +116,7 @@ func (r *BackupSQLiteRepository) GetConfigByID(_ context.Context, id string) (*m
 	var cfg models.BackupConfig
 	err := row.Scan(&cfg.ID, &cfg.ProjectID, &cfg.DatabaseID, &cfg.StorageID, &cfg.S3DestinationID, &cfg.Name, &cfg.Schedule, &cfg.RetentionDays, &cfg.Status, &cfg.CreatedAt, &cfg.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
+		return nil, utils.NewNotFoundError("Config", id)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to get backup config %s: %w", id, err)
@@ -226,7 +227,7 @@ func (r *BackupSQLiteRepository) GetRecordByID(ctx context.Context, id string) (
 	err := row.Scan(&rec.ID, &rec.BackupConfigID, &rec.ProjectID, &rec.DatabaseID, &rec.Status, &rec.FilePath, &rec.FileSizeBytes, &rec.S3URL, &rec.Logs, &rec.StartedAt, &rec.CompletedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
+			return nil, utils.NewNotFoundError("Record", id)
 		}
 		return nil, err
 	}
