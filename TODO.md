@@ -38,9 +38,9 @@
   - [x] **Health Verification:** Hits the `HealthCheckPath`; on success, instructs `internal/proxy` to update the Caddyfile and execute `caddy reload` — completing a zero-downtime deployment.
   - [x] Implement live CPU/RAM stats polling generator for active containers (`stats_monitor.go`).
 
-- [x] **Caddy v2 Dynamic Proxy Manager (`internal/proxy/`)**:
-  - [x] Auto-generate `/data/caddy/Caddyfile` rules when containers are deployed or custom domains are attached (`caddyfile_generator.go`).
-  - [x] Execute `caddy reload` cleanly inside Docker network when configurations change (`proxy_manager.go`).
+- [x] **Traefik Native Proxy Manager (`internal/proxy/`)**:
+  - [x] Bootstraps the central Traefik container on port 80/443 connected to the `vessel-network` Docker bridge (`traefik_manager.go`).
+  - [x] Automatically discover container routes using Docker Labels, completely eliminating manual config reloads and Caddyfiles.
 - [x] **Embedded SQLite Store & `.env` Vault (`internal/store/`)**:
   - [x] Initialize `CGO_ENABLED=0` modernc.org/sqlite database instance in `data/vessel.db` (`store.go`).
   - [x] Create modular repositories following strict `snake_case` and one-component-per-file (`project_store.go`, `domain_store.go`, `user_store.go`, `invite_store.go`, `env_var_store.go`).
@@ -68,7 +68,7 @@
   - [x] **Automated DB & Volume Backups (`backup_handler.go`, `backup_manager.go`)**: Automated backup scheduling, `pg_dump`/`mysqldump`/`sqlite3 .dump` execution, and automated S3/MinIO offsite uploads (`GET/POST /api/backups`, `POST /api/backups/trigger`, `GET/POST /api/s3-destinations`).
   - [x] **Teams, Organizations & Invitations (`team_handler.go`, `team_store.go`)**: Multi-tenant collaboration with `Owner`, `Admin`, and `Member` roles (`GET/POST /api/teams`, `POST /api/teams/:id/invite`, `DELETE /api/teams/:id/members/:userId`).
   - [x] **Server Settings & Profile (`settings_handler.go`)**: System configurations (Docker system prune, Caddy wildcard IP, Notification Webhooks: Discord/Slack/Telegram/Email) and Personal Access Tokens (PATs) for CLI.
-  - [x] **Wildcard Root Domain & Automatic Subdomain Provisioning (`domain_handler.go`, `caddyfile_generator.go`)**: Support a global `DefaultWildcardDomain` (e.g. `apps.yourdomain.com`). When a new service or project is launched, automatically provision `my-app.apps.yourdomain.com` with Caddy v2 Let's Encrypt wildcard certificates alongside `sslip.io` fallback.
+  - [x] **Wildcard Root Domain & Automatic Subdomain Provisioning (`domain_handler.go`, `traefik_manager.go`)**: Support a global `DefaultWildcardDomain` (e.g. `apps.yourdomain.com`). When a new service or project is launched, automatically provision `my-app.apps.yourdomain.com` using Traefik's Let's Encrypt automated TLS alongside `sslip.io` fallback.
   - [x] **Notification Integrations (`internal/notifier/`, `internal/api/`)**:
   - **Email (SMTP / Resend)**: SMTP host, port, user, password; or Resend API key. Send templated emails for team/project member invitations (with copy-link fallback) and deployment success/failure alerts. Commercial cloud will use AWS SES instead.
   - **Slack**: Enabled toggle, webhook URL, send test notification.

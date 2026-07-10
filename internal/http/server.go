@@ -24,7 +24,7 @@ import (
 type Server struct {
 	router                 *echo.Echo
 	deployer               *engine.Deployer
-	proxyManager           *proxy.ProxyManager
+	traefikManager         *proxy.TraefikManager
 	dockerClient           *client.Client
 	tokenService           *services.TokenService
 	authGuard              *middleware.AuthGuard
@@ -57,7 +57,7 @@ type Server struct {
 	notificationHandler    *handlers.NotificationHandler
 }
 
-func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyManager *proxy.ProxyManager, dockerClient *client.Client) *Server {
+func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefikManager *proxy.TraefikManager, dockerClient *client.Client) *Server {
 	settingsRepo := repositories.NewSettingsSQLiteRepository(db)
 	userRepo := repositories.NewUserSQLiteRepository(db)
 	oauthRepo := repositories.NewOAuthSQLiteRepository(db)
@@ -121,7 +121,7 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 	srv := &Server{
 		router:                 e,
 		deployer:               deployer,
-		proxyManager:           proxyManager,
+		traefikManager:         traefikManager,
 		dockerClient:           dockerClient,
 		tokenService:           tokenService,
 		authGuard:              authGuard,
@@ -147,7 +147,7 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 		oauthHandler:           handlers.NewOAuthHandler(oauthService),
 		gitHandler:             handlers.NewGitHandler(gitService),
 		webhookHandler:         handlers.NewWebhookHandler(gitService, projectService, appService, deploymentService, prPreviewService),
-		projectHandler:         handlers.NewProjectHandler(projectService, proxyManager),
+		projectHandler:         handlers.NewProjectHandler(projectService),
 		environmentHandler:     handlers.NewEnvironmentHandler(environmentService),
 		domainHandler:          handlers.NewDomainHandler(environmentService),
 		projectEnvHandler:      handlers.NewProjectEnvHandler(environmentService),

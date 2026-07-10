@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -10,17 +9,12 @@ import (
 	"vessel.dev/vessel/internal/services"
 )
 
-type ProxyReloader interface {
-	Reload(ctx context.Context) error
-}
-
 type ProjectHandler struct {
 	projectService *services.ProjectService
-	proxy          ProxyReloader
 }
 
-func NewProjectHandler(s *services.ProjectService, p ProxyReloader) *ProjectHandler {
-	return &ProjectHandler{projectService: s, proxy: p}
+func NewProjectHandler(s *services.ProjectService) *ProjectHandler {
+	return &ProjectHandler{projectService: s}
 }
 
 func (h *ProjectHandler) ListProjects(c echo.Context) error {
@@ -39,9 +33,6 @@ func (h *ProjectHandler) CreateProject(c echo.Context) error {
 	p, err := h.projectService.CreateProjectFromRequest(c.Request().Context(), &req)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-	if h.proxy != nil {
-		_ = h.proxy.Reload(c.Request().Context())
 	}
 	return c.JSON(http.StatusCreated, p)
 }
@@ -65,9 +56,6 @@ func (h *ProjectHandler) DeleteProject(c echo.Context) error {
 	}
 	if err := h.projectService.DeleteProject(c.Request().Context(), id); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-	if h.proxy != nil {
-		_ = h.proxy.Reload(c.Request().Context())
 	}
 	return c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
 }

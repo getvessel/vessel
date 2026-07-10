@@ -27,62 +27,7 @@ import (
 
 const vesselVersion = "0.1.0-alpha"
 
-type dbProjectLister struct{ db *sql.DB }
-
-func (a *dbProjectLister) ListProjects() ([]models.ProjectConfig, error) {
-	rows, err := a.db.Query(`SELECT id, COALESCE(workspace_id, ''), COALESCE(team_id,''), name, COALESCE(description,''), created_at, updated_at FROM projects ORDER BY created_at DESC`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var list []models.ProjectConfig
-	for rows.Next() {
-		var p models.ProjectConfig
-		if err := rows.Scan(&p.ID, &p.WorkspaceID, &p.TeamID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt); err != nil {
-			return nil, err
-		}
-		list = append(list, p)
-	}
-	return list, rows.Err()
-}
-
-type dbServiceLister struct{ db *sql.DB }
-
-func (a *dbServiceLister) ListServices() ([]models.AppService, error) {
-	rows, err := a.db.Query(`SELECT id, project_id, environment_id, name, repository_url, branch, internal_port, domain, container_id, status, created_at, updated_at FROM app_services ORDER BY created_at ASC`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var list []models.AppService
-	for rows.Next() {
-		var svc models.AppService
-		if err := rows.Scan(&svc.ID, &svc.ProjectID, &svc.EnvironmentID, &svc.Name, &svc.RepositoryURL, &svc.Branch, &svc.InternalPort, &svc.Domain, &svc.ContainerID, &svc.Status, &svc.CreatedAt, &svc.UpdatedAt); err != nil {
-			return nil, err
-		}
-		list = append(list, svc)
-	}
-	return list, rows.Err()
-}
-
-type dbDomainLister struct{ db *sql.DB }
-
-func (a *dbDomainLister) ListAllDomains() ([]models.DomainConfig, error) {
-	rows, err := a.db.Query(`SELECT id, project_id, domain_name, redirect_to, ssl_cert_status, path_prefix, created_at, updated_at FROM domains ORDER BY domain_name ASC`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var list []models.DomainConfig
-	for rows.Next() {
-		var d models.DomainConfig
-		if err := rows.Scan(&d.ID, &d.ProjectID, &d.DomainName, &d.RedirectTo, &d.SSLCertStatus, &d.PathPrefix, &d.CreatedAt, &d.UpdatedAt); err != nil {
-			return nil, err
-		}
-		list = append(list, d)
-	}
-	return list, rows.Err()
-}
+// Unused proxy listers removed
 
 type dbDeployerStore struct {
 	db    *sql.DB
@@ -153,12 +98,13 @@ func main() {
 	if err != nil {
 		log.Printf(" Docker daemon connection warning: %v (container deployment features disabled)", err)
 	}
-	proxyCfg := proxy.NewCaddyConfig(dataDir, os.Getenv("VESSEL_TLS_EMAIL"))
-	settingsRepo := repositories.NewSettingsSQLiteRepository(db)
-	proxyMgr := proxy.NewProxyManager(proxyCfg, &dbProjectLister{db: db}, &dbServiceLister{db: db}, &dbDomainLister{db: db}, settingsRepo, dockerClient)
-	_ = proxyMgr.Reload(context.Background())
+	traefikMgr := proxy.NewTraefikManager(dockerClient, os.Getenv("VESSEL_TLS_EMAIL"))
+	if err := traefikMgr.EnsureTraefikRunning(context.Background()); err != nil {
+		log.Printf(" Warning: Failed to start Traefik proxy: %v", err)
+	}
+
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
-	apiServer := vesselhttp.NewServer(db, vlt, deployer, proxyMgr, dockerClient)
+	apiServer := vesselhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
 	log.Printf(" Vessel control plane listening on :%s", port)
 	if err := http.ListenAndServe(":"+port, apiServer.Handler()); err != nil {
 		log.Fatalf(" Server crashed: %v", err)

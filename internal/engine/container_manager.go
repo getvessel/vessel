@@ -23,15 +23,25 @@ func NewContainerManager(dockerClient *client.Client, st ContainerManagerStore) 
 	return &ContainerManager{dockerClient: dockerClient, store: st}
 }
 
-func (c *ContainerManager) CreateAndStart(ctx context.Context, name, imageTag string, internalPort int, envs []string, memoryLimitMB int, cpuRequest float64) (string, error) {
+func (c *ContainerManager) CreateAndStart(ctx context.Context, name, imageTag, serviceID, domain string, internalPort int, envs []string, memoryLimitMB int, cpuRequest float64) (string, error) {
 	containerPort, err := nat.NewPort("tcp", fmt.Sprintf("%d", internalPort))
 	if err != nil {
 		return "", fmt.Errorf("invalid port definition: %w", err)
 	}
+	labels := map[string]string{}
+	if serviceID != "" && domain != "" {
+		labels = map[string]string{
+			"traefik.enable": "true",
+			fmt.Sprintf("traefik.http.routers.%s.rule", serviceID):                      fmt.Sprintf("Host(`%s`)", domain),
+			fmt.Sprintf("traefik.http.services.%s.loadbalancer.server.port", serviceID): fmt.Sprintf("%d", internalPort),
+		}
+	}
+
 	config := &container.Config{
 		Image:        imageTag,
 		Env:          envs,
 		ExposedPorts: nat.PortSet{containerPort: struct{}{}},
+		Labels:       labels,
 	}
 	hostConfig := &container.HostConfig{
 		RestartPolicy: container.RestartPolicy{Name: "always"},
@@ -42,6 +52,7 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, name, imageTag st
 			Memory:   utils.MegaBytesToBytes(memoryLimitMB),
 			NanoCPUs: utils.CPURequestToNanoCPUs(cpuRequest),
 		},
+		NetworkMode: "vessel-network", // Connect to the shared Traefik network
 	}
 	if c.store != nil {
 		settings, _ := c.store.GetServerSettings()
