@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -35,10 +36,8 @@ func (r *S3DestinationSQLiteRepository) CreateS3Destination(_ context.Context, d
 	if dest.CreatedAt == "" {
 		dest.CreatedAt = time.Now().UTC().Format(time.RFC3339)
 	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.Exec(`INSERT INTO s3_destinations (id, project_id, name, endpoint, bucket, region, access_key_id, secret_access_key, created_at)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		dest.ID, dest.ProjectID, dest.Name, dest.Endpoint, dest.Bucket, dest.Region, dest.AccessKeyID, dest.SecretAccessKey, dest.CreatedAt)
@@ -51,14 +50,12 @@ func (r *S3DestinationSQLiteRepository) CreateS3Destination(_ context.Context, d
 func (r *S3DestinationSQLiteRepository) ListS3Destinations(_ context.Context, projectID string) ([]*models.S3Destination, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	rows, err := r.db.Query(`SELECT id, project_id, name, endpoint, bucket, region, access_key_id, secret_access_key, created_at
 		FROM s3_destinations WHERE project_id = ? ORDER BY created_at DESC`, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list s3 destinations: %w", err)
 	}
 	defer rows.Close()
-
 	var list []*models.S3Destination
 	for rows.Next() {
 		var dest models.S3Destination
@@ -73,10 +70,8 @@ func (r *S3DestinationSQLiteRepository) ListS3Destinations(_ context.Context, pr
 func (r *S3DestinationSQLiteRepository) GetS3Destination(_ context.Context, id string) (*models.S3Destination, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	row := r.db.QueryRow(`SELECT id, project_id, name, endpoint, bucket, region, access_key_id, secret_access_key, created_at
 		FROM s3_destinations WHERE id = ?`, id)
-
 	var dest models.S3Destination
 	err := row.Scan(&dest.ID, &dest.ProjectID, &dest.Name, &dest.Endpoint, &dest.Bucket, &dest.Region, &dest.AccessKeyID, &dest.SecretAccessKey, &dest.CreatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -91,7 +86,6 @@ func (r *S3DestinationSQLiteRepository) GetS3Destination(_ context.Context, id s
 func (r *S3DestinationSQLiteRepository) DeleteS3Destination(_ context.Context, id, projectID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	res, err := r.db.Exec("DELETE FROM s3_destinations WHERE id = ? AND project_id = ?", id, projectID)
 	if err != nil {
 		return fmt.Errorf("failed to delete s3 destination: %w", err)

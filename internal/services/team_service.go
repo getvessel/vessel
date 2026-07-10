@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/repositories"
 )
@@ -26,7 +27,6 @@ func (s *TeamService) CreateTeam(ctx context.Context, name, ownerID string) (*mo
 	if name == "" || ownerID == "" {
 		return nil, errors.New("team name and ownerId are required")
 	}
-
 	team := &models.Team{
 		ID:        uuid.New().String(),
 		Name:      name,
@@ -34,11 +34,9 @@ func (s *TeamService) CreateTeam(ctx context.Context, name, ownerID string) (*mo
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
-
 	if err := s.teamRepo.CreateTeam(ctx, team); err != nil {
 		return nil, err
 	}
-
 	member := &models.TeamMember{
 		ID:       uuid.New().String(),
 		TeamID:   team.ID,
@@ -47,7 +45,6 @@ func (s *TeamService) CreateTeam(ctx context.Context, name, ownerID string) (*mo
 		JoinedAt: time.Now(),
 	}
 	_ = s.teamRepo.AddMember(ctx, member)
-
 	return team, nil
 }
 

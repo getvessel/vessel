@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/labstack/echo/v4"
-
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/services"
@@ -79,7 +79,6 @@ func (h *ProjectSettingsHandler) CreateToken(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
-
 	t := &models.ProjectToken{
 		ProjectID:     projectID,
 		Name:          req.Name,
@@ -88,7 +87,6 @@ func (h *ProjectSettingsHandler) CreateToken(c echo.Context) error {
 		IPAllowlist:   req.IPAllowlist,
 		ExpiresAt:     req.ExpiresAt,
 	}
-
 	token, raw, err := h.settingsService.CreateToken(c.Request().Context(), t)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})

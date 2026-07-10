@@ -10,6 +10,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+
 	"vessel.dev/vessel/internal/utils"
 )
 
@@ -27,13 +28,11 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, name, imageTag st
 	if err != nil {
 		return "", fmt.Errorf("invalid port definition: %w", err)
 	}
-
 	config := &container.Config{
 		Image:        imageTag,
 		Env:          envs,
 		ExposedPorts: nat.PortSet{containerPort: struct{}{}},
 	}
-
 	hostConfig := &container.HostConfig{
 		RestartPolicy: container.RestartPolicy{Name: "always"},
 		PortBindings: nat.PortMap{
@@ -44,7 +43,6 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, name, imageTag st
 			NanoCPUs: utils.CPURequestToNanoCPUs(cpuRequest),
 		},
 	}
-
 	if c.store != nil {
 		settings, _ := c.store.GetServerSettings()
 		if settings != nil && strings.TrimSpace(settings.CustomDNSResolvers) != "" {
@@ -61,18 +59,14 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, name, imageTag st
 			}
 		}
 	}
-
 	_ = c.StopAndRemove(ctx, name)
-
 	resp, err := c.dockerClient.ContainerCreate(ctx, config, hostConfig, nil, nil, name)
 	if err != nil {
 		return "", fmt.Errorf("docker container create failed: %w", err)
 	}
-
 	if err := c.dockerClient.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
 		return "", fmt.Errorf("docker container start failed: %w", err)
 	}
-
 	return resp.ID, nil
 }
 
@@ -101,7 +95,6 @@ func (c *ContainerManager) StreamLogs(ctx context.Context, containerIDOrName str
 		return fmt.Errorf("failed to open container logs stream: %w", err)
 	}
 	defer logsReader.Close()
-
 	_, err = io.Copy(out, logsReader)
 	return err
 }

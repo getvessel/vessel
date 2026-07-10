@@ -10,7 +10,6 @@ import (
 func TestCaddyfileGenerator(t *testing.T) {
 	config := NewCaddyConfig("testdata", "ops@vessel.local")
 	gen := NewCaddyfileGenerator(config)
-
 	projects := []models.ProjectConfig{
 		{
 			ID:   "test-id-123",
@@ -21,7 +20,6 @@ func TestCaddyfileGenerator(t *testing.T) {
 			Name: "Go Backend API",
 		},
 	}
-
 	services := []models.AppService{
 		{
 			ID:           "test-id-123",
@@ -37,7 +35,6 @@ func TestCaddyfileGenerator(t *testing.T) {
 			InternalPort: 8080,
 		},
 	}
-
 	domains := []models.DomainConfig{
 		{
 			ID:         "dom-1",
@@ -52,12 +49,10 @@ func TestCaddyfileGenerator(t *testing.T) {
 			PathPrefix: "/v1/*",
 		},
 	}
-
 	caddyfile, err := gen.Generate(projects, services, domains, "apps.local")
 	if err != nil {
 		t.Fatalf("expected no error generating caddyfile, got: %v", err)
 	}
-
 	if !strings.Contains(caddyfile, "email ops@vessel.local") {
 		t.Errorf("expected global email block, got:\n%s", caddyfile)
 	}

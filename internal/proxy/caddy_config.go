@@ -17,12 +17,10 @@ func NewCaddyConfig(baseDataDir string, tlsEmail string) *CaddyConfig {
 		baseDataDir = "data"
 	}
 	caddyDir := filepath.Join(baseDataDir, "caddy")
-	_ = os.MkdirAll(caddyDir, 0755)
-
+	_ = os.MkdirAll(caddyDir, 0o755)
 	if tlsEmail == "" {
 		tlsEmail = os.Getenv("VESSEL_TLS_EMAIL")
 	}
-
 	return &CaddyConfig{
 		CaddyfilePath:    filepath.Join(caddyDir, "Caddyfile"),
 		AdminAPIEndpoint: "http://127.0.0.1:2019/load",

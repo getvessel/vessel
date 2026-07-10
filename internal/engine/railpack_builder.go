@@ -24,12 +24,10 @@ func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions, engineNa
 	if opts.LogWriter != nil {
 		fmt.Fprintf(opts.LogWriter, "🌟 [Railpack/Nixpacks] Auto-detecting language & framework in %s...\n", opts.SourceDir)
 	}
-
 	stack := r.detectLanguageStack(opts.SourceDir)
 	if opts.LogWriter != nil {
 		fmt.Fprintf(opts.LogWriter, "🛠️ [Railpack/Nixpacks] Stack detected: %s\n", stack)
 	}
-
 	if engineName == "buildpacks" {
 		packPath, err := exec.LookPath("pack")
 		if err == nil {
@@ -59,7 +57,6 @@ func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions, engineNa
 			return imageTag, nil
 		}
 	}
-
 	if opts.LogWriter != nil {
 		fmt.Fprintf(opts.LogWriter, "⚠️ [Railpack/Nixpacks] Native CLI not found; synthesizing zero-config OCI build plan for %s...\n", stack)
 	}
@@ -67,13 +64,11 @@ func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions, engineNa
 	if err != nil {
 		return "", fmt.Errorf("failed to synthesize fallback dockerfile: %w", err)
 	}
-
 	dockerfilePath := filepath.Join(opts.SourceDir, ".vessel.Dockerfile")
-	if err := os.WriteFile(dockerfilePath, []byte(synthesizedDockerfile), 0644); err != nil {
+	if err := os.WriteFile(dockerfilePath, []byte(synthesizedDockerfile), 0o644); err != nil {
 		return "", fmt.Errorf("failed to write synthesized dockerfile: %w", err)
 	}
 	defer os.Remove(dockerfilePath)
-
 	fallbackOpts := opts
 	fallbackOpts.DockerfilePath = ".vessel.Dockerfile"
 	fallbackBuilder := NewDockerfileBuilder(r.dockerClient)
@@ -123,7 +118,6 @@ COPY go.mod go.sum* ./
 RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/server .
-
 FROM alpine:latest
 WORKDIR /app
 COPY --from=builder /app/server /app/server
@@ -144,7 +138,6 @@ CMD ["python3", "-m", "http.server", "3000"]
 WORKDIR /app
 COPY . .
 RUN cargo build --release
-
 FROM alpine:latest
 WORKDIR /app
 COPY --from=builder /app/target/release/* /app/server

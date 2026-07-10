@@ -62,5 +62,5 @@ type DatabaseQueryRequest struct {
 type DatabaseQueryResponse struct {
 	Columns []string         `json:"columns,omitempty"`
 	Rows    []map[string]any `json:"rows,omitempty"`
-	Result  any              `json:"result,omitempty"` // For Redis or non-tabular results
+	Result  any              `json:"result,omitempty"`
 }

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -34,13 +35,12 @@ func (r *GitSQLiteRepository) SaveProvider(_ context.Context, gp *models.GitProv
 	now := time.Now()
 	gp.CreatedAt = now
 	gp.UpdatedAt = now
-
 	encryptedToken, err := r.vault.Encrypt(gp.AccessToken)
 	if err != nil {
 		return err
 	}
-
-	_, err = r.db.Exec(`INSERT INTO user_git_providers (id, user_id, provider, encrypted_access_token, account_name, created_at, updated_at)
+	_, err = r.db.Exec(
+		`INSERT INTO user_git_providers (id, user_id, provider, encrypted_access_token, account_name, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(user_id, provider) DO UPDATE SET encrypted_access_token = excluded.encrypted_access_token, account_name = excluded.account_name, updated_at = excluded.updated_at`,
 		gp.ID, gp.UserID, gp.Provider, encryptedToken, gp.AccountName, gp.CreatedAt, gp.UpdatedAt,
@@ -52,10 +52,8 @@ func (r *GitSQLiteRepository) GetProvider(_ context.Context, userID, provider st
 	if userID == "" {
 		return r.GetAnyProviderByType(context.Background(), provider)
 	}
-
 	row := r.db.QueryRow(`SELECT id, user_id, provider, encrypted_access_token, account_name, created_at, updated_at
 		FROM user_git_providers WHERE user_id = ? AND provider = ?`, userID, provider)
-
 	var gp models.GitProviderConfig
 	var encryptedToken string
 	err := row.Scan(&gp.ID, &gp.UserID, &gp.Provider, &encryptedToken, &gp.AccountName, &gp.CreatedAt, &gp.UpdatedAt)
@@ -65,7 +63,6 @@ func (r *GitSQLiteRepository) GetProvider(_ context.Context, userID, provider st
 		}
 		return nil, err
 	}
-
 	decryptedToken, err := r.vault.Decrypt(encryptedToken)
 	if err != nil {
 		return nil, err
@@ -77,7 +74,6 @@ func (r *GitSQLiteRepository) GetProvider(_ context.Context, userID, provider st
 func (r *GitSQLiteRepository) GetAnyProviderByType(_ context.Context, provider string) (*models.GitProviderConfig, error) {
 	row := r.db.QueryRow(`SELECT id, user_id, provider, encrypted_access_token, account_name, created_at, updated_at
 		FROM user_git_providers WHERE provider = ? LIMIT 1`, provider)
-
 	var gp models.GitProviderConfig
 	var encryptedToken string
 	err := row.Scan(&gp.ID, &gp.UserID, &gp.Provider, &encryptedToken, &gp.AccountName, &gp.CreatedAt, &gp.UpdatedAt)
@@ -87,7 +83,6 @@ func (r *GitSQLiteRepository) GetAnyProviderByType(_ context.Context, provider s
 		}
 		return nil, err
 	}
-
 	decryptedToken, err := r.vault.Decrypt(encryptedToken)
 	if err != nil {
 		return nil, err
@@ -103,7 +98,6 @@ func (r *GitSQLiteRepository) ListProvidersByUser(_ context.Context, userID stri
 		return nil, err
 	}
 	defer rows.Close()
-
 	var list []*models.GitProviderConfig
 	for rows.Next() {
 		var gp models.GitProviderConfig

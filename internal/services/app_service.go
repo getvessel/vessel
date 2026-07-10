@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/repositories"
 )
@@ -37,7 +38,6 @@ func (s *AppService) CreateAppService(ctx context.Context, svc *models.AppServic
 		svc.CreatedAt = now
 	}
 	svc.UpdatedAt = now
-
 	if err := s.appRepo.Create(ctx, svc); err != nil {
 		return nil, err
 	}

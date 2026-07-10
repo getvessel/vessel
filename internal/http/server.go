@@ -5,34 +5,32 @@ import (
 	"database/sql"
 	"net/http"
 
+	"github.com/docker/docker/client"
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
 
-	"github.com/docker/docker/client"
+	"vessel.dev/vessel/internal/dispatch"
 	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/handlers"
+	"vessel.dev/vessel/internal/listeners"
 	"vessel.dev/vessel/internal/middleware"
 	"vessel.dev/vessel/internal/models"
-	"vessel.dev/vessel/internal/dispatch"
 	"vessel.dev/vessel/internal/proxy"
-	"vessel.dev/vessel/internal/events"
-	"vessel.dev/vessel/internal/listeners"
 	"vessel.dev/vessel/internal/repositories"
 	"vessel.dev/vessel/internal/services"
 	"vessel.dev/vessel/internal/vault"
 )
 
 type Server struct {
-	router          *echo.Echo
-	deployer        *engine.Deployer
-	proxyManager    *proxy.ProxyManager
-	dockerClient    *client.Client
-	tokenService    *services.TokenService
-	authGuard       *middleware.AuthGuard
-	cronManager     *engine.CronManager
-	serviceLinker   *services.ServiceLinker
-	dispatcherService *dispatch.DispatcherService
-
+	router                 *echo.Echo
+	deployer               *engine.Deployer
+	proxyManager           *proxy.ProxyManager
+	dockerClient           *client.Client
+	tokenService           *services.TokenService
+	authGuard              *middleware.AuthGuard
+	cronManager            *engine.CronManager
+	serviceLinker          *services.ServiceLinker
+	dispatcherService      *dispatch.DispatcherService
 	appServiceHandler      *handlers.AppHandler
 	dbHandler              *handlers.DatabaseHandler
 	storageHandler         *handlers.StorageHandler
@@ -60,7 +58,6 @@ type Server struct {
 }
 
 func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyManager *proxy.ProxyManager, dockerClient *client.Client) *Server {
-	// 1. Repositories
 	settingsRepo := repositories.NewSettingsSQLiteRepository(db)
 	userRepo := repositories.NewUserSQLiteRepository(db)
 	oauthRepo := repositories.NewOAuthSQLiteRepository(db)
@@ -83,26 +80,17 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 	svVarRepo := repositories.NewServiceVarSQLiteRepository(db)
 	s3Repo := repositories.NewS3DestinationSQLiteRepository(db)
 	prPreviewRepo := repositories.NewPRPreviewRepository(db)
-
-	// Engine adapter
 	ea := newEngineAdapter(settingsRepo, serviceRepo, envRepo, databaseRepo, storageRepo, projectRepo, jobRepo, backupRepo, s3Repo, svVarRepo)
-
-	// Engines
 	cronMgr := engine.NewCronManager(dockerClient, ea)
 	_ = cronMgr.Start()
 	backupMgr := engine.NewBackupManager(dockerClient, ea, "")
 	_ = backupMgr.Start()
 	dbDeployer := engine.NewDatabaseDeployer(dockerClient, ea)
 	storageDeployer := engine.NewStorageDeployer(dockerClient, ea)
-
-	// Linkers & common
 	svcLinker := services.NewServiceLinker(databaseRepo, storageRepo)
-
-	// 2. Services
 	dispatcherSvc := dispatch.NewDispatcherService(notifRepo)
-	eventBus := events.NewEventBus()
-	listeners.RegisterAll(eventBus, dispatcherSvc)
-
+	deploymentListeners := listeners.NewDeploymentListeners(dispatcherSvc)
+	deploymentListeners.Register()
 	settingsService := services.NewSettingsService(settingsRepo, notifRepo)
 	userService := services.NewUserService(userRepo)
 	tokenService := services.NewTokenService()
@@ -110,7 +98,6 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 	oauthService := services.NewOAuthService(oauthRepo, userRepo, tokenService)
 	updaterService := services.NewUpdaterService(settingsRepo)
 	updaterService.Start(context.Background())
-
 	gitService := services.NewGitService(gitRepo)
 	environmentService := services.NewEnvironmentService(environmentRepo, domainRepo, envRepo)
 	appService := services.NewAppService(serviceRepo, svVarRepo)
@@ -126,27 +113,21 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 	notificationService := services.NewNotificationService(notifRepo, dispatcherSvc)
 	deploymentService := services.NewDeploymentService(deploymentRepo, serviceRepo, projectRepo, deployer)
 	prPreviewService := services.NewPRPreviewService(prPreviewRepo, appService, gitService, deployer)
-
-	// Auth Guard
 	authGuard := middleware.NewAuthGuard(tokenService, settingsService, psService)
-
-	// 3. Handlers
 	e := echo.New()
 	e.Use(echomiddleware.Logger())
 	e.Use(echomiddleware.Recover())
 	e.Use(echomiddleware.CORS())
-
 	srv := &Server{
-		router:            e,
-		deployer:          deployer,
-		proxyManager:      proxyManager,
-		dockerClient:      dockerClient,
-		tokenService:      tokenService,
-		authGuard:         authGuard,
-		cronManager:       cronMgr,
-		serviceLinker:     svcLinker,
-		dispatcherService: dispatcherSvc,
-
+		router:                 e,
+		deployer:               deployer,
+		proxyManager:           proxyManager,
+		dockerClient:           dockerClient,
+		tokenService:           tokenService,
+		authGuard:              authGuard,
+		cronManager:            cronMgr,
+		serviceLinker:          svcLinker,
+		dispatcherService:      dispatcherSvc,
 		appServiceHandler:      handlers.NewAppHandler(appService),
 		dbHandler:              handlers.NewDatabaseHandler(dbService),
 		storageHandler:         handlers.NewStorageHandler(storageService),
@@ -172,7 +153,6 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, proxyM
 		projectEnvHandler:      handlers.NewProjectEnvHandler(environmentService),
 		notificationHandler:    handlers.NewNotificationHandler(notificationService),
 	}
-
 	if srv.deployer != nil {
 		srv.deployer.EnvProvider = func(projectID string) (map[string]string, error) {
 			return srv.serviceLinker.GetLinkedEnvironmentVariables(context.Background(), projectID)

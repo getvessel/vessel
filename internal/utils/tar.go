@@ -12,7 +12,6 @@ import (
 func CreateTarContext(sourceDir string) (io.Reader, error) {
 	var buf bytes.Buffer
 	tw := tar.NewWriter(&buf)
-
 	err := filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -29,7 +28,6 @@ func CreateTarContext(sourceDir string) (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	if err := tw.Close(); err != nil {
 		return nil, fmt.Errorf("failed to close tar writer: %w", err)
 	}
@@ -64,7 +62,6 @@ func writeTarFileContent(tw *tar.Writer, path string) error {
 		return fmt.Errorf("failed to open file %s: %w", path, err)
 	}
 	defer file.Close()
-
 	if _, err := io.Copy(tw, file); err != nil {
 		return fmt.Errorf("failed to copy file %s into tar: %w", path, err)
 	}

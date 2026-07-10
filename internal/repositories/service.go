@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -33,7 +34,6 @@ func NewAppServiceSQLiteRepository(db *sql.DB) *AppServiceSQLiteRepository {
 func (r *AppServiceSQLiteRepository) Create(_ context.Context, svc *models.AppService) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	if svc.ID == "" {
 		svc.ID = uuid.NewString()
 	}
@@ -46,7 +46,6 @@ func (r *AppServiceSQLiteRepository) Create(_ context.Context, svc *models.AppSe
 	if svc.InternalPort == 0 {
 		svc.InternalPort = 3000
 	}
-
 	_, err := r.db.Exec(
 		`INSERT INTO app_services (id, project_id, environment_id, name, repository_url, branch, root_directory, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -63,7 +62,6 @@ func (r *AppServiceSQLiteRepository) Create(_ context.Context, svc *models.AppSe
 func (r *AppServiceSQLiteRepository) GetByID(_ context.Context, id string) (*models.AppService, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-
 	row := r.db.QueryRow(
 		`SELECT id, project_id, environment_id, name, repository_url, branch, root_directory, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at
 		FROM app_services WHERE id = ?`, id,
@@ -86,7 +84,6 @@ func (r *AppServiceSQLiteRepository) GetByID(_ context.Context, id string) (*mod
 func (r *AppServiceSQLiteRepository) ListByEnvironment(_ context.Context, environmentID string) ([]*models.AppService, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-
 	rows, err := r.db.Query(
 		`SELECT id, project_id, environment_id, name, repository_url, branch, root_directory, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at
 		FROM app_services WHERE environment_id = ? ORDER BY created_at ASC`, environmentID,
@@ -95,14 +92,12 @@ func (r *AppServiceSQLiteRepository) ListByEnvironment(_ context.Context, enviro
 		return nil, fmt.Errorf("failed to list app services by environment: %w", err)
 	}
 	defer rows.Close()
-
 	return scanServices(rows)
 }
 
 func (r *AppServiceSQLiteRepository) ListByProject(_ context.Context, projectID string) ([]*models.AppService, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-
 	rows, err := r.db.Query(
 		`SELECT id, project_id, environment_id, name, repository_url, branch, root_directory, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at
 		FROM app_services WHERE project_id = ? ORDER BY created_at ASC`, projectID,
@@ -111,16 +106,13 @@ func (r *AppServiceSQLiteRepository) ListByProject(_ context.Context, projectID 
 		return nil, fmt.Errorf("failed to list app services by project: %w", err)
 	}
 	defer rows.Close()
-
 	return scanServices(rows)
 }
 
 func (r *AppServiceSQLiteRepository) Update(_ context.Context, svc *models.AppService) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	svc.UpdatedAt = time.Now().UTC()
-
 	_, err := r.db.Exec(
 		`UPDATE app_services SET
 			name = ?, repository_url = ?, branch = ?, root_directory = ?, build_command = ?, start_command = ?, dockerfile_path = ?, build_engine = ?, internal_port = ?, domain = ?, health_check_path = ?, container_id = ?, status = ?, updated_at = ?
@@ -137,7 +129,6 @@ func (r *AppServiceSQLiteRepository) Update(_ context.Context, svc *models.AppSe
 func (r *AppServiceSQLiteRepository) Delete(_ context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.Exec(`DELETE FROM app_services WHERE id = ?`, id)
 	return err
 }

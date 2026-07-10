@@ -38,7 +38,6 @@ func (d *DispatcherService) Send(event *models.NotificationEvent) error {
 	if err != nil || integ == nil {
 		return fmt.Errorf("could not load notification integrations: %w", err)
 	}
-
 	var pref *models.ProjectNotificationPref
 	if event.ProjectID != "" {
 		p, err := d.repo.GetProjectPref(context.Background(), event.ProjectID)
@@ -46,7 +45,6 @@ func (d *DispatcherService) Send(event *models.NotificationEvent) error {
 			pref = p
 		}
 	}
-
 	if pref == nil || pref.EmailEnabled {
 		if integ.SMTPEnabled && integ.SMTPHost != "" {
 			_ = d.sendSMTP(integ, event)
@@ -54,27 +52,21 @@ func (d *DispatcherService) Send(event *models.NotificationEvent) error {
 			_ = d.sendResend(integ, event)
 		}
 	}
-
 	if (pref == nil || pref.SlackEnabled) && integ.SlackEnabled && integ.SlackWebhookURL != "" {
 		_ = d.sendSlack(integ.SlackWebhookURL, event)
 	}
-
 	if (pref == nil || pref.DiscordEnabled) && integ.DiscordEnabled && integ.DiscordWebhookURL != "" {
 		_ = d.sendDiscord(integ.DiscordWebhookURL, integ.DiscordPingEnabled, event)
 	}
-
 	if (pref == nil || pref.TelegramEnabled) && integ.TelegramEnabled && integ.TelegramBotToken != "" && integ.TelegramChatID != "" {
 		_ = d.sendTelegram(integ.TelegramBotToken, integ.TelegramChatID, event)
 	}
-
 	if (pref == nil || pref.PushoverEnabled) && integ.PushoverEnabled && integ.PushoverUserKey != "" && integ.PushoverAPIToken != "" {
 		_ = d.sendPushover(integ.PushoverUserKey, integ.PushoverAPIToken, event)
 	}
-
 	if (pref == nil || pref.WebhookEnabled) && integ.WebhookEnabled && integ.WebhookURL != "" {
 		_ = d.sendWebhook(integ.WebhookURL, event)
 	}
-
 	return nil
 }
 
@@ -96,20 +88,16 @@ func (d *DispatcherService) sendSMTP(integ *models.NotificationIntegration, even
 		toAddr = fromAddr
 	}
 	to := []string{toAddr}
-
 	fromHeader := fromAddr
 	if integ.SMTPFromName != "" {
 		fromHeader = fmt.Sprintf("%s <%s>", integ.SMTPFromName, fromAddr)
 	}
-
 	var htmlBody bytes.Buffer
-	if err := views.HTMLTemplates.ExecuteTemplate(&htmlBody, "notification.html", event); err != nil {
+	if err := views.HTMLTemplates.ExecuteTemplate(&htmlBody, "notification.tmpl", event); err != nil {
 		htmlBody.WriteString(fmt.Sprintf("<p><strong>%s</strong></p><p>%s</p><p><a href=\"%s\">View in Dashboard</a></p>", event.Title, event.Message, event.URL))
 	}
-
 	msg := []byte(fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: [Vessel %s] %s\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n%s",
 		fromHeader, toAddr, strings.ToUpper(event.Level), event.Title, htmlBody.String()))
-
 	return smtp.SendMail(addr, auth, fromAddr, to, msg)
 }
 
@@ -123,10 +111,9 @@ func (d *DispatcherService) sendResend(integ *models.NotificationIntegration, ev
 		}
 	}
 	var htmlBody bytes.Buffer
-	if err := views.HTMLTemplates.ExecuteTemplate(&htmlBody, "notification.html", event); err != nil {
+	if err := views.HTMLTemplates.ExecuteTemplate(&htmlBody, "notification.tmpl", event); err != nil {
 		htmlBody.WriteString(fmt.Sprintf("<p><strong>%s</strong></p><p>%s</p><p><a href=\"%s\">View in Dashboard</a></p>", event.Title, event.Message, event.URL))
 	}
-
 	payload := map[string]interface{}{
 		"from":    fromStr,
 		"to":      []string{"admin@localhost"},
@@ -137,7 +124,6 @@ func (d *DispatcherService) sendResend(integ *models.NotificationIntegration, ev
 	req, _ := http.NewRequest("POST", "https://api.resend.com/emails", bytes.NewBuffer(body))
 	req.Header.Set("Authorization", "Bearer "+integ.ResendAPIKey)
 	req.Header.Set("Content-Type", "application/json")
-
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {

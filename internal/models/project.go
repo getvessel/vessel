@@ -70,19 +70,19 @@ type CreateProjectRequest struct {
 	Domain             string `json:"domain,omitempty"`
 }
 
-type SetEnvVarsRequest map[string]string
-
-type VarsRequest map[string]string
-
-type Webhook struct {
-	ID                    string    `json:"id"`
-	ProjectID             string    `json:"projectId"`
-	URL                   string    `json:"url"`
-	EventTypes            []string  `json:"eventTypes"`
-	IncludePREnvironments bool      `json:"includePrEnvironments"`
-	CreatedAt             time.Time `json:"createdAt"`
-	UpdatedAt             time.Time `json:"updatedAt"`
-}
+type (
+	SetEnvVarsRequest map[string]string
+	VarsRequest       map[string]string
+	Webhook           struct {
+		ID                    string    `json:"id"`
+		ProjectID             string    `json:"projectId"`
+		URL                   string    `json:"url"`
+		EventTypes            []string  `json:"eventTypes"`
+		IncludePREnvironments bool      `json:"includePrEnvironments"`
+		CreatedAt             time.Time `json:"createdAt"`
+		UpdatedAt             time.Time `json:"updatedAt"`
+	}
+)
 
 type ProjectToken struct {
 	ID            string     `json:"id"`

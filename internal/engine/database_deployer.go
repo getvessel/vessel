@@ -13,6 +13,7 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/utils"
 )
@@ -33,16 +34,12 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 	if d.dockerClient == nil {
 		return "", fmt.Errorf("docker daemon connection is not available")
 	}
-
 	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessel-db-%s", dbConfig.Name))
-
 	_ = d.dockerClient.ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true})
-
 	var imageName string
 	var envVars []string
 	var cmd []string
 	var containerMountPath string
-
 	switch strings.ToLower(dbConfig.Engine) {
 	case "postgres", "postgresql":
 		imageName = "postgres:" + getVersionOrDefault(dbConfig.Version, "16-alpine")
@@ -78,29 +75,24 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 	default:
 		return "", fmt.Errorf("unsupported database engine: %s", dbConfig.Engine)
 	}
-
 	pullResp, err := d.dockerClient.ImagePull(ctx, imageName, dockertypes.ImagePullOptions{})
 	if err == nil {
 		_, _ = io.Copy(io.Discard, pullResp)
 		_ = pullResp.Close()
 	}
-
 	hostVolumeDir, err := filepath.Abs(filepath.Join("data", "databases", dbConfig.ID))
 	if err != nil {
 		return "", err
 	}
-	_ = os.MkdirAll(hostVolumeDir, 0755)
-
+	_ = os.MkdirAll(hostVolumeDir, 0o755)
 	if err := utils.EnsureVesselNetwork(ctx, d.dockerClient); err != nil {
 		return "", fmt.Errorf("failed to ensure Docker network: %w", err)
 	}
-
 	containerCfg := &container.Config{
 		Image: imageName,
 		Env:   envVars,
 		Cmd:   cmd,
 	}
-
 	hostCfg := &container.HostConfig{
 		RestartPolicy: container.RestartPolicy{Name: "always"},
 		Mounts: []mount.Mount{
@@ -111,7 +103,6 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 			},
 		},
 	}
-
 	netCfg := &network.NetworkingConfig{
 		EndpointsConfig: map[string]*network.EndpointSettings{
 			"vessel-net": {
@@ -119,7 +110,6 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 			},
 		},
 	}
-
 	if d.store != nil {
 		settings, _ := d.store.GetServerSettings()
 		if settings != nil && strings.TrimSpace(settings.CustomDNSResolvers) != "" {
@@ -136,22 +126,18 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 			}
 		}
 	}
-
 	created, err := d.dockerClient.ContainerCreate(ctx, containerCfg, hostCfg, netCfg, nil, containerName)
 	if err != nil {
 		return "", fmt.Errorf("failed to create database container: %w", err)
 	}
-
 	if err := d.dockerClient.ContainerStart(ctx, created.ID, container.StartOptions{}); err != nil {
 		return "", fmt.Errorf("failed to start database container: %w", err)
 	}
-
 	internalDNS := fmt.Sprintf("%s:%d", containerName, dbConfig.Port)
 	_ = d.store.UpdateDatabaseStatus(dbConfig.ID, "running", created.ID)
 	dbConfig.ContainerID = created.ID
 	dbConfig.Status = "running"
 	dbConfig.InternalDNS = internalDNS
-
 	return created.ID, nil
 }
 
@@ -159,12 +145,10 @@ func (d *DatabaseDeployer) Stop(ctx context.Context, dbID string) error {
 	if d.dockerClient == nil {
 		return fmt.Errorf("docker daemon connection is not available")
 	}
-
 	dbConfig, err := d.store.GetDatabase(dbID)
 	if err != nil || dbConfig == nil {
 		return fmt.Errorf("database record not found")
 	}
-
 	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessel-db-%s", dbConfig.Name))
 	_ = d.dockerClient.ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true})
 	return d.store.UpdateDatabaseStatus(dbID, "stopped", "")

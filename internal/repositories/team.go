@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -18,12 +19,10 @@ type TeamRepository interface {
 	ListTeamsByUser(ctx context.Context, userID string) ([]*models.Team, error)
 	UpdateTeam(ctx context.Context, team *models.Team) error
 	DeleteTeam(ctx context.Context, id, ownerID string) error
-
 	AddMember(ctx context.Context, member *models.TeamMember) error
 	RemoveMember(ctx context.Context, teamID, userID string) error
 	GetMember(ctx context.Context, teamID, userID string) (*models.TeamMember, error)
 	ListMembers(ctx context.Context, teamID string) ([]*models.TeamMember, error)
-
 	CreateInvite(ctx context.Context, invite *models.TeamInvite) error
 	GetInviteByToken(ctx context.Context, token string) (*models.TeamInvite, error)
 	DeleteInvite(ctx context.Context, id string) error
@@ -41,7 +40,6 @@ func NewTeamSQLiteRepository(db *sql.DB) *TeamSQLiteRepository {
 func (r *TeamSQLiteRepository) Migrate(ctx context.Context) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `
 		CREATE TABLE IF NOT EXISTS teams (
 			id TEXT PRIMARY KEY,
@@ -84,22 +82,18 @@ func (r *TeamSQLiteRepository) CreateTeam(ctx context.Context, team *models.Team
 		team.CreatedAt = now
 	}
 	team.UpdatedAt = team.CreatedAt
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
-
 	_, err = tx.ExecContext(ctx, `INSERT INTO teams (id, name, avatar_url, preferred_region, owner_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		team.ID, team.Name, team.AvatarURL, team.PreferredRegion, team.OwnerID, team.CreatedAt.Format(time.RFC3339), team.UpdatedAt.Format(time.RFC3339))
 	if err != nil {
 		return fmt.Errorf("insert team: %w", err)
 	}
-
 	ownerMember := &models.TeamMember{
 		ID:        uuid.NewString(),
 		TeamID:    team.ID,
@@ -113,14 +107,12 @@ func (r *TeamSQLiteRepository) CreateTeam(ctx context.Context, team *models.Team
 	if err != nil {
 		return fmt.Errorf("insert team owner: %w", err)
 	}
-
 	return tx.Commit()
 }
 
 func (r *TeamSQLiteRepository) GetTeamByID(ctx context.Context, id string) (*models.Team, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	var t models.Team
 	var createdStr, updatedStr string
 	err := r.db.QueryRowContext(ctx, `SELECT id, name, avatar_url, preferred_region, owner_id, created_at, updated_at FROM teams WHERE id = ?`, id).
@@ -139,7 +131,6 @@ func (r *TeamSQLiteRepository) GetTeamByID(ctx context.Context, id string) (*mod
 func (r *TeamSQLiteRepository) ListTeamsByUser(ctx context.Context, userID string) ([]*models.Team, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	query := `SELECT t.id, t.name, t.avatar_url, t.preferred_region, t.owner_id, t.created_at, t.updated_at
 	          FROM teams t
 	          JOIN team_members m ON t.id = m.team_id
@@ -149,7 +140,6 @@ func (r *TeamSQLiteRepository) ListTeamsByUser(ctx context.Context, userID strin
 		return nil, fmt.Errorf("list teams by user: %w", err)
 	}
 	defer rows.Close()
-
 	var list []*models.Team
 	for rows.Next() {
 		var t models.Team
@@ -166,10 +156,8 @@ func (r *TeamSQLiteRepository) ListTeamsByUser(ctx context.Context, userID strin
 
 func (r *TeamSQLiteRepository) UpdateTeam(ctx context.Context, team *models.Team) error {
 	team.UpdatedAt = time.Now().UTC()
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `UPDATE teams SET name = ?, avatar_url = ?, preferred_region = ?, updated_at = ? WHERE id = ?`,
 		team.Name, team.AvatarURL, team.PreferredRegion, team.UpdatedAt.Format(time.RFC3339), team.ID)
 	return err
@@ -178,7 +166,6 @@ func (r *TeamSQLiteRepository) UpdateTeam(ctx context.Context, team *models.Team
 func (r *TeamSQLiteRepository) DeleteTeam(ctx context.Context, id, ownerID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	res, err := r.db.ExecContext(ctx, `DELETE FROM teams WHERE id = ? AND owner_id = ?`, id, ownerID)
 	if err != nil {
 		return fmt.Errorf("delete team: %w", err)

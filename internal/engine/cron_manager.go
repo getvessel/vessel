@@ -15,6 +15,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/robfig/cron/v3"
+
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/utils"
 )
@@ -41,10 +42,8 @@ func (cm *CronManager) Start() error {
 	if err != nil {
 		return fmt.Errorf("failed to load jobs during cron manager start: %w", err)
 	}
-
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
-
 	for _, j := range jobs {
 		if j.Status == "active" {
 			jobCopy := j
@@ -53,7 +52,6 @@ func (cm *CronManager) Start() error {
 			}
 		}
 	}
-
 	cm.cronEngine.Start()
 	log.Println("⏰ CronManager started and executing background tasks")
 	return nil
@@ -76,27 +74,22 @@ func (cm *CronManager) registerJobLocked(j *models.Job) error {
 		cm.cronEngine.Remove(entryID)
 		delete(cm.entries, j.ID)
 	}
-
 	if j.Status != "active" {
 		return nil
 	}
-
 	schedule := strings.TrimSpace(j.Schedule)
 	if len(strings.Fields(schedule)) == 5 && !strings.HasPrefix(schedule, "@") {
 		schedule = "0 " + schedule
 	}
-
 	jobID := j.ID
 	entryID, err := cm.cronEngine.AddFunc(schedule, func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 		defer cancel()
-
 		_, _ = cm.ExecuteJob(ctx, jobID)
 	})
 	if err != nil {
 		return fmt.Errorf("invalid cron schedule '%s': %w", j.Schedule, err)
 	}
-
 	cm.entries[j.ID] = entryID
 	return nil
 }
@@ -104,7 +97,6 @@ func (cm *CronManager) registerJobLocked(j *models.Job) error {
 func (cm *CronManager) UnregisterJob(jobID string) {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
-
 	if entryID, exists := cm.entries[jobID]; exists {
 		cm.cronEngine.Remove(entryID)
 		delete(cm.entries, jobID)
@@ -116,12 +108,10 @@ func (cm *CronManager) ExecuteJob(ctx context.Context, jobID string) (string, er
 	if err != nil || j == nil {
 		return "", fmt.Errorf("job %s not found: %w", jobID, err)
 	}
-
 	project, err := cm.store.GetProject(j.ProjectID)
 	if err != nil || project == nil {
 		return "", fmt.Errorf("project %s for job %s not found: %w", j.ProjectID, jobID, err)
 	}
-
 	containerName := utils.NormalizeContainerName(project.ID)
 	inspectResp, err := cm.dockerClient.ContainerInspect(ctx, containerName)
 	if err != nil || !inspectResp.State.Running {
@@ -130,20 +120,17 @@ func (cm *CronManager) ExecuteJob(ctx context.Context, jobID string) (string, er
 		_ = cm.store.UpdateJobStatusAndOutput(jobID, "error", &now, errMsg)
 		return errMsg, errors.New(errMsg)
 	}
-
 	execConfig := dockertypes.ExecConfig{
 		AttachStdout: true,
 		AttachStderr: true,
 		Cmd:          []string{"sh", "-c", j.Command},
 	}
-
 	execIDResp, err := cm.dockerClient.ContainerExecCreate(ctx, inspectResp.ID, execConfig)
 	if err != nil {
 		now := time.Now()
 		_ = cm.store.UpdateJobStatusAndOutput(jobID, "error", &now, err.Error())
 		return "", fmt.Errorf("failed to create container exec for job %s: %w", j.Name, err)
 	}
-
 	attachResp, err := cm.dockerClient.ContainerExecAttach(ctx, execIDResp.ID, dockertypes.ExecStartCheck{})
 	if err != nil {
 		now := time.Now()
@@ -151,12 +138,10 @@ func (cm *CronManager) ExecuteJob(ctx context.Context, jobID string) (string, er
 		return "", fmt.Errorf("failed to attach to container exec for job %s: %w", j.Name, err)
 	}
 	defer attachResp.Close()
-
 	var stdoutBuf, stderrBuf bytes.Buffer
 	if _, err := stdcopy.StdCopy(&stdoutBuf, &stderrBuf, attachResp.Reader); err != nil {
 		_, _ = io.Copy(&stdoutBuf, attachResp.Reader)
 	}
-
 	output := stdoutBuf.String()
 	if stderrBuf.Len() > 0 {
 		if output != "" {
@@ -164,7 +149,6 @@ func (cm *CronManager) ExecuteJob(ctx context.Context, jobID string) (string, er
 		}
 		output += stderrBuf.String()
 	}
-
 	now := time.Now()
 	_ = cm.store.UpdateJobStatusAndOutput(jobID, "active", &now, output)
 	return output, nil

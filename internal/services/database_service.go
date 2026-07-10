@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/repositories"
@@ -39,11 +40,9 @@ func (s *DatabaseService) CreateDatabase(ctx context.Context, db *models.Databas
 		db.CreatedAt = now
 	}
 	db.UpdatedAt = now
-
 	if err := s.repo.Create(ctx, db); err != nil {
 		return nil, err
 	}
-
 	if s.deployer != nil {
 		containerID, err := s.deployer.SpinUp(ctx, db)
 		if err == nil && containerID != "" {
@@ -55,7 +54,6 @@ func (s *DatabaseService) CreateDatabase(ctx context.Context, db *models.Databas
 			_ = s.repo.Update(ctx, db)
 		}
 	}
-
 	return db, nil
 }
 

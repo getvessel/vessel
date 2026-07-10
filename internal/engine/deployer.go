@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 	"io"
-
 	"net/http"
 	"time"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/utils"
 )
@@ -35,7 +35,6 @@ func (d *Deployer) Deploy(ctx context.Context, project *models.ProjectConfig, so
 	if err == nil && len(apps) > 0 {
 		return d.DeployAppService(ctx, apps[0], sourceDir, logWriter)
 	}
-
 	syntheticApp := &models.AppService{
 		ID:           project.ID,
 		ProjectID:    project.ID,
@@ -49,7 +48,6 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 	if logWriter != nil {
 		fmt.Fprintf(logWriter, "🚀 [Deployer] Starting deployment for service: %s (ID: %s)\n", app.Name, app.ID)
 	}
-
 	buildOpts := BuildOptions{
 		ProjectID: app.ProjectID,
 		ServiceID: app.ID,
@@ -57,7 +55,6 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 		LogWriter: logWriter,
 		AppConfig: app,
 	}
-
 	imageTag, err := d.builder.Build(ctx, buildOpts)
 	if err != nil {
 		return "", fmt.Errorf("build phase failed: %w", err)
@@ -65,7 +62,6 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 	if logWriter != nil {
 		fmt.Fprintf(logWriter, "✅ [Deployer] Successfully built OCI image: %s\n", imageTag)
 	}
-
 	envVarsMap, err := d.store.GetEnvVars(app.ProjectID)
 	if err != nil && logWriter != nil {
 		fmt.Fprintf(logWriter, "⚠️ [Deployer] Warning: could not load shared project environment variables: %v\n", err)
@@ -73,12 +69,10 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 	if envVarsMap == nil {
 		envVarsMap = make(map[string]string)
 	}
-
 	serviceVars, _ := d.store.ListServiceVariables(app.ID)
 	for _, sv := range serviceVars {
 		envVarsMap[sv.Key] = sv.Value
 	}
-
 	if d.EnvProvider != nil {
 		if linkedEnvs, err := d.EnvProvider(app.ProjectID); err == nil {
 			for k, v := range linkedEnvs {
@@ -91,24 +85,20 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 			}
 		}
 	}
-
 	var envSlice []string
 	for k, v := range envVarsMap {
 		envSlice = append(envSlice, fmt.Sprintf("%s=%s", k, v))
 	}
-
 	newContainerName := fmt.Sprintf("%s-%s", utils.NormalizeContainerName(app.ID), uuid.New().String()[:8])
 	if logWriter != nil {
 		fmt.Fprintf(logWriter, "🔄 [Deployer] Rolling out container %s with %d encrypted environment variables...\n", newContainerName, len(envSlice))
 	}
-
 	port := app.InternalPort
 	if port <= 0 {
 		port = 3000
 	}
 	memMB := 512
 	cpuReq := 0.5
-
 	_, err = d.containerManager.CreateAndStart(
 		ctx,
 		newContainerName,
@@ -121,24 +111,20 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 	if err != nil {
 		return "", fmt.Errorf("container rollout failed: %w", err)
 	}
-
-	// Active polling before swapping (Health Check)
 	healthy := false
 	if logWriter != nil {
 		fmt.Fprintf(logWriter, "⏳ [Deployer] Waiting for container to become healthy...\n")
 	}
-
 	for i := 0; i < 30; i++ {
 		time.Sleep(2 * time.Second)
 		inspect, err := d.containerManager.Inspect(ctx, newContainerName)
 		if err == nil {
 			if !inspect.State.Running {
 				if inspect.State.Status == "exited" {
-					break // Container crashed
+					break
 				}
 				continue
 			}
-
 			if app.HealthCheckPath != "" {
 				var hostPort string
 				for _, bindings := range inspect.NetworkSettings.Ports {
@@ -163,7 +149,6 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 			}
 		}
 	}
-
 	if !healthy {
 		_ = d.containerManager.StopAndRemove(ctx, newContainerName)
 		if logWriter != nil {
@@ -171,13 +156,10 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 		}
 		return "", fmt.Errorf("health check failed, deployment aborted")
 	}
-
 	if logWriter != nil {
 		fmt.Fprintf(logWriter, "🎉 [Deployer] Health check passed! Container is ready.\n")
 		fmt.Fprintf(logWriter, "🎉 [Deployer] Deployment successful! Container ID: %s\n", newContainerName)
 	}
-
-	// Schedule removal of the old container to allow zero-downtime swap
 	oldContainerID := app.ContainerID
 	if oldContainerID != "" && oldContainerID != newContainerName {
 		go func() {
@@ -185,7 +167,6 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 			_ = d.containerManager.StopAndRemove(context.Background(), oldContainerID)
 		}()
 	}
-
 	return newContainerName, nil
 }
 

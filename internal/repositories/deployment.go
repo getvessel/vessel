@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -32,7 +33,6 @@ func NewDeploymentSQLiteRepository(db *sql.DB) *DeploymentSQLiteRepository {
 func (r *DeploymentSQLiteRepository) Create(_ context.Context, d *models.Deployment) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	if d.ID == "" {
 		d.ID = uuid.NewString()
 	}
@@ -42,7 +42,6 @@ func (r *DeploymentSQLiteRepository) Create(_ context.Context, d *models.Deploym
 	if d.Status == "" {
 		d.Status = "BUILDING"
 	}
-
 	_, err := r.db.Exec(`INSERT INTO deployments (
 		id, service_id, environment_id, project_id, status, commit_hash,
 		commit_message, branch, trigger, build_logs, container_id, created_at, updated_at, finished_at
@@ -59,7 +58,6 @@ func (r *DeploymentSQLiteRepository) GetByID(_ context.Context, id string) (*mod
 	row := r.db.QueryRow(`SELECT id, service_id, environment_id, project_id, status, commit_hash,
 		commit_message, branch, trigger, build_logs, container_id, created_at, updated_at, finished_at
 		FROM deployments WHERE id = ?`, id)
-
 	var d models.Deployment
 	var finishedAt sql.NullTime
 	err := row.Scan(
@@ -86,7 +84,6 @@ func (r *DeploymentSQLiteRepository) ListByService(_ context.Context, serviceID 
 		return nil, fmt.Errorf("failed to query service deployments: %w", err)
 	}
 	defer rows.Close()
-
 	var deps []*models.Deployment
 	for rows.Next() {
 		var d models.Deployment
@@ -108,7 +105,6 @@ func (r *DeploymentSQLiteRepository) ListByService(_ context.Context, serviceID 
 func (r *DeploymentSQLiteRepository) Update(_ context.Context, d *models.Deployment) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	d.UpdatedAt = time.Now().UTC()
 	_, err := r.db.Exec(`UPDATE deployments SET status = ?, commit_hash = ?, commit_message = ?,
 		branch = ?, trigger = ?, build_logs = ?, container_id = ?, updated_at = ?, finished_at = ? WHERE id = ?`,
@@ -119,7 +115,6 @@ func (r *DeploymentSQLiteRepository) Update(_ context.Context, d *models.Deploym
 func (r *DeploymentSQLiteRepository) UpdateStatus(_ context.Context, id, status, buildLogs, containerID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	now := time.Now().UTC()
 	if status == "ACTIVE" || status == "FAILED" || status == "REMOVED" || status == "SLEPT" {
 		_, err := r.db.Exec(`UPDATE deployments SET status = ?, build_logs = ?, container_id = ?, updated_at = ?, finished_at = ? WHERE id = ?`,

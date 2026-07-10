@@ -11,18 +11,15 @@ func EnsureVesselNetwork(ctx context.Context, cli *client.Client) error {
 	if cli == nil {
 		return nil
 	}
-
 	networks, err := cli.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
 		return err
 	}
-
 	for _, net := range networks {
 		if net.Name == "vessel-net" {
 			return nil
 		}
 	}
-
 	_, err = cli.NetworkCreate(ctx, "vessel-net", types.NetworkCreate{
 		Driver: "bridge",
 	})

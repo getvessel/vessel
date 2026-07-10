@@ -49,7 +49,6 @@ func (g *AuthGuard) RequireAuth() echo.MiddlewareFunc {
 					}
 				}
 			}
-
 			tokenStr := ExtractTokenFromRequest(c)
 			if tokenStr == "" {
 				if g.TokenService == nil {
@@ -63,7 +62,6 @@ func (g *AuthGuard) RequireAuth() echo.MiddlewareFunc {
 				}
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "missing authentication token"})
 			}
-
 			if strings.HasPrefix(tokenStr, "vsl_tok_") {
 				if g.ProjectTokens == nil {
 					return c.JSON(http.StatusUnauthorized, map[string]string{"error": "API tokens not supported"})
@@ -83,7 +81,6 @@ func (g *AuthGuard) RequireAuth() echo.MiddlewareFunc {
 					}
 				}
 				_ = g.ProjectTokens.UpdateTokenLastUsed(c.Request().Context(), pt.ID)
-
 				userClaims := &models.UserClaims{
 					UserID: "api-token-" + pt.ID,
 					Email:  "api@" + pt.ProjectID + ".vessel.local",
@@ -95,12 +92,10 @@ func (g *AuthGuard) RequireAuth() echo.MiddlewareFunc {
 				c.Set("environment_id", pt.EnvironmentID)
 				return next(c)
 			}
-
 			claimsMap, err := g.TokenService.ValidateToken(tokenStr)
 			if err != nil {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid authentication token: " + err.Error()})
 			}
-
 			totpEnabled, _ := claimsMap["totpEnabled"].(bool)
 			userClaims := &models.UserClaims{
 				UserID:      fmt.Sprintf("%v", claimsMap["sub"]),
@@ -108,7 +103,6 @@ func (g *AuthGuard) RequireAuth() echo.MiddlewareFunc {
 				Role:        fmt.Sprintf("%v", claimsMap["role"]),
 				TOTPEnabled: totpEnabled,
 			}
-
 			c.Set("user", userClaims)
 			return next(c)
 		}
@@ -149,11 +143,8 @@ func (g *AuthGuard) RequireScope(requiredScope string) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			userClaims, ok := c.Get("user").(*models.UserClaims)
 			if !ok {
-				// RequireAuth has not been called or failed, but typically RequireScope is used AFTER RequireAuth or wraps it.
-				// For safety, if user is missing, we abort.
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "unauthorized"})
 			}
-
 			if userClaims.Role == "api" {
 				scopes, ok := c.Get("api_scopes").([]string)
 				if !ok {
@@ -170,7 +161,6 @@ func (g *AuthGuard) RequireScope(requiredScope string) echo.MiddlewareFunc {
 					return c.JSON(http.StatusForbidden, map[string]string{"error": "missing required scope: " + requiredScope})
 				}
 			}
-
 			return next(c)
 		}
 	}
@@ -188,7 +178,6 @@ func (g *AuthGuard) RequireRole(requiredRole string) echo.MiddlewareFunc {
 					}
 				}
 			}
-
 			if g.TokenService == nil {
 				userClaims := &models.UserClaims{
 					UserID: "default",
@@ -198,28 +187,21 @@ func (g *AuthGuard) RequireRole(requiredRole string) echo.MiddlewareFunc {
 				c.Set("user", userClaims)
 				return next(c)
 			}
-
 			tokenStr := ExtractTokenFromRequest(c)
 			if tokenStr == "" {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "missing authentication token"})
 			}
-
 			if strings.HasPrefix(tokenStr, "vsl_tok_") {
-				// API tokens bypass RequireRole logic since they are verified via RequireAuth/RequireScope
-				// Alternatively, we could fail them if this endpoint strictly requires a user role
 				return c.JSON(http.StatusForbidden, map[string]string{"error": "API tokens cannot access role-restricted endpoints"})
 			}
-
 			claimsMap, err := g.TokenService.ValidateToken(tokenStr)
 			if err != nil {
 				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid authentication token: " + err.Error()})
 			}
-
 			role := fmt.Sprintf("%v", claimsMap["role"])
 			if role != requiredRole && role != "admin" {
 				return c.JSON(http.StatusForbidden, map[string]string{"error": "insufficient permissions"})
 			}
-
 			totpEnabled, _ := claimsMap["totpEnabled"].(bool)
 			userClaims := &models.UserClaims{
 				UserID:      fmt.Sprintf("%v", claimsMap["sub"]),
@@ -227,7 +209,6 @@ func (g *AuthGuard) RequireRole(requiredRole string) echo.MiddlewareFunc {
 				Role:        role,
 				TOTPEnabled: totpEnabled,
 			}
-
 			c.Set("user", userClaims)
 			return next(c)
 		}
@@ -246,16 +227,13 @@ func ExtractTokenFromRequest(c echo.Context) string {
 	if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
 		return strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
 	}
-
 	cookie, err := c.Cookie("vessel_token")
 	if err == nil && cookie.Value != "" {
 		return strings.TrimSpace(cookie.Value)
 	}
-
 	queryToken := c.QueryParam("token")
 	if queryToken != "" {
 		return strings.TrimSpace(queryToken)
 	}
-
 	return ""
 }

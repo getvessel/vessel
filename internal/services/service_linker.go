@@ -21,12 +21,10 @@ func (sl *ServiceLinker) GetLinkedEnvironmentVariables(ctx context.Context, proj
 	if projectID == "" {
 		return envMap, nil
 	}
-
 	databases, err := sl.databases.ListByProject(ctx, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list linked databases for project %s: %w", projectID, err)
 	}
-
 	for _, db := range databases {
 		switch db.Engine {
 		case "postgres":
@@ -64,12 +62,10 @@ func (sl *ServiceLinker) GetLinkedEnvironmentVariables(ctx context.Context, proj
 			envMap["MONGO_DB"] = db.DatabaseName
 		}
 	}
-
 	storages, err := sl.storages.ListByProject(ctx, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list linked storage for project %s: %w", projectID, err)
 	}
-
 	for _, st := range storages {
 		if st.Type == "minio" {
 			envMap["S3_ENDPOINT"] = fmt.Sprintf("http://%s:9000", st.InternalDNS)
@@ -80,6 +76,5 @@ func (sl *ServiceLinker) GetLinkedEnvironmentVariables(ctx context.Context, proj
 			envMap["MINIO_CONSOLE_URL"] = fmt.Sprintf("http://%s:9001", st.InternalDNS)
 		}
 	}
-
 	return envMap, nil
 }

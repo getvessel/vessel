@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -21,10 +22,8 @@ func (r *WorkspaceSQLiteRepository) CreateTrustedDomain(ctx context.Context, d *
 	if d.Role == "" {
 		d.Role = "developer"
 	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `INSERT INTO workspace_trusted_domains (id, team_id, domain, role, created_at) VALUES (?, ?, ?, ?, ?)`,
 		d.ID, d.TeamID, d.Domain, d.Role, d.CreatedAt.Format(time.RFC3339))
 	if err != nil {
@@ -36,13 +35,11 @@ func (r *WorkspaceSQLiteRepository) CreateTrustedDomain(ctx context.Context, d *
 func (r *WorkspaceSQLiteRepository) ListTrustedDomains(ctx context.Context, teamID string) ([]*models.TrustedDomain, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	rows, err := r.db.QueryContext(ctx, `SELECT id, team_id, domain, role, created_at FROM workspace_trusted_domains WHERE team_id = ? ORDER BY created_at DESC`, teamID)
 	if err != nil {
 		return nil, fmt.Errorf("list trusted domains: %w", err)
 	}
 	defer rows.Close()
-
 	var list []*models.TrustedDomain
 	for rows.Next() {
 		var d models.TrustedDomain
@@ -59,7 +56,6 @@ func (r *WorkspaceSQLiteRepository) ListTrustedDomains(ctx context.Context, team
 func (r *WorkspaceSQLiteRepository) DeleteTrustedDomain(ctx context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `DELETE FROM workspace_trusted_domains WHERE id = ?`, id)
 	return err
 }
@@ -71,10 +67,8 @@ func (r *WorkspaceSQLiteRepository) CreateSSHKey(ctx context.Context, key *model
 	if key.CreatedAt.IsZero() {
 		key.CreatedAt = time.Now().UTC()
 	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `INSERT INTO workspace_ssh_keys (id, team_id, name, public_key, created_at) VALUES (?, ?, ?, ?, ?)`,
 		key.ID, key.TeamID, key.Name, key.PublicKey, key.CreatedAt.Format(time.RFC3339))
 	if err != nil {
@@ -86,13 +80,11 @@ func (r *WorkspaceSQLiteRepository) CreateSSHKey(ctx context.Context, key *model
 func (r *WorkspaceSQLiteRepository) ListSSHKeys(ctx context.Context, teamID string) ([]*models.SSHKey, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	rows, err := r.db.QueryContext(ctx, `SELECT id, team_id, name, public_key, created_at FROM workspace_ssh_keys WHERE team_id = ? ORDER BY created_at DESC`, teamID)
 	if err != nil {
 		return nil, fmt.Errorf("list ssh keys: %w", err)
 	}
 	defer rows.Close()
-
 	var list []*models.SSHKey
 	for rows.Next() {
 		var k models.SSHKey
@@ -109,7 +101,6 @@ func (r *WorkspaceSQLiteRepository) ListSSHKeys(ctx context.Context, teamID stri
 func (r *WorkspaceSQLiteRepository) DeleteSSHKey(ctx context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `DELETE FROM workspace_ssh_keys WHERE id = ?`, id)
 	return err
 }
@@ -121,10 +112,8 @@ func (r *WorkspaceSQLiteRepository) CreateAuditLog(ctx context.Context, log *mod
 	if log.CreatedAt.IsZero() {
 		log.CreatedAt = time.Now().UTC()
 	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `INSERT INTO workspace_audit_logs (id, team_id, project_id, environment_id, action, actor, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		log.ID, log.TeamID, log.ProjectID, log.EnvironmentID, log.Action, log.Actor, log.CreatedAt.Format(time.RFC3339))
 	if err != nil {
@@ -136,11 +125,9 @@ func (r *WorkspaceSQLiteRepository) CreateAuditLog(ctx context.Context, log *mod
 func (r *WorkspaceSQLiteRepository) ListAuditLogs(ctx context.Context, teamID string, limit int) ([]*models.AuditLog, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	if limit <= 0 {
 		limit = 100
 	}
-
 	rows, err := r.db.QueryContext(ctx, `SELECT id, team_id, COALESCE(project_id, ''), COALESCE(environment_id, ''), action, actor, created_at FROM workspace_audit_logs WHERE team_id = ? ORDER BY created_at DESC LIMIT ?`, teamID, limit)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, fmt.Errorf("list audit logs: %w", err)
@@ -149,7 +136,6 @@ func (r *WorkspaceSQLiteRepository) ListAuditLogs(ctx context.Context, teamID st
 		return []*models.AuditLog{}, nil
 	}
 	defer rows.Close()
-
 	var list []*models.AuditLog
 	for rows.Next() {
 		var log models.AuditLog

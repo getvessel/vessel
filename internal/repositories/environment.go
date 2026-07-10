@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -38,7 +39,6 @@ func NewEnvironmentSQLiteRepository(db *sql.DB) *EnvironmentSQLiteRepository {
 func (r *EnvironmentSQLiteRepository) Get(_ context.Context, id string) (*models.EnvironmentConfig, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-
 	row := r.db.QueryRow(
 		`SELECT id, project_id, name, is_default, created_at, updated_at FROM environments WHERE id = ?`, id,
 	)
@@ -58,7 +58,6 @@ func (r *EnvironmentSQLiteRepository) Get(_ context.Context, id string) (*models
 func (r *EnvironmentSQLiteRepository) ListByProject(_ context.Context, projectID string) ([]models.EnvironmentConfig, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-
 	rows, err := r.db.Query(
 		`SELECT id, project_id, name, is_default, created_at, updated_at FROM environments WHERE project_id = ? ORDER BY is_default DESC, created_at ASC`,
 		projectID,
@@ -67,7 +66,6 @@ func (r *EnvironmentSQLiteRepository) ListByProject(_ context.Context, projectID
 		return nil, fmt.Errorf("failed to list environments: %w", err)
 	}
 	defer rows.Close()
-
 	var envs []models.EnvironmentConfig
 	for rows.Next() {
 		var env models.EnvironmentConfig
@@ -84,14 +82,12 @@ func (r *EnvironmentSQLiteRepository) ListByProject(_ context.Context, projectID
 func (r *EnvironmentSQLiteRepository) Create(_ context.Context, env *models.EnvironmentConfig) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	if env.ID == "" {
 		env.ID = uuid.NewString()
 	}
 	now := time.Now().UTC()
 	env.CreatedAt = now
 	env.UpdatedAt = now
-
 	_, err := r.db.Exec(
 		`INSERT INTO environments (id, project_id, name, is_default, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`,
 		env.ID, env.ProjectID, env.Name, env.IsDefault, env.CreatedAt, env.UpdatedAt,
@@ -126,7 +122,6 @@ func (r *DomainSQLiteRepository) ListByProject(_ context.Context, projectID stri
 		return nil, err
 	}
 	defer rows.Close()
-
 	var domains []models.DomainConfig
 	for rows.Next() {
 		var d models.DomainConfig
@@ -146,7 +141,6 @@ func (r *DomainSQLiteRepository) ListAll(ctx context.Context) ([]models.DomainCo
 		return nil, err
 	}
 	defer rows.Close()
-
 	var domains []models.DomainConfig
 	for rows.Next() {
 		var d models.DomainConfig
@@ -165,7 +159,6 @@ func (r *DomainSQLiteRepository) Create(_ context.Context, d *models.DomainConfi
 	now := time.Now()
 	d.CreatedAt = now
 	d.UpdatedAt = now
-
 	_, err := r.db.Exec(
 		`INSERT INTO domains (id, project_id, domain_name, redirect_to, ssl_cert_status, path_prefix, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
 		d.ID, d.ProjectID, d.DomainName, d.RedirectTo, d.SSLCertStatus, d.PathPrefix, d.CreatedAt, d.UpdatedAt,

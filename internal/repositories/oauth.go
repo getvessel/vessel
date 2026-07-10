@@ -14,7 +14,6 @@ type OAuthRepository interface {
 	ListProviders(ctx context.Context) ([]models.OAuthProviderConfig, error)
 	GetProvider(ctx context.Context, idOrName string) (*models.OAuthProviderConfig, error)
 	SaveProvider(ctx context.Context, p *models.OAuthProviderConfig) error
-
 	GetUserTOTPSecret(ctx context.Context, userID string) (secret string, recoveryCodes []string, err error)
 	UpdateUserTOTP(ctx context.Context, userID string, enabled bool, secret string, recoveryCodes []string) error
 }
@@ -34,7 +33,6 @@ func (r *OAuthSQLiteRepository) ListProviders(ctx context.Context) ([]models.OAu
 		return nil, fmt.Errorf("failed to list oauth providers: %w", err)
 	}
 	defer rows.Close()
-
 	var providers []models.OAuthProviderConfig
 	for rows.Next() {
 		var p models.OAuthProviderConfig
@@ -49,7 +47,6 @@ func (r *OAuthSQLiteRepository) ListProviders(ctx context.Context) ([]models.OAu
 func (r *OAuthSQLiteRepository) GetProvider(ctx context.Context, idOrName string) (*models.OAuthProviderConfig, error) {
 	query := `SELECT id, provider_name, enabled, COALESCE(client_id, ''), COALESCE(client_secret, ''), COALESCE(redirect_uri, ''), COALESCE(base_url, ''), COALESCE(tenant, ''), created_at, updated_at FROM oauth_providers WHERE id = ? OR provider_name = ?`
 	row := r.db.QueryRowContext(ctx, query, idOrName, idOrName)
-
 	var p models.OAuthProviderConfig
 	if err := row.Scan(&p.ID, &p.ProviderName, &p.Enabled, &p.ClientID, &p.ClientSecret, &p.RedirectURI, &p.BaseURL, &p.Tenant, &p.CreatedAt, &p.UpdatedAt); err != nil {
 		if err == sql.ErrNoRows {
@@ -66,7 +63,6 @@ func (r *OAuthSQLiteRepository) SaveProvider(ctx context.Context, p *models.OAut
 		p.CreatedAt = now
 	}
 	p.UpdatedAt = now
-
 	query := `INSERT INTO oauth_providers (
 		id, provider_name, enabled, client_id, client_secret, redirect_uri, base_url, tenant, created_at, updated_at
 	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -79,7 +75,6 @@ func (r *OAuthSQLiteRepository) SaveProvider(ctx context.Context, p *models.OAut
 		base_url = excluded.base_url,
 		tenant = excluded.tenant,
 		updated_at = excluded.updated_at`
-
 	_, err := r.db.ExecContext(ctx, query, p.ID, p.ProviderName, p.Enabled, p.ClientID, p.ClientSecret, p.RedirectURI, p.BaseURL, p.Tenant, p.CreatedAt, p.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("failed to save oauth provider: %w", err)
@@ -94,7 +89,6 @@ func (r *OAuthSQLiteRepository) GetUserTOTPSecret(ctx context.Context, userID st
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to get totp secret: %w", err)
 	}
-
 	var codes []string
 	if recovery != "" {
 		for _, part := range strings.Split(recovery, ",") {

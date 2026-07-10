@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/repositories"
@@ -38,11 +39,9 @@ func (s *StorageService) CreateStorage(ctx context.Context, st *models.Storage) 
 		st.CreatedAt = now
 	}
 	st.UpdatedAt = now
-
 	if err := s.repo.Create(ctx, st); err != nil {
 		return nil, err
 	}
-
 	if s.deployer != nil {
 		containerID, err := s.deployer.SpinUp(ctx, st)
 		if err == nil && containerID != "" {
@@ -54,7 +53,6 @@ func (s *StorageService) CreateStorage(ctx context.Context, st *models.Storage) 
 			_ = s.repo.Update(ctx, st)
 		}
 	}
-
 	return st, nil
 }
 

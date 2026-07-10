@@ -13,7 +13,9 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/joho/godotenv"
+
 	_ "modernc.org/sqlite"
+
 	"vessel.dev/vessel/internal/agent"
 	"vessel.dev/vessel/internal/engine"
 	vesselhttp "vessel.dev/vessel/internal/http"
@@ -105,16 +107,12 @@ func (a *dbDeployerStore) ListServiceVariables(serviceID string) ([]*models.Vari
 }
 
 func main() {
-
 	_ = godotenv.Load()
-
 	isAgent := flag.Bool("agent", false, "Run in agent mode")
 	agentToken := flag.String("token", "", "Agent auth token")
 	serverURL := flag.String("server", "", "Controller server WSS URL")
 	flag.Parse()
-
 	log.Printf(" Booting Vessel Daemon (`vesseld`) v%s [%s/%s]...", vesselVersion, runtime.GOOS, runtime.GOARCH)
-
 	if *isAgent {
 		if *serverURL == "" {
 			log.Fatal(" Error: --server is required in agent mode (e.g. wss://vessel.domain.com/api/agent)")
@@ -127,51 +125,40 @@ func main() {
 		}
 		return
 	}
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
-
 	dataDir := os.Getenv("VESSEL_DATA_DIR")
 	if dataDir == "" {
 		dataDir = "data"
 	}
-
-	if err := os.MkdirAll(dataDir, 0755); err != nil {
+	if err := os.MkdirAll(dataDir, 0o755); err != nil {
 		log.Fatalf(" Failed to create data directory: %v", err)
 	}
-
 	vlt, err := vault.NewVault(dataDir)
 	if err != nil {
 		log.Fatalf(" Failed to initialize secrets vault: %v", err)
 	}
-
 	dbPath := filepath.Join(dataDir, "vessel.db")
 	db, err := sql.Open("sqlite", dbPath+"?_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=foreign_keys(ON)")
 	if err != nil {
 		log.Fatalf(" Failed to open SQLite database: %v", err)
 	}
 	defer db.Close()
-
 	if err := runMigrations(db); err != nil {
 		log.Fatalf(" Failed schema migration: %v", err)
 	}
-
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Printf(" Docker daemon connection warning: %v (container deployment features disabled)", err)
 	}
-
 	proxyCfg := proxy.NewCaddyConfig(dataDir, os.Getenv("VESSEL_TLS_EMAIL"))
 	settingsRepo := repositories.NewSettingsSQLiteRepository(db)
 	proxyMgr := proxy.NewProxyManager(proxyCfg, &dbProjectLister{db: db}, &dbServiceLister{db: db}, &dbDomainLister{db: db}, settingsRepo, dockerClient)
 	_ = proxyMgr.Reload(context.Background())
-
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
-
 	apiServer := vesselhttp.NewServer(db, vlt, deployer, proxyMgr, dockerClient)
-
 	log.Printf(" Vessel control plane listening on :%s", port)
 	if err := http.ListenAndServe(":"+port, apiServer.Handler()); err != nil {
 		log.Fatalf(" Server crashed: %v", err)
@@ -596,14 +583,11 @@ func runMigrations(db *sql.DB) error {
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
 	}
-
 	for _, q := range queries {
 		if _, err := db.Exec(q); err != nil {
 			return fmt.Errorf("migration failed: %w", err)
 		}
 	}
-
-	
 	log.Println(" Vessel SQLite schema initialized successfully (`data/vessel.db`)")
 	return nil
 }

@@ -22,7 +22,8 @@ func GenerateTOTPSecret() (string, error) {
 
 func GenerateTOTPQRUri(accountName, secret string) string {
 	issuer := "Vessel"
-	return fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s",
+	return fmt.Sprintf(
+		"otpauth://totp/%s:%s?secret=%s&issuer=%s",
 		url.QueryEscape(issuer),
 		url.QueryEscape(accountName),
 		url.QueryEscape(secret),

@@ -31,34 +31,28 @@ func (s *StatsMonitor) GetHealth(ctx context.Context, containerIDOrName string) 
 	if err != nil {
 		return &ContainerHealth{Status: "offline"}, fmt.Errorf("container inspect failed: %w", err)
 	}
-
 	if !inspectResp.State.Running {
 		return &ContainerHealth{Status: "stopped"}, nil
 	}
-
 	statsResp, err := s.dockerClient.ContainerStatsOneShot(ctx, containerIDOrName)
 	if err != nil {
 		return nil, fmt.Errorf("container stats failed: %w", err)
 	}
 	defer statsResp.Body.Close()
-
 	var stats types.StatsJSON
 	if err := json.NewDecoder(statsResp.Body).Decode(&stats); err != nil {
 		return nil, fmt.Errorf("failed to decode stats json: %w", err)
 	}
-
 	cpuPercent := CalculateCPUPercentage(&stats)
 	memoryUsage := stats.MemoryStats.Usage
 	if cache, exists := stats.MemoryStats.Stats["cache"]; exists && cache <= memoryUsage {
 		memoryUsage -= cache
 	}
-
 	startedAt, _ := time.Parse(time.RFC3339Nano, inspectResp.State.StartedAt)
 	uptimeSeconds := int64(time.Since(startedAt).Seconds())
 	if startedAt.IsZero() {
 		uptimeSeconds = 0
 	}
-
 	return &ContainerHealth{
 		Status:             "running",
 		CPUUsagePercentage: cpuPercent,

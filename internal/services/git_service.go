@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/repositories"
 )
@@ -265,7 +266,7 @@ func (s *GitService) CloneOrPullAppRepository(ctx context.Context, app *models.A
 		return nil
 	}
 	_ = os.RemoveAll(targetDir)
-	if err := os.MkdirAll(filepath.Dir(targetDir), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(targetDir), 0o755); err != nil {
 		return fmt.Errorf("failed to create build parent dir: %w", err)
 	}
 	cloneArgs := []string{"clone", "--depth", "1", "-b", branch, authURL, targetDir}

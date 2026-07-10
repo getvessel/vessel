@@ -13,13 +13,11 @@ func GenerateSslipDomain(projectNameOrID string, hostIP string) string {
 	if hostIP == "" {
 		hostIP = "127.0.0.1"
 	}
-
 	cleanIP := strings.ReplaceAll(strings.TrimSpace(hostIP), ".", "-")
 	cleanName := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(projectNameOrID), " ", "-"))
 	if len(cleanName) > 32 {
 		cleanName = cleanName[:32]
 	}
 	cleanName = strings.Trim(cleanName, "-")
-
 	return fmt.Sprintf("http://%s.%s.sslip.io", cleanName, cleanIP)
 }

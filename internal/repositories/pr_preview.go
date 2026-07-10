@@ -38,7 +38,6 @@ func (r *prPreviewRepo) GetByAppAndPR(ctx context.Context, appID string, prNumbe
 		return nil, err
 	}
 	defer rows.Close()
-
 	var previews []*models.PRPreview
 	for rows.Next() {
 		p := &models.PRPreview{}

@@ -36,12 +36,11 @@ func NewSettingsSQLiteRepository(db *sql.DB) *SettingsSQLiteRepository {
 func (r *SettingsSQLiteRepository) GetServerSettings(ctx context.Context) (*models.ServerSettings, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	var cfg models.ServerSettings
-	err := r.db.QueryRowContext(ctx, `SELECT id, caddy_wildcard_ip, discord_webhook_url, slack_webhook_url, telegram_bot_token, telegram_chat_id, 
-		 smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name, smtp_from_address, notification_alerts, 
-		 registration_enabled, registration_domain_allowlist, custom_dns_resolvers, dns_validation_enabled, ip_allowlist, mcp_server_enabled, default_wildcard_domain, 
-		 update_check_cron, auto_update_enabled, current_version, latest_version, last_update_check, updated_at 
+	err := r.db.QueryRowContext(ctx, `SELECT id, caddy_wildcard_ip, discord_webhook_url, slack_webhook_url, telegram_bot_token, telegram_chat_id,
+		 smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name, smtp_from_address, notification_alerts,
+		 registration_enabled, registration_domain_allowlist, custom_dns_resolvers, dns_validation_enabled, ip_allowlist, mcp_server_enabled, default_wildcard_domain,
+		 update_check_cron, auto_update_enabled, current_version, latest_version, last_update_check, updated_at
 		 FROM server_settings LIMIT 1`).
 		Scan(&cfg.ID, &cfg.CaddyWildcardIP, &cfg.DiscordWebhookURL, &cfg.SlackWebhookURL, &cfg.TelegramBotToken, &cfg.TelegramChatID,
 			&cfg.SMTPHost, &cfg.SMTPPort, &cfg.SMTPUser, &cfg.SMTPPassword, &cfg.SMTPFromName, &cfg.SMTPFromAddress, &cfg.NotificationAlerts,
@@ -79,10 +78,8 @@ func (r *SettingsSQLiteRepository) UpdateServerSettings(ctx context.Context, cfg
 		cfg.ID = "global"
 	}
 	cfg.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	query := `INSERT INTO server_settings (id, caddy_wildcard_ip, discord_webhook_url, slack_webhook_url, telegram_bot_token, telegram_chat_id, smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name, smtp_from_address, notification_alerts,
 	                                       registration_enabled, registration_domain_allowlist, custom_dns_resolvers, dns_validation_enabled, ip_allowlist, mcp_server_enabled, default_wildcard_domain, update_check_cron, auto_update_enabled, current_version, latest_version, last_update_check, updated_at)
 	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -123,13 +120,11 @@ func (r *SettingsSQLiteRepository) UpdateServerSettings(ctx context.Context, cfg
 func (r *SettingsSQLiteRepository) ListProjects(ctx context.Context) ([]map[string]any, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	rows, err := r.db.QueryContext(ctx, `SELECT id, name, repo_url, branch, status, updated_at FROM projects ORDER BY created_at DESC`)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list projects: %w", err)
 	}
 	defer rows.Close()
-
 	var projects []map[string]any
 	for rows.Next() {
 		var id, name, repoURL, branch, status, updatedAt string
@@ -158,12 +153,10 @@ func NewNotificationSQLiteRepository(db *sql.DB) *NotificationSQLiteRepository {
 
 func (r *NotificationSQLiteRepository) GetIntegration(ctx context.Context) (*models.NotificationIntegration, error) {
 	query := `SELECT id, smtp_enabled, COALESCE(smtp_host, ''), COALESCE(smtp_port, 587), COALESCE(smtp_user, ''), COALESCE(smtp_password, ''), COALESCE(smtp_from_name, ''), COALESCE(smtp_from_address, ''), resend_enabled, COALESCE(resend_api_key, ''), slack_enabled, COALESCE(slack_webhook_url, ''), discord_enabled, COALESCE(discord_webhook_url, ''), discord_ping_enabled, telegram_enabled, COALESCE(telegram_bot_token, ''), COALESCE(telegram_chat_id, ''), pushover_enabled, COALESCE(pushover_user_key, ''), COALESCE(pushover_api_token, ''), webhook_enabled, COALESCE(webhook_url, ''), COALESCE(updated_at, '') FROM notification_integrations WHERE id = 'global'`
-
 	row := r.db.QueryRowContext(ctx, query)
 	var n models.NotificationIntegration
 	var smtpHost, smtpUser, smtpPassword, smtpFromName, smtpFromAddress, resendKey, slackURL, discordURL, telegramBot, telegramChat, pushoverUser, pushoverToken, webhookURL, updatedAt string
 	var smtpPort int
-
 	err := row.Scan(
 		&n.ID, &n.SMTPEnabled, &smtpHost, &smtpPort, &smtpUser, &smtpPassword, &smtpFromName, &smtpFromAddress,
 		&n.ResendEnabled, &resendKey, &n.SlackEnabled, &slackURL,
@@ -178,7 +171,6 @@ func (r *NotificationSQLiteRepository) GetIntegration(ctx context.Context) (*mod
 	if err != nil {
 		return nil, fmt.Errorf("failed to scan notification integration: %w", err)
 	}
-
 	n.SMTPHost = smtpHost
 	n.SMTPPort = smtpPort
 	n.SMTPUser = smtpUser
@@ -194,14 +186,12 @@ func (r *NotificationSQLiteRepository) GetIntegration(ctx context.Context) (*mod
 	n.PushoverAPIToken = pushoverToken
 	n.WebhookURL = webhookURL
 	n.UpdatedAt = updatedAt
-
 	return &n, nil
 }
 
 func (r *NotificationSQLiteRepository) SaveIntegration(ctx context.Context, n *models.NotificationIntegration) error {
 	n.ID = "global"
 	n.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-
 	query := `INSERT INTO notification_integrations (
 		id, smtp_enabled, smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name, smtp_from_address,
 		resend_enabled, resend_api_key, slack_enabled, slack_webhook_url,
@@ -234,8 +224,8 @@ func (r *NotificationSQLiteRepository) SaveIntegration(ctx context.Context, n *m
 		webhook_enabled = excluded.webhook_enabled,
 		webhook_url = excluded.webhook_url,
 		updated_at = excluded.updated_at`
-
-	_, err := r.db.ExecContext(ctx, query,
+	_, err := r.db.ExecContext(
+		ctx, query,
 		n.ID, n.SMTPEnabled, n.SMTPHost, n.SMTPPort, n.SMTPUser, n.SMTPPassword, n.SMTPFromName, n.SMTPFromAddress,
 		n.ResendEnabled, n.ResendAPIKey, n.SlackEnabled, n.SlackWebhookURL,
 		n.DiscordEnabled, n.DiscordWebhookURL, n.DiscordPingEnabled,
@@ -246,13 +236,11 @@ func (r *NotificationSQLiteRepository) SaveIntegration(ctx context.Context, n *m
 	if err != nil {
 		return fmt.Errorf("failed to save notification integration: %w", err)
 	}
-
 	return nil
 }
 
 func (r *NotificationSQLiteRepository) GetProjectPref(ctx context.Context, projectID string) (*models.ProjectNotificationPref, error) {
 	query := `SELECT project_id, email_enabled, slack_enabled, discord_enabled, telegram_enabled, pushover_enabled, webhook_enabled, COALESCE(events, 'deploy.success,deploy.failure,invite'), updated_at FROM project_notification_prefs WHERE project_id = ?`
-
 	row := r.db.QueryRowContext(ctx, query, projectID)
 	var pref models.ProjectNotificationPref
 	err := row.Scan(&pref.ProjectID, &pref.EmailEnabled, &pref.SlackEnabled, &pref.DiscordEnabled, &pref.TelegramEnabled, &pref.PushoverEnabled, &pref.WebhookEnabled, &pref.Events, &pref.UpdatedAt)
@@ -272,13 +260,11 @@ func (r *NotificationSQLiteRepository) GetProjectPref(ctx context.Context, proje
 	if err != nil {
 		return nil, fmt.Errorf("failed to scan project notification preferences: %w", err)
 	}
-
 	return &pref, nil
 }
 
 func (r *NotificationSQLiteRepository) SaveProjectPref(ctx context.Context, pref *models.ProjectNotificationPref) error {
 	pref.UpdatedAt = time.Now().UTC()
-
 	query := `INSERT INTO project_notification_prefs (
 		project_id, email_enabled, slack_enabled, discord_enabled, telegram_enabled, pushover_enabled, webhook_enabled, events, updated_at
 	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -291,14 +277,13 @@ func (r *NotificationSQLiteRepository) SaveProjectPref(ctx context.Context, pref
 		webhook_enabled = excluded.webhook_enabled,
 		events = excluded.events,
 		updated_at = excluded.updated_at`
-
-	_, err := r.db.ExecContext(ctx, query,
+	_, err := r.db.ExecContext(
+		ctx, query,
 		pref.ProjectID, pref.EmailEnabled, pref.SlackEnabled, pref.DiscordEnabled,
 		pref.TelegramEnabled, pref.PushoverEnabled, pref.WebhookEnabled, pref.Events, pref.UpdatedAt,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to save project notification preferences: %w", err)
 	}
-
 	return nil
 }

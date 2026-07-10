@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -33,7 +34,6 @@ func NewJobSQLiteRepository(db *sql.DB) *JobSQLiteRepository {
 func (r *JobSQLiteRepository) Create(_ context.Context, j *models.Job) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	if j.ID == "" {
 		j.ID = uuid.NewString()
 	}
@@ -43,7 +43,6 @@ func (r *JobSQLiteRepository) Create(_ context.Context, j *models.Job) error {
 	if j.Status == "" {
 		j.Status = "active"
 	}
-
 	_, err := r.db.Exec(`INSERT INTO jobs (
 		id, project_id, name, schedule, command, status, last_run_at, last_output, created_at, updated_at
 	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -54,7 +53,6 @@ func (r *JobSQLiteRepository) Create(_ context.Context, j *models.Job) error {
 func (r *JobSQLiteRepository) GetByID(_ context.Context, id string) (*models.Job, error) {
 	var j models.Job
 	var lastRunAt sql.NullTime
-
 	err := r.db.QueryRow(`SELECT id, project_id, name, schedule, command, status, last_run_at, COALESCE(last_output, ''), created_at, updated_at
 		FROM jobs WHERE id = ?`, id).Scan(
 		&j.ID, &j.ProjectID, &j.Name, &j.Schedule, &j.Command, &j.Status, &lastRunAt, &j.LastOutput, &j.CreatedAt, &j.UpdatedAt,
@@ -77,7 +75,6 @@ func (r *JobSQLiteRepository) ListAll(_ context.Context) ([]models.Job, error) {
 		return nil, err
 	}
 	defer rows.Close()
-
 	var jobs []models.Job
 	for rows.Next() {
 		var j models.Job
@@ -100,7 +97,6 @@ func (r *JobSQLiteRepository) ListByProject(_ context.Context, projectID string)
 		return nil, err
 	}
 	defer rows.Close()
-
 	var jobs []models.Job
 	for rows.Next() {
 		var j models.Job
@@ -119,7 +115,6 @@ func (r *JobSQLiteRepository) ListByProject(_ context.Context, projectID string)
 func (r *JobSQLiteRepository) Update(_ context.Context, j *models.Job) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	j.UpdatedAt = time.Now()
 	_, err := r.db.Exec(`UPDATE jobs SET name = ?, schedule = ?, command = ?, status = ?, last_run_at = ?, last_output = ?, updated_at = ? WHERE id = ?`,
 		j.Name, j.Schedule, j.Command, j.Status, j.LastRunAt, j.LastOutput, j.UpdatedAt, j.ID)
@@ -134,7 +129,6 @@ func (r *JobSQLiteRepository) Delete(_ context.Context, id string) error {
 func (r *JobSQLiteRepository) UpdateStatus(_ context.Context, id, status string, lastRunAt *time.Time, output string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	now := time.Now()
 	_, err := r.db.Exec(`UPDATE jobs SET status = ?, last_run_at = ?, last_output = ?, updated_at = ? WHERE id = ?`,
 		status, lastRunAt, output, now, id)

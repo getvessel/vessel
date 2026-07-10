@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/repositories"
@@ -40,7 +41,6 @@ func (s *BackupService) CreateConfig(ctx context.Context, cfg *models.BackupConf
 	}
 	cfg.CreatedAt = time.Now().UTC().Format(time.RFC3339)
 	cfg.UpdatedAt = cfg.CreatedAt
-
 	if err := s.backupRepo.CreateConfig(ctx, cfg); err != nil {
 		return err
 	}

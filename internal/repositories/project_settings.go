@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -19,13 +20,11 @@ type ProjectSettingsRepository interface {
 	CreateWebhook(ctx context.Context, w *models.Webhook) error
 	ListWebhooksByProject(ctx context.Context, projectID string) ([]*models.Webhook, error)
 	DeleteWebhook(ctx context.Context, id, projectID string) error
-
 	CreateToken(ctx context.Context, t *models.ProjectToken) (string, error)
 	ListTokensByProject(ctx context.Context, projectID string) ([]*models.ProjectToken, error)
 	DeleteToken(ctx context.Context, id, projectID string) error
 	GetTokenByHash(ctx context.Context, tokenHash string) (*models.ProjectToken, error)
 	UpdateTokenLastUsed(ctx context.Context, id string) error
-
 	AddMember(ctx context.Context, m *models.ProjectMember) error
 	ListMembers(ctx context.Context, projectID string) ([]*models.ProjectMember, error)
 	RemoveMember(ctx context.Context, id, projectID string) error
@@ -43,14 +42,12 @@ func NewProjectSettingsSQLiteRepository(db *sql.DB) *ProjectSettingsSQLiteReposi
 func (r *ProjectSettingsSQLiteRepository) CreateWebhook(ctx context.Context, w *models.Webhook) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	if w.ID == "" {
 		w.ID = uuid.NewString()
 	}
 	now := time.Now().UTC()
 	w.CreatedAt = now
 	w.UpdatedAt = now
-
 	eventTypesStr := strings.Join(w.EventTypes, ",")
 	_, err := r.db.ExecContext(ctx,
 		`INSERT INTO project_webhooks (id, project_id, url, event_types, include_pr_environments, created_at, updated_at)
@@ -65,7 +62,6 @@ func (r *ProjectSettingsSQLiteRepository) CreateWebhook(ctx context.Context, w *
 func (r *ProjectSettingsSQLiteRepository) ListWebhooksByProject(ctx context.Context, projectID string) ([]*models.Webhook, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	rows, err := r.db.QueryContext(ctx,
 		`SELECT id, project_id, url, event_types, include_pr_environments, created_at, updated_at
 		 FROM project_webhooks WHERE project_id = ? ORDER BY created_at DESC`, projectID)
@@ -73,7 +69,6 @@ func (r *ProjectSettingsSQLiteRepository) ListWebhooksByProject(ctx context.Cont
 		return nil, fmt.Errorf("list webhooks: %w", err)
 	}
 	defer rows.Close()
-
 	var out []*models.Webhook
 	for rows.Next() {
 		var w models.Webhook
@@ -96,7 +91,6 @@ func (r *ProjectSettingsSQLiteRepository) ListWebhooksByProject(ctx context.Cont
 func (r *ProjectSettingsSQLiteRepository) DeleteWebhook(ctx context.Context, id, projectID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	res, err := r.db.ExecContext(ctx, `DELETE FROM project_webhooks WHERE id = ? AND project_id = ?`, id, projectID)
 	if err != nil {
 		return fmt.Errorf("delete webhook: %w", err)
@@ -111,12 +105,10 @@ func (r *ProjectSettingsSQLiteRepository) DeleteWebhook(ctx context.Context, id,
 func (r *ProjectSettingsSQLiteRepository) CreateToken(ctx context.Context, t *models.ProjectToken) (string, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	if t.ID == "" {
 		t.ID = uuid.NewString()
 	}
 	t.CreatedAt = time.Now().UTC()
-
 	randomBytes := make([]byte, 32)
 	if _, err := rand.Read(randomBytes); err != nil {
 		return "", fmt.Errorf("generate token bytes: %w", err)
@@ -124,15 +116,12 @@ func (r *ProjectSettingsSQLiteRepository) CreateToken(ctx context.Context, t *mo
 	rawSecret := hex.EncodeToString(randomBytes)
 	fullToken := fmt.Sprintf("vsl_tok_%s", rawSecret)
 	t.TokenPrefix = fullToken[:16]
-
 	scopesStr := strings.Join(t.Scopes, ",")
 	ipStr := strings.Join(t.IPAllowlist, ",")
-
 	var expiresAtVal interface{}
 	if t.ExpiresAt != nil {
 		expiresAtVal = t.ExpiresAt.Format(time.RFC3339)
 	}
-
 	_, err := r.db.ExecContext(ctx,
 		`INSERT INTO project_tokens (id, project_id, environment_id, name, token_prefix, token_hash, scopes, ip_allowlist, expires_at, created_at)
 		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -146,7 +135,6 @@ func (r *ProjectSettingsSQLiteRepository) CreateToken(ctx context.Context, t *mo
 func (r *ProjectSettingsSQLiteRepository) ListTokensByProject(ctx context.Context, projectID string) ([]*models.ProjectToken, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	rows, err := r.db.QueryContext(ctx,
 		`SELECT id, project_id, environment_id, name, token_prefix, scopes, ip_allowlist, expires_at, created_at
 		 FROM project_tokens WHERE project_id = ? ORDER BY created_at DESC`, projectID)
@@ -154,38 +142,31 @@ func (r *ProjectSettingsSQLiteRepository) ListTokensByProject(ctx context.Contex
 		return nil, fmt.Errorf("list tokens: %w", err)
 	}
 	defer rows.Close()
-
 	var out []*models.ProjectToken
 	for rows.Next() {
 		var t models.ProjectToken
 		var scopesStr, ipStr string
 		var expiresAtStr sql.NullString
 		var createdAtStr string
-
 		if err := rows.Scan(&t.ID, &t.ProjectID, &t.EnvironmentID, &t.Name, &t.TokenPrefix, &scopesStr, &ipStr, &expiresAtStr, &createdAtStr); err != nil {
 			return nil, fmt.Errorf("scan token: %w", err)
 		}
-
 		if scopesStr != "" {
 			t.Scopes = strings.Split(scopesStr, ",")
 		} else {
 			t.Scopes = []string{}
 		}
-
 		if ipStr != "" {
 			t.IPAllowlist = strings.Split(ipStr, ",")
 		} else {
 			t.IPAllowlist = []string{}
 		}
-
 		if expiresAtStr.Valid && expiresAtStr.String != "" {
 			parsed, _ := time.Parse(time.RFC3339, expiresAtStr.String)
 			t.ExpiresAt = &parsed
 		}
-
 		parsedCreated, _ := time.Parse(time.RFC3339, createdAtStr)
 		t.CreatedAt = parsedCreated
-
 		out = append(out, &t)
 	}
 	return out, rows.Err()
@@ -194,7 +175,6 @@ func (r *ProjectSettingsSQLiteRepository) ListTokensByProject(ctx context.Contex
 func (r *ProjectSettingsSQLiteRepository) DeleteToken(ctx context.Context, id, projectID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	res, err := r.db.ExecContext(ctx, `DELETE FROM project_tokens WHERE id = ? AND project_id = ?`, id, projectID)
 	if err != nil {
 		return fmt.Errorf("delete token: %w", err)
@@ -209,24 +189,20 @@ func (r *ProjectSettingsSQLiteRepository) DeleteToken(ctx context.Context, id, p
 func (r *ProjectSettingsSQLiteRepository) GetTokenByHash(ctx context.Context, tokenHash string) (*models.ProjectToken, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	var t models.ProjectToken
 	var scopesStr, ipStr string
 	var expiresAtStr sql.NullString
 	var createdAtStr string
-
 	err := r.db.QueryRowContext(ctx,
 		`SELECT id, project_id, environment_id, name, token_prefix, scopes, ip_allowlist, expires_at, created_at
 		 FROM project_tokens WHERE token_hash = ?`, tokenHash).
 		Scan(&t.ID, &t.ProjectID, &t.EnvironmentID, &t.Name, &t.TokenPrefix, &scopesStr, &ipStr, &expiresAtStr, &createdAtStr)
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("invalid or revoked token")
 		}
 		return nil, fmt.Errorf("get token by hash: %w", err)
 	}
-
 	if scopesStr != "" {
 		t.Scopes = strings.Split(scopesStr, ",")
 	}
@@ -239,14 +215,12 @@ func (r *ProjectSettingsSQLiteRepository) GetTokenByHash(ctx context.Context, to
 	}
 	parsedCreated, _ := time.Parse(time.RFC3339, createdAtStr)
 	t.CreatedAt = parsedCreated
-
 	return &t, nil
 }
 
 func (r *ProjectSettingsSQLiteRepository) UpdateTokenLastUsed(ctx context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `UPDATE project_tokens SET last_used_at = ? WHERE id = ?`, time.Now().Format(time.RFC3339), id)
 	return err
 }
@@ -254,7 +228,6 @@ func (r *ProjectSettingsSQLiteRepository) UpdateTokenLastUsed(ctx context.Contex
 func (r *ProjectSettingsSQLiteRepository) AddMember(ctx context.Context, m *models.ProjectMember) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	if m.ID == "" {
 		m.ID = uuid.NewString()
 	}
@@ -266,7 +239,6 @@ func (r *ProjectSettingsSQLiteRepository) AddMember(ctx context.Context, m *mode
 	if m.Permission == "" {
 		m.Permission = "Can Edit"
 	}
-
 	_, err := r.db.ExecContext(ctx,
 		`INSERT INTO project_members (id, project_id, user_id, email, permission, status, invited_at, accepted_at)
 		 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -283,7 +255,6 @@ func (r *ProjectSettingsSQLiteRepository) AddMember(ctx context.Context, m *mode
 func (r *ProjectSettingsSQLiteRepository) ListMembers(ctx context.Context, projectID string) ([]*models.ProjectMember, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	rows, err := r.db.QueryContext(ctx,
 		`SELECT id, project_id, user_id, email, permission, status, invited_at, accepted_at
 		 FROM project_members WHERE project_id = ? ORDER BY invited_at ASC`, projectID)
@@ -291,7 +262,6 @@ func (r *ProjectSettingsSQLiteRepository) ListMembers(ctx context.Context, proje
 		return nil, fmt.Errorf("list members: %w", err)
 	}
 	defer rows.Close()
-
 	var out []*models.ProjectMember
 	for rows.Next() {
 		var m models.ProjectMember
@@ -310,7 +280,6 @@ func (r *ProjectSettingsSQLiteRepository) ListMembers(ctx context.Context, proje
 func (r *ProjectSettingsSQLiteRepository) RemoveMember(ctx context.Context, id, projectID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	res, err := r.db.ExecContext(ctx, `DELETE FROM project_members WHERE id = ? AND project_id = ?`, id, projectID)
 	if err != nil {
 		return fmt.Errorf("remove member: %w", err)

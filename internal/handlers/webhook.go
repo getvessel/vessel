@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"github.com/labstack/echo/v4"
-
 	"context"
 	"fmt"
 	"log"
@@ -11,6 +9,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
+
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/services"
 )
@@ -44,18 +44,15 @@ func (h *WebhookHandler) HandleProjectWebhook(c echo.Context) error {
 	if projectID == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing projectId parameter"})
 	}
-
 	project, err := h.projectService.GetProject(c.Request().Context(), projectID)
 	if err != nil || project == nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "project not found"})
 	}
-
 	go func() {
 		ctx := context.Background()
 		sourceDir := filepath.Join("data", "builds", project.ID)
 		_, _ = h.deploymentService.DeployProject(ctx, project.ID, sourceDir, nil)
 	}()
-
 	return c.JSON(http.StatusAccepted, map[string]string{
 		"status":  "accepted",
 		"message": fmt.Sprintf("triggering background build & deployment for %s", project.Name),
@@ -67,12 +64,10 @@ func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 	if serviceID == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing serviceId parameter"})
 	}
-
 	appSvc, err := h.appService.GetAppService(c.Request().Context(), serviceID)
 	if err != nil || appSvc == nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "service not found"})
 	}
-
 	go func() {
 		ctx := context.Background()
 		dep := &models.Deployment{
@@ -88,7 +83,6 @@ func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 			UpdatedAt:     time.Now().UTC(),
 		}
 		_, _ = h.deploymentService.CreateDeployment(ctx, dep)
-
 		sourceDir := filepath.Join("data", "builds", "services", appSvc.ID)
 		if h.gitService != nil && appSvc.RepositoryURL != "" {
 			if err := h.gitService.CloneOrPullAppRepository(ctx, appSvc, sourceDir, nil); err != nil {
@@ -97,10 +91,8 @@ func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 				return
 			}
 		}
-
 		_ = h.deploymentService.UpdateStatus(ctx, dep.ID, "ACTIVE", dep.BuildLogs+"Deployment rollout triggered via Webhook.\n", appSvc.ContainerID)
 	}()
-
 	return c.JSON(http.StatusAccepted, map[string]string{
 		"status":  "accepted",
 		"message": fmt.Sprintf("triggering background build & rollout for service %s", appSvc.Name),
@@ -112,12 +104,10 @@ func (h *WebhookHandler) HandleGitHubWebhook(c echo.Context) error {
 	if serviceID == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing serviceId parameter"})
 	}
-
 	event := c.Request().Header.Get("X-GitHub-Event")
 	if event == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing X-GitHub-Event header"})
 	}
-
 	var payload struct {
 		Action      string `json:"action"`
 		Number      int    `json:"number"`
@@ -128,11 +118,9 @@ func (h *WebhookHandler) HandleGitHubWebhook(c echo.Context) error {
 			} `json:"head"`
 		} `json:"pull_request"`
 	}
-
 	if err := c.Bind(&payload); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
-
 	if event == "pull_request" {
 		if payload.Action == "opened" || payload.Action == "synchronize" {
 			go func() {
@@ -148,6 +136,5 @@ func (h *WebhookHandler) HandleGitHubWebhook(c echo.Context) error {
 			return c.JSON(http.StatusAccepted, map[string]string{"message": "Destroying PR preview"})
 		}
 	}
-
 	return c.JSON(http.StatusOK, map[string]string{"message": "Event ignored"})
 }

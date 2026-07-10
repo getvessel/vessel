@@ -34,7 +34,6 @@ func (cs *CronService) CreateJob(ctx context.Context, j *models.Job) error {
 	if j.Command == "" {
 		return errors.New("command is required")
 	}
-
 	project, err := cs.projects.Get(ctx, j.ProjectID)
 	if err != nil {
 		return fmt.Errorf("failed to verify project existence: %w", err)
@@ -42,11 +41,9 @@ func (cs *CronService) CreateJob(ctx context.Context, j *models.Job) error {
 	if project == nil {
 		return fmt.Errorf("project with ID %s not found", j.ProjectID)
 	}
-
 	if err := cs.jobs.Create(ctx, j); err != nil {
 		return err
 	}
-
 	return cs.cronManager.RegisterJob(j)
 }
 

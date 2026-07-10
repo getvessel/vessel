@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/labstack/echo/v4"
-
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/services"
@@ -91,16 +91,13 @@ func (h *DatabaseHandler) QueryDatabase(c echo.Context) error {
 	if id == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing database id parameter"})
 	}
-
 	var req models.DatabaseQueryRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
-
 	res, err := h.databaseService.QueryDatabase(c.Request().Context(), id, req.Query)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-
 	return c.JSON(http.StatusOK, res)
 }

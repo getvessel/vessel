@@ -9,6 +9,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -55,40 +56,32 @@ func (m *ProxyManager) Reload(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to load active projects for caddy reload: %w", err)
 	}
-
 	services, _ := m.services.ListServices()
-
 	domains, err := m.domains.ListAllDomains()
 	if err != nil {
 		return fmt.Errorf("failed to load custom domains for caddy reload: %w", err)
 	}
-
 	var wildcardDomain string
 	if m.settings != nil {
 		if settings, err := m.settings.GetServerSettings(ctx); err == nil && settings != nil {
 			wildcardDomain = settings.DefaultWildcardDomain
 		}
 	}
-
 	caddyfileContent, err := m.generator.Generate(projects, services, domains, wildcardDomain)
 	if err != nil {
 		return fmt.Errorf("failed to generate caddyfile syntax: %w", err)
 	}
-
-	if err := os.WriteFile(m.config.CaddyfilePath, []byte(caddyfileContent), 0644); err != nil {
+	if err := os.WriteFile(m.config.CaddyfilePath, []byte(caddyfileContent), 0o644); err != nil {
 		return fmt.Errorf("failed to persist caddyfile to %s: %w", m.config.CaddyfilePath, err)
 	}
-
 	if err := m.reloadAdminAPI(ctx, []byte(caddyfileContent)); err == nil {
 		return nil
 	}
-
 	if m.docker != nil {
 		if err := m.reloadDockerContainer(ctx); err == nil {
 			return nil
 		}
 	}
-
 	return nil
 }
 
@@ -98,13 +91,11 @@ func (m *ProxyManager) reloadAdminAPI(ctx context.Context, caddyfileBytes []byte
 		return err
 	}
 	req.Header.Set("Content-Type", "text/caddyfile")
-
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
-
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return fmt.Errorf("caddy admin api returned unexpected status code: %d", resp.StatusCode)
 	}
@@ -117,11 +108,9 @@ func (m *ProxyManager) reloadDockerContainer(ctx context.Context) error {
 		AttachStdout: true,
 		AttachStderr: true,
 	}
-
 	execID, err := m.docker.ContainerExecCreate(ctx, m.config.DockerContainer, execConfig)
 	if err != nil {
 		return err
 	}
-
 	return m.docker.ContainerExecStart(ctx, execID.ID, types.ExecStartCheck{})
 }

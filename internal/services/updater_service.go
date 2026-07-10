@@ -49,7 +49,6 @@ func (u *UpdaterService) Start(ctx context.Context) {
 	go func() {
 		ticker := time.NewTicker(1 * time.Hour)
 		defer ticker.Stop()
-
 		go func() {
 			time.Sleep(30 * time.Second)
 			settingsCfg, err := u.repo.GetServerSettings(ctx)
@@ -57,7 +56,6 @@ func (u *UpdaterService) Start(ctx context.Context) {
 				_, _ = u.CheckForUpdates(ctx)
 			}
 		}()
-
 		for {
 			select {
 			case <-ctx.Done():
@@ -81,15 +79,12 @@ func (u *UpdaterService) Stop() {
 func (u *UpdaterService) GetStatus() *UpdateInfo {
 	u.mu.Lock()
 	defer u.mu.Unlock()
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
 	settingsCfg, err := u.repo.GetServerSettings(ctx)
 	if err != nil {
 		return &UpdateInfo{}
 	}
-
 	return &UpdateInfo{
 		CurrentVersion:  settingsCfg.CurrentVersion,
 		LatestVersion:   settingsCfg.LatestVersion,
@@ -103,30 +98,25 @@ func (u *UpdaterService) GetStatus() *UpdateInfo {
 func (u *UpdaterService) CheckForUpdates(ctx context.Context) (*UpdateInfo, error) {
 	u.mu.Lock()
 	defer u.mu.Unlock()
-
 	settingsCfg, err := u.repo.GetServerSettings(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed fetching server settings: %w", err)
 	}
-
 	currentVer := settingsCfg.CurrentVersion
 	if strings.TrimSpace(currentVer) == "" {
 		currentVer = defaultVersion
 		settingsCfg.CurrentVersion = currentVer
 	}
-
 	latestVer := currentVer
 	releaseNotes := "System is running optimal build."
 	downloadURL := os.Getenv("VESSEL_DOWNLOAD_URL")
 	if downloadURL == "" {
 		downloadURL = "https://github.com/solomonolatunji/vessel/releases"
 	}
-
 	releaseAPI := os.Getenv("VESSEL_UPDATE_URL")
 	if releaseAPI == "" {
 		releaseAPI = "https://api.github.com/repos/solomonolatunji/vessel/releases/latest"
 	}
-
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, releaseAPI, nil)
 	if err == nil {
 		req.Header.Set("User-Agent", "vessel-updater/"+currentVer)
@@ -150,19 +140,15 @@ func (u *UpdaterService) CheckForUpdates(ctx context.Context) (*UpdateInfo, erro
 			}
 		}
 	}
-
 	if latestVer == currentVer && strings.HasSuffix(currentVer, "-dev") {
 		latestVer = strings.TrimSuffix(currentVer, "-dev")
 	}
-
 	hasUpdate := isNewerVersion(currentVer, latestVer)
 	settingsCfg.LatestVersion = latestVer
 	settingsCfg.LastUpdateCheck = time.Now().Format(time.RFC3339)
-
 	if err := u.repo.UpdateServerSettings(ctx, settingsCfg); err != nil {
 		return nil, fmt.Errorf("failed saving updated version info: %w", err)
 	}
-
 	return &UpdateInfo{
 		CurrentVersion:  currentVer,
 		LatestVersion:   latestVer,
@@ -178,23 +164,18 @@ func (u *UpdaterService) CheckForUpdates(ctx context.Context) (*UpdateInfo, erro
 func (u *UpdaterService) DeployUpdate(ctx context.Context) error {
 	u.mu.Lock()
 	defer u.mu.Unlock()
-
 	settingsCfg, err := u.repo.GetServerSettings(ctx)
 	if err != nil {
 		return fmt.Errorf("failed loading server settings: %w", err)
 	}
-
 	if settingsCfg.LatestVersion == "" || settingsCfg.LatestVersion == settingsCfg.CurrentVersion {
 		return nil
 	}
-
 	settingsCfg.CurrentVersion = settingsCfg.LatestVersion
 	settingsCfg.LastUpdateCheck = time.Now().Format(time.RFC3339)
-
 	if err := u.repo.UpdateServerSettings(ctx, settingsCfg); err != nil {
 		return fmt.Errorf("failed finalizing update deployment: %w", err)
 	}
-
 	return nil
 }
 

@@ -5,13 +5,11 @@ import (
 	"html/template"
 )
 
-//go:embed emails/*.html
+//go:embed emails/*.tmpl
 var emailFS embed.FS
 
-var (
-	HTMLTemplates *template.Template
-)
+var HTMLTemplates *template.Template
 
 func init() {
-	HTMLTemplates = template.Must(template.ParseFS(emailFS, "emails/*.html"))
+	HTMLTemplates = template.Must(template.ParseFS(emailFS, "emails/*.tmpl"))
 }

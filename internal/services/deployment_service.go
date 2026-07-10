@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/repositories"
@@ -48,7 +49,6 @@ func (s *DeploymentService) CreateDeployment(ctx context.Context, d *models.Depl
 		d.CreatedAt = now
 	}
 	d.UpdatedAt = now
-
 	if err := s.repo.Create(ctx, d); err != nil {
 		return nil, err
 	}

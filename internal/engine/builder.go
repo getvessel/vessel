@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/docker/docker/client"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -53,7 +54,6 @@ func (b *EngineBuilder) Build(ctx context.Context, opts BuildOptions) (string, e
 	if opts.LogWriter != nil {
 		fmt.Fprintf(opts.LogWriter, "🚀 [Builder] Detected build strategy: %s\n", strategy)
 	}
-
 	switch strategy {
 	case StrategyDockerfile:
 		imageTag, err := b.dockerfileBuilder.Build(ctx, opts)
@@ -76,7 +76,6 @@ func (b *EngineBuilder) DetectStrategy(sourceDir, dockerfilePath string, app *mo
 	if app != nil && app.BuildEngine != "" {
 		return BuildStrategy(app.BuildEngine)
 	}
-
 	if dockerfilePath != "" {
 		if _, err := os.Stat(filepath.Join(sourceDir, dockerfilePath)); err == nil {
 			return StrategyDockerfile

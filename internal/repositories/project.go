@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -36,7 +37,6 @@ func (r *ProjectSQLiteRepository) List(_ context.Context) ([]models.ProjectConfi
 		return nil, err
 	}
 	defer rows.Close()
-
 	var projects []models.ProjectConfig
 	for rows.Next() {
 		var p models.ProjectConfig
@@ -68,7 +68,6 @@ func (r *ProjectSQLiteRepository) Create(ctx context.Context, p *models.ProjectC
 	now := time.Now().UTC()
 	p.CreatedAt = now
 	p.UpdatedAt = now
-
 	_, err := r.db.Exec(
 		`INSERT INTO projects (id, workspace_id, team_id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		p.ID, p.WorkspaceID, p.TeamID, p.Name, p.Description, p.CreatedAt, p.UpdatedAt,
@@ -76,7 +75,6 @@ func (r *ProjectSQLiteRepository) Create(ctx context.Context, p *models.ProjectC
 	if err != nil {
 		return err
 	}
-
 	defaultEnv := &models.EnvironmentConfig{
 		ProjectID: p.ID,
 		Name:      "production",
@@ -105,7 +103,6 @@ func (r *EnvSQLiteRepository) GetVars(_ context.Context, projectID string) (map[
 		return nil, err
 	}
 	defer rows.Close()
-
 	envs := make(map[string]string)
 	for rows.Next() {
 		var key, encrypted string

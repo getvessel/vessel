@@ -12,7 +12,6 @@ import (
 func (r *CanvasSQLiteRepository) GetEnvironmentCanvas(_ context.Context, environmentID string) (*models.EnvironmentCanvas, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	row := r.db.QueryRow(
 		`SELECT id, project_id, name, is_default, created_at, updated_at FROM environments WHERE id = ?`, environmentID,
 	)
@@ -26,11 +25,9 @@ func (r *CanvasSQLiteRepository) GetEnvironmentCanvas(_ context.Context, environ
 		return nil, err
 	}
 	env.IsDefault = isDefault == 1
-
 	apps, _ := r.listAppServicesByEnvironment(environmentID)
 	dbs, _ := r.listDatabasesByEnvironment(environmentID)
 	storageItems, _ := r.listStorageByEnvironment(environmentID)
-
 	var dbsPtrs []*models.Database
 	for i := range dbs {
 		dbsPtrs = append(dbsPtrs, &dbs[i])
@@ -39,7 +36,6 @@ func (r *CanvasSQLiteRepository) GetEnvironmentCanvas(_ context.Context, environ
 	for i := range storageItems {
 		storagePtrs = append(storagePtrs, &storageItems[i])
 	}
-
 	return &models.EnvironmentCanvas{
 		Environment: &env,
 		Apps:        apps,
@@ -64,7 +60,6 @@ func (r *CanvasSQLiteRepository) listAllProjects() ([]projectRow, error) {
 		return nil, err
 	}
 	defer rows.Close()
-
 	var projects []projectRow
 	for rows.Next() {
 		var p projectRow
@@ -105,7 +100,6 @@ func (r *CanvasSQLiteRepository) listAllEnvironments(ctx context.Context) ([]*mo
 		return nil, err
 	}
 	defer rows.Close()
-
 	var result []*models.EnvironmentConfig
 	for rows.Next() {
 		var env models.EnvironmentConfig
@@ -137,7 +131,6 @@ func (r *CanvasSQLiteRepository) scanAppServices(query string, args ...any) ([]*
 		return nil, err
 	}
 	defer rows.Close()
-
 	var apps []*models.AppService
 	for rows.Next() {
 		var a models.AppService
@@ -171,7 +164,6 @@ func (r *CanvasSQLiteRepository) scanDatabases(query string, args ...any) ([]mod
 		return nil, err
 	}
 	defer rows.Close()
-
 	var dbs []models.Database
 	for rows.Next() {
 		var d models.Database
@@ -205,7 +197,6 @@ func (r *CanvasSQLiteRepository) scanStorage(query string, args ...any) ([]model
 		return nil, err
 	}
 	defer rows.Close()
-
 	var items []models.Storage
 	for rows.Next() {
 		var s models.Storage

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -21,10 +22,8 @@ func (r *TeamSQLiteRepository) AddMember(ctx context.Context, member *models.Tea
 	if member.Role == "" {
 		member.Role = "Member"
 	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `INSERT INTO team_members (id, team_id, user_id, user_email, role, joined_at) VALUES (?, ?, ?, ?, ?, ?)`,
 		member.ID, member.TeamID, member.UserID, member.UserEmail, member.Role, member.JoinedAt.Format(time.RFC3339))
 	if err != nil {
@@ -36,7 +35,6 @@ func (r *TeamSQLiteRepository) AddMember(ctx context.Context, member *models.Tea
 func (r *TeamSQLiteRepository) RemoveMember(ctx context.Context, teamID, userID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	res, err := r.db.ExecContext(ctx, `DELETE FROM team_members WHERE team_id = ? AND user_id = ? AND role != 'Owner'`, teamID, userID)
 	if err != nil {
 		return fmt.Errorf("remove team member: %w", err)
@@ -51,7 +49,6 @@ func (r *TeamSQLiteRepository) RemoveMember(ctx context.Context, teamID, userID 
 func (r *TeamSQLiteRepository) GetMember(ctx context.Context, teamID, userID string) (*models.TeamMember, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	var m models.TeamMember
 	var joinedStr string
 	err := r.db.QueryRowContext(ctx, `SELECT id, team_id, user_id, user_email, role, joined_at FROM team_members WHERE team_id = ? AND user_id = ?`, teamID, userID).
@@ -69,13 +66,11 @@ func (r *TeamSQLiteRepository) GetMember(ctx context.Context, teamID, userID str
 func (r *TeamSQLiteRepository) ListMembers(ctx context.Context, teamID string) ([]*models.TeamMember, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	rows, err := r.db.QueryContext(ctx, `SELECT id, team_id, user_id, user_email, role, joined_at FROM team_members WHERE team_id = ? ORDER BY joined_at ASC`, teamID)
 	if err != nil {
 		return nil, fmt.Errorf("list team members: %w", err)
 	}
 	defer rows.Close()
-
 	var list []*models.TeamMember
 	for rows.Next() {
 		var m models.TeamMember
@@ -106,10 +101,8 @@ func (r *TeamSQLiteRepository) CreateInvite(ctx context.Context, invite *models.
 	if invite.Role == "" {
 		invite.Role = "Member"
 	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `INSERT INTO team_invites (id, team_id, email, role, token, invited_by, expires_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
 		invite.ID, invite.TeamID, invite.Email, invite.Role, invite.Token, invite.InvitedBy, invite.ExpiresAt.Format(time.RFC3339), invite.CreatedAt.Format(time.RFC3339))
 	if err != nil {
@@ -121,7 +114,6 @@ func (r *TeamSQLiteRepository) CreateInvite(ctx context.Context, invite *models.
 func (r *TeamSQLiteRepository) GetInviteByToken(ctx context.Context, token string) (*models.TeamInvite, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	var inv models.TeamInvite
 	var expStr, createdStr string
 	err := r.db.QueryRowContext(ctx, `SELECT id, team_id, email, role, token, invited_by, expires_at, created_at FROM team_invites WHERE token = ?`, token).
@@ -140,7 +132,6 @@ func (r *TeamSQLiteRepository) GetInviteByToken(ctx context.Context, token strin
 func (r *TeamSQLiteRepository) DeleteInvite(ctx context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `DELETE FROM team_invites WHERE id = ?`, id)
 	return err
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/repositories"
@@ -39,7 +40,6 @@ func (s *JobService) CreateJob(ctx context.Context, j *models.Job) (*models.Job,
 	now := time.Now()
 	j.CreatedAt = now
 	j.UpdatedAt = now
-
 	if err := s.repo.Create(ctx, j); err != nil {
 		return nil, err
 	}

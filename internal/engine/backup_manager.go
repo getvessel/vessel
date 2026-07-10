@@ -18,6 +18,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/robfig/cron/v3"
+
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/utils"
 )
@@ -35,8 +36,7 @@ func NewBackupManager(dockerClient *client.Client, s BackupManagerStore, backupD
 	if backupDir == "" {
 		backupDir = filepath.Join("data", "backups")
 	}
-	_ = os.MkdirAll(backupDir, 0755)
-
+	_ = os.MkdirAll(backupDir, 0o755)
 	return &BackupManager{
 		dockerClient: dockerClient,
 		store:        s,
@@ -51,16 +51,13 @@ func (bm *BackupManager) Start() error {
 	if err != nil {
 		return fmt.Errorf("failed to load active backup configs during start: %w", err)
 	}
-
 	bm.mu.Lock()
 	defer bm.mu.Unlock()
-
 	for _, cfg := range cfgs {
 		if err := bm.registerBackupLocked(cfg); err != nil {
 			log.Printf("⚠️ Failed to schedule automated backup %s (%s): %v", cfg.Name, cfg.ID, err)
 		}
 	}
-
 	bm.cronEngine.Start()
 	log.Println("⏰ BackupManager started and monitoring scheduled database/volume snapshots")
 	return nil
@@ -83,27 +80,22 @@ func (bm *BackupManager) registerBackupLocked(cfg *models.BackupConfig) error {
 		bm.cronEngine.Remove(entryID)
 		delete(bm.entries, cfg.ID)
 	}
-
 	if cfg.Status != "active" {
 		return nil
 	}
-
 	schedule := strings.TrimSpace(cfg.Schedule)
 	if len(strings.Fields(schedule)) == 5 && !strings.HasPrefix(schedule, "@") {
 		schedule = "0 " + schedule
 	}
-
 	cfgID := cfg.ID
 	entryID, err := bm.cronEngine.AddFunc(schedule, func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 		defer cancel()
-
 		_, _ = bm.TriggerBackup(ctx, cfgID)
 	})
 	if err != nil {
 		return fmt.Errorf("invalid cron schedule '%s' for backup %s: %w", cfg.Schedule, cfg.Name, err)
 	}
-
 	bm.entries[cfg.ID] = entryID
 	return nil
 }
@@ -111,7 +103,6 @@ func (bm *BackupManager) registerBackupLocked(cfg *models.BackupConfig) error {
 func (bm *BackupManager) UnregisterBackup(backupConfigID string) {
 	bm.mu.Lock()
 	defer bm.mu.Unlock()
-
 	if entryID, exists := bm.entries[backupConfigID]; exists {
 		bm.cronEngine.Remove(entryID)
 		delete(bm.entries, backupConfigID)
@@ -123,7 +114,6 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 	if err != nil || cfg == nil {
 		return nil, fmt.Errorf("backup config %s not found: %w", backupConfigID, err)
 	}
-
 	rec := &models.BackupRecord{
 		BackupConfigID: cfg.ID,
 		ProjectID:      cfg.ProjectID,
@@ -134,11 +124,9 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 	if err := bm.store.CreateBackupRecord(rec); err != nil {
 		return nil, fmt.Errorf("failed to create backup record: %w", err)
 	}
-
 	var dumpCmd []string
 	var fileExt string
 	var containerName string
-
 	if cfg.DatabaseID != "" {
 		db, err := bm.store.GetDatabase(cfg.DatabaseID)
 		if err != nil || db == nil {
@@ -173,13 +161,10 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 		_ = bm.store.UpdateBackupRecord(rec.ID, "failed", "", "", errStr, 0, time.Now().UTC().Format(time.RFC3339))
 		return nil, errors.New(errStr)
 	}
-
 	fileName := fmt.Sprintf("backup_%s_%s%s", cfg.ID, time.Now().UTC().Format("20060102_150405"), fileExt)
 	filePath := filepath.Join(bm.backupDir, fileName)
-
 	var dumpBytes []byte
 	var execLogs string
-
 	if bm.dockerClient != nil {
 		inspectResp, err := bm.dockerClient.ContainerInspect(ctx, containerName)
 		if err != nil || !inspectResp.State.Running {
@@ -187,7 +172,6 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 			_ = bm.store.UpdateBackupRecord(rec.ID, "failed", "", "", errStr, 0, time.Now().UTC().Format(time.RFC3339))
 			return nil, errors.New(errStr)
 		}
-
 		execConfig := dockertypes.ExecConfig{
 			AttachStdout: true,
 			AttachStderr: true,
@@ -199,7 +183,6 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 			_ = bm.store.UpdateBackupRecord(rec.ID, "failed", "", "", errStr, 0, time.Now().UTC().Format(time.RFC3339))
 			return nil, errors.New(errStr)
 		}
-
 		attachResp, err := bm.dockerClient.ContainerExecAttach(ctx, execIDResp.ID, dockertypes.ExecStartCheck{})
 		if err != nil {
 			errStr := fmt.Sprintf("docker exec attach failed: %v", err)
@@ -207,7 +190,6 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 			return nil, errors.New(errStr)
 		}
 		defer attachResp.Close()
-
 		var stdoutBuf, stderrBuf bytes.Buffer
 		if _, err := stdcopy.StdCopy(&stdoutBuf, &stderrBuf, attachResp.Reader); err != nil {
 			_, _ = io.Copy(&stdoutBuf, attachResp.Reader)
@@ -218,19 +200,16 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 		dumpBytes = []byte(fmt.Sprintf("-- Simulated backup dump for %s at %s --\n", cfg.Name, time.Now().UTC().Format(time.RFC3339)))
 		execLogs = "Docker client nil: simulated successful local dump.\n"
 	}
-
-	if err := os.WriteFile(filePath, dumpBytes, 0600); err != nil {
+	if err := os.WriteFile(filePath, dumpBytes, 0o600); err != nil {
 		errStr := fmt.Sprintf("failed to write backup archive to disk: %v", err)
 		_ = bm.store.UpdateBackupRecord(rec.ID, "failed", "", "", errStr, 0, time.Now().UTC().Format(time.RFC3339))
 		return nil, errors.New(errStr)
 	}
-
 	fileInfo, _ := os.Stat(filePath)
 	var sizeBytes int64 = int64(len(dumpBytes))
 	if fileInfo != nil {
 		sizeBytes = fileInfo.Size()
 	}
-
 	s3URL := ""
 	if cfg.S3DestinationID != "" {
 		dest, err := bm.store.GetS3Destination(cfg.S3DestinationID)
@@ -243,13 +222,10 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 			}
 		}
 	}
-
 	bm.enforceRetentionPolicy(cfg)
-
 	nowStr := time.Now().UTC().Format(time.RFC3339)
 	finalLogs := rec.Logs + execLogs + "\nBackup run completed successfully."
 	_ = bm.store.UpdateBackupRecord(rec.ID, "completed", filePath, s3URL, finalLogs, sizeBytes, nowStr)
-
 	rec.Status = "completed"
 	rec.FilePath = filePath
 	rec.FileSizeBytes = sizeBytes
@@ -266,7 +242,6 @@ func (bm *BackupManager) uploadToS3(ctx context.Context, dest *models.S3Destinat
 	} else if strings.HasPrefix(dest.Endpoint, "localhost") || strings.HasPrefix(dest.Endpoint, "127.0.0.1") {
 		url = fmt.Sprintf("http://%s/%s/%s", dest.Endpoint, dest.Bucket, fileName)
 	}
-
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url, bytes.NewReader(data))
 	if err != nil {
 		return "", err
@@ -274,7 +249,6 @@ func (bm *BackupManager) uploadToS3(ctx context.Context, dest *models.S3Destinat
 	req.ContentLength = int64(len(data))
 	req.Header.Set("Content-Type", "application/octet-stream")
 	req.Header.Set("X-Vessel-S3-Access-Key", dest.AccessKeyID)
-
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {

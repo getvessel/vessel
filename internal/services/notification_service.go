@@ -55,7 +55,6 @@ func (s *NotificationService) SendTest(channel, projectID string) error {
 	if dashboardURL == "" {
 		dashboardURL = "http://localhost:3000"
 	}
-
 	return s.dispatcher.Send(&models.NotificationEvent{
 		Title:     "Test Notification from Vessel",
 		Message:   "If you see this, your " + channel + " integration is working correctly!",

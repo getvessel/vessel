@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/repositories"
 )
@@ -66,13 +67,11 @@ func (s *UserService) CreatePAT(ctx context.Context, userID, name string, expire
 	if userID == "" || name == "" {
 		return nil, "", errors.New("userId and name are required")
 	}
-
 	rawToken := uuid.New().String() + "-" + uuid.New().String()
 	hash, err := bcrypt.GenerateFromPassword([]byte(rawToken), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, "", err
 	}
-
 	pat := &models.PersonalAccessToken{
 		ID:        uuid.New().String(),
 		UserID:    userID,
@@ -83,11 +82,9 @@ func (s *UserService) CreatePAT(ctx context.Context, userID, name string, expire
 	if expiresAt != nil {
 		pat.ExpiresAt = *expiresAt
 	}
-
 	if err := s.userRepo.CreatePAT(ctx, pat); err != nil {
 		return nil, "", err
 	}
-
 	return pat, rawToken, nil
 }
 

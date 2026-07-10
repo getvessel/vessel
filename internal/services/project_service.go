@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/repositories"
 	"vessel.dev/vessel/internal/utils"
@@ -32,7 +33,6 @@ func (s *ProjectService) CreateProject(ctx context.Context, name, workspaceID, t
 	if name == "" {
 		return nil, errors.New("project name is required")
 	}
-
 	p := &models.ProjectConfig{
 		ID:          uuid.New().String(),
 		WorkspaceID: workspaceID,
@@ -42,7 +42,6 @@ func (s *ProjectService) CreateProject(ctx context.Context, name, workspaceID, t
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
-
 	if err := s.projectRepo.Create(ctx, p); err != nil {
 		return nil, err
 	}

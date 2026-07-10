@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -46,6 +47,5 @@ func ExtractUserID(c echo.Context) string {
 }
 
 func GetUserClaimsFromContext(ctx context.Context) *models.UserClaims {
-	// For compat if needed somewhere
 	return nil
 }

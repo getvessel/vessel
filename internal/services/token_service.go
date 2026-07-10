@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -30,7 +31,6 @@ func (ts *TokenService) GenerateToken(u *models.User) (string, error) {
 	if u == nil {
 		return "", errors.New("user cannot be nil when generating token")
 	}
-
 	claims := jwt.MapClaims{
 		"sub":         u.ID,
 		"email":       u.Email,
@@ -40,7 +40,6 @@ func (ts *TokenService) GenerateToken(u *models.User) (string, error) {
 		"iat":         time.Now().Unix(),
 		"iss":         "vessel-auth",
 	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(ts.secretKey)
 }
@@ -55,11 +54,9 @@ func (ts *TokenService) ValidateToken(tokenStr string) (jwt.MapClaims, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
 		return nil, errors.New("invalid token claims or signature")
 	}
-
 	return claims, nil
 }

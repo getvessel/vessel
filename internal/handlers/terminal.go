@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"github.com/labstack/echo/v4"
-
 	"context"
 	"io"
 	"net/http"
@@ -11,6 +9,8 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"github.com/gorilla/websocket"
+	"github.com/labstack/echo/v4"
+
 	"vessel.dev/vessel/internal/middleware"
 	"vessel.dev/vessel/internal/services"
 	"vessel.dev/vessel/internal/utils"
@@ -54,12 +54,10 @@ func (h *TerminalHandler) HandleWebSocket(c echo.Context) error {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid authentication token for terminal access"})
 		}
 	}
-
 	id := c.Param("id")
 	if id == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing id parameter"})
 	}
-
 	containerName := h.normalizeName(id)
 	if h.appService != nil {
 		if svc, err := h.appService.GetAppService(c.Request().Context(), id); err == nil && svc != nil {
@@ -70,7 +68,6 @@ func (h *TerminalHandler) HandleWebSocket(c echo.Context) error {
 			}
 		}
 	}
-
 	execConfig := types.ExecConfig{
 		Cmd:          []string{"/bin/sh"},
 		Tty:          true,
@@ -78,41 +75,34 @@ func (h *TerminalHandler) HandleWebSocket(c echo.Context) error {
 		AttachStdout: true,
 		AttachStderr: true,
 	}
-
 	if h.dockerClient == nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "docker client unavailable"})
 	}
-
 	resp, err := h.dockerClient.ContainerExecCreate(context.Background(), containerName, execConfig)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to create exec instance: " + err.Error()})
 	}
-
 	hijackedResp, err := h.dockerClient.ContainerExecAttach(context.Background(), resp.ID, types.ExecStartCheck{Tty: true})
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to attach to exec instance: " + err.Error()})
 	}
 	defer hijackedResp.Close()
-
 	ws, err := terminalUpgrader.Upgrade(c.Response().Writer, c.Request(), nil)
 	if err != nil {
 		return err
 	}
 	defer ws.Close()
-
 	errChan := make(chan error, 2)
 	go func() {
 		wsReader := h.wsToReader(ws)
 		_, err := io.Copy(hijackedResp.Conn, wsReader)
 		errChan <- err
 	}()
-
 	go func() {
 		wsWriter := h.wsToWriter(ws)
 		_, err := io.Copy(wsWriter, hijackedResp.Reader)
 		errChan <- err
 	}()
-
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 	go func() {
@@ -122,7 +112,6 @@ func (h *TerminalHandler) HandleWebSocket(c echo.Context) error {
 			}
 		}
 	}()
-
 	<-errChan
 	return nil
 }

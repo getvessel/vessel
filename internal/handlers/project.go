@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"github.com/labstack/echo/v4"
-
 	"context"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/services"

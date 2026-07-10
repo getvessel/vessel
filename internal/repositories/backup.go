@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -18,7 +19,6 @@ type BackupRepository interface {
 	ListConfigsByProject(ctx context.Context, projectID string) ([]*models.BackupConfig, error)
 	ListAllActiveConfigs(ctx context.Context) ([]*models.BackupConfig, error)
 	DeleteConfig(ctx context.Context, id, projectID string) error
-
 	CreateRecord(ctx context.Context, rec *models.BackupRecord) error
 	GetRecordByID(ctx context.Context, id string) (*models.BackupRecord, error)
 	ListRecordsByConfig(ctx context.Context, backupConfigID string) ([]*models.BackupRecord, error)
@@ -96,10 +96,8 @@ func (r *BackupSQLiteRepository) CreateConfig(_ context.Context, cfg *models.Bac
 	if cfg.RetentionDays <= 0 {
 		cfg.RetentionDays = 7
 	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.Exec(`INSERT INTO backup_configs (id, project_id, database_id, storage_id, s3_destination_id, name, schedule, retention_days, status, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		cfg.ID, cfg.ProjectID, cfg.DatabaseID, cfg.StorageID, cfg.S3DestinationID, cfg.Name, cfg.Schedule, cfg.RetentionDays, cfg.Status, cfg.CreatedAt, cfg.UpdatedAt)
@@ -112,10 +110,8 @@ func (r *BackupSQLiteRepository) CreateConfig(_ context.Context, cfg *models.Bac
 func (r *BackupSQLiteRepository) GetConfigByID(_ context.Context, id string) (*models.BackupConfig, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	row := r.db.QueryRow(`SELECT id, project_id, database_id, storage_id, s3_destination_id, name, schedule, retention_days, status, created_at, updated_at
 		FROM backup_configs WHERE id = ?`, id)
-
 	var cfg models.BackupConfig
 	err := row.Scan(&cfg.ID, &cfg.ProjectID, &cfg.DatabaseID, &cfg.StorageID, &cfg.S3DestinationID, &cfg.Name, &cfg.Schedule, &cfg.RetentionDays, &cfg.Status, &cfg.CreatedAt, &cfg.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -130,14 +126,12 @@ func (r *BackupSQLiteRepository) GetConfigByID(_ context.Context, id string) (*m
 func (r *BackupSQLiteRepository) ListConfigsByProject(_ context.Context, projectID string) ([]*models.BackupConfig, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	rows, err := r.db.Query(`SELECT id, project_id, database_id, storage_id, s3_destination_id, name, schedule, retention_days, status, created_at, updated_at
 		FROM backup_configs WHERE project_id = ? ORDER BY created_at DESC`, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list backup configs: %w", err)
 	}
 	defer rows.Close()
-
 	var list []*models.BackupConfig
 	for rows.Next() {
 		var cfg models.BackupConfig
@@ -152,14 +146,12 @@ func (r *BackupSQLiteRepository) ListConfigsByProject(_ context.Context, project
 func (r *BackupSQLiteRepository) ListAllActiveConfigs(_ context.Context) ([]*models.BackupConfig, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	rows, err := r.db.Query(`SELECT id, project_id, database_id, storage_id, s3_destination_id, name, schedule, retention_days, status, created_at, updated_at
 		FROM backup_configs WHERE status = 'active'`)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list active backup configs: %w", err)
 	}
 	defer rows.Close()
-
 	var list []*models.BackupConfig
 	for rows.Next() {
 		var cfg models.BackupConfig
@@ -174,7 +166,6 @@ func (r *BackupSQLiteRepository) ListAllActiveConfigs(_ context.Context) ([]*mod
 func (r *BackupSQLiteRepository) DeleteConfig(_ context.Context, id, projectID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	res, err := r.db.Exec("DELETE FROM backup_configs WHERE id = ? AND project_id = ?", id, projectID)
 	if err != nil {
 		return fmt.Errorf("failed to delete backup config: %w", err)
@@ -196,10 +187,8 @@ func (r *BackupSQLiteRepository) CreateRecord(_ context.Context, rec *models.Bac
 	if rec.Status == "" {
 		rec.Status = "running"
 	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.Exec(`INSERT INTO backup_records (id, backup_config_id, project_id, database_id, status, file_path, file_size_bytes, s3_url, logs, started_at, completed_at)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		rec.ID, rec.BackupConfigID, rec.ProjectID, rec.DatabaseID, rec.Status, rec.FilePath, rec.FileSizeBytes, rec.S3URL, rec.Logs, rec.StartedAt, rec.CompletedAt)
@@ -212,14 +201,12 @@ func (r *BackupSQLiteRepository) CreateRecord(_ context.Context, rec *models.Bac
 func (r *BackupSQLiteRepository) ListRecordsByConfig(_ context.Context, backupConfigID string) ([]*models.BackupRecord, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	rows, err := r.db.Query(`SELECT id, backup_config_id, project_id, database_id, status, file_path, file_size_bytes, s3_url, logs, started_at, completed_at
 		FROM backup_records WHERE backup_config_id = ? ORDER BY started_at DESC`, backupConfigID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list backup records: %w", err)
 	}
 	defer rows.Close()
-
 	var list []*models.BackupRecord
 	for rows.Next() {
 		var rec models.BackupRecord
@@ -235,7 +222,6 @@ func (r *BackupSQLiteRepository) GetRecordByID(ctx context.Context, id string) (
 	row := r.db.QueryRowContext(ctx, `
 		SELECT id, backup_config_id, project_id, COALESCE(database_id, ''), status, COALESCE(file_path, ''), file_size_bytes, COALESCE(s3_url, ''), COALESCE(logs, ''), created_at, COALESCE(completed_at, '')
 		FROM backup_records WHERE id = ?`, id)
-
 	var rec models.BackupRecord
 	err := row.Scan(&rec.ID, &rec.BackupConfigID, &rec.ProjectID, &rec.DatabaseID, &rec.Status, &rec.FilePath, &rec.FileSizeBytes, &rec.S3URL, &rec.Logs, &rec.StartedAt, &rec.CompletedAt)
 	if err != nil {
@@ -250,9 +236,8 @@ func (r *BackupSQLiteRepository) GetRecordByID(ctx context.Context, id string) (
 func (r *BackupSQLiteRepository) UpdateRecord(ctx context.Context, rec *models.BackupRecord) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	res, err := r.db.ExecContext(ctx, `
-		UPDATE backup_records 
+		UPDATE backup_records
 		SET status = ?, file_path = ?, s3_url = ?, logs = ?, file_size_bytes = ?, completed_at = ?
 		WHERE id = ?`,
 		rec.Status, rec.FilePath, rec.S3URL, rec.Logs, rec.FileSizeBytes, rec.CompletedAt, rec.ID)

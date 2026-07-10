@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"vessel.dev/vessel/internal/models"
 )
 
@@ -18,15 +19,12 @@ type WorkspaceRepository interface {
 	List(ctx context.Context, ownerID string) ([]*models.Workspace, error)
 	Update(ctx context.Context, ws *models.Workspace) error
 	Delete(ctx context.Context, id, ownerID string) error
-
 	CreateTrustedDomain(ctx context.Context, d *models.TrustedDomain) error
 	ListTrustedDomains(ctx context.Context, teamID string) ([]*models.TrustedDomain, error)
 	DeleteTrustedDomain(ctx context.Context, id string) error
-
 	CreateSSHKey(ctx context.Context, key *models.SSHKey) error
 	ListSSHKeys(ctx context.Context, teamID string) ([]*models.SSHKey, error)
 	DeleteSSHKey(ctx context.Context, id string) error
-
 	CreateAuditLog(ctx context.Context, log *models.AuditLog) error
 	ListAuditLogs(ctx context.Context, teamID string, limit int) ([]*models.AuditLog, error)
 }
@@ -43,7 +41,6 @@ func NewWorkspaceSQLiteRepository(db *sql.DB) *WorkspaceSQLiteRepository {
 func (r *WorkspaceSQLiteRepository) Migrate(ctx context.Context) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `
 		CREATE TABLE IF NOT EXISTS workspaces (
 			id TEXT PRIMARY KEY,
@@ -94,10 +91,8 @@ func (r *WorkspaceSQLiteRepository) Create(ctx context.Context, ws *models.Works
 	if ws.PreferredRegion == "" {
 		ws.PreferredRegion = "local"
 	}
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `INSERT INTO workspaces (id, name, avatar_url, preferred_region, owner_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		ws.ID, ws.Name, ws.AvatarURL, ws.PreferredRegion, ws.OwnerID, ws.CreatedAt.Format(time.RFC3339), ws.UpdatedAt.Format(time.RFC3339))
 	if err != nil {
@@ -109,7 +104,6 @@ func (r *WorkspaceSQLiteRepository) Create(ctx context.Context, ws *models.Works
 func (r *WorkspaceSQLiteRepository) Get(ctx context.Context, id string) (*models.Workspace, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	var ws models.Workspace
 	var createdStr, updatedStr string
 	err := r.db.QueryRowContext(ctx, `SELECT id, name, avatar_url, preferred_region, owner_id, created_at, updated_at FROM workspaces WHERE id = ?`, id).
@@ -128,13 +122,11 @@ func (r *WorkspaceSQLiteRepository) Get(ctx context.Context, id string) (*models
 func (r *WorkspaceSQLiteRepository) List(ctx context.Context, ownerID string) ([]*models.Workspace, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	rows, err := r.db.QueryContext(ctx, `SELECT id, name, avatar_url, preferred_region, owner_id, created_at, updated_at FROM workspaces WHERE owner_id = ? ORDER BY created_at DESC`, ownerID)
 	if err != nil {
 		return nil, fmt.Errorf("list workspaces: %w", err)
 	}
 	defer rows.Close()
-
 	var list []*models.Workspace
 	for rows.Next() {
 		var ws models.Workspace
@@ -151,10 +143,8 @@ func (r *WorkspaceSQLiteRepository) List(ctx context.Context, ownerID string) ([
 
 func (r *WorkspaceSQLiteRepository) Update(ctx context.Context, ws *models.Workspace) error {
 	ws.UpdatedAt = time.Now().UTC()
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	_, err := r.db.ExecContext(ctx, `UPDATE workspaces SET name = ?, avatar_url = ?, preferred_region = ?, updated_at = ? WHERE id = ?`,
 		ws.Name, ws.AvatarURL, ws.PreferredRegion, ws.UpdatedAt.Format(time.RFC3339), ws.ID)
 	if err != nil {
@@ -166,13 +156,11 @@ func (r *WorkspaceSQLiteRepository) Update(ctx context.Context, ws *models.Works
 func (r *WorkspaceSQLiteRepository) Delete(ctx context.Context, id, ownerID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
 	var count int
 	_ = r.db.QueryRowContext(ctx, "SELECT count(*) FROM workspaces WHERE owner_id = ?", ownerID).Scan(&count)
 	if count <= 1 {
 		return errors.New("cannot delete your last workspace. To delete your account, visit Account Settings")
 	}
-
 	_, err := r.db.ExecContext(ctx, "DELETE FROM workspaces WHERE id = ? AND owner_id = ?", id, ownerID)
 	return err
 }
