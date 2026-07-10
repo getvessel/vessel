@@ -93,6 +93,9 @@
   - [x] Allow remote execution of Docker commands over the tunnel without exposing public ports.
   - [x] Ships in the open-source daemon; the cloud-side connection acceptor is in Phase 6.
 - [x] **Update Management (`internal/api/settings_handler.go`, `internal/updater/`)**:
+- [ ] **Rollback Logic & Cleanup**: Automatically clean up orphaned containers and perform rollbacks if a deployment fails midway.
+  - [ ] **Database Hardening**: Apply/preserve Redis authentication during restores/deploys, and allow passing custom command arguments to database containers.
+
   - [x] **Update Check Frequency**: Configurable cron expression for automatic update checks (e.g. `0 * * * *`).
   - [x] **Manual Check Button**: Trigger an immediate update check from the API (`POST /api/settings/updates/check`).
   - [x] **Auto-Update & Deploy**: Toggle to enable/disable automatic updates and execute binary rollout (`POST /api/settings/updates/deploy`).
@@ -109,10 +112,18 @@
 ## 💻 Phase 3: Control Panel Dashboard (`dashboard/`)
 
 - [ ] **Navigation & Shell Layout**:
-  - Responsive dark-mode glassmorphism sidebar (`Dashboard`, `Projects`, `Databases & Storage`, `Jobs & Backups`, `Teams`, `Settings`).
+  - Responsive dark-mode glassmorphism sidebar
+  - **Shared Confirmation Dialogs**: Robust system to prevent accidental deletions of services, databases, domains, and env vars.
+  - **Guard Active Deployments**: UI logic to disable system updates or conflicting actions while an active deployment is running.
+ (`Dashboard`, `Projects`, `Databases & Storage`, `Jobs & Backups`, `Teams`, `Settings`).
   - System health indicator header (`CPU %`, `RAM %`, `Docker Status`, `Upgrade Available banner`).
 - [ ] **Project Management & Deployment Pages**:
-  - "New Project" Wizard (`Connect GitHub/GitLab OAuth/PAT`, `Select from authenticated public/private repositories` OR `paste public Git URL` -> `Select Branch` -> `Configure Build Port`).
+  - "New Project" Wizard
+  - **GitHub One-Click Connect (App Manifest Flow)**: Automatically configure and install a GitHub App via the GitHub App Manifest API, eliminating manual secret copy-pasting.
+  - **Vercel Project Imports**: One-click flow to authenticate and import existing projects directly from a user's Vercel account.
+  - **AI-Powered Deployment Diagnostics**: Use AI (with provider selection) to analyze build logs and explain deployment failures in plain English.
+  - **Serverless Functions + AI Generation**: Built-in GUI editor for serverless functions with an embedded AI assistant to generate code.
+ (`Connect GitHub/GitLab OAuth/PAT`, `Select from authenticated public/private repositories` OR `paste public Git URL` -> `Select Branch` -> `Configure Build Port`).
   - Project Details View with Tab Navigation (`Overview`, `Live Logs`, `Environment Variables`, `Settings`).
   - **Pull Request (PR) Previews Tab (`/projects/:id/previews`)**: Monitor active ephemeral PR preview environments, inspect Git commit links, view isolated logs, and trigger 1-click manual teardown.
   - **Service Build Strategy Configurator**: Dropdown in Service Settings to select build engine (`Dockerfile`, `Nixpacks`, `Buildpacks`, or `Railpack`) and toggle BuildKit layer caching (`--cache-from`).
