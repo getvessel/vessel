@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/docker/docker/client"
+	"vessel.dev/vessel/internal/utils"
 )
 
 type RailpackBuilder struct {
@@ -38,7 +39,7 @@ func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions, engineNa
 			cmd.Stdout = opts.LogWriter
 			cmd.Stderr = opts.LogWriter
 			if err := cmd.Run(); err != nil {
-				return "", fmt.Errorf("buildpacks execution failed: %w", err)
+				return "", utils.NewDeploymentError("buildpacks execution failed", err)
 			}
 			return imageTag, nil
 		}
@@ -52,7 +53,7 @@ func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions, engineNa
 			cmd.Stdout = opts.LogWriter
 			cmd.Stderr = opts.LogWriter
 			if err := cmd.Run(); err != nil {
-				return "", fmt.Errorf("nixpacks execution failed: %w", err)
+				return "", utils.NewDeploymentError("nixpacks execution failed", err)
 			}
 			return imageTag, nil
 		}

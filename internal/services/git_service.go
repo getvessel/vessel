@@ -19,6 +19,7 @@ import (
 
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/repositories"
+	"vessel.dev/vessel/internal/utils"
 )
 
 type GitService struct {
@@ -258,11 +259,11 @@ func (s *GitService) CloneOrPullAppRepository(ctx context.Context, app *models.A
 		}
 		fetchCmd := exec.CommandContext(ctx, "git", "-C", targetDir, "fetch", "origin", branch)
 		if out, err := fetchCmd.CombinedOutput(); err != nil {
-			return fmt.Errorf("git fetch failed: %v (%s)", err, string(out))
+			return utils.NewDeploymentError(fmt.Sprintf("git fetch failed: %s", string(out)), err)
 		}
 		resetCmd := exec.CommandContext(ctx, "git", "-C", targetDir, "reset", "--hard", "origin/"+branch)
 		if out, err := resetCmd.CombinedOutput(); err != nil {
-			return fmt.Errorf("git reset failed: %v (%s)", err, string(out))
+			return utils.NewDeploymentError(fmt.Sprintf("git reset failed: %s", string(out)), err)
 		}
 		if logWriter != nil {
 			fmt.Fprintf(logWriter, "✅ [GitService] Successfully updated local repository to latest commit on %s.\n", branch)
@@ -288,10 +289,10 @@ func (s *GitService) CloneOrPullAppRepository(ctx context.Context, app *models.A
 			_ = os.RemoveAll(targetDir)
 			cloneCmd = exec.CommandContext(ctx, "git", "clone", "--depth", "1", authURL, targetDir)
 			if errFallback := cloneCmd.Run(); errFallback != nil {
-				return fmt.Errorf("git clone failed: %v (%s)", errFallback, stderr.String())
+				return utils.NewDeploymentError(fmt.Sprintf("git clone failed: %s", stderr.String()), errFallback)
 			}
 		} else {
-			return fmt.Errorf("git clone failed: %v (%s)", err, stderr.String())
+			return utils.NewDeploymentError(fmt.Sprintf("git clone failed: %s", stderr.String()), err)
 		}
 	}
 	if logWriter != nil {
