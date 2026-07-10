@@ -13,11 +13,12 @@ import (
 )
 
 type DispatcherService struct {
-	repo repositories.NotificationRepository
+	notifRepo    repositories.NotificationRepository
+	settingsRepo repositories.SettingsRepository
 }
 
-func NewDispatcherService(repo repositories.NotificationRepository) *DispatcherService {
-	return &DispatcherService{repo: repo}
+func NewDispatcherService(notifRepo repositories.NotificationRepository, settingsRepo repositories.SettingsRepository) *DispatcherService {
+	return &DispatcherService{notifRepo: notifRepo, settingsRepo: settingsRepo}
 }
 
 func (d *DispatcherService) Dispatch(event *models.NotificationEvent) {
@@ -33,7 +34,11 @@ func (d *DispatcherService) Send(event *models.NotificationEvent) error {
 		return fmt.Errorf("TeamID is required for dispatch")
 	}
 
-	channels, err := d.repo.ListChannelsByTeam(context.Background(), event.TeamID)
+	if event.TeamID == "global_test" {
+		return d.sendGlobalTest(event)
+	}
+
+	channels, err := d.notifRepo.ListChannelsByTeam(context.Background(), event.TeamID)
 	if err != nil {
 		return fmt.Errorf("failed to list channels for team %s: %w", event.TeamID, err)
 	}
@@ -89,4 +94,43 @@ func (d *DispatcherService) sendWebhook(webhookURL string, event *models.Notific
 	body, _ := json.Marshal(payload)
 	_, err := http.Post(webhookURL, "application/json", bytes.NewBuffer(body))
 	return err
+}
+
+func (d *DispatcherService) sendGlobalTest(event *models.NotificationEvent) error {
+	ctx := context.Background()
+	settings, err := d.settingsRepo.GetServerSettings(ctx)
+	if err != nil || settings == nil {
+		return fmt.Errorf("could not fetch server settings: %v", err)
+	}
+
+	provider := event.EventType[len("test_global_"):]
+
+	switch provider {
+	case "discord":
+		if settings.DiscordEnabled && settings.DiscordWebhookURL != "" {
+			return d.sendWebhook(settings.DiscordWebhookURL, event)
+		}
+	case "slack":
+		if settings.SlackEnabled && settings.SlackWebhookURL != "" {
+			return d.sendWebhook(settings.SlackWebhookURL, event)
+		}
+	case "telegram":
+		if settings.TelegramEnabled && settings.TelegramBotToken != "" && settings.TelegramChatID != "" {
+			// telegram specific logic
+			url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", settings.TelegramBotToken)
+			payload := map[string]string{
+				"chat_id": settings.TelegramChatID,
+				"text":    fmt.Sprintf("**%s**\n%s\n%s", event.Title, event.Message, event.URL),
+			}
+			body, _ := json.Marshal(payload)
+			_, err := http.Post(url, "application/json", bytes.NewBuffer(body))
+			return err
+		}
+	case "generic":
+		if settings.GenericWebhookEnabled && settings.GenericWebhookURL != "" {
+			return d.sendWebhook(settings.GenericWebhookURL, event)
+		}
+	}
+	
+	return fmt.Errorf("provider not enabled or configured")
 }

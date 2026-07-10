@@ -59,6 +59,7 @@ type Server struct {
 	aiSettingsHandler      *handlers.AISettingsHandler
 	aiDiagnosticsHandler   *handlers.AIDiagnosticsHandler
 	vercelHandler          *handlers.VercelHandler
+	serverlessHandler      *handlers.ServerlessHandler
 }
 
 func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefikManager *proxy.TraefikManager, dockerClient *client.Client) *Server {
@@ -84,7 +85,8 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefi
 	svVarRepo := repositories.NewServiceVarSQLiteRepository(db)
 	s3Repo := repositories.NewS3DestinationSQLiteRepository(db)
 	prPreviewRepo := repositories.NewPRPreviewRepository(db)
-	ea := newEngineAdapter(settingsRepo, serviceRepo, envRepo, databaseRepo, storageRepo, projectRepo, jobRepo, backupRepo, s3Repo, svVarRepo)
+	serverlessRepo := repositories.NewServerlessRepository(db)
+	ea := newEngineAdapter(settingsRepo, serviceRepo, envRepo, databaseRepo, storageRepo, projectRepo, jobRepo, backupRepo, s3Repo, svVarRepo, serverlessRepo)
 	cronMgr := engine.NewCronManager(dockerClient, ea)
 	_ = cronMgr.Start()
 	backupMgr := engine.NewBackupManager(dockerClient, ea, "")
@@ -92,7 +94,7 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefi
 	dbDeployer := engine.NewDatabaseDeployer(dockerClient, ea)
 	storageDeployer := engine.NewStorageDeployer(dockerClient, ea)
 	svcLinker := services.NewServiceLinker(databaseRepo, storageRepo)
-	dispatcherSvc := dispatch.NewDispatcherService(notifRepo)
+	dispatcherSvc := dispatch.NewDispatcherService(notifRepo, settingsRepo)
 	deploymentListeners := listeners.NewDeploymentListeners(dispatcherSvc)
 	deploymentListeners.Register()
 	settingsService := services.NewSettingsService(settingsRepo, notifRepo)
@@ -126,6 +128,8 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefi
 
 	vercelRepo := repositories.NewVercelRepository(db, vault)
 	vercelService := services.NewVercelService(vercelRepo)
+
+	serverlessService := services.NewServerlessService(serverlessRepo)
 
 	authGuard := middleware.NewAuthGuard(tokenService, settingsService, psService)
 	e := echo.New()
@@ -170,6 +174,7 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefi
 		aiSettingsHandler:      handlers.NewAISettingsHandler(aiSettingsService),
 		aiDiagnosticsHandler:   handlers.NewAIDiagnosticsHandler(aiSettingsService, deploymentService, projectService),
 		vercelHandler:          handlers.NewVercelHandler(vercelService),
+		serverlessHandler:      handlers.NewServerlessHandler(serverlessService),
 	}
 	if srv.deployer != nil {
 		srv.deployer.EnvProvider = func(projectID string) (map[string]string, error) {

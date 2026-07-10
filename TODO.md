@@ -4,12 +4,12 @@
 
 ## ⚙️ Phase 2: Go Backend Engine (`cmd/vesseld` & `internal/`)
 
-- [ ] **Serverless Functions Engine**: Endpoints to save function code snippets and a backend builder to package and run serverless functions as containers.
+- [x] **Serverless Functions Engine**: Endpoints to save function code snippets and a backend builder to package and run serverless functions as containers.
   - _Schema Update_: Add `serverless_functions_code` table to store `service_id`, `runtime`, and `code_content`.
 
   **How `deployer.go`, `container_manager.go` & `stats_monitor.go` complete the deployment:**
 
-- [ ] **Enterprise PaaS Core Services & Advanced API (`internal/api/` & `internal/engine/`)**:
+- [x] **Enterprise PaaS Core Services & Advanced API (`internal/api/` & `internal/engine/`)**:
   - **Email (SMTP / Resend)**: SMTP host, port, user, password; or Resend API key. Send templated emails for team/project member invitations (with copy-link fallback) and deployment success/failure alerts. Commercial cloud will use AWS SES instead.
   - **Slack**: Enabled toggle, webhook URL, send test notification.
   - **Discord**: Enabled toggle, webhook URL, ping enable/disable, send test notification.

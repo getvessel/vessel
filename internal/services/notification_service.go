@@ -50,7 +50,27 @@ func (s *NotificationService) DeleteChannel(ctx context.Context, id string) erro
 	return s.repo.DeleteChannel(ctx, id)
 }
 
-func (s *NotificationService) SendTest(teamID string) error {
+func (s *NotificationService) TestGlobalNotification(ctx context.Context, provider string) error {
+	if s.dispatcher == nil {
+		return errors.New("dispatcher unavailable")
+	}
+	// For global notifications, we will pass a special TeamID like "global"
+	// We also pass the specific provider in EventType to target only that provider in the dispatcher
+	dashboardURL := os.Getenv("VESSEL_DASHBOARD_URL")
+	if dashboardURL == "" {
+		dashboardURL = "http://localhost:3000"
+	}
+	return s.dispatcher.Send(&models.NotificationEvent{
+		TeamID:    "global_test",
+		EventType: "test_global_" + provider,
+		Title:     "Global Test Notification from Vessel",
+		Message:   "If you see this, your global integration is working correctly!",
+		Level:     "info",
+		URL:       dashboardURL + "/settings/notifications",
+	})
+}
+
+func (s *NotificationService) TestTeamNotification(ctx context.Context, teamID, channelID string) error {
 	if s.dispatcher == nil {
 		return errors.New("dispatcher unavailable")
 	}
@@ -60,9 +80,9 @@ func (s *NotificationService) SendTest(teamID string) error {
 	}
 	return s.dispatcher.Send(&models.NotificationEvent{
 		TeamID:    teamID,
-		EventType: "test",
+		EventType: "test_channel_" + channelID,
 		Title:     "Test Notification from Vessel",
-		Message:   "If you see this, your integration is working correctly!",
+		Message:   "If you see this, your team integration is working correctly!",
 		Level:     "info",
 		URL:       dashboardURL + "/settings/notifications",
 	})

@@ -71,13 +71,29 @@ func (h *NotificationHandler) TestNotification(c echo.Context) error {
 	var req struct {
 		ChannelID string `json:"channelId"`
 		TeamID    string `json:"teamId"`
+		Provider  string `json:"provider"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
-	// For testing, just send a basic test notification to the channel
-	// Note: We modified SendTest signature previously to string,string but we'll need to pass TeamID and EventType
-	// We'll update the signature in notification_service.go shortly.
+
+	if req.Provider != "" {
+		err := h.notificationService.TestGlobalNotification(c.Request().Context(), req.Provider)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		}
+		return c.JSON(http.StatusOK, map[string]string{
+			"status":  "ok",
+			"message": "Global test notification queued",
+		})
+	}
+
+	// For testing a specific team channel
+	err := h.notificationService.TestTeamNotification(c.Request().Context(), req.TeamID, req.ChannelID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
 	return c.JSON(http.StatusOK, map[string]string{
 		"status":  "ok",
 		"message": "Test notification queued",

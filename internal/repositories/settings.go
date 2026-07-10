@@ -34,12 +34,14 @@ func NewSettingsSQLiteRepository(db *sql.DB) *SettingsSQLiteRepository {
 	return &SettingsSQLiteRepository{db: db}
 }
 
-const serverSettingsColumns = `id, caddy_wildcard_ip, discord_webhook_url, slack_webhook_url, telegram_bot_token, telegram_chat_id, smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name, smtp_from_address, notification_alerts, registration_enabled, registration_domain_allowlist, custom_dns_resolvers, dns_validation_enabled, ip_allowlist, mcp_server_enabled, default_wildcard_domain, update_check_cron, auto_update_enabled, current_version, latest_version, last_update_check, updated_at`
+const serverSettingsColumns = `id, caddy_wildcard_ip, discord_webhook_url, discord_ping_enabled, discord_enabled, slack_webhook_url, slack_enabled, telegram_bot_token, telegram_chat_id, telegram_enabled, smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name, smtp_from_address, smtp_enabled, resend_api_key, resend_enabled, pushover_user_key, pushover_api_token, pushover_enabled, generic_webhook_url, generic_webhook_enabled, notification_alerts, registration_enabled, registration_domain_allowlist, custom_dns_resolvers, dns_validation_enabled, ip_allowlist, mcp_server_enabled, default_wildcard_domain, update_check_cron, auto_update_enabled, current_version, latest_version, last_update_check, updated_at`
 
 func scanServerSettings(scanner interface{ Scan(dest ...any) error }, cfg *models.ServerSettings) error {
 	return scanner.Scan(
-		&cfg.ID, &cfg.CaddyWildcardIP, &cfg.DiscordWebhookURL, &cfg.SlackWebhookURL, &cfg.TelegramBotToken, &cfg.TelegramChatID,
-		&cfg.SMTPHost, &cfg.SMTPPort, &cfg.SMTPUser, &cfg.SMTPPassword, &cfg.SMTPFromName, &cfg.SMTPFromAddress, &cfg.NotificationAlerts,
+		&cfg.ID, &cfg.CaddyWildcardIP, &cfg.DiscordWebhookURL, &cfg.DiscordPingEnabled, &cfg.DiscordEnabled, &cfg.SlackWebhookURL, &cfg.SlackEnabled, &cfg.TelegramBotToken, &cfg.TelegramChatID, &cfg.TelegramEnabled,
+		&cfg.SMTPHost, &cfg.SMTPPort, &cfg.SMTPUser, &cfg.SMTPPassword, &cfg.SMTPFromName, &cfg.SMTPFromAddress, &cfg.SMTPEnabled,
+		&cfg.ResendAPIKey, &cfg.ResendEnabled, &cfg.PushoverUserKey, &cfg.PushoverAPIToken, &cfg.PushoverEnabled, &cfg.GenericWebhookURL, &cfg.GenericWebhookEnabled,
+		&cfg.NotificationAlerts,
 		&cfg.RegistrationEnabled, &cfg.RegistrationDomainAllowlist, &cfg.CustomDNSResolvers, &cfg.DNSValidationEnabled, &cfg.IPAllowlist, &cfg.MCPServerEnabled, &cfg.DefaultWildcardDomain,
 		&cfg.UpdateCheckCron, &cfg.AutoUpdateEnabled, &cfg.CurrentVersion, &cfg.LatestVersion, &cfg.LastUpdateCheck, &cfg.UpdatedAt,
 	)
@@ -47,8 +49,10 @@ func scanServerSettings(scanner interface{ Scan(dest ...any) error }, cfg *model
 
 func serverSettingsArgs(cfg *models.ServerSettings) []any {
 	return []any{
-		cfg.ID, cfg.CaddyWildcardIP, cfg.DiscordWebhookURL, cfg.SlackWebhookURL, cfg.TelegramBotToken, cfg.TelegramChatID,
-		cfg.SMTPHost, cfg.SMTPPort, cfg.SMTPUser, cfg.SMTPPassword, cfg.SMTPFromName, cfg.SMTPFromAddress, cfg.NotificationAlerts,
+		cfg.ID, cfg.CaddyWildcardIP, cfg.DiscordWebhookURL, cfg.DiscordPingEnabled, cfg.DiscordEnabled, cfg.SlackWebhookURL, cfg.SlackEnabled, cfg.TelegramBotToken, cfg.TelegramChatID, cfg.TelegramEnabled,
+		cfg.SMTPHost, cfg.SMTPPort, cfg.SMTPUser, cfg.SMTPPassword, cfg.SMTPFromName, cfg.SMTPFromAddress, cfg.SMTPEnabled,
+		cfg.ResendAPIKey, cfg.ResendEnabled, cfg.PushoverUserKey, cfg.PushoverAPIToken, cfg.PushoverEnabled, cfg.GenericWebhookURL, cfg.GenericWebhookEnabled,
+		cfg.NotificationAlerts,
 		cfg.RegistrationEnabled, cfg.RegistrationDomainAllowlist, cfg.CustomDNSResolvers, cfg.DNSValidationEnabled, cfg.IPAllowlist, cfg.MCPServerEnabled, cfg.DefaultWildcardDomain,
 		cfg.UpdateCheckCron, cfg.AutoUpdateEnabled, cfg.CurrentVersion, cfg.LatestVersion, cfg.LastUpdateCheck, cfg.UpdatedAt,
 	}
@@ -92,19 +96,31 @@ func (r *SettingsSQLiteRepository) UpdateServerSettings(ctx context.Context, cfg
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	query := fmt.Sprintf(`INSERT INTO server_settings (%s)
-	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	          ON CONFLICT(id) DO UPDATE SET
 	          caddy_wildcard_ip = excluded.caddy_wildcard_ip,
 	          discord_webhook_url = excluded.discord_webhook_url,
+	          discord_ping_enabled = excluded.discord_ping_enabled,
+	          discord_enabled = excluded.discord_enabled,
 	          slack_webhook_url = excluded.slack_webhook_url,
+	          slack_enabled = excluded.slack_enabled,
 	          telegram_bot_token = excluded.telegram_bot_token,
 	          telegram_chat_id = excluded.telegram_chat_id,
+	          telegram_enabled = excluded.telegram_enabled,
 	          smtp_host = excluded.smtp_host,
 	          smtp_port = excluded.smtp_port,
 	          smtp_user = excluded.smtp_user,
 	          smtp_password = excluded.smtp_password,
 	          smtp_from_name = excluded.smtp_from_name,
 	          smtp_from_address = excluded.smtp_from_address,
+	          smtp_enabled = excluded.smtp_enabled,
+	          resend_api_key = excluded.resend_api_key,
+	          resend_enabled = excluded.resend_enabled,
+	          pushover_user_key = excluded.pushover_user_key,
+	          pushover_api_token = excluded.pushover_api_token,
+	          pushover_enabled = excluded.pushover_enabled,
+	          generic_webhook_url = excluded.generic_webhook_url,
+	          generic_webhook_enabled = excluded.generic_webhook_enabled,
 	          notification_alerts = excluded.notification_alerts,
 	          registration_enabled = excluded.registration_enabled,
 	          registration_domain_allowlist = excluded.registration_domain_allowlist,
