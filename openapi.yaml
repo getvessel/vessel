@@ -259,6 +259,8 @@ paths:
                     - mysql
                     - redis
                     - mongodb
+                customArgs:
+                  type: string
               type: object
       responses:
         "201":
@@ -394,6 +396,8 @@ components:
         port:
           type: integer
         status:
+          type: string
+        customArgs:
           type: string
         createdAt:
           type: string

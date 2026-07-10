@@ -4,21 +4,7 @@
 
 ## ⚙️ Phase 2: Go Backend Engine (`cmd/vesseld` & `internal/`)
 
-- [x] **Serverless Functions Engine**: Endpoints to save function code snippets and a backend builder to package and run serverless functions as containers.
-  - _Schema Update_: Add `serverless_functions_code` table to store `service_id`, `runtime`, and `code_content`.
-
-  **How `deployer.go`, `container_manager.go` & `stats_monitor.go` complete the deployment:**
-
-- [x] **Enterprise PaaS Core Services & Advanced API (`internal/handlers/` & `internal/engine/`)**:
-  - **Email (SMTP / Resend)**: SMTP host, port, user, password; or Resend API key. Send templated emails for team/project member invitations (with copy-link fallback) and deployment success/failure alerts. Commercial cloud will use AWS SES instead.
-  - **Slack**: Enabled toggle, webhook URL, send test notification.
-  - **Discord**: Enabled toggle, webhook URL, ping enable/disable, send test notification.
-  - **Telegram**: Enabled toggle, bot API token, chat ID, send test notification.
-  - **Pushover**: Enabled toggle, user key, API token, send test notification.
-  - **Generic Webhook**: Enabled toggle, POST webhook URL, send test notification.
-  - **Notification Preferences**: Per-project toggle to enable/disable each channel independently for deployment events.
-- [x] **Rollback Logic & Cleanup**: Automatically clean up orphaned containers and perform rollbacks if a deployment fails midway.
-- [x] **Database Hardening**: Apply/preserve Redis authentication during restores/deploys, and allow passing custom command arguments to database containers.
+*(All Phase 2 tasks have been completed)*
 
 ---
 
