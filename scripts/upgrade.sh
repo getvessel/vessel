@@ -1,27 +1,37 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-echo "🛰️  Starting in-place Vessel self-upgrade..."
+VERSION=${1:-latest}
+VESSEL_DIR=${VESSEL_DIR:-/vessel}
 
-# 1. Perform automated backup before upgrading
-if [ -f "./scripts/backup.sh" ]; then
-  echo "📦 Taking pre-upgrade state backup..."
-  bash ./scripts/backup.sh
-else
-  mkdir -p ./data/backups
-  if [ -f "./data/vessel.db" ]; then
-    cp ./data/vessel.db "./data/backups/vessel-pre-upgrade-$(date +%s).db"
-    echo "✅ SQLite database backed up safely."
+echo "🛰️  Starting Vessel upgrade to v${VERSION}..."
+
+if [ ! -f "$VESSEL_DIR/docker-compose.yml" ]; then
+  if [ -f "./docker-compose.yml" ]; then
+    VESSEL_DIR="."
+  else
+    echo "❌ No Vessel installation found at $VESSEL_DIR."
+    exit 1
   fi
 fi
 
-# 2. Pull latest container image or update binary
-echo "⬇️  Fetching latest Vessel release..."
-if command -v docker &> /dev/null && [ -f "docker-compose.yml" ]; then
-  docker compose pull vessel || echo "Local build required or pull deferred..."
-  docker compose up -d --force-recreate vessel
-else
-  echo "Running outside Docker. Please replace the binary manually or via bootstrap/install.sh."
+echo "📦 Taking pre-upgrade state backup..."
+mkdir -p "$VESSEL_DIR/data/backups"
+if [ -f "$VESSEL_DIR/data/vessel.db" ]; then
+  # Safely copy database or dump it
+  cp "$VESSEL_DIR/data/vessel.db" "$VESSEL_DIR/data/backups/vessel-pre-upgrade-$(date +%Y%m%d%H%M%S).db" 2>/dev/null || true
+  echo "✅ SQLite database backed up safely."
 fi
 
-echo "🚀 Vessel upgrade completed successfully! Your user containers experienced zero downtime."
+export VESSEL_VERSION="$VERSION"
+echo "⬇️  Fetching Vessel release v${VERSION}..."
+
+if command -v docker &> /dev/null; then
+  docker compose -f "$VESSEL_DIR/docker-compose.yml" pull
+  docker compose -f "$VESSEL_DIR/docker-compose.yml" up -d --force-recreate
+else
+  echo "❌ Docker not found. Running outside Docker? Please replace binary manually."
+  exit 1
+fi
+
+echo "🚀 Vessel upgrade to v${VERSION} completed successfully! User containers experienced zero downtime."

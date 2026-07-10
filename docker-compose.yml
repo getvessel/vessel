@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: vessel:latest
+    image: ghcr.io/solomonolatunji/vessel:${VESSEL_VERSION:-latest}
     container_name: vessel-control-plane
     restart: unless-stopped
     ports:
