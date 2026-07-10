@@ -22,32 +22,35 @@ func NewNotificationService(repo repositories.NotificationRepository, dispatcher
 	return &NotificationService{repo: repo, dispatcher: dispatcher}
 }
 
-func (s *NotificationService) GetIntegration(ctx context.Context) (*models.NotificationIntegration, error) {
-	return s.repo.GetIntegration(ctx)
-}
-
-func (s *NotificationService) SaveIntegration(ctx context.Context, n *models.NotificationIntegration) error {
-	if n == nil {
-		return errors.New("integration required")
+func (s *NotificationService) ListChannels(ctx context.Context, teamID string) ([]models.TeamNotificationChannel, error) {
+	if teamID == "" {
+		return nil, errors.New("teamId required")
 	}
-	return s.repo.SaveIntegration(ctx, n)
+	return s.repo.ListChannelsByTeam(ctx, teamID)
 }
 
-func (s *NotificationService) GetProjectPref(ctx context.Context, projectID string) (*models.ProjectNotificationPref, error) {
-	if projectID == "" {
-		return nil, errors.New("projectId required")
+func (s *NotificationService) GetChannel(ctx context.Context, id string) (*models.TeamNotificationChannel, error) {
+	if id == "" {
+		return nil, errors.New("id required")
 	}
-	return s.repo.GetProjectPref(ctx, projectID)
+	return s.repo.GetChannel(ctx, id)
 }
 
-func (s *NotificationService) SaveProjectPref(ctx context.Context, pref *models.ProjectNotificationPref) error {
-	if pref == nil || pref.ProjectID == "" {
-		return errors.New("valid preference with projectId required")
+func (s *NotificationService) SaveChannel(ctx context.Context, c *models.TeamNotificationChannel) error {
+	if c == nil || c.TeamID == "" {
+		return errors.New("valid channel with teamId required")
 	}
-	return s.repo.SaveProjectPref(ctx, pref)
+	return s.repo.SaveChannel(ctx, c)
 }
 
-func (s *NotificationService) SendTest(channel, projectID string) error {
+func (s *NotificationService) DeleteChannel(ctx context.Context, id string) error {
+	if id == "" {
+		return errors.New("id required")
+	}
+	return s.repo.DeleteChannel(ctx, id)
+}
+
+func (s *NotificationService) SendTest(teamID string) error {
 	if s.dispatcher == nil {
 		return errors.New("dispatcher unavailable")
 	}
@@ -56,10 +59,11 @@ func (s *NotificationService) SendTest(channel, projectID string) error {
 		dashboardURL = "http://localhost:3000"
 	}
 	return s.dispatcher.Send(&models.NotificationEvent{
+		TeamID:    teamID,
+		EventType: "test",
 		Title:     "Test Notification from Vessel",
-		Message:   "If you see this, your " + channel + " integration is working correctly!",
+		Message:   "If you see this, your integration is working correctly!",
 		Level:     "info",
-		ProjectID: projectID,
 		URL:       dashboardURL + "/settings/notifications",
 	})
 }

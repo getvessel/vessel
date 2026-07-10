@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 
@@ -37,46 +36,47 @@ func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
 	return c.JSON(http.StatusOK, payload)
 }
 
-func (h *SettingsHandler) GetNotificationIntegration(c echo.Context) error {
-	n, err := h.settingsService.GetNotificationIntegration(c.Request().Context())
+func (h *SettingsHandler) ListTeamNotificationChannels(c echo.Context) error {
+	teamID := c.QueryParam("teamId")
+	if teamID == "" {
+		teamID = "default"
+	}
+	channels, err := h.settingsService.ListTeamNotificationChannels(c.Request().Context(), teamID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return c.JSON(http.StatusOK, n)
+	return c.JSON(http.StatusOK, channels)
 }
 
-func (h *SettingsHandler) SaveNotificationIntegration(c echo.Context) error {
-	var payload models.NotificationIntegration
+func (h *SettingsHandler) SaveTeamNotificationChannel(c echo.Context) error {
+	var payload models.TeamNotificationChannel
 	if err := c.Bind(&payload); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
-	if err := h.settingsService.SaveNotificationIntegration(c.Request().Context(), &payload); err != nil {
+	if payload.TeamID == "" {
+		payload.TeamID = "default"
+	}
+	if err := h.settingsService.SaveTeamNotificationChannel(c.Request().Context(), &payload); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusOK, payload)
 }
 
-func (h *SettingsHandler) GetProjectNotificationPref(c echo.Context) error {
-	projectID := strings.TrimPrefix(c.Request().URL.Path, "/api/settings/notifications/project/")
-	if projectID == "" || projectID == c.Request().URL.Path {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing project id parameter"})
-	}
-	pref, err := h.settingsService.GetProjectNotificationPref(c.Request().Context(), projectID)
+func (h *SettingsHandler) GetTeamNotificationChannel(c echo.Context) error {
+	id := c.Param("id")
+	channel, err := h.settingsService.GetTeamNotificationChannel(c.Request().Context(), id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return c.JSON(http.StatusOK, pref)
+	return c.JSON(http.StatusOK, channel)
 }
 
-func (h *SettingsHandler) SaveProjectNotificationPref(c echo.Context) error {
-	var payload models.ProjectNotificationPref
-	if err := c.Bind(&payload); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
-	}
-	if err := h.settingsService.SaveProjectNotificationPref(c.Request().Context(), &payload); err != nil {
+func (h *SettingsHandler) DeleteTeamNotificationChannel(c echo.Context) error {
+	id := c.Param("id")
+	if err := h.settingsService.DeleteTeamNotificationChannel(c.Request().Context(), id); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return c.JSON(http.StatusOK, payload)
+	return c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
 }
 
 func (h *SettingsHandler) HandleMCPRequest(c echo.Context) error {

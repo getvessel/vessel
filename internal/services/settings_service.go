@@ -32,29 +32,32 @@ func (s *SettingsService) UpdateSettings(ctx context.Context, cfg *models.Server
 	return s.settingsRepo.UpdateServerSettings(ctx, cfg)
 }
 
-func (s *SettingsService) GetNotificationIntegration(ctx context.Context) (*models.NotificationIntegration, error) {
-	return s.notificationRepo.GetIntegration(ctx)
+func (s *SettingsService) ListTeamNotificationChannels(ctx context.Context, teamID string) ([]models.TeamNotificationChannel, error) {
+	if teamID == "" {
+		return nil, errors.New("team id is required")
+	}
+	return s.notificationRepo.ListChannelsByTeam(ctx, teamID)
 }
 
-func (s *SettingsService) SaveNotificationIntegration(ctx context.Context, n *models.NotificationIntegration) error {
-	if n == nil {
-		return errors.New("notification integration cannot be nil")
+func (s *SettingsService) SaveTeamNotificationChannel(ctx context.Context, c *models.TeamNotificationChannel) error {
+	if c == nil || c.TeamID == "" {
+		return errors.New("valid team notification channel is required")
 	}
-	return s.notificationRepo.SaveIntegration(ctx, n)
+	return s.notificationRepo.SaveChannel(ctx, c)
 }
 
-func (s *SettingsService) GetProjectNotificationPref(ctx context.Context, projectID string) (*models.ProjectNotificationPref, error) {
-	if projectID == "" {
-		return nil, errors.New("project id is required")
+func (s *SettingsService) GetTeamNotificationChannel(ctx context.Context, id string) (*models.TeamNotificationChannel, error) {
+	if id == "" {
+		return nil, errors.New("channel id is required")
 	}
-	return s.notificationRepo.GetProjectPref(ctx, projectID)
+	return s.notificationRepo.GetChannel(ctx, id)
 }
 
-func (s *SettingsService) SaveProjectNotificationPref(ctx context.Context, pref *models.ProjectNotificationPref) error {
-	if pref == nil || pref.ProjectID == "" {
-		return errors.New("valid project notification preference is required")
+func (s *SettingsService) DeleteTeamNotificationChannel(ctx context.Context, id string) error {
+	if id == "" {
+		return errors.New("channel id is required")
 	}
-	return s.notificationRepo.SaveProjectPref(ctx, pref)
+	return s.notificationRepo.DeleteChannel(ctx, id)
 }
 
 func (s *SettingsService) CheckMCPEnabled(ctx context.Context) error {

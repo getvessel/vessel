@@ -55,6 +55,7 @@ type Server struct {
 	domainHandler          *handlers.DomainHandler
 	projectEnvHandler      *handlers.ProjectEnvHandler
 	notificationHandler    *handlers.NotificationHandler
+	gitAppsHandler         *handlers.GitAppsHandler
 }
 
 func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefikManager *proxy.TraefikManager, dockerClient *client.Client) *Server {
@@ -113,6 +114,10 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefi
 	notificationService := services.NewNotificationService(notifRepo, dispatcherSvc)
 	deploymentService := services.NewDeploymentService(deploymentRepo, serviceRepo, projectRepo, deployer)
 	prPreviewService := services.NewPRPreviewService(prPreviewRepo, appService, gitService, deployer)
+
+	gitAppsRepo := repositories.NewGitAppSQLiteRepository(db, vault)
+	gitAppsService := services.NewGitAppsService(gitAppsRepo)
+
 	authGuard := middleware.NewAuthGuard(tokenService, settingsService, psService)
 	e := echo.New()
 	e.Use(echomiddleware.Logger())
@@ -152,6 +157,7 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefi
 		domainHandler:          handlers.NewDomainHandler(environmentService),
 		projectEnvHandler:      handlers.NewProjectEnvHandler(environmentService),
 		notificationHandler:    handlers.NewNotificationHandler(notificationService),
+		gitAppsHandler:         handlers.NewGitAppsHandler(gitAppsService),
 	}
 	if srv.deployer != nil {
 		srv.deployer.EnvProvider = func(projectID string) (map[string]string, error) {

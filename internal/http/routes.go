@@ -122,11 +122,11 @@ func (s *Server) registerRoutes() {
 	authGroup.GET("/profile/tokens", s.userHandler.ListPATs)
 	authGroup.POST("/profile/tokens", s.userHandler.CreatePAT)
 	authGroup.DELETE("/profile/tokens/:id", s.userHandler.DeletePAT)
-	authGroup.GET("/settings/notifications", s.notificationHandler.GetIntegrations)
-	apiGroup.PUT("/settings/notifications", s.notificationHandler.SaveIntegrations, s.authGuard.RequireRole("admin"))
+	authGroup.GET("/settings/notifications", s.notificationHandler.ListChannels)
+	apiGroup.PUT("/settings/notifications", s.notificationHandler.SaveChannel, s.authGuard.RequireRole("admin"))
 	apiGroup.POST("/settings/notifications/test", s.notificationHandler.TestNotification, s.authGuard.RequireRole("admin"))
-	authGroup.GET("/projects/:id/notifications", s.notificationHandler.GetProjectPreferences)
-	authGroup.PUT("/projects/:id/notifications", s.notificationHandler.SaveProjectPreferences)
+	authGroup.GET("/settings/notifications/:id", s.settingsHandler.GetTeamNotificationChannel)
+	authGroup.DELETE("/settings/notifications/:id", s.notificationHandler.DeleteChannel)
 	authGroup.GET("/settings/oauth/providers", s.oauthHandler.ListProviders)
 	apiGroup.PUT("/settings/oauth/providers", s.oauthHandler.SaveProvider, s.authGuard.RequireRole("admin"))
 	apiGroup.GET("/auth/oauth/:provider", s.oauthHandler.OAuthRedirect)
@@ -135,6 +135,22 @@ func (s *Server) registerRoutes() {
 	authGroup.POST("/auth/2fa/verify", s.oauthHandler.Verify2FA)
 	authGroup.POST("/auth/2fa/disable", s.oauthHandler.Disable2FA)
 	apiGroup.GET("/ws/terminal/:id", s.terminalHandler.HandleWebSocket)
+
+	// Git Apps
+	authGroup.GET("/settings/git_apps/github", s.gitAppsHandler.ListGithubApps)
+	authGroup.GET("/settings/git_apps/github/:id", s.gitAppsHandler.GetGithubApp)
+	apiGroup.PUT("/settings/git_apps/github", s.gitAppsHandler.SaveGithubApp, s.authGuard.RequireRole("admin"))
+	apiGroup.DELETE("/settings/git_apps/github/:id", s.gitAppsHandler.DeleteGithubApp, s.authGuard.RequireRole("admin"))
+
+	authGroup.GET("/settings/git_apps/gitlab", s.gitAppsHandler.ListGitlabApps)
+	authGroup.GET("/settings/git_apps/gitlab/:id", s.gitAppsHandler.GetGitlabApp)
+	apiGroup.PUT("/settings/git_apps/gitlab", s.gitAppsHandler.SaveGitlabApp, s.authGuard.RequireRole("admin"))
+	apiGroup.DELETE("/settings/git_apps/gitlab/:id", s.gitAppsHandler.DeleteGitlabApp, s.authGuard.RequireRole("admin"))
+
+	authGroup.GET("/settings/git_apps/bitbucket", s.gitAppsHandler.ListBitbucketApps)
+	authGroup.GET("/settings/git_apps/bitbucket/:id", s.gitAppsHandler.GetBitbucketApp)
+	apiGroup.PUT("/settings/git_apps/bitbucket", s.gitAppsHandler.SaveBitbucketApp, s.authGuard.RequireRole("admin"))
+	apiGroup.DELETE("/settings/git_apps/bitbucket/:id", s.gitAppsHandler.DeleteBitbucketApp, s.authGuard.RequireRole("admin"))
 	apiGroup.GET("/ws/services/:id/terminal", s.terminalHandler.HandleWebSocket)
 	s.setupSPAFallback()
 }

@@ -27,3 +27,44 @@ type GitConnectRequest struct {
 	AccessToken string `json:"accessToken"`
 	AccountName string `json:"accountName"`
 }
+
+type GithubApp struct {
+	ID             string    `json:"id"`
+	TeamID         string    `json:"teamId"`
+	Name           string    `json:"name"`
+	AppID          string    `json:"appId"`
+	InstallationID string    `json:"installationId"`
+	ClientID       string    `json:"clientId"`
+	ClientSecret   string    `json:"clientSecret"`
+	WebhookSecret  string    `json:"webhookSecret"`
+	PrivateKey     string    `json:"privateKey"`
+	IsPublic       bool      `json:"isPublic"`
+	CreatedAt      time.Time `json:"createdAt"`
+	UpdatedAt      time.Time `json:"updatedAt"`
+}
+
+type GitlabApp struct {
+	ID            string    `json:"id"`
+	TeamID        string    `json:"teamId"`
+	Name          string    `json:"name"`
+	AppID         string    `json:"appId"`
+	AppSecret     string    `json:"appSecret"`
+	WebhookSecret string    `json:"webhookSecret"`
+	APIURL        string    `json:"apiUrl"`
+	IsPublic      bool      `json:"isPublic"`
+	CreatedAt     time.Time `json:"createdAt"`
+	UpdatedAt     time.Time `json:"updatedAt"`
+}
+
+type BitbucketApp struct {
+	ID            string    `json:"id"`
+	TeamID        string    `json:"teamId"`
+	Name          string    `json:"name"`
+	Workspace     string    `json:"workspace"`
+	ClientID      string    `json:"clientId"`
+	ClientSecret  string    `json:"clientSecret"`
+	WebhookSecret string    `json:"webhookSecret"`
+	IsPublic      bool      `json:"isPublic"`
+	CreatedAt     time.Time `json:"createdAt"`
+	UpdatedAt     time.Time `json:"updatedAt"`
+}
