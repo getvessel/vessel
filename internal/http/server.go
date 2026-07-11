@@ -14,7 +14,7 @@ import (
 	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/handlers"
 	"vessel.dev/vessel/internal/listeners"
-	"vessel.dev/vessel/internal/mcpbridge"
+	"vessel.dev/vessel/internal/mcp"
 	"vessel.dev/vessel/internal/middleware"
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/proxy"
@@ -25,7 +25,7 @@ import (
 
 type Server struct {
 	router                 *echo.Echo
-	mcpBridge              *mcpbridge.Bridge
+	mcpBridge              *mcp.Bridge
 	deployer               *engine.Deployer
 	traefikManager         *proxy.TraefikManager
 	dockerClient           *client.Client
@@ -134,7 +134,7 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefi
 
 	serverlessService := services.NewServerlessService(serverlessRepo)
 
-	mcpBridge := mcpbridge.NewBridge(projectService, appService, dbService)
+	mcpBridge := mcp.NewBridge(projectService, appService, dbService)
 
 	authGuard := middleware.NewAuthGuard(tokenService, settingsService, psService)
 	e := echo.New()

@@ -184,7 +184,7 @@ func (s *Server) registerRoutes() {
 
 func (s *Server) setupSPAFallback() {
 	staticDir := os.Getenv("VESSEL_STATIC_DIR")
-	
+
 	// If VESSEL_STATIC_DIR is explicitly provided, serve from disk
 	if staticDir != "" {
 		if stat, err := os.Stat(staticDir); err == nil && stat.IsDir() {
@@ -205,7 +205,7 @@ func (s *Server) setupSPAFallback() {
 		if reqPath == "/" || reqPath == "." {
 			reqPath = "index.html"
 		}
-		
+
 		// Try to read the file from embedded fs
 		content, err := dashboard.DistFS.ReadFile("dist/" + reqPath)
 		if err != nil {
