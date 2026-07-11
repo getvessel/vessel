@@ -144,5 +144,3 @@ func (h *SettingsHandler) ActivateLicense(c echo.Context) error {
 		"plan":   claims.Plan,
 	})
 }
-
-

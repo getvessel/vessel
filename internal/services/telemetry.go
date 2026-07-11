@@ -44,7 +44,7 @@ func pingTelemetry(db *sql.DB, version string) {
 		return
 	}
 
-	// By default, we can assume telemetry is enabled unless explicitly disabled, 
+	// By default, we can assume telemetry is enabled unless explicitly disabled,
 	// or we can strictly check if it's enabled. Let's strictly check:
 	if !settings.TelemetryEnabled {
 		return
@@ -77,14 +77,14 @@ func pingTelemetry(db *sql.DB, version string) {
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
-	
+
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return // Silently fail to not spam logs for offline instances
 	}
 	defer resp.Body.Close()
-	
+
 	if resp.StatusCode == http.StatusOK {
 		log.Println("Telemetry ping sent successfully.")
 	}

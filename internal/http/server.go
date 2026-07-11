@@ -14,13 +14,13 @@ import (
 	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/handlers"
 	"vessel.dev/vessel/internal/listeners"
+	"vessel.dev/vessel/internal/mcpbridge"
 	"vessel.dev/vessel/internal/middleware"
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/proxy"
 	"vessel.dev/vessel/internal/repositories"
 	"vessel.dev/vessel/internal/services"
 	"vessel.dev/vessel/internal/vault"
-	"vessel.dev/vessel/internal/mcpbridge"
 )
 
 type Server struct {

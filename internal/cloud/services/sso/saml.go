@@ -1,16 +1,13 @@
 package sso
 
 import (
-	"context"
 	"crypto/rsa"
-	"crypto/tls"
 	"crypto/x509"
-	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 
 	"github.com/crewjam/saml/samlsp"
-	"github.com/labstack/echo/v4"
 )
 
 type SAMLService struct {
@@ -33,13 +30,18 @@ func (s *SAMLService) ConfigureMiddleware(idpMetadataURL string) (*samlsp.Middle
 		return nil, err
 	}
 
-	idpMetadataResp, err := http.Get(idpMetadata.String())
+	resp, err := http.Get(idpMetadata.String())
 	if err != nil {
 		return nil, err
 	}
-	defer idpMetadataResp.Body.Close()
+	defer resp.Body.Close()
 
-	idpEntityDescriptor, err := samlsp.ParseMetadata(idpMetadataResp.Body)
+	metadataBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	idpEntityDescriptor, err := samlsp.ParseMetadata(metadataBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -55,19 +57,4 @@ func (s *SAMLService) ConfigureMiddleware(idpMetadataURL string) (*samlsp.Middle
 		Certificate: s.Cert,
 		IDPMetadata: idpEntityDescriptor,
 	})
-}
-
-// Wrap is an Echo middleware wrapper around samlsp.Middleware
-func (s *SAMLService) RequireSAML(samlSP *samlsp.Middleware) echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			// A quick wrapper passing the standard http.Handler
-			handler := samlSP.RequireAccount(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				c.SetRequest(r)
-				next(c)
-			}))
-			handler.ServeHTTP(c.Response().Writer, c.Request())
-			return nil
-		}
-	}
 }
