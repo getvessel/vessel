@@ -22,6 +22,42 @@ func NewGitAppsService(repo repositories.GitAppRepository) *GitAppsService {
 	return &GitAppsService{repo: repo}
 }
 
+// --- Generic Helpers ---
+
+func listApps[T any](ctx context.Context, teamID string, listFn func(context.Context, string) ([]T, error)) ([]T, error) {
+	if teamID == "" {
+		return nil, errors.New("team ID is required")
+	}
+	return listFn(ctx, teamID)
+}
+
+func getApp[T any](ctx context.Context, id string, getFn func(context.Context, string) (*T, error)) (*T, error) {
+	if id == "" {
+		return nil, errors.New("app ID is required")
+	}
+	return getFn(ctx, id)
+}
+
+func saveApp[T any](ctx context.Context, app *T, getTeamID func(*T) string, getID func(*T) string, setID func(*T, string), saveFn func(context.Context, *T) error) error {
+	if app == nil {
+		return errors.New("app config is required")
+	}
+	if getTeamID(app) == "" {
+		return errors.New("team ID is required")
+	}
+	if getID(app) == "" {
+		setID(app, uuid.NewString())
+	}
+	return saveFn(ctx, app)
+}
+
+func deleteApp(ctx context.Context, id string, deleteFn func(context.Context, string) error) error {
+	if id == "" {
+		return errors.New("app ID is required")
+	}
+	return deleteFn(ctx, id)
+}
+
 // ---- GitHub Apps ----
 
 type githubManifestConversionResponse struct {
@@ -87,107 +123,53 @@ func (s *GitAppsService) ExchangeGithubManifestCode(ctx context.Context, code st
 }
 
 func (s *GitAppsService) ListGithubApps(ctx context.Context, teamID string) ([]models.GithubApp, error) {
-	if teamID == "" {
-		return nil, errors.New("team ID is required")
-	}
-	return s.repo.ListGithubApps(ctx, teamID)
+	return listApps(ctx, teamID, s.repo.ListGithubApps)
 }
 
 func (s *GitAppsService) GetGithubApp(ctx context.Context, id string) (*models.GithubApp, error) {
-	if id == "" {
-		return nil, errors.New("app ID is required")
-	}
-	return s.repo.GetGithubApp(ctx, id)
+	return getApp(ctx, id, s.repo.GetGithubApp)
 }
 
 func (s *GitAppsService) SaveGithubApp(ctx context.Context, app *models.GithubApp) error {
-	if app == nil {
-		return errors.New("app config is required")
-	}
-	if app.TeamID == "" {
-		return errors.New("team ID is required")
-	}
-	if app.ID == "" {
-		app.ID = uuid.NewString()
-	}
-	return s.repo.SaveGithubApp(ctx, app)
+	return saveApp(ctx, app, func(a *models.GithubApp) string { return a.TeamID }, func(a *models.GithubApp) string { return a.ID }, func(a *models.GithubApp, id string) { a.ID = id }, s.repo.SaveGithubApp)
 }
 
 func (s *GitAppsService) DeleteGithubApp(ctx context.Context, id string) error {
-	if id == "" {
-		return errors.New("app ID is required")
-	}
-	return s.repo.DeleteGithubApp(ctx, id)
+	return deleteApp(ctx, id, s.repo.DeleteGithubApp)
 }
 
 // ---- GitLab Apps ----
 
 func (s *GitAppsService) ListGitlabApps(ctx context.Context, teamID string) ([]models.GitlabApp, error) {
-	if teamID == "" {
-		return nil, errors.New("team ID is required")
-	}
-	return s.repo.ListGitlabApps(ctx, teamID)
+	return listApps(ctx, teamID, s.repo.ListGitlabApps)
 }
 
 func (s *GitAppsService) GetGitlabApp(ctx context.Context, id string) (*models.GitlabApp, error) {
-	if id == "" {
-		return nil, errors.New("app ID is required")
-	}
-	return s.repo.GetGitlabApp(ctx, id)
+	return getApp(ctx, id, s.repo.GetGitlabApp)
 }
 
 func (s *GitAppsService) SaveGitlabApp(ctx context.Context, app *models.GitlabApp) error {
-	if app == nil {
-		return errors.New("app config is required")
-	}
-	if app.TeamID == "" {
-		return errors.New("team ID is required")
-	}
-	if app.ID == "" {
-		app.ID = uuid.NewString()
-	}
-	return s.repo.SaveGitlabApp(ctx, app)
+	return saveApp(ctx, app, func(a *models.GitlabApp) string { return a.TeamID }, func(a *models.GitlabApp) string { return a.ID }, func(a *models.GitlabApp, id string) { a.ID = id }, s.repo.SaveGitlabApp)
 }
 
 func (s *GitAppsService) DeleteGitlabApp(ctx context.Context, id string) error {
-	if id == "" {
-		return errors.New("app ID is required")
-	}
-	return s.repo.DeleteGitlabApp(ctx, id)
+	return deleteApp(ctx, id, s.repo.DeleteGitlabApp)
 }
 
 // ---- Bitbucket Apps ----
 
 func (s *GitAppsService) ListBitbucketApps(ctx context.Context, teamID string) ([]models.BitbucketApp, error) {
-	if teamID == "" {
-		return nil, errors.New("team ID is required")
-	}
-	return s.repo.ListBitbucketApps(ctx, teamID)
+	return listApps(ctx, teamID, s.repo.ListBitbucketApps)
 }
 
 func (s *GitAppsService) GetBitbucketApp(ctx context.Context, id string) (*models.BitbucketApp, error) {
-	if id == "" {
-		return nil, errors.New("app ID is required")
-	}
-	return s.repo.GetBitbucketApp(ctx, id)
+	return getApp(ctx, id, s.repo.GetBitbucketApp)
 }
 
 func (s *GitAppsService) SaveBitbucketApp(ctx context.Context, app *models.BitbucketApp) error {
-	if app == nil {
-		return errors.New("app config is required")
-	}
-	if app.TeamID == "" {
-		return errors.New("team ID is required")
-	}
-	if app.ID == "" {
-		app.ID = uuid.NewString()
-	}
-	return s.repo.SaveBitbucketApp(ctx, app)
+	return saveApp(ctx, app, func(a *models.BitbucketApp) string { return a.TeamID }, func(a *models.BitbucketApp) string { return a.ID }, func(a *models.BitbucketApp, id string) { a.ID = id }, s.repo.SaveBitbucketApp)
 }
 
 func (s *GitAppsService) DeleteBitbucketApp(ctx context.Context, id string) error {
-	if id == "" {
-		return errors.New("app ID is required")
-	}
-	return s.repo.DeleteBitbucketApp(ctx, id)
+	return deleteApp(ctx, id, s.repo.DeleteBitbucketApp)
 }

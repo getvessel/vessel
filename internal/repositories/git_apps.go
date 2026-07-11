@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"strings"
 	"time"
 
 	"vessel.dev/vessel/internal/models"
@@ -73,6 +75,40 @@ func getApp[T any](ctx context.Context, db *sql.DB, query string, id string, mod
 	return &a, nil
 }
 
+func saveApp(ctx context.Context, db *sql.DB, tableName string, columns []string, values []any) error {
+	placeholders := make([]string, len(columns))
+	updates := make([]string, len(columns))
+	for i, col := range columns {
+		placeholders[i] = "?"
+		if col != "id" && col != "team_id" && col != "created_at" {
+			updates[i] = fmt.Sprintf("%s=excluded.%s", col, col)
+		}
+	}
+
+	updateCols := []string{}
+	for _, up := range updates {
+		if up != "" {
+			updateCols = append(updateCols, up)
+		}
+	}
+
+	query := fmt.Sprintf(`
+		INSERT INTO %s (%s)
+		VALUES (%s)
+		ON CONFLICT(id) DO UPDATE SET
+			%s,
+			updated_at=CURRENT_TIMESTAMP
+	`, tableName, strings.Join(columns, ", "), strings.Join(placeholders, ", "), strings.Join(updateCols, ",\n\t\t\t"))
+
+	_, err := db.ExecContext(ctx, query, values...)
+	return err
+}
+
+func deleteApp(ctx context.Context, db *sql.DB, tableName, id string) error {
+	_, err := db.ExecContext(ctx, fmt.Sprintf("DELETE FROM %s WHERE id = ?", tableName), id)
+	return err
+}
+
 // ---- GitHub Apps ----
 
 func (r *GitAppSQLiteRepository) ListGithubApps(ctx context.Context, teamID string) ([]models.GithubApp, error) {
@@ -106,36 +142,21 @@ func (r *GitAppSQLiteRepository) GetGithubApp(ctx context.Context, id string) (*
 }
 
 func (r *GitAppSQLiteRepository) SaveGithubApp(ctx context.Context, app *models.GithubApp) error {
-	query := `
-		INSERT INTO github_apps (id, team_id, name, app_id, installation_id, client_id, client_secret, webhook_secret, private_key, is_public, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		ON CONFLICT(id) DO UPDATE SET
-			name=excluded.name,
-			app_id=excluded.app_id,
-			installation_id=excluded.installation_id,
-			client_id=excluded.client_id,
-			client_secret=excluded.client_secret,
-			webhook_secret=excluded.webhook_secret,
-			private_key=excluded.private_key,
-			is_public=excluded.is_public,
-			updated_at=CURRENT_TIMESTAMP
-	`
 	cs, _ := r.vault.Encrypt(app.ClientSecret)
 	ws, _ := r.vault.Encrypt(app.WebhookSecret)
 	pk, _ := r.vault.Encrypt(app.PrivateKey)
-
 	if app.CreatedAt.IsZero() {
 		app.CreatedAt = time.Now()
 	}
 	app.UpdatedAt = time.Now()
 
-	_, err := r.db.ExecContext(ctx, query, app.ID, app.TeamID, app.Name, app.AppID, app.InstallationID, app.ClientID, cs, ws, pk, app.IsPublic, app.CreatedAt, app.UpdatedAt)
-	return err
+	cols := []string{"id", "team_id", "name", "app_id", "installation_id", "client_id", "client_secret", "webhook_secret", "private_key", "is_public", "created_at", "updated_at"}
+	vals := []any{app.ID, app.TeamID, app.Name, app.AppID, app.InstallationID, app.ClientID, cs, ws, pk, app.IsPublic, app.CreatedAt, app.UpdatedAt}
+	return saveApp(ctx, r.db, "github_apps", cols, vals)
 }
 
 func (r *GitAppSQLiteRepository) DeleteGithubApp(ctx context.Context, id string) error {
-	_, err := r.db.ExecContext(ctx, `DELETE FROM github_apps WHERE id = ?`, id)
-	return err
+	return deleteApp(ctx, r.db, "github_apps", id)
 }
 
 // ---- GitLab Apps ----
@@ -167,33 +188,20 @@ func (r *GitAppSQLiteRepository) GetGitlabApp(ctx context.Context, id string) (*
 }
 
 func (r *GitAppSQLiteRepository) SaveGitlabApp(ctx context.Context, app *models.GitlabApp) error {
-	query := `
-		INSERT INTO gitlab_apps (id, team_id, name, app_id, app_secret, webhook_secret, api_url, is_public, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		ON CONFLICT(id) DO UPDATE SET
-			name=excluded.name,
-			app_id=excluded.app_id,
-			app_secret=excluded.app_secret,
-			webhook_secret=excluded.webhook_secret,
-			api_url=excluded.api_url,
-			is_public=excluded.is_public,
-			updated_at=CURRENT_TIMESTAMP
-	`
 	as, _ := r.vault.Encrypt(app.AppSecret)
 	ws, _ := r.vault.Encrypt(app.WebhookSecret)
-
 	if app.CreatedAt.IsZero() {
 		app.CreatedAt = time.Now()
 	}
 	app.UpdatedAt = time.Now()
 
-	_, err := r.db.ExecContext(ctx, query, app.ID, app.TeamID, app.Name, app.AppID, as, ws, app.APIURL, app.IsPublic, app.CreatedAt, app.UpdatedAt)
-	return err
+	cols := []string{"id", "team_id", "name", "app_id", "app_secret", "webhook_secret", "api_url", "is_public", "created_at", "updated_at"}
+	vals := []any{app.ID, app.TeamID, app.Name, app.AppID, as, ws, app.APIURL, app.IsPublic, app.CreatedAt, app.UpdatedAt}
+	return saveApp(ctx, r.db, "gitlab_apps", cols, vals)
 }
 
 func (r *GitAppSQLiteRepository) DeleteGitlabApp(ctx context.Context, id string) error {
-	_, err := r.db.ExecContext(ctx, `DELETE FROM gitlab_apps WHERE id = ?`, id)
-	return err
+	return deleteApp(ctx, r.db, "gitlab_apps", id)
 }
 
 // ---- Bitbucket Apps ----
@@ -225,31 +233,18 @@ func (r *GitAppSQLiteRepository) GetBitbucketApp(ctx context.Context, id string)
 }
 
 func (r *GitAppSQLiteRepository) SaveBitbucketApp(ctx context.Context, app *models.BitbucketApp) error {
-	query := `
-		INSERT INTO bitbucket_apps (id, team_id, name, workspace, client_id, client_secret, webhook_secret, is_public, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		ON CONFLICT(id) DO UPDATE SET
-			name=excluded.name,
-			workspace=excluded.workspace,
-			client_id=excluded.client_id,
-			client_secret=excluded.client_secret,
-			webhook_secret=excluded.webhook_secret,
-			is_public=excluded.is_public,
-			updated_at=CURRENT_TIMESTAMP
-	`
 	cs, _ := r.vault.Encrypt(app.ClientSecret)
 	ws, _ := r.vault.Encrypt(app.WebhookSecret)
-
 	if app.CreatedAt.IsZero() {
 		app.CreatedAt = time.Now()
 	}
 	app.UpdatedAt = time.Now()
 
-	_, err := r.db.ExecContext(ctx, query, app.ID, app.TeamID, app.Name, app.Workspace, app.ClientID, cs, ws, app.IsPublic, app.CreatedAt, app.UpdatedAt)
-	return err
+	cols := []string{"id", "team_id", "name", "workspace", "client_id", "client_secret", "webhook_secret", "is_public", "created_at", "updated_at"}
+	vals := []any{app.ID, app.TeamID, app.Name, app.Workspace, app.ClientID, cs, ws, app.IsPublic, app.CreatedAt, app.UpdatedAt}
+	return saveApp(ctx, r.db, "bitbucket_apps", cols, vals)
 }
 
 func (r *GitAppSQLiteRepository) DeleteBitbucketApp(ctx context.Context, id string) error {
-	_, err := r.db.ExecContext(ctx, `DELETE FROM bitbucket_apps WHERE id = ?`, id)
-	return err
+	return deleteApp(ctx, r.db, "bitbucket_apps", id)
 }
