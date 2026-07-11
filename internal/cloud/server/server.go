@@ -3,10 +3,12 @@ package server
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"vessel.dev/vessel/internal/cloud/handlers"
 )
 
 type Server struct {
-	router *echo.Echo
+	router       *echo.Echo
+	agentHandler *handlers.AgentHandler
 }
 
 func NewServer() *Server {
@@ -17,7 +19,8 @@ func NewServer() *Server {
 	e.Use(middleware.CORS())
 
 	s := &Server{
-		router: e,
+		router:       e,
+		agentHandler: handlers.NewAgentHandler(),
 	}
 
 	s.registerRoutes()
@@ -32,7 +35,9 @@ func (s *Server) registerRoutes() {
 		return c.JSON(200, map[string]string{"status": "ok", "service": "vessel-cloud"})
 	})
 
-	// TODO: Mount handlers for billing, agent connections, audit, etc.
+	api.GET("/agent/connect", s.agentHandler.AcceptConnection)
+
+	// TODO: Mount handlers for billing, audit, etc.
 }
 
 func (s *Server) Start(address string) error {
