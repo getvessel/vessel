@@ -7,9 +7,10 @@ import (
 )
 
 type Server struct {
-	router        *echo.Echo
-	agentHandler  *handlers.AgentHandler
-	wizardHandler *handlers.WizardHandler
+	router         *echo.Echo
+	agentHandler   *handlers.AgentHandler
+	wizardHandler  *handlers.WizardHandler
+	billingHandler *handlers.BillingHandler
 }
 
 func NewServer() *Server {
@@ -20,9 +21,10 @@ func NewServer() *Server {
 	e.Use(middleware.CORS())
 
 	s := &Server{
-		router:        e,
-		agentHandler:  handlers.NewAgentHandler(),
-		wizardHandler: handlers.NewWizardHandler(),
+		router:         e,
+		agentHandler:   handlers.NewAgentHandler(),
+		wizardHandler:  handlers.NewWizardHandler(),
+		billingHandler: handlers.NewBillingHandler(),
 	}
 
 	s.registerRoutes()
@@ -40,7 +42,10 @@ func (s *Server) registerRoutes() {
 	api.GET("/agent/connect", s.agentHandler.AcceptConnection)
 	api.POST("/wizard/token", s.wizardHandler.GenerateAgentToken)
 
-	// TODO: Mount handlers for billing, audit, etc.
+	api.POST("/billing/stripe/webhook", s.billingHandler.HandleStripeWebhook)
+	api.POST("/billing/paystack/webhook", s.billingHandler.HandlePaystackWebhook)
+
+	// TODO: Mount handlers for audit, etc.
 }
 
 func (s *Server) Start(address string) error {
