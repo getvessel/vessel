@@ -10,7 +10,7 @@ Turn any bare-metal Linux VPS into your own private Vercel, Railway, or Heroku i
 
 - **⚡ Blazing-Fast Go Daemon (`vesseld`)**: Uses native Go concurrency and official Docker SDK with `< 30MB RAM` idle overhead.
 - **💻 Self-Hosted Dashboard (`dashboard/`)**: Built with **Vite + TanStack Router + React + Tailwind CSS**. Served directly by the Go daemon. Features live `@xterm/xterm` terminal logs, real-time CPU/RAM stats, and dark-mode glassmorphism.
-- **🔒 Automated Edge Routing (`Caddy v2`)**: Zero-config Let's Encrypt SSL/TLS certificates and automatic reverse proxy configuration.
+- **🔒 Automated Edge Routing (`Traefik v3`)**: Zero-config Let's Encrypt SSL/TLS certificates and automatic reverse proxy configuration.
 - **🔐 Encrypted `.env` Vault**: AES-256 encrypted environment variables stored inside an embedded SQLite database.
 - **🛡️ Modular Middleware & Security**: Built-in JWT authentication guards, RBAC enforcement (`admin`, `member`), and global CORS middleware.
 - **🔄 1-Click Zero-Downtime Self-Updates**: Upgrade the Vessel control plane with a single click (`scripts/upgrade.sh`) while your deployed user applications experience **zero seconds of downtime**.
@@ -30,7 +30,7 @@ vessel/
 │   ├── middleware/       # Authentication guards & CORS configuration
 │   ├── models/           # Domain model structs (project, database, user, etc.)
 │   ├── notifier/         # Multi-channel notification dispatcher
-│   ├── proxy/            # Caddy v2 reverse proxy controller
+│   ├── proxy/            # Traefik v3 reverse proxy controller
 │   ├── repositories/     # SQLite data access layer (per-domain repositories)
 │   ├── services/         # Business logic services (auth, cron, deploy, git, etc.)
 │   └── vault/            # AES-256-GCM encryption vault for secrets

@@ -29,7 +29,7 @@ if ! docker info &> /dev/null; then
 fi
 
 # --- Directory setup ---
-mkdir -p "$VESSEL_DIR"/data/{backups,caddy,builds}
+mkdir -p "$VESSEL_DIR"/data/{backups,traefik,builds}
 
 # --- Pull files ---
 echo "⬇️  Fetching configuration files..."

@@ -19,6 +19,6 @@ BACKUP_FILE="${BACKUP_DIR}/vessel-backup-${TIMESTAMP}.tar.gz"
 echo "📦 Starting Vessel automated backup to ${BACKUP_FILE}..."
 mkdir -p "${BACKUP_DIR}"
 
-# Archive data folder (SQLite DB, Caddy configs) excluding existing backups
+# Archive data folder (SQLite DB, Traefik configs) excluding existing backups
 tar --exclude="backups" -czf "${BACKUP_FILE}" -C "${VESSEL_DIR}" data
 echo "✅ Backup created successfully: ${BACKUP_FILE}"

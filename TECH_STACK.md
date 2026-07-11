@@ -16,7 +16,7 @@
 - **HTTP Router**: `net/http` (Go 1.22+ enhanced ServeMux with path parameters)
 - **Database**: SQLite (via `modernc.org/sqlite`, CGO-free)
 - **Encryption**: AES-256-GCM (custom vault implementation)
-- **Proxy**: Caddy v2 (automatic Let's Encrypt SSL reverse proxy)
+- **Proxy**: Traefik v3 (automatic Let's Encrypt SSL reverse proxy)
 - **Docker SDK**: `github.com/docker/docker/client`
 - **WebSocket**: `gorilla/websocket`
 - **Auth**: JWT (via `golang-jwt/jwt/v5`)

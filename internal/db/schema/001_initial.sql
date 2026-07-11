@@ -378,7 +378,7 @@ CREATE TABLE IF NOT EXISTS workspace_audit_logs (
 
 CREATE TABLE IF NOT EXISTS server_settings (
 			id TEXT PRIMARY KEY,
-			caddy_wildcard_ip TEXT DEFAULT '127.0.0.1',
+			traefik_wildcard_ip TEXT DEFAULT '127.0.0.1',
 			discord_webhook_url TEXT,
 			discord_ping_enabled BOOLEAN DEFAULT FALSE,
 			discord_enabled BOOLEAN DEFAULT FALSE,

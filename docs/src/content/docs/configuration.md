@@ -9,7 +9,7 @@ Set encrypted environment variables per project or per service from the dashboar
 
 ## Custom Domains
 
-Attach custom domains with automatic Let's Encrypt SSL via Caddy v2.
+Attach custom domains with automatic Let's Encrypt SSL via Traefik v3.
 
 ## Server Settings
 

@@ -38,7 +38,7 @@
   - User profile settings (`Update Name/Email/Password`, `Manage CLI Personal Access Tokens`).
   - **Scoped API Keys Manager (`/settings/tokens`)**: Modal to create API keys with granular RBAC checkboxes (`deploy:write`, `logs:read`, `env:read`, `db:manage`), IP allowlist restriction, and expiry dates.
 - [ ] **Server Settings & Domain Management (BYOK Architecture)**:
-  - **Global Wildcard Domain Configurator**: Input box in Server Settings for `DefaultWildcardDomain` (e.g. `cloud.yourdomain.com`) to enable instant Caddy v2 Let's Encrypt wildcard subdomains for all apps.
+  - **Global Wildcard Domain Configurator**: Input box in Server Settings for `DefaultWildcardDomain` (e.g. `cloud.yourdomain.com`) to enable instant Traefik v3 Let's Encrypt wildcard subdomains for all apps.
   - **OAuth Provider Manager (`/settings/auth`)**: Table of OAuth providers with enable/disable toggles, client ID/secret fields, redirect URI display, and provider-specific fields (base URL, tenant).
   - **2FA Setup Page**: TOTP QR code scanner, verification code input, recovery codes display.
   - **Notification Integrations Page (`/settings/notifications`)**: Per-provider configuration cards (Bring Your Own Key) for App-level notifications — SMTP, Resend, Slack, Discord, Telegram, Pushover, Generic Webhooks. Protects platform email reputation by keeping app-level outbound emails under user-controlled API keys.

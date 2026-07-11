@@ -28,7 +28,7 @@ type TeamEmailSettings struct {
 
 type ServerSettings struct {
 	ID                          string `json:"id"`
-	CaddyWildcardIP             string `json:"caddyWildcardIp"`
+	TraefikWildcardIP           string `json:"traefikWildcardIp"`
 	DiscordWebhookURL           string `json:"discordWebhookUrl,omitempty"`
 	DiscordPingEnabled          bool   `json:"discordPingEnabled"`
 	DiscordEnabled              bool   `json:"discordEnabled"`
