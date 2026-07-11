@@ -8,7 +8,7 @@ Vessel turns any bare-metal VPS into your own private Vercel & Railway.
 ## One-Line Install
 
 ```sh
-curl -fsSL https://get.vessel.dev | sh
+curl -fsSL https://get.vessl.dev | sh
 ```
 
 ## Prerequisites

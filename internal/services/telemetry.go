@@ -68,7 +68,7 @@ func pingTelemetry(db *sql.DB, version string) {
 		return
 	}
 
-	req, err := http.NewRequest("POST", "https://cloud.vessel.dev/api/cloud/telemetry/ping", bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", "https://cloud.vessl.dev/api/cloud/telemetry/ping", bytes.NewBuffer(body))
 	if err != nil {
 		return
 	}

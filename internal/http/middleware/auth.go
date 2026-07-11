@@ -108,7 +108,7 @@ func (g *AuthGuard) baseAuth(c echo.Context, denyAPITokens bool) (*models.UserCl
 		if g.TokenService == nil {
 			return &models.UserClaims{
 				UserID: "default",
-				Email:  "default@vessel.dev",
+				Email:  "default@vessl.dev",
 				Role:   "admin",
 			}, nil
 		}

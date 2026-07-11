@@ -24,7 +24,7 @@ Current version: `v0.1.0-alpha`.
 ## Upgrade
 
 ```bash
-curl -fsSL https://get.vessel.dev | sh
+curl -fsSL https://get.vessl.dev | sh
 ```
 
 Or in the dashboard: `Settings → Updates → Check for Updates`.

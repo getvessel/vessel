@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Vessel 1-Click Installer
-# Usage: curl -fsSL https://get.vessel.dev | sh
+# Usage: curl -fsSL https://get.vessl.dev | sh
 set -eo pipefail
 
 RELEASE=${VESSEL_VERSION:-latest}
@@ -74,4 +74,4 @@ SERVICE
 fi
 
 echo "✅ Vessel is running! Access the dashboard at http://$(curl -4fsS ifconfig.me 2>/dev/null || echo 'your-server-ip'):3000"
-echo "📖 Docs: https://docs.vessel.dev"
+echo "📖 Docs: https://docs.vessl.dev"

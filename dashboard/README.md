@@ -33,7 +33,7 @@ src/
 
 ## Domain
 
-This dashboard ships with the daemon binary. Access it at your instance's IP/domain after running `vesseld`. Not used by cloud users — they use `cloud.vessel.dev` instead.
+This dashboard ships with the daemon binary. Access it at your instance's IP/domain after running `vesseld`. Not used by cloud users — they use `cloud.vessl.dev` instead.
 
 ## Learn More
 

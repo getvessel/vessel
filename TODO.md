@@ -51,7 +51,7 @@
 ## 🌐 Phase 4: Public Marketing Site (`web/`)
 
 - [ ] **Hero Section & Quick-Install Banner**:
-  - High-conversion hero banner with one-click copyable install command: `curl -fsSL https://get.vessel.dev | sh`.
+  - High-conversion hero banner with one-click copyable install command: `curl -fsSL https://get.vessl.dev | sh`.
   - Interactive terminal mockup tabs showing instant container rollouts & CPU/RAM usage.
 - [ ] **Comparison Tables vs. Existing Solutions**:
   - Comparison grid highlighting `<30MB RAM` Go daemon vs. Coolify/CapRover/Dokku/Railway/Vercel.

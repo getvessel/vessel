@@ -35,8 +35,8 @@ vessel/
 │   ├── services/         # Business logic services (auth, cron, deploy, git, etc.)
 │   └── vault/            # AES-256-GCM encryption vault for secrets
 ├── dashboard/            # 💻 Self-hosted dashboard — served by daemon binary
-├── web/                  # 🌐 Marketing site — `vessel.dev`
-├── docs/                 # 📖 Documentation — `docs.vessel.dev`
+├── web/                  # 🌐 Marketing site — `vessl.dev`
+├── docs/                 # 📖 Documentation — `docs.vessl.dev`
 ├── bootstrap/            # 📦 One-line install server (`install.sh`)
 ├── scripts/              # 🛠️ System automation (`upgrade.sh`, `backup.sh`, `restore.sh`, `downgrade.sh`)
 ├── Dockerfile            # Multi-stage container build uniting `dashboard/` and `vesseld`
@@ -49,7 +49,7 @@ vessel/
 ## 🚀 Quick Install (On any Linux VPS)
 
 ```bash
-curl -fsSL https://get.vessel.dev | sh
+curl -fsSL https://get.vessl.dev | sh
 ```
 
 Access your dashboard at `http://your-server-ip:3000`.

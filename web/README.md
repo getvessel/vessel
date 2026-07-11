@@ -1,8 +1,8 @@
 # Vessel Website
 
-**Public marketing landing page** — hosted at `vessel.dev`.
+**Public marketing landing page** — hosted at `vessl.dev`.
 
-Built with Astro 7 and Tailwind CSS v4. Routes visitors to either self-hosted (`dashboard/`) or cloud (`cloud.vessel.dev`).
+Built with Astro 7 and Tailwind CSS v4. Routes visitors to either self-hosted (`dashboard/`) or cloud (`cloud.vessl.dev`).
 
 ```sh
 npm install

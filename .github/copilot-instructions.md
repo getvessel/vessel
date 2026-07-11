@@ -29,7 +29,7 @@ React 19 + TanStack Router + TanStack Query + Radix UI + Tailwind CSS v4. The se
 
 ### Marketing Site (`web/`)
 
-Astro 7 + Tailwind CSS v4. Public landing page at `vessel.dev` — hero section, feature comparisons, install command.
+Astro 7 + Tailwind CSS v4. Public landing page at `vessl.dev` — hero section, feature comparisons, install command.
 
 ### Docs (`docs/`)
 
