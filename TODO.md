@@ -60,74 +60,12 @@
 
 ---
 
-## ☁️ Cloud Auth & User Management (`internal/cloud/`)
+## 🤖 Phase 7: AI Agent Protocol (MCP) & API Ecosystem
 
-> Replace all mock handlers. Cloud users register/sign in independently of self-hosted users. Admins/staff sign in via the same endpoint — role is encoded in the JWT claim. Password reset uses a 6-digit OTP (no magic link — user stays on page). Email verification uses a signed token sent on registration.
-
-### Step 1 — DB Schema (`internal/cloud/repos/migrations.go`)
-
-- [x] Add columns to `cloud_users`: `role` (`user`|`admin`|`staff`), `email_verified BOOLEAN`, `verified_at`, `otp_code VARCHAR(6)`, `otp_expires_at TIMESTAMP`
-- [x] Add `cloud_admin_users` table (or reuse `cloud_users` with `role='admin'`) — decide: same table, `role` field gates access
-
-### Step 2 — Email Templates (`internal/cloud/views/emails/`)
-
-- [x] `welcome.tmpl` — sent on successful registration (fields: `Name`, `DashboardURL`)
-- [x] `verify_email.tmpl` — email verification link (fields: `Name`, `VerifyURL`)
-- [x] `otp_reset.tmpl` — password reset OTP (fields: `Name`, `OTPCode`, `ExpiresIn`)
-- [x] `billing_alert.tmpl` — replace hardcoded HTML in `mailer.go` (fields: `Amount`)
-- [x] Update `MailerService` to use `html/template` rendering from `.tmpl` files (same pattern as `internal/views/emails/notification.tmpl`)
-
-### Step 3 — Auth Repo (`internal/cloud/repos/auth_repo.go`)
-
-- [x] `CreateUser(ctx, user)` — insert into `cloud_users`
-- [x] `GetUserByEmail(ctx, email)` — lookup for login / forgot password
-- [x] `GetUserByID(ctx, id)` — lookup for JWT validation
-- [x] `SaveOTP(ctx, userID, code, expiresAt)` — write OTP + expiry
-- [x] `ClearOTP(ctx, userID)` — nullify after successful reset
-- [x] `UpdatePassword(ctx, userID, hash)` — bcrypt hash update
-- [x] `MarkEmailVerified(ctx, userID)` — set `email_verified=true`, `verified_at=now`
-
-### Step 4 — Auth Service (`internal/cloud/services/auth_service.go`)
-
-- [x] `Register(email, password, name)` → hash password, insert user, send `welcome.tmpl` + `verify_email.tmpl`, return JWT
-- [x] `Login(email, password)` → verify hash, check `email_verified`, return JWT with `{id, email, role}` claims
-- [x] `ForgotPassword(email)` → generate 6-digit OTP, 15-min expiry, send `otp_reset.tmpl`
-- [x] `ResetPassword(email, otp, newPassword)` → validate OTP not expired, bcrypt new password, clear OTP
-- [x] `VerifyEmail(token)` → validate signed token, call `MarkEmailVerified`
-- [x] JWT: sign with `VESSEL_CLOUD_JWT_SECRET` (separate from self-host daemon secret)
-
-### Step 5 — Auth Handler (`internal/cloud/handlers/auth.go`)
-
-- [x] `POST /cloud/auth/register` → `AuthService.Register`
-- [x] `POST /cloud/auth/login` → `AuthService.Login`
-- [x] `POST /cloud/auth/forgot-password` → `AuthService.ForgotPassword`
-- [x] `POST /cloud/auth/reset-password` → `AuthService.ResetPassword`
-- [x] `GET  /cloud/auth/verify-email?token=` → `AuthService.VerifyEmail`
-
-### Step 6 — Auth Middleware (`internal/cloud/middleware/auth.go`)
-
-- [x] `RequireCloudAuth()` — parse + validate cloud JWT, inject `CloudUser` into echo context
-- [x] `RequireAdmin()` — assert `role == "admin"` from context user, 403 otherwise
-- [x] `RequireStaff()` — assert `role == "admin" || role == "staff"`
-
-### Step 7 — Wire AdminHandler to real data (`internal/cloud/handlers/admin.go`)
-
-- [x] Replace hardcoded mock stats with real `CloudRepo` queries (`COUNT cloud_users`, `COUNT cloud_servers`, `COUNT cloud_subscriptions WHERE status='active'`)
-- [x] Replace mock audit logs with real `CloudRepo.ListAuditLogs(ctx, page, limit)`
-- [x] Add `cloud_admin_users` seeding: env var `CLOUD_ADMIN_EMAIL` + `CLOUD_ADMIN_PASSWORD` on first boot
-
-### Step 8 — Add missing env vars
-
-- [x] Add `VESSEL_CLOUD_JWT_SECRET` to `.env.cloud.example`
-
----
-
-## 🤖 Phase 7: AI Agent Protocol (MCP) & API Ecosystem (OSS & Cloud)
-
-> The MCP server and API Ecosystem is a core feature built into the `vesseld` Go daemon directly so self-hosters can use it for free, but it is also securely exposed and proxied via the Vessel Cloud control plane for managed users.
+> The MCP server and API Ecosystem is a core feature built into the `vesseld` Go daemon directly so self-hosters can use it for free. Cloud-specific proxying lives in the `vessel-cloud` repository.
 
 - [x] **REST API to MCP Bridge**:
   - Expose Vessel's REST API as an MCP server (`@modelcontextprotocol/sdk`) so AI agents (Claude Code, Cursor, etc.) can deploy apps, manage databases, and query logs programmatically.
-  - Implement Local stdio transport for the CLI daemon and SSE/WebSocket transport for the Cloud.
+  - Implement Local stdio transport for the CLI daemon.
 - [ ] **SDKs**:
   - Publish an official Vessel API client SDK for Node.js and Go.

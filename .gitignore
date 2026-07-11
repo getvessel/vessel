@@ -32,6 +32,3 @@ node_modules/
 
 # Local personal development trackers
 
-# CI workflows (billing issues — not running)
-.github/workflows/
-

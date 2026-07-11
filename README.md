@@ -10,7 +10,6 @@ Turn any bare-metal Linux VPS into your own private Vercel, Railway, or Heroku i
 
 - **⚡ Blazing-Fast Go Daemon (`vesseld`)**: Uses native Go concurrency and official Docker SDK with `< 30MB RAM` idle overhead.
 - **💻 Self-Hosted Dashboard (`dashboard/`)**: Built with **Vite + TanStack Router + React + Tailwind CSS**. Served directly by the Go daemon. Features live `@xterm/xterm` terminal logs, real-time CPU/RAM stats, and dark-mode glassmorphism.
-- **☁️ Cloud Dashboard (`cloud/`)**: Same UI experience but hosted as a separate SPA, talking to the cloud backend with Stripe/Paddle/Paystack billing.
 - **🔒 Automated Edge Routing (`Caddy v2`)**: Zero-config Let's Encrypt SSL/TLS certificates and automatic reverse proxy configuration.
 - **🔐 Encrypted `.env` Vault**: AES-256 encrypted environment variables stored inside an embedded SQLite database.
 - **🛡️ Modular Middleware & Security**: Built-in JWT authentication guards, RBAC enforcement (`admin`, `member`), and global CORS middleware.
@@ -25,7 +24,6 @@ vessel/
 ├── cmd/vesseld/          # Go Daemon entrypoint (`main.go`)
 ├── internal/             # Core Go packages (horizontal layers)
 │   ├── agent/            # Agent mode for remote cloud connectivity
-│   ├── cloud/            # Cloud backend (billing, agent acceptor, admin API)
 │   ├── engine/           # Docker engine lifecycle, build strategies, deployer
 │   ├── handlers/         # HTTP handlers (auth, backup, canvas, database, deployment, etc.)
 │   ├── http/             # HTTP server setup, routes, CORS, auth middleware
@@ -36,7 +34,6 @@ vessel/
 │   ├── repositories/     # SQLite data access layer (per-domain repositories)
 │   ├── services/         # Business logic services (auth, cron, deploy, git, etc.)
 │   └── vault/            # AES-256-GCM encryption vault for secrets
-├── cloud/                # ☁️ Cloud user dashboard — `cloud.vessel.dev`
 ├── dashboard/            # 💻 Self-hosted dashboard — served by daemon binary
 ├── web/                  # 🌐 Marketing site — `vessel.dev`
 ├── docs/                 # 📖 Documentation — `docs.vessel.dev`

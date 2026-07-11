@@ -1,8 +1,8 @@
-SERVICES = dashboard cloud web docs
+SERVICES = dashboard web docs
 BINARY_NAME = vesseld
 BUILD_DIR = bin
 
-.PHONY: help all build build-daemon build-dashboard dev dev-daemon dev-dashboard clean check fmt test install update organize-imports deploy deploy-web deploy-cloud deploy-docs docker-build docker-up docker-down
+.PHONY: help all build build-daemon build-dashboard dev dev-daemon dev-dashboard clean check fmt test install update organize-imports deploy deploy-web deploy-docs docker-build docker-up docker-down
 
 all: check build
 
@@ -20,10 +20,9 @@ help:
 	@echo "  make clean             Remove build artifacts"
 	@echo "  make update            Check npm dependency updates"
 	@echo "  make organize-imports  Organize TS import order"
-	@echo "  make deploy-web        Deploy web to Cloudflare Pages"
-	@echo "  make deploy-cloud      Deploy cloud to Cloudflare Pages"
-	@echo "  make deploy-docs       Deploy docs to Cloudflare Pages"
-	@echo "  make deploy            Deploy all frontends"
+  @echo "  make deploy-web        Deploy web to Cloudflare Pages"
+  @echo "  make deploy-docs       Deploy docs to Cloudflare Pages"
+  @echo "  make deploy            Deploy all frontends"
 	@echo "  make docker-build      Build Docker image"
 	@echo "  make docker-up         Start Docker stack"
 	@echo "  make docker-down       Stop Docker stack"
@@ -112,10 +111,6 @@ clean:
 deploy-web:
 	@echo "🌐 Deploying web to Cloudflare Pages..."
 	npm run deploy:web
-
-deploy-cloud:
-	@echo "☁️  Deploying cloud to Cloudflare Pages..."
-	npm run deploy:cloud
 
 deploy-docs:
 	@echo "📖 Deploying docs to Cloudflare Pages..."

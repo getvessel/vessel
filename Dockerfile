@@ -5,7 +5,7 @@ WORKDIR /app
 # Copy root monorepo files and workspaces
 COPY package*.json ./
 COPY dashboard/package*.json ./dashboard/
-COPY website/package*.json ./website/
+COPY web/package*.json ./web/
 
 # Install dependencies
 RUN npm ci

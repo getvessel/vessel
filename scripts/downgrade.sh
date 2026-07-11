@@ -8,7 +8,7 @@ if [ -z "$VERSION" ]; then
   echo "❌ Usage: ./scripts/downgrade.sh <version>"
   echo "   Example: ./scripts/downgrade.sh 0.1.0"
   echo ""
-  echo "Available versions: https://github.com/solomonolatunji/vessel/releases"
+  echo "Available versions: https://github.com/getvessel/vessel/releases"
   exit 1
 fi
 

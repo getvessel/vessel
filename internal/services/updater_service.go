@@ -112,11 +112,11 @@ func (u *UpdaterService) CheckForUpdates(ctx context.Context) (*UpdateInfo, erro
 	releaseNotes := "System is running optimal build."
 	downloadURL := os.Getenv("VESSEL_DOWNLOAD_URL")
 	if downloadURL == "" {
-		downloadURL = "https://github.com/solomonolatunji/vessel/releases"
+		downloadURL = "https://github.com/getvessel/vessel/releases"
 	}
 	releaseAPI := os.Getenv("VESSEL_UPDATE_URL")
 	if releaseAPI == "" {
-		releaseAPI = "https://api.github.com/repos/solomonolatunji/vessel/releases/latest"
+		releaseAPI = "https://api.github.com/repos/getvessel/vessel/releases/latest"
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, releaseAPI, nil)
 	if err == nil {
