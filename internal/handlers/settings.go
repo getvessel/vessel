@@ -3,8 +3,11 @@ package handlers
 import (
 	"net/http"
 
+	"os"
+
 	"github.com/labstack/echo/v4"
 
+	"vessel.dev/vessel/internal/license"
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/services"
 )
@@ -96,6 +99,50 @@ func (h *SettingsHandler) DeleteTeamNotificationChannel(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
+}
+
+// @Summary Activate License endpoint
+// @Description Activates offline license key
+// @Tags Settings
+// @Accept json
+// @Produce json
+// @Router /api/settings/license [post]
+func (h *SettingsHandler) ActivateLicense(c echo.Context) error {
+	var payload struct {
+		LicenseKey string `json:"license_key"`
+	}
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
+	}
+
+	pubKey := os.Getenv("LICENSE_PUBLIC_KEY")
+	if pubKey == "" {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "license public key not configured on this instance"})
+	}
+
+	claims, err := license.VerifyLicense(pubKey, payload.LicenseKey)
+	if err != nil {
+		return c.JSON(http.StatusForbidden, map[string]string{"error": err.Error()})
+	}
+
+	// Update local settings with the license details
+	s, err := h.settingsService.GetSettings(c.Request().Context())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to load settings"})
+	}
+
+	s.LicenseKey = payload.LicenseKey
+	s.Plan = claims.Plan
+	s.MaxSeats = claims.MaxSeats
+
+	if err := h.settingsService.UpdateSettings(c.Request().Context(), s); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to save license to settings"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"status": "activated",
+		"plan":   claims.Plan,
+	})
 }
 
 // @Summary HandleMCPRequest endpoint

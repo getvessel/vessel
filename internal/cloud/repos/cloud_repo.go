@@ -11,6 +11,7 @@ import (
 type CloudRepo interface {
 	GetTeamByID(id uint) (*models.CloudTeam, error)
 	GetTeamByName(name string) (*models.CloudTeam, error)
+	UpdateTeam(team *models.CloudTeam) error
 	GetActiveServerCount(teamID uint) (int64, error)
 	GetDeploymentsInLastHour(teamID uint) (int64, error)
 	LogUsage(usage *models.CloudUsageLog) error
@@ -46,6 +47,10 @@ func (r *cloudRepo) GetTeamByName(name string) (*models.CloudTeam, error) {
 		return nil, err
 	}
 	return &team, nil
+}
+
+func (r *cloudRepo) UpdateTeam(team *models.CloudTeam) error {
+	return r.db.Save(team).Error
 }
 
 func (r *cloudRepo) GetActiveServerCount(teamID uint) (int64, error) {

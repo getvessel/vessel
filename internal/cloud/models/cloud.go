@@ -11,7 +11,11 @@ type CloudTeam struct {
 	Name             string `gorm:"uniqueIndex"`
 	Plan             string `gorm:"default:'hobby'"` // hobby, pro, team
 	StripeCustomerID string
-	PaddleCustomerID string
+	PaddleCustomerID string `gorm:"index"`
+	// Branding
+	CustomDomain string
+	LogoURL      string
+	PrimaryColor string
 }
 
 type CloudServer struct {

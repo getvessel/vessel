@@ -22,6 +22,7 @@ type Server struct {
 	adminHandler     *handlers.AdminHandler
 	meteringHandler  *handlers.MeteringHandler
 	telemetryHandler *handlers.TelemetryHandler
+	teamHandler      *handlers.TeamHandler
 }
 
 func NewServer(db *gorm.DB) *Server {
@@ -45,6 +46,7 @@ func NewServer(db *gorm.DB) *Server {
 		adminHandler:     handlers.NewAdminHandler(),
 		meteringHandler:  handlers.NewMeteringHandler(services.NewMeteringService(repo)),
 		telemetryHandler: handlers.NewTelemetryHandler(repo),
+		teamHandler:      handlers.NewTeamHandler(repo),
 	}
 
 	s.registerRoutes()
@@ -80,9 +82,12 @@ func (s *Server) registerRoutes() {
 	api.POST("/auth/login", s.authHandler.Login)
 
 	api.GET("/users/me", s.userHandler.GetProfile)
+	
+	api.PATCH("/teams/:id/branding", s.teamHandler.UpdateBranding)
 
 	api.GET("/admin/stats", s.adminHandler.GetSystemStats)
 	api.GET("/admin/audit-logs", s.adminHandler.GetAuditLogs)
+	api.POST("/admin/licenses", s.adminHandler.GenerateOfflineLicense)
 
 	api.POST("/fleet/deploy", s.agentHandler.DeployToFleet, vesselMiddleware.DeploymentRateLimiter(s.repo))
 
