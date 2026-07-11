@@ -51,38 +51,80 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 		fmt.Fprintf(logWriter, "🚀 [Deployer] Starting deployment for service: %s (ID: %s)\n", app.Name, app.ID)
 	}
 
-	if app.BuildEngine == string(StrategyServerless) {
-		code, err := d.store.GetServerlessFunctionCode(app.ID)
-		if err != nil {
-			return "", fmt.Errorf("could not retrieve serverless code: %w", err)
-		}
-
-		// Create the source dir if it doesn't exist
-		if err := os.MkdirAll(sourceDir, 0755); err != nil {
-			return "", fmt.Errorf("could not create source directory: %w", err)
-		}
-
-		var filename string
-		switch code.Runtime {
-		case "nodejs":
-			filename = "index.js"
-		case "python":
-			filename = "main.py"
-		case "go":
-			filename = "main.go"
-		default:
-			filename = "main.txt"
-		}
-
-		filePath := filepath.Join(sourceDir, filename)
-		if err := os.WriteFile(filePath, []byte(code.CodeContent), 0644); err != nil {
-			return "", fmt.Errorf("could not write serverless code to file: %w", err)
-		}
-
-		if logWriter != nil {
-			fmt.Fprintf(logWriter, "📝 [Deployer] Wrote serverless function code to %s\n", filePath)
-		}
+	if err := d.prepareServerlessCode(app, sourceDir, logWriter); err != nil {
+		return "", err
 	}
+
+	imageTag, err := d.buildImage(ctx, app, sourceDir, logWriter)
+	if err != nil {
+		return "", err
+	}
+
+	envSlice, err := d.prepareEnvironmentVariables(app, logWriter)
+	if err != nil {
+		return "", err
+	}
+
+	newContainerName := fmt.Sprintf("%s-%s", utils.NormalizeContainerName(app.ID), uuid.New().String()[:8])
+	if logWriter != nil {
+		fmt.Fprintf(logWriter, "🔄 [Deployer] Rolling out container %s with %d encrypted environment variables...\n", newContainerName, len(envSlice))
+	}
+
+	if err := d.startContainer(ctx, app, newContainerName, imageTag, envSlice); err != nil {
+		return "", err
+	}
+
+	if err := d.verifyHealthCheck(ctx, app, newContainerName, logWriter); err != nil {
+		return "", err
+	}
+
+	if logWriter != nil {
+		fmt.Fprintf(logWriter, "🎉 [Deployer] Health check passed! Container is ready.\n")
+		fmt.Fprintf(logWriter, "🎉 [Deployer] Deployment successful! Container ID: %s\n", newContainerName)
+	}
+
+	d.scheduleCleanup(app, newContainerName, logWriter)
+	return newContainerName, nil
+}
+
+func (d *Deployer) prepareServerlessCode(app *models.AppService, sourceDir string, logWriter io.Writer) error {
+	if app.BuildEngine != string(StrategyServerless) {
+		return nil
+	}
+
+	code, err := d.store.GetServerlessFunctionCode(app.ID)
+	if err != nil {
+		return fmt.Errorf("could not retrieve serverless code: %w", err)
+	}
+
+	if err := os.MkdirAll(sourceDir, 0755); err != nil {
+		return fmt.Errorf("could not create source directory: %w", err)
+	}
+
+	var filename string
+	switch code.Runtime {
+	case "nodejs":
+		filename = "index.js"
+	case "python":
+		filename = "main.py"
+	case "go":
+		filename = "main.go"
+	default:
+		filename = "main.txt"
+	}
+
+	filePath := filepath.Join(sourceDir, filename)
+	if err := os.WriteFile(filePath, []byte(code.CodeContent), 0644); err != nil {
+		return fmt.Errorf("could not write serverless code to file: %w", err)
+	}
+
+	if logWriter != nil {
+		fmt.Fprintf(logWriter, "📝 [Deployer] Wrote serverless function code to %s\n", filePath)
+	}
+	return nil
+}
+
+func (d *Deployer) buildImage(ctx context.Context, app *models.AppService, sourceDir string, logWriter io.Writer) (string, error) {
 	buildOpts := BuildOptions{
 		ProjectID: app.ProjectID,
 		ServiceID: app.ID,
@@ -97,6 +139,10 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 	if logWriter != nil {
 		fmt.Fprintf(logWriter, "✅ [Deployer] Successfully built OCI image: %s\n", imageTag)
 	}
+	return imageTag, nil
+}
+
+func (d *Deployer) prepareEnvironmentVariables(app *models.AppService, logWriter io.Writer) ([]string, error) {
 	envVarsMap, err := d.store.GetEnvVars(app.ProjectID)
 	if err != nil && logWriter != nil {
 		fmt.Fprintf(logWriter, "⚠️ [Deployer] Warning: could not load shared project environment variables: %v\n", err)
@@ -104,10 +150,12 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 	if envVarsMap == nil {
 		envVarsMap = make(map[string]string)
 	}
+
 	serviceVars, _ := d.store.ListServiceVariables(app.ID)
 	for _, sv := range serviceVars {
 		envVarsMap[sv.Key] = sv.Value
 	}
+
 	if d.EnvProvider != nil {
 		if linkedEnvs, err := d.EnvProvider(app.ProjectID); err == nil {
 			for k, v := range linkedEnvs {
@@ -120,23 +168,24 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 			}
 		}
 	}
+
 	var envSlice []string
 	for k, v := range envVarsMap {
 		envSlice = append(envSlice, fmt.Sprintf("%s=%s", k, v))
 	}
-	newContainerName := fmt.Sprintf("%s-%s", utils.NormalizeContainerName(app.ID), uuid.New().String()[:8])
-	if logWriter != nil {
-		fmt.Fprintf(logWriter, "🔄 [Deployer] Rolling out container %s with %d encrypted environment variables...\n", newContainerName, len(envSlice))
-	}
+	return envSlice, nil
+}
+
+func (d *Deployer) startContainer(ctx context.Context, app *models.AppService, containerName, imageTag string, envSlice []string) error {
 	port := app.InternalPort
 	if port <= 0 {
 		port = 3000
 	}
 	memMB := 512
 	cpuReq := 0.5
-	_, err = d.containerManager.CreateAndStart(
+	_, err := d.containerManager.CreateAndStart(
 		ctx,
-		newContainerName,
+		containerName,
 		imageTag,
 		app.ID,
 		app.Domain,
@@ -146,20 +195,24 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 		cpuReq,
 	)
 	if err != nil {
-		return "", fmt.Errorf("container rollout failed: %w", err)
+		return fmt.Errorf("container rollout failed: %w", err)
 	}
-	healthy := d.waitForHealthyContainer(ctx, newContainerName, app.HealthCheckPath)
+	return nil
+}
+
+func (d *Deployer) verifyHealthCheck(ctx context.Context, app *models.AppService, containerName string, logWriter io.Writer) error {
+	healthy := d.waitForHealthyContainer(ctx, containerName, app.HealthCheckPath)
 	if !healthy {
-		_ = d.containerManager.StopAndRemove(ctx, newContainerName)
+		_ = d.containerManager.StopAndRemove(ctx, containerName)
 		if logWriter != nil {
 			fmt.Fprintf(logWriter, "❌ [Deployer] Health check failed. Rolling back to previous version.\n")
 		}
-		return "", fmt.Errorf("health check failed, deployment aborted")
+		return fmt.Errorf("health check failed, deployment aborted")
 	}
-	if logWriter != nil {
-		fmt.Fprintf(logWriter, "🎉 [Deployer] Health check passed! Container is ready.\n")
-		fmt.Fprintf(logWriter, "🎉 [Deployer] Deployment successful! Container ID: %s\n", newContainerName)
-	}
+	return nil
+}
+
+func (d *Deployer) scheduleCleanup(app *models.AppService, newContainerName string, logWriter io.Writer) {
 	prefix := utils.NormalizeContainerName(app.ID)
 	go func() {
 		time.Sleep(10 * time.Second)
@@ -168,8 +221,6 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 		}
 		_ = d.containerManager.CleanupOrphanedContainers(context.Background(), prefix, newContainerName)
 	}()
-
-	return newContainerName, nil
 }
 
 func (d *Deployer) Stop(ctx context.Context, containerID string) error {

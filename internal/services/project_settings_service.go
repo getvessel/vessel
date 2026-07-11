@@ -2,7 +2,10 @@ package services
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -58,12 +61,21 @@ func (s *ProjectSettingsService) CreateToken(ctx context.Context, t *models.Proj
 	if t.ID == "" {
 		t.ID = uuid.New().String()
 	}
-	t.CreatedAt = time.Now()
-	raw, err := s.repo.CreateToken(ctx, t)
+	t.CreatedAt = time.Now().UTC()
+
+	randomBytes := make([]byte, 32)
+	if _, err := rand.Read(randomBytes); err != nil {
+		return nil, "", fmt.Errorf("generate token bytes: %w", err)
+	}
+	rawSecret := hex.EncodeToString(randomBytes)
+	fullToken := fmt.Sprintf("vsl_tok_%s", rawSecret)
+	t.TokenPrefix = fullToken[:16]
+
+	err := s.repo.CreateToken(ctx, t, fullToken)
 	if err != nil {
 		return nil, "", err
 	}
-	return t, raw, nil
+	return t, fullToken, nil
 }
 
 func (s *ProjectSettingsService) GetTokenByHash(ctx context.Context, tokenHash string) (*models.ProjectToken, error) {

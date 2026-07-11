@@ -2,9 +2,7 @@ package repositories
 
 import (
 	"context"
-	"crypto/rand"
 	"database/sql"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"strings"
@@ -21,7 +19,7 @@ type ProjectSettingsRepository interface {
 	CreateWebhook(ctx context.Context, w *models.Webhook) error
 	ListWebhooksByProject(ctx context.Context, projectID string) ([]*models.Webhook, error)
 	DeleteWebhook(ctx context.Context, id, projectID string) error
-	CreateToken(ctx context.Context, t *models.ProjectToken) (string, error)
+	CreateToken(ctx context.Context, t *models.ProjectToken, fullToken string) error
 	ListTokensByProject(ctx context.Context, projectID string) ([]*models.ProjectToken, error)
 	DeleteToken(ctx context.Context, id, projectID string) error
 	GetTokenByHash(ctx context.Context, tokenHash string) (*models.ProjectToken, error)
@@ -109,20 +107,10 @@ func (r *ProjectSettingsSQLiteRepository) DeleteWebhook(ctx context.Context, id,
 	return r.deleteByIDAndProject(ctx, "project_webhooks", id, projectID, "webhook")
 }
 
-func (r *ProjectSettingsSQLiteRepository) CreateToken(ctx context.Context, t *models.ProjectToken) (string, error) {
+func (r *ProjectSettingsSQLiteRepository) CreateToken(ctx context.Context, t *models.ProjectToken, fullToken string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	if t.ID == "" {
-		t.ID = uuid.NewString()
-	}
-	t.CreatedAt = time.Now().UTC()
-	randomBytes := make([]byte, 32)
-	if _, err := rand.Read(randomBytes); err != nil {
-		return "", fmt.Errorf("generate token bytes: %w", err)
-	}
-	rawSecret := hex.EncodeToString(randomBytes)
-	fullToken := fmt.Sprintf("vsl_tok_%s", rawSecret)
-	t.TokenPrefix = fullToken[:16]
+
 	scopesStr := strings.Join(t.Scopes, ",")
 	ipStr := strings.Join(t.IPAllowlist, ",")
 	var expiresAtVal interface{}
@@ -134,9 +122,9 @@ func (r *ProjectSettingsSQLiteRepository) CreateToken(ctx context.Context, t *mo
 		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		t.ID, t.ProjectID, t.EnvironmentID, t.Name, t.TokenPrefix, fullToken, scopesStr, ipStr, expiresAtVal, t.CreatedAt.Format(time.RFC3339))
 	if err != nil {
-		return "", fmt.Errorf("create token: %w", err)
+		return fmt.Errorf("create token: %w", err)
 	}
-	return fullToken, nil
+	return nil
 }
 
 func (r *ProjectSettingsSQLiteRepository) ListTokensByProject(ctx context.Context, projectID string) ([]*models.ProjectToken, error) {

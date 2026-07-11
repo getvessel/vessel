@@ -130,26 +130,56 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 	if err := bm.store.CreateBackupRecord(rec); err != nil {
 		return nil, fmt.Errorf("failed to create backup record: %w", err)
 	}
-	var dumpCmd []string
-	var fileExt string
-	var containerName string
+
+	containerName, dumpCmd, fileExt, err := bm.buildDumpCommand(cfg)
+	if err != nil {
+		return bm.failBackupRecord(rec.ID, err.Error())
+	}
+
+	fileName := fmt.Sprintf("backup_%s_%s%s", cfg.ID, time.Now().UTC().Format("20060102_150405"), fileExt)
+	filePath := filepath.Join(bm.backupDir, fileName)
+
+	dumpBytes, execLogs, err := bm.executeDump(ctx, containerName, dumpCmd, cfg.Name)
+	if err != nil {
+		return bm.failBackupRecord(rec.ID, err.Error())
+	}
+
+	if err := os.WriteFile(filePath, dumpBytes, 0o600); err != nil {
+		return bm.failBackupRecord(rec.ID, fmt.Sprintf("failed to write backup archive to disk: %v", err))
+	}
+
+	sizeBytes := int64(len(dumpBytes))
+	if fileInfo, err := os.Stat(filePath); err == nil && fileInfo != nil {
+		sizeBytes = fileInfo.Size()
+	}
+
+	s3URL := ""
+	if cfg.S3DestinationID != "" {
+		s3URL, execLogs = bm.handleS3Upload(ctx, cfg, fileName, dumpBytes, execLogs)
+	}
+
+	bm.enforceRetentionPolicy(cfg)
+
+	return bm.finalizeBackupRecord(rec, filePath, s3URL, execLogs, sizeBytes)
+}
+
+func (bm *BackupManager) buildDumpCommand(cfg *models.BackupConfig) (string, []string, string, error) {
 	if cfg.DatabaseID != "" {
 		db, err := bm.store.GetDatabase(cfg.DatabaseID)
 		if err != nil || db == nil {
-			return bm.failBackupRecord(rec.ID, fmt.Sprintf("target database %s not found", cfg.DatabaseID))
+			return "", nil, "", fmt.Errorf("target database %s not found", cfg.DatabaseID)
 		}
-		containerName = utils.NormalizeContainerName(db.ID)
+		containerName := utils.NormalizeContainerName(db.ID)
 		tmplMgr, err := templates.NewManager()
 		if err != nil {
-			return bm.failBackupRecord(rec.ID, fmt.Sprintf("failed to init template manager: %v", err))
+			return "", nil, "", fmt.Errorf("failed to init template manager: %v", err)
 		}
 
 		composeFile, err := tmplMgr.GetTemplate(strings.ToLower(db.Engine))
 		if err != nil {
-			return bm.failBackupRecord(rec.ID, fmt.Sprintf("unsupported database engine %s: %v", db.Engine, err))
+			return "", nil, "", fmt.Errorf("unsupported database engine %s: %v", db.Engine, err)
 		}
 
-		// Get the main service
 		tmplService, exists := composeFile.Services[strings.ToLower(db.Engine)]
 		if !exists {
 			for _, s := range composeFile.Services {
@@ -159,83 +189,79 @@ func (bm *BackupManager) TriggerBackup(ctx context.Context, backupConfigID strin
 		}
 
 		if tmplService.XVessel != nil && tmplService.XVessel.Backup != nil && len(tmplService.XVessel.Backup.Command) > 0 {
-			// Resolve variables in command
+			var dumpCmd []string
 			for _, c := range tmplService.XVessel.Backup.Command {
 				resolved := strings.ReplaceAll(c, "${db.password}", db.Password)
 				resolved = strings.ReplaceAll(resolved, "${db.username}", db.Username)
 				resolved = strings.ReplaceAll(resolved, "${db.database_name}", db.DatabaseName)
 				dumpCmd = append(dumpCmd, resolved)
 			}
-			fileExt = tmplService.XVessel.Backup.FileExtension
-		} else {
-			// Fallback generic dump if no metadata exists
-			dumpCmd = []string{"sh", "-c", "echo 'Generic volume snapshot'"}
-			fileExt = ".tar.gz"
+			return containerName, dumpCmd, tmplService.XVessel.Backup.FileExtension, nil
 		}
+		return containerName, []string{"sh", "-c", "echo 'Generic volume snapshot'"}, ".tar.gz", nil
+
 	} else if cfg.StorageID != "" {
-		containerName = utils.NormalizeContainerName(cfg.StorageID)
-		dumpCmd = []string{"tar", "-czf", "-", "/data"}
-		fileExt = ".tar.gz"
+		return utils.NormalizeContainerName(cfg.StorageID), []string{"tar", "-czf", "-", "/data"}, ".tar.gz", nil
+	}
+
+	return "", nil, "", errors.New("backup config requires either databaseId or storageId")
+}
+
+func (bm *BackupManager) executeDump(ctx context.Context, containerName string, dumpCmd []string, backupName string) ([]byte, string, error) {
+	if bm.dockerClient == nil {
+		dumpBytes := []byte(fmt.Sprintf("-- Simulated backup dump for %s at %s --\n", backupName, time.Now().UTC().Format(time.RFC3339)))
+		return dumpBytes, "Docker client nil: simulated successful local dump.\n", nil
+	}
+
+	inspectResp, err := bm.dockerClient.ContainerInspect(ctx, containerName)
+	if err != nil || !inspectResp.State.Running {
+		return nil, "", fmt.Errorf("cannot backup: container %s is stopped or not running", containerName)
+	}
+
+	execConfig := dockertypes.ExecConfig{
+		AttachStdout: true,
+		AttachStderr: true,
+		Cmd:          dumpCmd,
+	}
+
+	execIDResp, err := bm.dockerClient.ContainerExecCreate(ctx, inspectResp.ID, execConfig)
+	if err != nil {
+		return nil, "", fmt.Errorf("docker exec create failed: %v", err)
+	}
+
+	attachResp, err := bm.dockerClient.ContainerExecAttach(ctx, execIDResp.ID, dockertypes.ExecStartCheck{})
+	if err != nil {
+		return nil, "", fmt.Errorf("docker exec attach failed: %v", err)
+	}
+	defer attachResp.Close()
+
+	var stdoutBuf, stderrBuf bytes.Buffer
+	if _, err := stdcopy.StdCopy(&stdoutBuf, &stderrBuf, attachResp.Reader); err != nil {
+		_, _ = io.Copy(&stdoutBuf, attachResp.Reader)
+	}
+
+	return stdoutBuf.Bytes(), stderrBuf.String(), nil
+}
+
+func (bm *BackupManager) handleS3Upload(ctx context.Context, cfg *models.BackupConfig, fileName string, dumpBytes []byte, execLogs string) (string, string) {
+	dest, err := bm.store.GetS3Destination(cfg.S3DestinationID)
+	if err != nil || dest == nil {
+		return "", execLogs
+	}
+	s3URL, err := bm.uploadToS3(ctx, dest, fileName, dumpBytes)
+	if err != nil {
+		execLogs += fmt.Sprintf("\n⚠️ S3 upload failed: %v", err)
 	} else {
-		return bm.failBackupRecord(rec.ID, "backup config requires either databaseId or storageId")
+		execLogs += fmt.Sprintf("\n✅ Successfully uploaded backup to S3/MinIO destination: %s", s3URL)
 	}
-	fileName := fmt.Sprintf("backup_%s_%s%s", cfg.ID, time.Now().UTC().Format("20060102_150405"), fileExt)
-	filePath := filepath.Join(bm.backupDir, fileName)
-	var dumpBytes []byte
-	var execLogs string
-	if bm.dockerClient != nil {
-		inspectResp, err := bm.dockerClient.ContainerInspect(ctx, containerName)
-		if err != nil || !inspectResp.State.Running {
-			return bm.failBackupRecord(rec.ID, fmt.Sprintf("cannot backup: container %s is stopped or not running", containerName))
-		}
-		execConfig := dockertypes.ExecConfig{
-			AttachStdout: true,
-			AttachStderr: true,
-			Cmd:          dumpCmd,
-		}
-		execIDResp, err := bm.dockerClient.ContainerExecCreate(ctx, inspectResp.ID, execConfig)
-		if err != nil {
-			return bm.failBackupRecord(rec.ID, fmt.Sprintf("docker exec create failed: %v", err))
-		}
-		attachResp, err := bm.dockerClient.ContainerExecAttach(ctx, execIDResp.ID, dockertypes.ExecStartCheck{})
-		if err != nil {
-			return bm.failBackupRecord(rec.ID, fmt.Sprintf("docker exec attach failed: %v", err))
-		}
-		defer attachResp.Close()
-		var stdoutBuf, stderrBuf bytes.Buffer
-		if _, err := stdcopy.StdCopy(&stdoutBuf, &stderrBuf, attachResp.Reader); err != nil {
-			_, _ = io.Copy(&stdoutBuf, attachResp.Reader)
-		}
-		dumpBytes = stdoutBuf.Bytes()
-		execLogs = stderrBuf.String()
-	} else {
-		dumpBytes = []byte(fmt.Sprintf("-- Simulated backup dump for %s at %s --\n", cfg.Name, time.Now().UTC().Format(time.RFC3339)))
-		execLogs = "Docker client nil: simulated successful local dump.\n"
-	}
-	if err := os.WriteFile(filePath, dumpBytes, 0o600); err != nil {
-		return bm.failBackupRecord(rec.ID, fmt.Sprintf("failed to write backup archive to disk: %v", err))
-	}
-	fileInfo, _ := os.Stat(filePath)
-	var sizeBytes int64 = int64(len(dumpBytes))
-	if fileInfo != nil {
-		sizeBytes = fileInfo.Size()
-	}
-	s3URL := ""
-	if cfg.S3DestinationID != "" {
-		dest, err := bm.store.GetS3Destination(cfg.S3DestinationID)
-		if err == nil && dest != nil {
-			s3URL, err = bm.uploadToS3(ctx, dest, fileName, dumpBytes)
-			if err != nil {
-				execLogs += fmt.Sprintf("\n⚠️ S3 upload failed: %v", err)
-			} else {
-				execLogs += fmt.Sprintf("\n✅ Successfully uploaded backup to S3/MinIO destination: %s", s3URL)
-			}
-		}
-	}
-	bm.enforceRetentionPolicy(cfg)
+	return s3URL, execLogs
+}
+
+func (bm *BackupManager) finalizeBackupRecord(rec *models.BackupRecord, filePath string, s3URL string, execLogs string, sizeBytes int64) (*models.BackupRecord, error) {
 	nowStr := time.Now().UTC().Format(time.RFC3339)
 	finalLogs := rec.Logs + execLogs + "\nBackup run completed successfully."
 	_ = bm.store.UpdateBackupRecord(rec.ID, "completed", filePath, s3URL, finalLogs, sizeBytes, nowStr)
+
 	rec.Status = "completed"
 	rec.FilePath = filePath
 	rec.FileSizeBytes = sizeBytes

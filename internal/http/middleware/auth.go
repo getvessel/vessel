@@ -52,6 +52,53 @@ func (g *AuthGuard) checkIPAllowlist(c echo.Context) error {
 	return nil
 }
 
+func (g *AuthGuard) validateAPIToken(c echo.Context, tokenStr string, denyAPITokens bool) (*models.UserClaims, error) {
+	if denyAPITokens {
+		return nil, c.JSON(http.StatusForbidden, map[string]string{"error": "API tokens cannot access role-restricted endpoints"})
+	}
+	if g.ProjectTokens == nil {
+		return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "API tokens not supported"})
+	}
+	pt, err := g.ProjectTokens.GetTokenByHash(c.Request().Context(), tokenStr)
+	if err != nil {
+		return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid or revoked API token"})
+	}
+	if pt.ExpiresAt != nil && pt.ExpiresAt.Before(time.Now()) {
+		return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "API token has expired"})
+	}
+	if len(pt.IPAllowlist) > 0 {
+		if !IsIPAllowed(c.RealIP(), strings.Join(pt.IPAllowlist, ",")) {
+			return nil, c.JSON(http.StatusForbidden, map[string]string{"error": "IP address not allowed for this API token"})
+		}
+	}
+	_ = g.ProjectTokens.UpdateTokenLastUsed(c.Request().Context(), pt.ID)
+
+	c.Set("api_scopes", pt.Scopes)
+	c.Set("project_id", pt.ProjectID)
+	c.Set("environment_id", pt.EnvironmentID)
+
+	return &models.UserClaims{
+		UserID: "api-token-" + pt.ID,
+		Email:  "api@" + pt.ProjectID + ".vessel.local",
+		Role:   "api",
+	}, nil
+}
+
+func (g *AuthGuard) validateJWT(c echo.Context, tokenStr string) (*models.UserClaims, error) {
+	claimsMap, err := g.TokenService.ValidateToken(tokenStr)
+	if err != nil {
+		return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid authentication token: " + err.Error()})
+	}
+
+	totpEnabled, _ := claimsMap["totpEnabled"].(bool)
+	return &models.UserClaims{
+		UserID:      fmt.Sprintf("%v", claimsMap["sub"]),
+		Email:       fmt.Sprintf("%v", claimsMap["email"]),
+		Role:        fmt.Sprintf("%v", claimsMap["role"]),
+		TOTPEnabled: totpEnabled,
+	}, nil
+}
+
 func (g *AuthGuard) baseAuth(c echo.Context, denyAPITokens bool) (*models.UserClaims, error) {
 	if err := g.checkIPAllowlist(c); err != nil {
 		return nil, err
@@ -69,49 +116,10 @@ func (g *AuthGuard) baseAuth(c echo.Context, denyAPITokens bool) (*models.UserCl
 	}
 
 	if strings.HasPrefix(tokenStr, "vsl_tok_") {
-		if denyAPITokens {
-			return nil, c.JSON(http.StatusForbidden, map[string]string{"error": "API tokens cannot access role-restricted endpoints"})
-		}
-		if g.ProjectTokens == nil {
-			return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "API tokens not supported"})
-		}
-		pt, err := g.ProjectTokens.GetTokenByHash(c.Request().Context(), tokenStr)
-		if err != nil {
-			return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid or revoked API token"})
-		}
-		if pt.ExpiresAt != nil && pt.ExpiresAt.Before(time.Now()) {
-			return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "API token has expired"})
-		}
-		if len(pt.IPAllowlist) > 0 {
-			if !IsIPAllowed(c.RealIP(), strings.Join(pt.IPAllowlist, ",")) {
-				return nil, c.JSON(http.StatusForbidden, map[string]string{"error": "IP address not allowed for this API token"})
-			}
-		}
-		_ = g.ProjectTokens.UpdateTokenLastUsed(c.Request().Context(), pt.ID)
-
-		c.Set("api_scopes", pt.Scopes)
-		c.Set("project_id", pt.ProjectID)
-		c.Set("environment_id", pt.EnvironmentID)
-
-		return &models.UserClaims{
-			UserID: "api-token-" + pt.ID,
-			Email:  "api@" + pt.ProjectID + ".vessel.local",
-			Role:   "api",
-		}, nil
+		return g.validateAPIToken(c, tokenStr, denyAPITokens)
 	}
 
-	claimsMap, err := g.TokenService.ValidateToken(tokenStr)
-	if err != nil {
-		return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid authentication token: " + err.Error()})
-	}
-
-	totpEnabled, _ := claimsMap["totpEnabled"].(bool)
-	return &models.UserClaims{
-		UserID:      fmt.Sprintf("%v", claimsMap["sub"]),
-		Email:       fmt.Sprintf("%v", claimsMap["email"]),
-		Role:        fmt.Sprintf("%v", claimsMap["role"]),
-		TOTPEnabled: totpEnabled,
-	}, nil
+	return g.validateJWT(c, tokenStr)
 }
 
 func (g *AuthGuard) RequireAuth() echo.MiddlewareFunc {
