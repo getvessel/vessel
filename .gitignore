@@ -1,5 +1,6 @@
 # Binaries & builds
 /vesseld
+/vesselcloud
 /vessel-cli
 *.exe
 *.exe~
