@@ -26,8 +26,7 @@
   --sl-color-backdrop-overlay: rgba(10, 10, 15, 0.78);
   --sl-font: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --sl-font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    monospace;
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
 :root[data-theme="light"] {

@@ -6,10 +6,10 @@ import {
   Folder01Icon,
   Settings01Icon,
   UserGroupIcon,
-} from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Link } from "@tanstack/react-router";
-import type * as React from "react";
+} from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Link } from '@tanstack/react-router';
+import type * as React from 'react';
 
 import {
   Sidebar,
@@ -25,38 +25,38 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-} from "#/components/ui/sidebar.tsx";
+} from '#/components/ui/sidebar.tsx';
 
 // Menu items
 const items = [
   {
-    title: "Dashboard",
-    url: "/",
+    title: 'Dashboard',
+    url: '/',
     icon: DashboardSquare01Icon,
   },
   {
-    title: "Projects",
-    url: "/projects",
+    title: 'Projects',
+    url: '/projects',
     icon: Folder01Icon,
   },
   {
-    title: "Databases & Storage",
-    url: "/databases",
+    title: 'Databases & Storage',
+    url: '/databases',
     icon: Database01Icon,
   },
   {
-    title: "Jobs & Backups",
-    url: "/jobs",
+    title: 'Jobs & Backups',
+    url: '/jobs',
     icon: Activity01Icon,
   },
   {
-    title: "Teams",
-    url: "/teams",
+    title: 'Teams',
+    url: '/teams',
     icon: UserGroupIcon,
   },
   {
-    title: "Settings",
-    url: "/settings",
+    title: 'Settings',
+    url: '/settings',
     icon: Settings01Icon,
   },
 ];
@@ -70,10 +70,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       >
         <SidebarHeader className="h-16 flex items-center justify-center border-b border-zinc-800/50">
           <div className="flex items-center gap-2 font-bold text-lg tracking-tight text-zinc-100 w-full px-4">
-            <HugeiconsIcon
-              icon={CloudServerIcon}
-              className="h-5 w-5 text-indigo-400"
-            />
+            <HugeiconsIcon icon={CloudServerIcon} className="h-5 w-5 text-indigo-400" />
             <span>Vessel</span>
           </div>
         </SidebarHeader>
@@ -103,9 +100,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter className="border-t border-zinc-800/50 p-4">
-          <div className="text-xs text-zinc-500 text-center">
-            Vessel Control Panel v0.1.0
-          </div>
+          <div className="text-xs text-zinc-500 text-center">Vessel Control Panel v0.1.0</div>
         </SidebarFooter>
       </Sidebar>
 
@@ -140,9 +135,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto bg-zinc-950 text-zinc-50 p-6">
-          {children}
-        </main>
+        <main className="flex-1 overflow-auto bg-zinc-950 text-zinc-50 p-6">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );
