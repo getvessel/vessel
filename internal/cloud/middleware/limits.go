@@ -4,25 +4,30 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"vessel.dev/vessel/internal/cloud/repos"
 	"vessel.dev/vessel/internal/cloud/services"
 )
 
 // DeploymentRateLimiter intercepts deployment requests to check if the team has exceeded their hourly limit
-func DeploymentRateLimiter() echo.MiddlewareFunc {
+func DeploymentRateLimiter(repo repos.CloudRepo) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			// Mock extracting user plan and team ID from JWT
-			// In production, this is set by earlier AuthMiddleware
-			teamID := "team_1"
+			// In production, this is set by earlier AuthMiddleware (e.g. JWT claims)
+			// Mocking team ID logic until real auth is plugged in, but DB queries use it
+			teamID := uint(1) 
+			teamStrID := "team_1"
 			plan := "hobby"
+			
+			team, err := repo.GetTeamByID(teamID)
+			if err == nil && team != nil {
+				plan = team.Plan
+			}
 
-			limit := services.GetFeatures().GetDeploymentRateLimit(teamID, plan)
+			limit := services.GetFeatures().GetDeploymentRateLimit(teamStrID, plan)
 
-			// TODO: Check Redis or Database to see how many deployments have occurred in the last hour
-			// Mocking current usage
-			currentUsage := 5
+			currentUsage, _ := repo.GetDeploymentsInLastHour(teamID)
 
-			if currentUsage >= limit {
+			if int(currentUsage) >= limit {
 				return c.JSON(http.StatusTooManyRequests, map[string]string{
 					"error": "Deployment rate limit exceeded for your tier",
 				})
@@ -34,20 +39,23 @@ func DeploymentRateLimiter() echo.MiddlewareFunc {
 }
 
 // SeatLimitGuard intercepts server connection (BYOS) requests to check if they can add another server
-func SeatLimitGuard() echo.MiddlewareFunc {
+func SeatLimitGuard(repo repos.CloudRepo) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			// Mock extracting user plan and team ID from JWT
-			teamID := "team_1"
+			teamID := uint(1)
+			teamStrID := "team_1"
 			plan := "hobby"
 
-			limit := services.GetFeatures().GetMaxServers(teamID, plan)
+			team, err := repo.GetTeamByID(teamID)
+			if err == nil && team != nil {
+				plan = team.Plan
+			}
 
-			// TODO: Query cloud_servers database to count currently connected active servers
-			// Mocking current server count
-			currentServers := 1
+			limit := services.GetFeatures().GetMaxServers(teamStrID, plan)
 
-			if currentServers >= limit {
+			currentServers, _ := repo.GetActiveServerCount(teamID)
+
+			if int(currentServers) >= limit {
 				return c.JSON(http.StatusForbidden, map[string]string{
 					"error": "Bring Your Own Server (BYOS) seat limit reached. Please upgrade your plan.",
 				})

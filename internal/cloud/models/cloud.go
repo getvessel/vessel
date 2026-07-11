@@ -1,0 +1,34 @@
+package models
+
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
+type CloudTeam struct {
+	gorm.Model
+	Name             string `gorm:"uniqueIndex"`
+	Plan             string `gorm:"default:'hobby'"` // hobby, pro, team
+	StripeCustomerID string
+	PaddleCustomerID string
+}
+
+type CloudServer struct {
+	gorm.Model
+	TeamID    uint
+	ServerID  string `gorm:"uniqueIndex"`
+	Name      string
+	IPAddress string
+	IsActive  bool
+	LastPing  time.Time
+}
+
+type CloudUsageLog struct {
+	gorm.Model
+	TeamID         uint
+	Deployments    int
+	ContainerHours int
+	BandwidthGB    int
+	ReportedAt     time.Time
+}

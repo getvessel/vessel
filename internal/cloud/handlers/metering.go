@@ -19,7 +19,7 @@ func NewMeteringHandler(meteringService services.MeteringService) *MeteringHandl
 }
 
 type UsageReport struct {
-	TeamID         string `json:"team_id"`
+	TeamID         uint   `json:"team_id"`
 	Deployments    int    `json:"deployments"`
 	ContainerHours int    `json:"container_hours"`
 	BandwidthGB    int    `json:"bandwidth_gb"`
@@ -43,11 +43,11 @@ func (h *MeteringHandler) ReportUsage(c echo.Context) error {
 
 	err := h.meteringService.RecordUsage(req.TeamID, req.Deployments, req.ContainerHours, req.BandwidthGB)
 	if err != nil {
-		log.Printf("Error recording usage for team %s: %v", req.TeamID, err)
+		log.Printf("Error recording usage for team %d: %v", req.TeamID, err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to record usage"})
 	}
 
-	log.Printf("Successfully recorded usage report for team %s: %d deploys, %d hours", req.TeamID, req.Deployments, req.ContainerHours)
+	log.Printf("Successfully recorded usage report for team %d: %d deploys, %d hours", req.TeamID, req.Deployments, req.ContainerHours)
 
 	return c.JSON(http.StatusOK, map[string]string{"status": "recorded"})
 }

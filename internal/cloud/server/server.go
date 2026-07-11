@@ -3,13 +3,17 @@ package server
 import (
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
+	"gorm.io/gorm"
 	"vessel.dev/vessel/internal/cloud/handlers"
 	vesselMiddleware "vessel.dev/vessel/internal/cloud/middleware"
+	"vessel.dev/vessel/internal/cloud/repos"
 	"vessel.dev/vessel/internal/cloud/services"
 )
 
 type Server struct {
 	router          *echo.Echo
+	db              *gorm.DB
+	repo            repos.CloudRepo
 	agentHandler    *handlers.AgentHandler
 	wizardHandler   *handlers.WizardHandler
 	billingHandler  *handlers.BillingHandler
@@ -19,22 +23,26 @@ type Server struct {
 	meteringHandler *handlers.MeteringHandler
 }
 
-func NewServer() *Server {
+func NewServer(db *gorm.DB) *Server {
 	e := echo.New()
 
 	e.Use(echoMiddleware.Logger())
 	e.Use(echoMiddleware.Recover())
 	e.Use(echoMiddleware.CORS())
 
+	repo := repos.NewCloudRepo(db)
+
 	s := &Server{
 		router:          e,
+		db:              db,
+		repo:            repo,
 		agentHandler:    handlers.NewAgentHandler(),
 		wizardHandler:   handlers.NewWizardHandler(),
 		billingHandler:  handlers.NewBillingHandler(),
 		authHandler:     handlers.NewAuthHandler(),
 		userHandler:     handlers.NewUserHandler(),
 		adminHandler:    handlers.NewAdminHandler(),
-		meteringHandler: handlers.NewMeteringHandler(services.NewMeteringService()),
+		meteringHandler: handlers.NewMeteringHandler(services.NewMeteringService(repo)),
 	}
 
 	s.registerRoutes()
@@ -56,7 +64,7 @@ func (s *Server) registerRoutes() {
 	api.GET("/agent/connect", s.agentHandler.AcceptConnection)
 
 	// Agent & Wizard routes
-	api.POST("/wizard/token", s.wizardHandler.GenerateAgentToken, vesselMiddleware.SeatLimitGuard())
+	api.POST("/wizard/token", s.wizardHandler.GenerateAgentToken, vesselMiddleware.SeatLimitGuard(s.repo))
 
 	api.POST("/billing/stripe/webhook", s.billingHandler.HandleStripeWebhook)
 	api.POST("/billing/stripe/checkout", s.billingHandler.CreateStripeCheckout)
@@ -74,7 +82,7 @@ func (s *Server) registerRoutes() {
 	api.GET("/admin/stats", s.adminHandler.GetSystemStats)
 	api.GET("/admin/audit-logs", s.adminHandler.GetAuditLogs)
 
-	api.POST("/fleet/deploy", s.agentHandler.DeployToFleet, vesselMiddleware.DeploymentRateLimiter())
+	api.POST("/fleet/deploy", s.agentHandler.DeployToFleet, vesselMiddleware.DeploymentRateLimiter(s.repo))
 }
 
 func (s *Server) Start(address string) error {

@@ -18,7 +18,9 @@ func main() {
 		port = "8081" // Different from OSS vessel default (8080)
 	}
 
-	app := server.NewServer()
+	db := server.InitDatabase()
+
+	app := server.NewServer(db)
 	log.Printf("Starting Vessel Cloud API on port %s", port)
 	if err := app.Start(":" + port); err != nil {
 		log.Fatalf("Failed to start cloud server: %v", err)
