@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"gorm.io/gorm"
-	"vessel.dev/vessel/internal/cloud/models"
+	"vessel.dev/vessel/internal/models"
 )
 
 type CloudRepo interface {

@@ -79,13 +79,17 @@ type SSHKey struct {
 }
 
 type AuditLog struct {
-	ID            string    `json:"id"`
+	ID            string    `json:"id" gorm:"primarykey"`
 	TeamID        string    `json:"teamId"`
+	UserID        string    `json:"userId,omitempty"`
 	ProjectID     string    `json:"projectId,omitempty"`
 	EnvironmentID string    `json:"environmentId,omitempty"`
 	Action        string    `json:"action"`
+	Resource      string    `json:"resource,omitempty"`
 	Actor         string    `json:"actor"`
+	IPAddress     string    `json:"ipAddress,omitempty"`
 	CreatedAt     time.Time `json:"createdAt"`
+	Timestamp     time.Time `json:"timestamp,omitempty"`
 }
 
 type CreateWorkspaceRequest struct {

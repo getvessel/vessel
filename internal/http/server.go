@@ -10,12 +10,11 @@ import (
 	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/mark3labs/mcp-go/server"
 
-	"vessel.dev/vessel/internal/dispatch"
+	"vessel.dev/vessel/internal/core"
 	"vessel.dev/vessel/internal/engine"
 	"vessel.dev/vessel/internal/handlers"
-	"vessel.dev/vessel/internal/listeners"
+	"vessel.dev/vessel/internal/http/middleware"
 	"vessel.dev/vessel/internal/mcp"
-	"vessel.dev/vessel/internal/middleware"
 	"vessel.dev/vessel/internal/models"
 	"vessel.dev/vessel/internal/proxy"
 	"vessel.dev/vessel/internal/repositories"
@@ -33,7 +32,7 @@ type Server struct {
 	authGuard              *middleware.AuthGuard
 	cronManager            *engine.CronManager
 	serviceLinker          *services.ServiceLinker
-	dispatcherService      *dispatch.DispatcherService
+	dispatcherService      *core.DispatcherService
 	appServiceHandler      *handlers.AppHandler
 	dbHandler              *handlers.DatabaseHandler
 	storageHandler         *handlers.StorageHandler
@@ -97,8 +96,8 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefi
 	dbDeployer := engine.NewDatabaseDeployer(dockerClient, ea)
 	storageDeployer := engine.NewStorageDeployer(dockerClient, ea)
 	svcLinker := services.NewServiceLinker(databaseRepo, storageRepo)
-	dispatcherSvc := dispatch.NewDispatcherService(notifRepo, settingsRepo)
-	deploymentListeners := listeners.NewDeploymentListeners(dispatcherSvc)
+	dispatcherSvc := core.NewDispatcherService(notifRepo, settingsRepo)
+	deploymentListeners := core.NewDeploymentListeners(dispatcherSvc)
 	deploymentListeners.Register()
 	settingsService := services.NewSettingsService(settingsRepo, notifRepo)
 	userService := services.NewUserService(userRepo)

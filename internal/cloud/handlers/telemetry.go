@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"vessel.dev/vessel/internal/cloud/models"
 	"vessel.dev/vessel/internal/cloud/repos"
+	"vessel.dev/vessel/internal/models"
 )
 
 type TelemetryHandler struct {

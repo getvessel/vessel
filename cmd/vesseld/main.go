@@ -23,7 +23,7 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	"vessel.dev/vessel/internal/agent"
+	"vessel.dev/vessel/internal/core"
 	vesseldb "vessel.dev/vessel/internal/db"
 	"vessel.dev/vessel/internal/engine"
 	vesselhttp "vessel.dev/vessel/internal/http"
@@ -80,7 +80,7 @@ func main() {
 		if *agentToken == "" {
 			log.Fatal(" Error: --token is required in agent mode")
 		}
-		if err := agent.Run(context.Background(), *serverURL, *agentToken); err != nil {
+		if err := core.Run(context.Background(), *serverURL, *agentToken); err != nil {
 			log.Fatalf(" Agent mode exited: %v", err)
 		}
 		return

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"vessel.dev/vessel/internal/cloud/services/sso"
+	"vessel.dev/vessel/internal/cloud/services"
 
 	"github.com/crewjam/saml/samlsp"
 	"github.com/labstack/echo/v4"
@@ -17,7 +17,7 @@ type SSOHandler struct {
 }
 
 func NewSSOHandler(baseURL string, idpMetadataURL string, key *rsa.PrivateKey, cert *x509.Certificate) (*SSOHandler, error) {
-	svc := sso.NewSAMLService(baseURL, key, cert)
+	svc := services.NewSAMLService(baseURL, key, cert)
 	sp, err := svc.ConfigureMiddleware(idpMetadataURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to configure SAML middleware: %v", err)

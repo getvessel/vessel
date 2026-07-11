@@ -1,19 +1,18 @@
-package listeners
+package core
 
 import (
 	"fmt"
 	"log"
 
-	"vessel.dev/vessel/internal/dispatch"
 	"vessel.dev/vessel/internal/events"
 	"vessel.dev/vessel/internal/models"
 )
 
 type DeploymentListeners struct {
-	dispatcher *dispatch.DispatcherService
+	dispatcher *DispatcherService
 }
 
-func NewDeploymentListeners(dispatcher *dispatch.DispatcherService) *DeploymentListeners {
+func NewDeploymentListeners(dispatcher *DispatcherService) *DeploymentListeners {
 	return &DeploymentListeners{dispatcher: dispatcher}
 }
 

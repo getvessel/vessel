@@ -1,4 +1,4 @@
-package billing
+package services
 
 type StripeService struct{}
 

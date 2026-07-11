@@ -7,8 +7,8 @@ import (
 
 	"github.com/stripe/stripe-go/v78"
 	"github.com/stripe/stripe-go/v78/billing/meterevent"
-	"vessel.dev/vessel/internal/cloud/models"
 	"vessel.dev/vessel/internal/cloud/repos"
+	"vessel.dev/vessel/internal/models"
 )
 
 type MeteringService interface {

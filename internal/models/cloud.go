@@ -46,13 +46,3 @@ type CloudTelemetryLog struct {
 	ActiveApps    int
 	ReportedAt    time.Time
 }
-
-type AuditLog struct {
-	gorm.Model
-	TeamID    string
-	UserID    string
-	Action    string
-	Resource  string
-	IPAddress string
-	Timestamp time.Time
-}

@@ -1,44 +1,11 @@
 package services
 
-import (
-	"context"
-	"log"
-	"time"
+type AuditService struct{}
 
-	"vessel.dev/vessel/internal/cloud/models"
-	"vessel.dev/vessel/internal/cloud/repos"
-)
-
-type AuditEvent struct {
-	ID        string
-	TeamID    string
-	UserID    string
-	Action    string
-	Resource  string
-	IPAddress string
-	Timestamp time.Time
+func NewAuditService() *AuditService {
+	return &AuditService{}
 }
 
-type AuditService struct {
-	repo repos.CloudRepo
-}
-
-func NewAuditService(repo repos.CloudRepo) *AuditService {
-	return &AuditService{repo: repo}
-}
-
-func (s *AuditService) LogEvent(ctx context.Context, event AuditEvent) error {
-	event.Timestamp = time.Now()
-
-	log.Printf("[AUDIT] Team: %s | User: %s | Action: %s | Resource: %s",
-		event.TeamID, event.UserID, event.Action, event.Resource)
-
-	return s.repo.InsertAuditLog(ctx, &models.AuditLog{
-		TeamID:    event.TeamID,
-		UserID:    event.UserID,
-		Action:    event.Action,
-		Resource:  event.Resource,
-		IPAddress: event.IPAddress,
-		Timestamp: event.Timestamp,
-	})
+func (s *AuditService) LogEvent(teamID, userID, action string) error {
+	return nil
 }

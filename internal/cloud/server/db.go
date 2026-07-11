@@ -6,7 +6,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"vessel.dev/vessel/internal/cloud/models"
+	"vessel.dev/vessel/internal/models"
 )
 
 func InitDatabase() *gorm.DB {

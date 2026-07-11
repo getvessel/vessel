@@ -1,4 +1,4 @@
-package mailer
+package services
 
 type SESMailer struct{}
 
