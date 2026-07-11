@@ -21,7 +21,7 @@ Turn any bare-metal Linux VPS into your own private Vercel, Railway, or Heroku i
 
 ```text
 vessel/
-├── cmd/vesseld/          # Go Daemon entrypoint (`main.go`)
+├── cmd/          # Go Daemon entrypoint (`main.go`)
 ├── internal/             # Core Go packages (horizontal layers)
 │   ├── agent/            # Agent mode for remote cloud connectivity
 │   ├── engine/           # Docker engine lifecycle, build strategies, deployer
@@ -69,7 +69,7 @@ Vessel includes a comprehensive root-level `Makefile` to streamline local develo
 | `make build-daemon`    | Compiles only the Go backend daemon binary into `bin/vesseld`.                               |
 | `make build-dashboard` | Bundles the Vite + TanStack Router frontend GUI into `dashboard/dist/`.                      |
 | `make dev`             | Launches the backend daemon and dashboard dev servers concurrently (`npx concurrently`).     |
-| `make dev-daemon`      | Runs the standalone Go backend server (`go run ./cmd/vesseld`).                              |
+| `make dev-daemon`      | Runs the standalone Go backend server (`go run ./cmd`).                              |
 | `make dev-dashboard`   | Runs the standalone Vite frontend dev server on port `3000`.                                 |
 | `make dev-web`         | Runs the Astro marketing landing page dev server (`web/`).                                   |
 | `make docker-build`    | Builds the all-in-one Vessel container image via Docker Compose.                             |

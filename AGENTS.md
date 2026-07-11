@@ -22,7 +22,7 @@
 | Frontend (dashboard) | React 19, TanStack Router, TanStack Query, Radix UI, Tailwind CSS v4, Vite   |
 | Marketing (web)      | Astro 7, Tailwind CSS v4                                                     |
 | Docs                 | Astro 7, Starlight                                                           |
-| Backend              | Go (`cmd/vesseld`, `internal/`)                                              |
+| Backend              | Go (`cmd`, `internal/`)                                              |
 | State (dashboard)    | TanStack Store, TanStack Query, Zod validation                               |
 | Styling (dashboard)  | `tailwind-merge` + `clsx` + `class-variance-authority` for class composition |
 | Monorepo             | npm workspaces (`dashboard/`, `web/`, `docs/`)                               |
@@ -52,7 +52,7 @@
 - **File naming:** lowercase snake_case (`container_health.go`).
 - **Package naming:** short, lowercase, single word (`cron`, `auth`, `apikeys`).
 - **Error handling:** always check errors; wrap with `fmt.Errorf("context: %w", err)`.
-- **No global state.** Pass dependencies via struct fields — wire up in `cmd/vesseld/main.go`.
+- **No global state.** Pass dependencies via struct fields — wire up in `cmd/main.go`.
 - **JSON tags** on every exported struct field.
 - Use `modernc.org/sqlite` (CGO-free) for SQLite. No `database/sql` driver imports for `mattn/go-sqlite3`.
 - Use official `github.com/docker/docker/client` for Docker SDK. Use `gorilla/websocket` for WebSocket upgrades.

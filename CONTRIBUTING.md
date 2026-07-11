@@ -109,7 +109,7 @@ Two terminals needed — daemon + dashboard.
 ### Terminal 1: Go Daemon
 
 ```bash
-go run ./cmd/vesseld
+go run ./cmd
 # API at http://localhost:8080
 ```
 
@@ -198,7 +198,7 @@ tsc --noEmit
 - **No comments allowed.** Code must be self-explanatory.
 - JSON tags on every exported struct field.
 - Snake_case for file names, single-word package names.
-- SQLite via `modernc.org/sqlite` (CGO-free). Migrations auto-run on startup in `cmd/vesseld/main.go`.
+- SQLite via `modernc.org/sqlite` (CGO-free). Migrations auto-run on startup in `cmd/main.go`.
 
 ### Dashboard Conventions
 
@@ -228,7 +228,7 @@ tsc --noEmit
 ```bash
 # Stop daemon (Ctrl+C), then:
 rm -f data/vessel.db data/.vault_key
-go run ./cmd/vesseld
+go run ./cmd
 ```
 
 Schema is recreated automatically.

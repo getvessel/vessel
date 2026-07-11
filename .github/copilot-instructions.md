@@ -4,7 +4,7 @@
 
 This is the Vessel monorepo — an open-source, self-hosted PaaS that turns any bare-metal VPS into a private Vercel & Railway. It's written in Go (backend daemon) and TypeScript (dashboard UI, marketing site, docs).
 
-- **Language (backend)**: Go — `cmd/vesseld`, `internal/`
+- **Language (backend)**: Go — `cmd`, `internal/`
 - **Language (frontend)**: TypeScript/TSX — React 19, Astro 7
 - **Runtime (dashboard)**: Vite + TanStack Start
 - **Runtime (web/docs)**: Astro 7 + Starlight
@@ -16,7 +16,7 @@ This is the Vessel monorepo — an open-source, self-hosted PaaS that turns any 
 
 ### Backend (`cmd/`, `internal/`)
 
-1. **Entrypoint** — `cmd/vesseld/main.go`: HTTP server daemon, wires dependencies
+1. **Entrypoint** — `cmd/main.go`: HTTP server daemon, wires dependencies
 2. **API Handlers** — `internal/api/`: REST + WebSocket endpoints (projects, databases, env vars, git, terminal)
 3. **Orchestrator** — `internal/orchestrator/`: Multi-language build engine (Dockerfile, Railpack, Nixpacks), container lifecycle, zero-downtime deploys
 4. **Proxy** — `internal/proxy/`: Dynamic Caddy v2 reverse proxy config generation and hot-reload

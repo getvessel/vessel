@@ -1,4 +1,4 @@
-# cmd/vesseld
+# cmd
 
 Entrypoint for the Vessel self-hosted daemon.
 
@@ -15,11 +15,11 @@ Entrypoint for the Vessel self-hosted daemon.
 
 ```bash
 cp .env.example .env
-go run ./cmd/vesseld
+go run ./cmd
 ```
 
 ## Build
 
 ```bash
-go build -o bin/vesseld ./cmd/vesseld
+go build -o bin/vesseld ./cmd
 ```
