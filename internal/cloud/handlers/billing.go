@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	paddle "github.com/PaddleHQ/paddle-go-sdk/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/stripe/stripe-go/v78"
 	"github.com/stripe/stripe-go/v78/webhook"
@@ -14,12 +15,14 @@ import (
 
 type BillingHandler struct {
 	stripeWebhookSecret string
+	paddleWebhookSecret string
 }
 
 func NewBillingHandler() *BillingHandler {
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 	return &BillingHandler{
 		stripeWebhookSecret: os.Getenv("STRIPE_WEBHOOK_SECRET"),
+		paddleWebhookSecret: os.Getenv("PADDLE_WEBHOOK_SECRET"),
 	}
 }
 
@@ -89,17 +92,53 @@ func (h *BillingHandler) HandleStripeWebhook(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"status": "received"})
 }
 
-// HandlePaystackWebhook handles Paystack subscription webhooks
-// @Summary Paystack Webhook
-// @Description Receives billing events from Paystack
+// HandlePaddleWebhook handles Paddle subscription webhooks
+// @Summary Paddle Webhook
+// @Description Receives billing events from Paddle
 // @Tags Cloud-Billing
 // @Accept json
 // @Produce json
 // @Success 200 {object} map[string]string
-// @Router /cloud/billing/paystack/webhook [post]
-func (h *BillingHandler) HandlePaystackWebhook(c echo.Context) error {
-	// Paystack signature verification requires HMAC-SHA512
-	// For simplicity, we are leaving the stub but it would be similarly structured
-	log.Println("Received Paystack webhook event")
+// @Router /cloud/billing/paddle/webhook [post]
+func (h *BillingHandler) HandlePaddleWebhook(c echo.Context) error {
+	const MaxBodyBytes = int64(65536)
+	c.Request().Body = http.MaxBytesReader(c.Response(), c.Request().Body, MaxBodyBytes)
+
+	if h.paddleWebhookSecret != "" {
+		verifier := paddle.NewWebhookVerifier(h.paddleWebhookSecret)
+		ok, err := verifier.Verify(c.Request())
+		if err != nil {
+			log.Printf("Paddle verification error: %v", err)
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Verification failed"})
+		}
+		if !ok {
+			return c.JSON(http.StatusForbidden, map[string]string{"error": "Invalid signature"})
+		}
+	}
+
+	payload, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		return c.JSON(http.StatusServiceUnavailable, map[string]string{"error": "Error reading request body"})
+	}
+
+	// Payload is verified, parse the JSON
+	var event map[string]interface{}
+	if err := json.Unmarshal(payload, &event); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid payload"})
+	}
+
+	eventType, _ := event["event_type"].(string)
+	log.Printf("Received Paddle webhook event: %s", eventType)
+
+	switch eventType {
+	case "subscription.created", "subscription.updated":
+		log.Println("Handling Paddle subscription update...")
+		// TODO: Update cloud_subscriptions table
+
+	case "subscription.canceled":
+		log.Println("Handling Paddle subscription canceled...")
+		// TODO: Mark as canceled in cloud_subscriptions table
+	}
+
 	return c.JSON(http.StatusOK, map[string]string{"status": "received"})
 }

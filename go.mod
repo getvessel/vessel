@@ -3,6 +3,7 @@ module vessel.dev/vessel
 go 1.25.11
 
 require (
+	github.com/PaddleHQ/paddle-go-sdk/v5 v5.2.0
 	github.com/aws/aws-sdk-go-v2 v1.42.1
 	github.com/aws/aws-sdk-go-v2/config v1.32.29
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.28
@@ -49,6 +50,8 @@ require (
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
+	github.com/ggicci/httpin v0.20.3 // indirect
+	github.com/ggicci/owl v0.8.2 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v1.0.0 // indirect
@@ -62,6 +65,7 @@ require (
 	github.com/go-openapi/swag/typeutils v0.27.0 // indirect
 	github.com/go-openapi/swag/yamlutils v0.27.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/labstack/gommon v0.5.0 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect

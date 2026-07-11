@@ -43,7 +43,7 @@ func (s *Server) registerRoutes() {
 	api.POST("/wizard/token", s.wizardHandler.GenerateAgentToken)
 
 	api.POST("/billing/stripe/webhook", s.billingHandler.HandleStripeWebhook)
-	api.POST("/billing/paystack/webhook", s.billingHandler.HandlePaystackWebhook)
+	api.POST("/billing/paddle/webhook", s.billingHandler.HandlePaddleWebhook)
 
 	// TODO: Mount handlers for audit, etc.
 }
