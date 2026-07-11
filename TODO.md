@@ -107,14 +107,24 @@ migrations/                 # PostgreSQL schema migrations
   - Implement automated BYOS seat limits and deployment rate limiting.
   - Usage metering — track deployments, container hours, bandwidth per account for billing.
   - Integrate GrowthBook for feature flag gating of Pro/Team features and gradual rollouts.
-- [ ] **AI Agent Protocol (MCP) & API Ecosystem**:
-  - Expose Vessel's REST API as an MCP server (`@modelcontextprotocol/sdk`) so AI agents (Claude Code, Cursor, etc.) can deploy apps, manage databases, and query logs programmatically.
-  - Publish an official Vessel API client SDK for Node.js and Go.
+
 - [ ] **Enterprise Features**:
   - **SSO / SAML**: Enterprise single sign-on with Okta, Azure AD, Google Workspace.
   - **Audit Logs**: Immutable event log of all actions (deployments, config changes, member management) with export API.
   - **Email Delivery**: Use AWS SES for all transactional emails (invites, alerts) — no SMTP config needed on cloud.
   - **Custom Branding**: White-label dashboard with custom domain, logo, and colors for enterprise tenants.
 - [ ] **Self-Hosted License & Telemetry**:
-  - Optional telemetry ping (version, anonymous usage stats) for upgrade notifications and feature analytics.
-  - License key system for self-hosted enterprise tier with offline activation.
+	- Optional telemetry ping (version, anonymous usage stats) for upgrade notifications and feature analytics.
+	- License key system for self-hosted enterprise tier with offline activation.
+
+---
+
+## 🤖 Phase 7: AI Agent Protocol (MCP) & API Ecosystem (OSS & Cloud)
+
+> The MCP server and API Ecosystem is a core feature built into the `vesseld` Go daemon directly so self-hosters can use it for free, but it is also securely exposed and proxied via the Vessel Cloud control plane for managed users.
+
+- [ ] **REST API to MCP Bridge**:
+  - Expose Vessel's REST API as an MCP server (`@modelcontextprotocol/sdk`) so AI agents (Claude Code, Cursor, etc.) can deploy apps, manage databases, and query logs programmatically.
+  - Implement Local stdio transport for the CLI daemon and SSE/WebSocket transport for the Cloud.
+- [ ] **SDKs**:
+  - Publish an official Vessel API client SDK for Node.js and Go.
