@@ -75,6 +75,63 @@ func (h *AgentHandler) AcceptConnection(c echo.Context) error {
 	return nil
 }
 
+type FleetDeployRequest struct {
+	ImageTag    string   `json:"image_tag"`
+	AgentTokens []string `json:"agent_tokens"` // Target servers
+	EnvVars     []string `json:"env_vars"`
+}
+
+// DeployToFleet broadcasts a deployment command to selected agents
+// @Summary Fleet Deployment
+// @Description Dispatch a deployment instruction to a subset of connected Vossel Daemons
+// @Tags Cloud-Fleet
+// @Accept json
+// @Produce json
+// @Success 202 {object} map[string]interface{}
+// @Router /cloud/fleet/deploy [post]
+func (h *AgentHandler) DeployToFleet(c echo.Context) error {
+	var req FleetDeployRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	successfulDispatches := 0
+	failedAgents := []string{}
+
+	// In a real implementation, we would encode a JSON instruction
+	// and write it to the Yamux session streams.
+	for _, token := range req.AgentTokens {
+		session, exists := h.activeAgents[token]
+		if !exists || session.IsClosed() {
+			failedAgents = append(failedAgents, token)
+			continue
+		}
+
+		// Open a stream to the remote agent
+		stream, err := session.Open()
+		if err != nil {
+			failedAgents = append(failedAgents, token)
+			continue
+		}
+
+		// Mock payload dispatch
+		// e.g. json.NewEncoder(stream).Encode(instruction)
+		stream.Write([]byte("DEPLOY:" + req.ImageTag + "\n"))
+		stream.Close()
+
+		successfulDispatches++
+	}
+
+	return c.JSON(http.StatusAccepted, map[string]interface{}{
+		"message":   "Fleet deployment dispatched",
+		"successes": successfulDispatches,
+		"failures":  failedAgents,
+	})
+}
+
 // GetDockerClient returns a Docker client that routes traffic over the yamux tunnel
 func (h *AgentHandler) GetDockerClient(serverID string) (*client.Client, error) {
 	h.mu.RLock()

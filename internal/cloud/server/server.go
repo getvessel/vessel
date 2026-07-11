@@ -65,6 +65,8 @@ func (s *Server) registerRoutes() {
 
 	api.GET("/admin/stats", s.adminHandler.GetSystemStats)
 	api.GET("/admin/audit-logs", s.adminHandler.GetAuditLogs)
+
+	api.POST("/fleet/deploy", s.agentHandler.DeployToFleet)
 }
 
 func (s *Server) Start(address string) error {
