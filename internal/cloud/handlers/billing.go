@@ -10,6 +10,7 @@ import (
 	paddle "github.com/PaddleHQ/paddle-go-sdk/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/stripe/stripe-go/v78"
+	"github.com/stripe/stripe-go/v78/checkout/session"
 	"github.com/stripe/stripe-go/v78/webhook"
 )
 
@@ -141,4 +142,93 @@ func (h *BillingHandler) HandlePaddleWebhook(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"status": "received"})
+}
+
+type CheckoutRequest struct {
+	PlanID    string `json:"plan_id"`
+	ReturnURL string `json:"return_url"`
+}
+
+// CreateStripeCheckout creates a new Stripe Checkout session
+// @Summary Create Stripe Checkout
+// @Description Generates a checkout URL for subscriptions
+// @Tags Cloud-Billing
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]string
+// @Router /cloud/billing/stripe/checkout [post]
+func (h *BillingHandler) CreateStripeCheckout(c echo.Context) error {
+	var req CheckoutRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	// Mock mapping of plan names to Stripe Price IDs
+	// In production, these should come from environment variables or a DB
+	priceID := ""
+	switch req.PlanID {
+	case "hobby":
+		priceID = os.Getenv("STRIPE_PRICE_HOBBY")
+	case "pro":
+		priceID = os.Getenv("STRIPE_PRICE_PRO")
+	case "team":
+		priceID = os.Getenv("STRIPE_PRICE_TEAM")
+	default:
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid plan ID"})
+	}
+
+	params := &stripe.CheckoutSessionParams{
+		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				Price:    stripe.String(priceID),
+				Quantity: stripe.Int64(1),
+			},
+		},
+		Mode:       stripe.String(string(stripe.CheckoutSessionModeSubscription)),
+		SuccessURL: stripe.String(req.ReturnURL + "?session_id={CHECKOUT_SESSION_ID}"),
+		CancelURL:  stripe.String(req.ReturnURL + "?canceled=true"),
+	}
+
+	s, err := session.New(params)
+	if err != nil {
+		log.Printf("Stripe checkout error: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create checkout session"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"url": s.URL})
+}
+
+// CreatePaddleCheckout creates a new Paddle Checkout session
+// @Summary Create Paddle Checkout
+// @Description Generates a checkout URL/Transaction for subscriptions
+// @Tags Cloud-Billing
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]string
+// @Router /cloud/billing/paddle/checkout [post]
+func (h *BillingHandler) CreatePaddleCheckout(c echo.Context) error {
+	var req CheckoutRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	// Currently returning a mock structure as Paddle v5 typically builds
+	// transactions via API or relies on Paddle.js for checkout overlay.
+	priceID := ""
+	switch req.PlanID {
+	case "hobby":
+		priceID = os.Getenv("PADDLE_PRICE_HOBBY")
+	case "pro":
+		priceID = os.Getenv("PADDLE_PRICE_PRO")
+	case "team":
+		priceID = os.Getenv("PADDLE_PRICE_TEAM")
+	default:
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid plan ID"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"price_id": priceID,
+		"status":   "ready_for_frontend_paddle_js",
+	})
 }

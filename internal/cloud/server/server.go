@@ -7,13 +7,14 @@ import (
 )
 
 type Server struct {
-	router         *echo.Echo
-	agentHandler   *handlers.AgentHandler
-	wizardHandler  *handlers.WizardHandler
-	billingHandler *handlers.BillingHandler
-	authHandler    *handlers.AuthHandler
-	userHandler    *handlers.UserHandler
-	adminHandler   *handlers.AdminHandler
+	router          *echo.Echo
+	agentHandler    *handlers.AgentHandler
+	wizardHandler   *handlers.WizardHandler
+	billingHandler  *handlers.BillingHandler
+	authHandler     *handlers.AuthHandler
+	userHandler     *handlers.UserHandler
+	adminHandler    *handlers.AdminHandler
+	meteringHandler *handlers.MeteringHandler
 }
 
 func NewServer() *Server {
@@ -24,13 +25,14 @@ func NewServer() *Server {
 	e.Use(middleware.CORS())
 
 	s := &Server{
-		router:         e,
-		agentHandler:   handlers.NewAgentHandler(),
-		wizardHandler:  handlers.NewWizardHandler(),
-		billingHandler: handlers.NewBillingHandler(),
-		authHandler:    handlers.NewAuthHandler(),
-		userHandler:    handlers.NewUserHandler(),
-		adminHandler:   handlers.NewAdminHandler(),
+		router:          e,
+		agentHandler:    handlers.NewAgentHandler(),
+		wizardHandler:   handlers.NewWizardHandler(),
+		billingHandler:  handlers.NewBillingHandler(),
+		authHandler:     handlers.NewAuthHandler(),
+		userHandler:     handlers.NewUserHandler(),
+		adminHandler:    handlers.NewAdminHandler(),
+		meteringHandler: handlers.NewMeteringHandler(),
 	}
 
 	s.registerRoutes()
@@ -49,7 +51,12 @@ func (s *Server) registerRoutes() {
 	api.POST("/wizard/token", s.wizardHandler.GenerateAgentToken)
 
 	api.POST("/billing/stripe/webhook", s.billingHandler.HandleStripeWebhook)
+	api.POST("/billing/stripe/checkout", s.billingHandler.CreateStripeCheckout)
+
 	api.POST("/billing/paddle/webhook", s.billingHandler.HandlePaddleWebhook)
+	api.POST("/billing/paddle/checkout", s.billingHandler.CreatePaddleCheckout)
+
+	api.POST("/billing/usage/report", s.meteringHandler.ReportUsage)
 
 	api.POST("/auth/register", s.authHandler.Register)
 	api.POST("/auth/login", s.authHandler.Login)
