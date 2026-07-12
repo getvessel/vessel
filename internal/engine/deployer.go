@@ -51,6 +51,14 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 		fmt.Fprintf(logWriter, "🚀 [Deployer] Starting deployment for service: %s (ID: %s)\n", app.Name, app.ID)
 	}
 
+	if os.Getenv("DEPLOY_DRY_RUN") == "true" {
+		if logWriter != nil {
+			fmt.Fprintf(logWriter, "🚀 [Deployer] Dry-run mode is enabled. Skipping actual build and run steps.\n")
+		}
+		newContainerName := fmt.Sprintf("%s-dryrun", utils.NormalizeContainerName(app.ID))
+		return newContainerName, nil
+	}
+
 	if err := d.prepareServerlessCode(app, sourceDir, logWriter); err != nil {
 		return "", err
 	}
