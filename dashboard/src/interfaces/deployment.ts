@@ -1,32 +1,7 @@
-import type { BaseEntity } from './base';
+import type { BaseResponse } from './base';
 
-export interface Deployment extends BaseEntity {
-  serviceId: string;
-  environmentId: string;
-  projectId: string;
-  status: string;
-  branch?: string;
-  commitHash?: string;
-  commitMessage?: string;
-  trigger?: string;
-  buildLogs?: string;
-  containerId?: string;
-  finishedAt?: string;
-}
-
-export interface ServiceMetric {
-  timestamp: string;
-  cpuPercent: number;
-  memoryMB: number;
-  networkRxKB: number;
-  networkTxKB: number;
-}
-
-export interface TriggerDeploymentRequest {
-  branch?: string;
-}
-
-export interface AppService extends BaseEntity {
+export interface AppService {
+  id: string;
   projectId: string;
   environmentId: string;
   name: string;
@@ -42,6 +17,112 @@ export interface AppService extends BaseEntity {
   healthCheckPath: string;
   containerId: string;
   status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Deployment {
+  id: string;
+  serviceId: string;
+  environmentId: string;
+  projectId: string;
+  status: string;
+  branch?: string;
+  commitHash?: string;
+  commitMessage?: string;
+  trigger?: string;
+  buildLogs?: string;
+  containerId?: string;
+  createdAt: string;
+  updatedAt: string;
+  finishedAt?: string;
+}
+
+export interface ServiceMetric {
+  timestamp: string;
+  cpuPercent: number;
+  memoryMB: number;
+  networkRxKB: number;
+  networkTxKB: number;
+}
+
+export interface Variable {
+  id: string;
+  serviceId: string;
+  projectId: string;
+  environmentId: string;
+  key: string;
+  value: string;
+  isSecret: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Job {
+  id: string;
+  projectId: string;
+  name: string;
+  schedule: string;
+  command: string;
+  status: string;
+  lastRunAt: string;
+  lastOutput: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BackupConfig {
+  id: string;
+  projectId: string;
+  databaseId?: string;
+  storageId?: string;
+  s3DestinationId?: string;
+  name: string;
+  schedule: string;
+  retentionDays: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BackupRecord {
+  id: string;
+  backupConfigId: string;
+  projectId: string;
+  databaseId?: string;
+  status: string;
+  filePath: string;
+  fileSizeBytes: number;
+  s3Url?: string;
+  logs: string;
+  startedAt: string;
+  completedAt: string;
+}
+
+export interface S3Destination {
+  id: string;
+  projectId: string;
+  name: string;
+  endpoint: string;
+  bucket: string;
+  region: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+  createdAt: string;
+}
+
+export interface PRPreview {
+  id: string;
+  serviceId: string;
+  projectId: string;
+  prNumber: number;
+  branch: string;
+  commitHash: string;
+  status: string;
+  previewDomain: string;
+  containerId: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateAppServiceRequest {
@@ -75,13 +156,8 @@ export interface UpdateAppServiceRequest {
   status: string;
 }
 
-export interface Variable extends BaseEntity {
-  serviceId: string;
-  projectId: string;
-  environmentId: string;
-  key: string;
-  value: string;
-  isSecret: boolean;
+export interface TriggerDeploymentRequest {
+  branch?: string;
 }
 
 export interface CreateServiceVarRequest {
@@ -94,16 +170,6 @@ export interface UpdateServiceVarRequest {
   key: string;
   value: string;
   isSecret: boolean;
-}
-
-export interface Job extends BaseEntity {
-  projectId: string;
-  name: string;
-  schedule: string;
-  command: string;
-  status: string;
-  lastRunAt: string;
-  lastOutput: string;
 }
 
 export interface CreateJobRequest {
@@ -120,50 +186,8 @@ export interface UpdateJobRequest {
   status?: string;
 }
 
-export interface BackupConfig extends BaseEntity {
-  projectId: string;
-  databaseId?: string;
-  storageId?: string;
-  s3DestinationId?: string;
-  name: string;
-  schedule: string;
-  retentionDays: number;
-  status: string;
-}
-
-export interface BackupRecord {
-  id: string;
-  backupConfigId: string;
-  projectId: string;
-  databaseId?: string;
-  status: string;
-  filePath: string;
-  fileSizeBytes: number;
-  s3Url?: string;
-  logs: string;
-  startedAt: string;
-  completedAt: string;
-}
-
-export interface S3Destination {
-  id: string;
-  projectId: string;
-  name: string;
-  endpoint: string;
-  bucket: string;
-  region: string;
-  accessKeyId: string;
-  secretAccessKey: string;
-  createdAt: string;
-}
-
-export interface PRPreview extends BaseEntity {
-  serviceId: string;
-  projectId: string;
-  prNumber: number;
-  branch: string;
-  commitHash: string;
-  status: string;
-  previewDomain: string;
-  containerId: string;
-}
+// Response Types
+export type ListAppsResponse = BaseResponse<AppService[]>;
+export type GetAppResponse = BaseResponse<AppService>;
+export type CreateAppResponse = BaseResponse<AppService>;
+export type UpdateAppResponse = BaseResponse<AppService>;

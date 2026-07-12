@@ -1,28 +1,55 @@
-import type { CreateWorkspaceRequest, GetWorkspaceResponse, UpdateWorkspaceRequest, Workspace } from '#/interfaces/workspace';
-import { apiClient } from './instance';
+import type {
+  CreateWorkspaceRequest,
+  CreateWorkspaceResponse,
+  GetWorkspaceResponse,
+  ListWorkspacesResponse,
+  UpdateWorkspaceRequest,
+  UpdateWorkspaceResponse,
+} from '#/interfaces/workspace';
+import { apiClient } from '#/lib/apiClient';
+import { handleApiError } from '#/lib/error';
 
 export const workspacesService = {
-  listWorkspaces: async (): Promise<Workspace[]> => {
-    const { data } = await apiClient.get<Workspace[]>('/workspaces');
-    return data;
+  listWorkspaces: async (): Promise<ListWorkspacesResponse> => {
+    try {
+      return await apiClient.get<ListWorkspacesResponse>('/workspaces');
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
   getWorkspace: async (id: string): Promise<GetWorkspaceResponse> => {
-    const { data } = await apiClient.get<GetWorkspaceResponse>(`/workspaces/${id}`);
-    return data;
+    try {
+      return await apiClient.get<GetWorkspaceResponse>(`/workspaces/${id}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
-  createWorkspace: async (payload: CreateWorkspaceRequest): Promise<Workspace> => {
-    const { data } = await apiClient.post<Workspace>('/workspaces', payload);
-    return data;
+  createWorkspace: async (payload: CreateWorkspaceRequest): Promise<CreateWorkspaceResponse> => {
+    try {
+      return await apiClient.post<CreateWorkspaceResponse>('/workspaces', payload);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
-  updateWorkspace: async (id: string, payload: UpdateWorkspaceRequest): Promise<Workspace> => {
-    const { data } = await apiClient.put<Workspace>(`/workspaces/${id}`, payload);
-    return data;
+  updateWorkspace: async (
+    id: string,
+    payload: UpdateWorkspaceRequest
+  ): Promise<UpdateWorkspaceResponse> => {
+    try {
+      return await apiClient.put<UpdateWorkspaceResponse>(`/workspaces/${id}`, payload);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
   deleteWorkspace: async (id: string): Promise<void> => {
-    await apiClient.delete(`/workspaces/${id}`);
+    try {
+      await apiClient.delete(`/workspaces/${id}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 };

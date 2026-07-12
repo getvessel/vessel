@@ -1,29 +1,51 @@
-import type { PaginatedData } from '#/interfaces/base';
-import type { CreateProjectRequest, ProjectConfig } from '#/interfaces/project';
-import { apiClient } from './instance';
+import type {
+  CreateProjectRequest,
+  CreateProjectResponse,
+  GetProjectResponse,
+  ListProjectsResponse,
+} from '#/interfaces/project';
+import { apiClient } from '#/lib/apiClient';
+import { handleApiError } from '#/lib/error';
 
 export const projectsService = {
-  listProjects: async (workspaceId?: string): Promise<PaginatedData<ProjectConfig>> => {
-    const params = workspaceId ? { workspaceId } : {};
-    const { data } = await apiClient.get<PaginatedData<ProjectConfig>>('/projects', { params });
-    return data;
+  listProjects: async (workspaceId?: string): Promise<ListProjectsResponse> => {
+    try {
+      const url = workspaceId ? `/projects?workspaceId=${workspaceId}` : '/projects';
+      return await apiClient.get<ListProjectsResponse>(url);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
-  getProject: async (id: string): Promise<ProjectConfig> => {
-    const { data } = await apiClient.get<ProjectConfig>(`/projects/${id}`);
-    return data;
+  getProject: async (id: string): Promise<GetProjectResponse> => {
+    try {
+      return await apiClient.get<GetProjectResponse>(`/projects/${id}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
-  createProject: async (payload: CreateProjectRequest): Promise<ProjectConfig> => {
-    const { data } = await apiClient.post<ProjectConfig>('/projects', payload);
-    return data;
+  createProject: async (payload: CreateProjectRequest): Promise<CreateProjectResponse> => {
+    try {
+      return await apiClient.post<CreateProjectResponse>('/projects', payload);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
   deleteProject: async (id: string): Promise<void> => {
-    await apiClient.delete(`/projects/${id}`);
+    try {
+      await apiClient.delete(`/projects/${id}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
   deployProject: async (id: string): Promise<void> => {
-    await apiClient.post(`/projects/${id}/deploy`);
+    try {
+      await apiClient.post(`/projects/${id}/deploy`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 };

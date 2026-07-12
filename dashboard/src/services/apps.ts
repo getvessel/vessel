@@ -1,33 +1,69 @@
-import type { AppService, CreateAppServiceRequest, UpdateAppServiceRequest } from '#/interfaces/deployment';
-import { apiClient } from './instance';
+import type {
+  CreateAppResponse,
+  CreateAppServiceRequest,
+  GetAppResponse,
+  ListAppsResponse,
+  UpdateAppResponse,
+  UpdateAppServiceRequest,
+} from '#/interfaces/deployment';
+import { apiClient } from '#/lib/apiClient';
+import { handleApiError } from '#/lib/error';
 
 export const appsService = {
-  listByProject: async (projectId: string): Promise<AppService[]> => {
-    const { data } = await apiClient.get<AppService[]>(`/projects/${projectId}/apps`);
-    return data;
+  listByProject: async (projectId: string): Promise<ListAppsResponse> => {
+    try {
+      return await apiClient.get<ListAppsResponse>(`/projects/${projectId}/apps`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
-  listByEnvironment: async (environmentId: string): Promise<AppService[]> => {
-    const { data } = await apiClient.get<AppService[]>(`/environments/${environmentId}/apps`);
-    return data;
+  listByEnvironment: async (environmentId: string): Promise<ListAppsResponse> => {
+    try {
+      return await apiClient.get<ListAppsResponse>(`/environments/${environmentId}/apps`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
-  getApp: async (appId: string): Promise<AppService> => {
-    const { data } = await apiClient.get<AppService>(`/apps/${appId}`);
-    return data;
+  getApp: async (appId: string): Promise<GetAppResponse> => {
+    try {
+      return await apiClient.get<GetAppResponse>(`/apps/${appId}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
-  createApp: async (environmentId: string, payload: CreateAppServiceRequest): Promise<AppService> => {
-    const { data } = await apiClient.post<AppService>(`/environments/${environmentId}/apps`, payload);
-    return data;
+  createApp: async (
+    environmentId: string,
+    payload: CreateAppServiceRequest
+  ): Promise<CreateAppResponse> => {
+    try {
+      return await apiClient.post<CreateAppResponse>(
+        `/environments/${environmentId}/apps`,
+        payload
+      );
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
-  updateApp: async (appId: string, payload: UpdateAppServiceRequest): Promise<AppService> => {
-    const { data } = await apiClient.put<AppService>(`/apps/${appId}`, payload);
-    return data;
+  updateApp: async (
+    appId: string,
+    payload: UpdateAppServiceRequest
+  ): Promise<UpdateAppResponse> => {
+    try {
+      return await apiClient.put<UpdateAppResponse>(`/apps/${appId}`, payload);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
   deleteApp: async (appId: string): Promise<void> => {
-    await apiClient.delete(`/apps/${appId}`);
+    try {
+      await apiClient.delete(`/apps/${appId}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 };

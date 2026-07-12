@@ -1,6 +1,8 @@
+export { appsService } from './apps';
 export { authService } from './auth';
 export { canvasService } from './canvas';
 export { databasesService } from './databases';
-export { apiClient } from './instance';
+export { environmentsService } from './environments';
 export { jobsService } from './jobs';
 export { projectsService } from './projects';
+export { workspacesService } from './workspaces';

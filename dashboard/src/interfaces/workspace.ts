@@ -1,10 +1,13 @@
-import type { BaseEntity } from "./base";
+import type { BaseResponse } from './base';
 
-export interface Workspace extends BaseEntity {
+export interface Workspace {
+  id: string;
   name: string;
   avatarUrl?: string;
   preferredRegion?: string;
   ownerId: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface WorkspaceMember {
@@ -16,33 +19,16 @@ export interface WorkspaceMember {
   joinedAt: string;
 }
 
-export interface WorkspaceInvite extends BaseEntity {
+export interface WorkspaceInvite {
+  id: string;
   workspaceId: string;
   email: string;
   role: string;
   token: string;
   invitedBy: string;
   expiresAt: string;
-}
-
-export interface CreateWorkspaceRequest {
-  name: string;
-  avatarUrl?: string;
-  preferredRegion?: string;
-}
-
-export interface InviteMemberRequest {
-  email: string;
-  role: string;
-}
-
-export interface AcceptInviteRequest {
-  token: string;
-}
-
-export interface GetWorkspaceResponse {
-  workspace: Workspace;
-  members: WorkspaceMember[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface TrustedDomain {
@@ -75,6 +61,21 @@ export interface AuditLog {
   timestamp?: string;
 }
 
+export interface CreateWorkspaceRequest {
+  name: string;
+  avatarUrl?: string;
+  preferredRegion?: string;
+}
+
+export interface InviteMemberRequest {
+  email: string;
+  role: string;
+}
+
+export interface AcceptInviteRequest {
+  token: string;
+}
+
 export interface UpdateWorkspaceRequest {
   name?: string;
   avatarUrl?: string;
@@ -90,3 +91,14 @@ export interface CreateSSHKeyRequest {
   name: string;
   publicKey: string;
 }
+
+interface GetWorkspaceData {
+  workspace: Workspace;
+  members: WorkspaceMember[];
+}
+
+// Response Types
+export type ListWorkspacesResponse = BaseResponse<Workspace[]>;
+export type GetWorkspaceResponse = BaseResponse<GetWorkspaceData>;
+export type CreateWorkspaceResponse = BaseResponse<Workspace>;
+export type UpdateWorkspaceResponse = BaseResponse<Workspace>;

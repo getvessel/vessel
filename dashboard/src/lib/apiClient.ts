@@ -29,7 +29,6 @@ export const apiClient = {
       headers.set('Content-Type', 'application/json');
     }
 
-    // Attach Authorization header automatically
     const token = authStore.state.token;
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
@@ -40,7 +39,6 @@ export const apiClient = {
       headers,
     });
 
-    // Handle 204 No Content
     if (response.status === 204) {
       return {} as T;
     }

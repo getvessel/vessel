@@ -1,34 +1,47 @@
-import type { BaseEntity } from './base';
+import type { BaseResponse, PaginatedData } from './base';
 import type { Database } from './database';
 import type { AppService } from './deployment';
 
-export interface ProjectConfig extends BaseEntity {
+export interface ProjectConfig {
+  id: string;
   workspaceId?: string;
   name: string;
   description?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface DomainConfig extends BaseEntity {
+export interface EnvironmentConfig {
+  id: string;
+  projectId: string;
+  name: string;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DomainConfig {
+  id: string;
   projectId: string;
   domainName: string;
   redirectTo?: string;
   sslCertStatus: string;
   pathPrefix: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface ServerlessFunctionCode extends BaseEntity {
+export interface ServerlessFunctionCode {
+  id: string;
   serviceId: string;
   runtime: string;
   codeContent: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface EnvironmentConfig extends BaseEntity {
-  projectId: string;
-  name: string;
-  isDefault: boolean;
-}
-
-export interface CanvasSummary extends BaseEntity {
+export interface CanvasSummary {
+  id: string;
   workspaceId?: string;
   name: string;
   description?: string;
@@ -40,6 +53,8 @@ export interface CanvasSummary extends BaseEntity {
   totalServices: number;
   serviceIcons: string[];
   defaultEnvironment?: EnvironmentConfig;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface EnvironmentCanvas {
@@ -50,7 +65,6 @@ export interface EnvironmentCanvas {
 }
 
 export interface CreateProjectRequest {
-  id?: string;
   workspaceId?: string;
   name: string;
   description?: string;
@@ -101,3 +115,10 @@ export interface AddMemberRequest {
   email: string;
   permission: string;
 }
+
+// Response Types
+export type ListProjectsResponse = BaseResponse<PaginatedData<ProjectConfig>>;
+export type GetProjectResponse = BaseResponse<ProjectConfig>;
+export type CreateProjectResponse = BaseResponse<ProjectConfig>;
+export type ListEnvironmentsResponse = BaseResponse<EnvironmentConfig[]>;
+export type CreateEnvironmentResponse = BaseResponse<EnvironmentConfig>;
