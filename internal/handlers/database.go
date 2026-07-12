@@ -67,6 +67,7 @@ func (h *DatabaseHandler) ListDatabases(c echo.Context) error {
 // @Tags Databases
 // @Accept json
 // @Produce json
+// @Param request body models.CreateDatabaseRequest true "Payload"
 // @Router /api/databases [post]
 func (h *DatabaseHandler) CreateDatabase(c echo.Context) error {
 	var req models.CreateDatabaseRequest
@@ -187,6 +188,7 @@ func (h *DatabaseHandler) StopDatabase(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param id path string true "id"
+// @Param request body models.DatabaseQueryRequest true "Payload"
 // @Router /api/databases/{id}/query [post]
 func (h *DatabaseHandler) QueryDatabase(c echo.Context) error {
 	id := c.Param("id")

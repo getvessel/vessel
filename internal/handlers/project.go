@@ -47,6 +47,7 @@ func (h *ProjectHandler) ListProjects(c echo.Context) error {
 // @Tags Projects
 // @Accept json
 // @Produce json
+// @Param request body models.CreateProjectRequest true "Payload"
 // @Router /api/projects [post]
 func (h *ProjectHandler) CreateProject(c echo.Context) error {
 	var req models.CreateProjectRequest

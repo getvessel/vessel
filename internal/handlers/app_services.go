@@ -39,6 +39,7 @@ func (h *AppHandler) verifyProjectOwnership(c echo.Context, projectID string) er
 // @Tags Workspaces
 // @Accept json
 // @Produce json
+// @Param request body models.AppService true "Payload"
 // @Router /api/workspaces [post]
 func (h *AppHandler) Create(c echo.Context) error {
 	envID := c.Param("id")

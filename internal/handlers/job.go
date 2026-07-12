@@ -40,6 +40,7 @@ func (h *JobHandler) ListProjectJobs(c echo.Context) error {
 // @Tags Workspaces
 // @Accept json
 // @Produce json
+// @Param request body models.Job true "Payload"
 // @Router /api/workspaces [post]
 func (h *JobHandler) Create(c echo.Context) error {
 	var j models.Job

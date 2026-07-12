@@ -39,6 +39,7 @@ func (h *StorageHandler) ListStorage(c echo.Context) error {
 // @Tags Storage
 // @Accept json
 // @Produce json
+// @Param request body models.Storage true "Payload"
 // @Router /api/storage [post]
 func (h *StorageHandler) CreateStorage(c echo.Context) error {
 	var st models.Storage

@@ -22,6 +22,7 @@ func NewGitHandler(s *services.GitService) *GitHandler {
 // @Tags Git
 // @Accept json
 // @Produce json
+// @Param request body models.GitConnectRequest true "Payload"
 // @Router /api/git/connect [post]
 func (h *GitHandler) Connect(c echo.Context) error {
 	userID := ExtractUserID(c)

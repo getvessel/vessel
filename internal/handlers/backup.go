@@ -46,12 +46,14 @@ func (h *BackupHandler) List(c echo.Context) error {
 // @Tags Workspaces
 // @Accept json
 // @Produce json
+// @Param request body models.BackupConfig true "Payload"
 // @Router /api/workspaces [post]
 // @Summary Create Backup
 // @Description Create Backup
 // @Tags Backups
 // @Accept json
 // @Produce json
+// @Param request body models.BackupConfig true "Payload"
 // @Router /api/backups [post]
 func (h *BackupHandler) Create(c echo.Context) error {
 	var cfg models.BackupConfig
@@ -177,6 +179,7 @@ func (h *BackupHandler) ListS3Destinations(c echo.Context) error {
 // @Tags S3-destinations
 // @Accept json
 // @Produce json
+// @Param request body models.S3Destination true "Payload"
 // @Router /api/s3-destinations [post]
 func (h *BackupHandler) CreateS3Destination(c echo.Context) error {
 	var dest models.S3Destination

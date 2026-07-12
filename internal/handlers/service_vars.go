@@ -44,6 +44,7 @@ func (h *ServiceVarHandler) List(c echo.Context) error {
 // @Tags Workspaces
 // @Accept json
 // @Produce json
+// @Param request body models.Variable true "Payload"
 // @Router /api/workspaces [post]
 // @Summary Create Service Variable
 // @Description Create Service Variable
@@ -51,6 +52,7 @@ func (h *ServiceVarHandler) List(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param serviceId path string true "Service ID"
+// @Param request body models.Variable true "Payload"
 // @Router /api/services/{serviceId}/variables [post]
 func (h *ServiceVarHandler) Create(c echo.Context) error {
 	serviceID := c.Param("serviceId")
@@ -78,6 +80,7 @@ func (h *ServiceVarHandler) Create(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param id path string true "id"
+// @Param request body models.Variable true "Payload"
 // @Router /api/workspaces/{id} [put]
 // @Summary Update Service Variable
 // @Description Update Service Variable
@@ -86,6 +89,7 @@ func (h *ServiceVarHandler) Create(c echo.Context) error {
 // @Produce json
 // @Param serviceId path string true "Service ID"
 // @Param id path string true "Variable ID"
+// @Param request body models.Variable true "Payload"
 // @Router /api/services/{serviceId}/variables/{id} [put]
 func (h *ServiceVarHandler) Update(c echo.Context) error {
 	serviceID := c.Param("serviceId")

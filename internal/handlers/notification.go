@@ -43,6 +43,7 @@ func (h *NotificationHandler) ListChannels(c echo.Context) error {
 // @Tags Settings
 // @Accept json
 // @Produce json
+// @Param request body models.TeamNotificationChannel true "Payload"
 // @Router /api/settings/notifications [put]
 func (h *NotificationHandler) SaveChannel(c echo.Context) error {
 	if c.Request().Method != http.MethodPut && c.Request().Method != http.MethodPost {

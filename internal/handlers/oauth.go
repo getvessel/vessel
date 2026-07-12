@@ -39,6 +39,7 @@ func (h *OAuthHandler) ListProviders(c echo.Context) error {
 // @Tags Settings
 // @Accept json
 // @Produce json
+// @Param request body models.OAuthProviderConfig true "Payload"
 // @Router /api/settings/oauth/providers [put]
 func (h *OAuthHandler) SaveProvider(c echo.Context) error {
 	var p models.OAuthProviderConfig

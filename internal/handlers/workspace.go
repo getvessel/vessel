@@ -84,6 +84,7 @@ func (h *WorkspaceHandler) Get(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param id path string true "id"
+// @Param request body models.Workspace true "Payload"
 // @Router /api/workspaces/{id} [put]
 func (h *WorkspaceHandler) Update(c echo.Context) error {
 	id := c.Param("id")

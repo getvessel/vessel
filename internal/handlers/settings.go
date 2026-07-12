@@ -39,6 +39,7 @@ func (h *SettingsHandler) GetSettings(c echo.Context) error {
 // @Tags Settings
 // @Accept json
 // @Produce json
+// @Param request body models.ServerSettings true "Payload"
 // @Router /api/settings [put]
 func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
 	var payload models.ServerSettings

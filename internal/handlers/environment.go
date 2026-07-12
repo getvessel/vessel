@@ -41,6 +41,7 @@ func (h *EnvironmentHandler) ListByProject(c echo.Context) error {
 // @Tags Workspaces
 // @Accept json
 // @Produce json
+// @Param request body models.EnvironmentConfig true "Payload"
 // @Router /api/workspaces [post]
 func (h *EnvironmentHandler) Create(c echo.Context) error {
 	projectID := c.Param("id")

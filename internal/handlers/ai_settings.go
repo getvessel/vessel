@@ -46,6 +46,7 @@ func (h *AISettingsHandler) Get(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param teamId path string true "teamId"
+// @Param request body models.TeamAISettings true "Payload"
 // @Router /api/teams/{teamId}/ai_settings [put]
 func (h *AISettingsHandler) Save(c echo.Context) error {
 	teamID := c.Param("teamId")

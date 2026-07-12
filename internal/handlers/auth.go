@@ -16,17 +16,20 @@ func NewAuthHandler(s *services.AuthService) *AuthHandler {
 	return &AuthHandler{authService: s}
 }
 
+type AuthRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 // @Summary Register endpoint
 // @Description Register endpoint
 // @Tags Auth
 // @Accept json
 // @Produce json
+// @Param request body AuthRequest true "Registration credentials"
 // @Router /api/auth/signup [post]
 func (h *AuthHandler) Register(c echo.Context) error {
-	var payload struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+	var payload AuthRequest
 	if err := c.Bind(&payload); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
@@ -46,12 +49,10 @@ func (h *AuthHandler) Register(c echo.Context) error {
 // @Tags Auth
 // @Accept json
 // @Produce json
+// @Param request body AuthRequest true "Login credentials"
 // @Router /api/auth/signin [post]
 func (h *AuthHandler) Login(c echo.Context) error {
-	var payload struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+	var payload AuthRequest
 	if err := c.Bind(&payload); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}

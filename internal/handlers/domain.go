@@ -41,6 +41,7 @@ func (h *DomainHandler) ListByProject(c echo.Context) error {
 // @Tags Workspaces
 // @Accept json
 // @Produce json
+// @Param request body models.DomainConfig true "Payload"
 // @Router /api/workspaces [post]
 func (h *DomainHandler) Create(c echo.Context) error {
 	projectID := c.Param("id")

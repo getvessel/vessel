@@ -42,6 +42,7 @@ func (h *ProjectSettingsHandler) ListWebhooks(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param projectId path string true "projectId"
+// @Param request body models.Webhook true "Payload"
 // @Router /api/projects/{projectId}/webhooks [post]
 func (h *ProjectSettingsHandler) CreateWebhook(c echo.Context) error {
 	projectID := c.Param("projectId")
@@ -105,6 +106,7 @@ func (h *ProjectSettingsHandler) ListTokens(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param projectId path string true "projectId"
+// @Param request body models.CreateTokenRequest true "Payload"
 // @Router /api/projects/{projectId}/tokens [post]
 func (h *ProjectSettingsHandler) CreateToken(c echo.Context) error {
 	projectID := c.Param("projectId")
@@ -183,6 +185,7 @@ func (h *ProjectSettingsHandler) ListMembers(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param projectId path string true "projectId"
+// @Param request body models.ProjectMember true "Payload"
 // @Router /api/projects/{projectId}/members [post]
 func (h *ProjectSettingsHandler) AddMember(c echo.Context) error {
 	projectID := c.Param("projectId")

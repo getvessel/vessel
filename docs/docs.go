@@ -167,6 +167,17 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "Login endpoint",
+                "parameters": [
+                    {
+                        "description": "Login credentials",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.AuthRequest"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -183,6 +194,17 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "Register endpoint",
+                "parameters": [
+                    {
+                        "description": "Registration credentials",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.AuthRequest"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -219,6 +241,26 @@ const docTemplate = `{
                     "Backups"
                 ],
                 "summary": "Create Backup",
+                "parameters": [
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.BackupConfig"
+                        }
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.BackupConfig"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -379,6 +421,17 @@ const docTemplate = `{
                     "Databases"
                 ],
                 "summary": "CreateDatabase endpoint",
+                "parameters": [
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateDatabaseRequest"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -450,6 +503,15 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DatabaseQueryRequest"
+                        }
                     }
                 ],
                 "responses": {}
@@ -713,6 +775,17 @@ const docTemplate = `{
                     "Git"
                 ],
                 "summary": "Connect endpoint",
+                "parameters": [
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.GitConnectRequest"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -989,6 +1062,17 @@ const docTemplate = `{
                     "Projects"
                 ],
                 "summary": "CreateProject endpoint",
+                "parameters": [
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateProjectRequest"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -1183,6 +1267,15 @@ const docTemplate = `{
                         "name": "projectId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ProjectMember"
+                        }
                     }
                 ],
                 "responses": {}
@@ -1273,6 +1366,15 @@ const docTemplate = `{
                         "name": "projectId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateTokenRequest"
+                        }
                     }
                 ],
                 "responses": {}
@@ -1353,6 +1455,15 @@ const docTemplate = `{
                         "name": "projectId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Webhook"
+                        }
                     }
                 ],
                 "responses": {}
@@ -1417,6 +1528,17 @@ const docTemplate = `{
                     "S3-destinations"
                 ],
                 "summary": "CreateS3Destination endpoint",
+                "parameters": [
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.S3Destination"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -1615,11 +1737,29 @@ const docTemplate = `{
                 "summary": "Create Service Variable",
                 "parameters": [
                     {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Variable"
+                        }
+                    },
+                    {
                         "type": "string",
                         "description": "Service ID",
                         "name": "serviceId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Variable"
+                        }
                     }
                 ],
                 "responses": {}
@@ -1650,6 +1790,15 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Variable"
+                        }
+                    },
+                    {
                         "type": "string",
                         "description": "Service ID",
                         "name": "serviceId",
@@ -1662,6 +1811,15 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Variable"
+                        }
                     }
                 ],
                 "responses": {}
@@ -1734,6 +1892,17 @@ const docTemplate = `{
                     "Settings"
                 ],
                 "summary": "UpdateSettings endpoint",
+                "parameters": [
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ServerSettings"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -2033,6 +2202,17 @@ const docTemplate = `{
                     "Settings"
                 ],
                 "summary": "SaveChannel endpoint",
+                "parameters": [
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TeamNotificationChannel"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -2127,6 +2307,17 @@ const docTemplate = `{
                     "Settings"
                 ],
                 "summary": "SaveProvider endpoint",
+                "parameters": [
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.OAuthProviderConfig"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -2230,6 +2421,17 @@ const docTemplate = `{
                     "Storage"
                 ],
                 "summary": "CreateStorage endpoint",
+                "parameters": [
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Storage"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -2603,6 +2805,15 @@ const docTemplate = `{
                         "name": "teamId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TeamAISettings"
+                        }
                     }
                 ],
                 "responses": {}
@@ -2676,6 +2887,15 @@ const docTemplate = `{
                         "name": "teamId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TeamEmailSettings"
+                        }
                     }
                 ],
                 "responses": {}
@@ -2968,6 +3188,15 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Workspace"
+                        }
                     }
                 ],
                 "responses": {}
@@ -3046,6 +3275,767 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "handlers.AuthRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.AppService": {
+            "type": "object",
+            "properties": {
+                "branch": {
+                    "type": "string"
+                },
+                "buildCommand": {
+                    "type": "string"
+                },
+                "buildEngine": {
+                    "type": "string"
+                },
+                "containerId": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "dockerfilePath": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "environmentId": {
+                    "type": "string"
+                },
+                "healthCheckPath": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "internalPort": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "repositoryUrl": {
+                    "type": "string"
+                },
+                "rootDirectory": {
+                    "type": "string"
+                },
+                "startCommand": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.BackupConfig": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "databaseId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "retentionDays": {
+                    "type": "integer"
+                },
+                "s3DestinationId": {
+                    "type": "string"
+                },
+                "schedule": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "storageId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateDatabaseRequest": {
+            "type": "object",
+            "properties": {
+                "customArgs": {
+                    "type": "string"
+                },
+                "databaseName": {
+                    "type": "string"
+                },
+                "engine": {
+                    "type": "string"
+                },
+                "environmentId": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                },
+                "volumePath": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateProjectRequest": {
+            "type": "object",
+            "properties": {
+                "branch": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "internalPort": {
+                    "type": "integer"
+                },
+                "internal_port": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "repositoryUrl": {
+                    "type": "string"
+                },
+                "repository_url": {
+                    "type": "string"
+                },
+                "teamId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateTokenRequest": {
+            "type": "object",
+            "properties": {
+                "environmentId": {
+                    "type": "string"
+                },
+                "expiresAt": {
+                    "type": "string"
+                },
+                "ipAllowlist": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "scopes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "models.DatabaseQueryRequest": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DomainConfig": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "domainName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "pathPrefix": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "redirectTo": {
+                    "type": "string"
+                },
+                "sslCertStatus": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.EnvironmentConfig": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isDefault": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.GitConnectRequest": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "accountName": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Job": {
+            "type": "object",
+            "properties": {
+                "command": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastOutput": {
+                    "type": "string"
+                },
+                "lastRunAt": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "schedule": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.OAuthProviderConfig": {
+            "type": "object",
+            "properties": {
+                "baseUrl": {
+                    "type": "string"
+                },
+                "clientId": {
+                    "type": "string"
+                },
+                "clientSecret": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "providerName": {
+                    "type": "string"
+                },
+                "redirectUri": {
+                    "type": "string"
+                },
+                "tenant": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ProjectMember": {
+            "type": "object",
+            "properties": {
+                "acceptedAt": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "invitedAt": {
+                    "type": "string"
+                },
+                "permission": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.S3Destination": {
+            "type": "object",
+            "properties": {
+                "accessKeyId": {
+                    "type": "string"
+                },
+                "bucket": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "endpoint": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "secretAccessKey": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ServerSettings": {
+            "type": "object",
+            "properties": {
+                "autoUpdateEnabled": {
+                    "type": "boolean"
+                },
+                "currentVersion": {
+                    "type": "string"
+                },
+                "customDnsResolvers": {
+                    "type": "string"
+                },
+                "defaultAnthropicKey": {
+                    "type": "string"
+                },
+                "defaultOpenAIKey": {
+                    "type": "string"
+                },
+                "defaultWildcardDomain": {
+                    "type": "string"
+                },
+                "discordEnabled": {
+                    "type": "boolean"
+                },
+                "discordPingEnabled": {
+                    "type": "boolean"
+                },
+                "discordWebhookUrl": {
+                    "type": "string"
+                },
+                "dnsValidationEnabled": {
+                    "type": "boolean"
+                },
+                "genericWebhookEnabled": {
+                    "type": "boolean"
+                },
+                "genericWebhookUrl": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ipAllowlist": {
+                    "type": "string"
+                },
+                "lastUpdateCheck": {
+                    "type": "string"
+                },
+                "latestVersion": {
+                    "type": "string"
+                },
+                "licenseKey": {
+                    "type": "string"
+                },
+                "maxSeats": {
+                    "type": "integer"
+                },
+                "mcpServerEnabled": {
+                    "type": "boolean"
+                },
+                "notificationAlerts": {
+                    "type": "boolean"
+                },
+                "plan": {
+                    "type": "string"
+                },
+                "pushoverApiToken": {
+                    "type": "string"
+                },
+                "pushoverEnabled": {
+                    "type": "boolean"
+                },
+                "pushoverUserKey": {
+                    "type": "string"
+                },
+                "registrationDomainAllowlist": {
+                    "type": "string"
+                },
+                "registrationEnabled": {
+                    "type": "boolean"
+                },
+                "resendApiKey": {
+                    "type": "string"
+                },
+                "resendEnabled": {
+                    "type": "boolean"
+                },
+                "slackEnabled": {
+                    "type": "boolean"
+                },
+                "slackWebhookUrl": {
+                    "type": "string"
+                },
+                "smtpEnabled": {
+                    "type": "boolean"
+                },
+                "smtpFromAddress": {
+                    "type": "string"
+                },
+                "smtpFromName": {
+                    "type": "string"
+                },
+                "smtpHost": {
+                    "type": "string"
+                },
+                "smtpPassword": {
+                    "type": "string"
+                },
+                "smtpPort": {
+                    "type": "integer"
+                },
+                "smtpUser": {
+                    "type": "string"
+                },
+                "telegramBotToken": {
+                    "type": "string"
+                },
+                "telegramChatId": {
+                    "type": "string"
+                },
+                "telegramEnabled": {
+                    "type": "boolean"
+                },
+                "telemetryEnabled": {
+                    "type": "boolean"
+                },
+                "traefikWildcardIp": {
+                    "type": "string"
+                },
+                "updateCheckCron": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Storage": {
+            "type": "object",
+            "properties": {
+                "accessKey": {
+                    "type": "string"
+                },
+                "apiPort": {
+                    "type": "integer"
+                },
+                "bucketName": {
+                    "type": "string"
+                },
+                "consolePort": {
+                    "type": "integer"
+                },
+                "containerId": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "environmentId": {
+                    "type": "string"
+                },
+                "externalDns": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "internalDns": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "secretKey": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "volumePath": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TeamAISettings": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "teamId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TeamEmailSettings": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "resendApiKey": {
+                    "type": "string"
+                },
+                "smtpFromAddress": {
+                    "type": "string"
+                },
+                "smtpFromName": {
+                    "type": "string"
+                },
+                "smtpHost": {
+                    "type": "string"
+                },
+                "smtpPassword": {
+                    "type": "string"
+                },
+                "smtpPort": {
+                    "type": "integer"
+                },
+                "smtpUser": {
+                    "type": "string"
+                },
+                "teamId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "useResend": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.TeamNotificationChannel": {
+            "type": "object"
+        },
+        "models.Variable": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "environmentId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isSecret": {
+                    "type": "boolean"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "serviceId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Webhook": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "eventTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "includePrEnvironments": {
+                    "type": "boolean"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Workspace": {
+            "type": "object",
+            "properties": {
+                "avatarUrl": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerId": {
+                    "type": "string"
+                },
+                "preferredRegion": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
             }
         }
     },

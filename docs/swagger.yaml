@@ -1,4 +1,504 @@
 basePath: /api
+definitions:
+  handlers.AuthRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.AppService:
+    properties:
+      branch:
+        type: string
+      buildCommand:
+        type: string
+      buildEngine:
+        type: string
+      containerId:
+        type: string
+      createdAt:
+        type: string
+      dockerfilePath:
+        type: string
+      domain:
+        type: string
+      environmentId:
+        type: string
+      healthCheckPath:
+        type: string
+      id:
+        type: string
+      internalPort:
+        type: integer
+      name:
+        type: string
+      projectId:
+        type: string
+      repositoryUrl:
+        type: string
+      rootDirectory:
+        type: string
+      startCommand:
+        type: string
+      status:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.BackupConfig:
+    properties:
+      createdAt:
+        type: string
+      databaseId:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      projectId:
+        type: string
+      retentionDays:
+        type: integer
+      s3DestinationId:
+        type: string
+      schedule:
+        type: string
+      status:
+        type: string
+      storageId:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.CreateDatabaseRequest:
+    properties:
+      customArgs:
+        type: string
+      databaseName:
+        type: string
+      engine:
+        type: string
+      environmentId:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      port:
+        type: integer
+      projectId:
+        type: string
+      username:
+        type: string
+      version:
+        type: string
+      volumePath:
+        type: string
+    type: object
+  models.CreateProjectRequest:
+    properties:
+      branch:
+        type: string
+      description:
+        type: string
+      domain:
+        type: string
+      id:
+        type: string
+      internal_port:
+        type: integer
+      internalPort:
+        type: integer
+      name:
+        type: string
+      repository_url:
+        type: string
+      repositoryUrl:
+        type: string
+      teamId:
+        type: string
+    type: object
+  models.CreateTokenRequest:
+    properties:
+      environmentId:
+        type: string
+      expiresAt:
+        type: string
+      ipAllowlist:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      scopes:
+        items:
+          type: string
+        type: array
+    type: object
+  models.DatabaseQueryRequest:
+    properties:
+      query:
+        type: string
+    type: object
+  models.DomainConfig:
+    properties:
+      createdAt:
+        type: string
+      domainName:
+        type: string
+      id:
+        type: string
+      pathPrefix:
+        type: string
+      projectId:
+        type: string
+      redirectTo:
+        type: string
+      sslCertStatus:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.EnvironmentConfig:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      isDefault:
+        type: boolean
+      name:
+        type: string
+      projectId:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.GitConnectRequest:
+    properties:
+      accessToken:
+        type: string
+      accountName:
+        type: string
+      provider:
+        type: string
+    type: object
+  models.Job:
+    properties:
+      command:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      lastOutput:
+        type: string
+      lastRunAt:
+        type: string
+      name:
+        type: string
+      projectId:
+        type: string
+      schedule:
+        type: string
+      status:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.OAuthProviderConfig:
+    properties:
+      baseUrl:
+        type: string
+      clientId:
+        type: string
+      clientSecret:
+        type: string
+      createdAt:
+        type: string
+      enabled:
+        type: boolean
+      id:
+        type: string
+      providerName:
+        type: string
+      redirectUri:
+        type: string
+      tenant:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.ProjectMember:
+    properties:
+      acceptedAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      invitedAt:
+        type: string
+      permission:
+        type: string
+      projectId:
+        type: string
+      status:
+        type: string
+      userId:
+        type: string
+    type: object
+  models.S3Destination:
+    properties:
+      accessKeyId:
+        type: string
+      bucket:
+        type: string
+      createdAt:
+        type: string
+      endpoint:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      projectId:
+        type: string
+      region:
+        type: string
+      secretAccessKey:
+        type: string
+    type: object
+  models.ServerSettings:
+    properties:
+      autoUpdateEnabled:
+        type: boolean
+      currentVersion:
+        type: string
+      customDnsResolvers:
+        type: string
+      defaultAnthropicKey:
+        type: string
+      defaultOpenAIKey:
+        type: string
+      defaultWildcardDomain:
+        type: string
+      discordEnabled:
+        type: boolean
+      discordPingEnabled:
+        type: boolean
+      discordWebhookUrl:
+        type: string
+      dnsValidationEnabled:
+        type: boolean
+      genericWebhookEnabled:
+        type: boolean
+      genericWebhookUrl:
+        type: string
+      id:
+        type: string
+      ipAllowlist:
+        type: string
+      lastUpdateCheck:
+        type: string
+      latestVersion:
+        type: string
+      licenseKey:
+        type: string
+      maxSeats:
+        type: integer
+      mcpServerEnabled:
+        type: boolean
+      notificationAlerts:
+        type: boolean
+      plan:
+        type: string
+      pushoverApiToken:
+        type: string
+      pushoverEnabled:
+        type: boolean
+      pushoverUserKey:
+        type: string
+      registrationDomainAllowlist:
+        type: string
+      registrationEnabled:
+        type: boolean
+      resendApiKey:
+        type: string
+      resendEnabled:
+        type: boolean
+      slackEnabled:
+        type: boolean
+      slackWebhookUrl:
+        type: string
+      smtpEnabled:
+        type: boolean
+      smtpFromAddress:
+        type: string
+      smtpFromName:
+        type: string
+      smtpHost:
+        type: string
+      smtpPassword:
+        type: string
+      smtpPort:
+        type: integer
+      smtpUser:
+        type: string
+      telegramBotToken:
+        type: string
+      telegramChatId:
+        type: string
+      telegramEnabled:
+        type: boolean
+      telemetryEnabled:
+        type: boolean
+      traefikWildcardIp:
+        type: string
+      updateCheckCron:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.Storage:
+    properties:
+      accessKey:
+        type: string
+      apiPort:
+        type: integer
+      bucketName:
+        type: string
+      consolePort:
+        type: integer
+      containerId:
+        type: string
+      createdAt:
+        type: string
+      environmentId:
+        type: string
+      externalDns:
+        type: string
+      id:
+        type: string
+      internalDns:
+        type: string
+      name:
+        type: string
+      projectId:
+        type: string
+      secretKey:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+      updatedAt:
+        type: string
+      volumePath:
+        type: string
+    type: object
+  models.TeamAISettings:
+    properties:
+      apiKey:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      provider:
+        type: string
+      teamId:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.TeamEmailSettings:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      resendApiKey:
+        type: string
+      smtpFromAddress:
+        type: string
+      smtpFromName:
+        type: string
+      smtpHost:
+        type: string
+      smtpPassword:
+        type: string
+      smtpPort:
+        type: integer
+      smtpUser:
+        type: string
+      teamId:
+        type: string
+      updatedAt:
+        type: string
+      useResend:
+        type: boolean
+    type: object
+  models.TeamNotificationChannel:
+    type: object
+  models.Variable:
+    properties:
+      createdAt:
+        type: string
+      environmentId:
+        type: string
+      id:
+        type: string
+      isSecret:
+        type: boolean
+      key:
+        type: string
+      projectId:
+        type: string
+      serviceId:
+        type: string
+      updatedAt:
+        type: string
+      value:
+        type: string
+    type: object
+  models.Webhook:
+    properties:
+      createdAt:
+        type: string
+      eventTypes:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      includePrEnvironments:
+        type: boolean
+      projectId:
+        type: string
+      updatedAt:
+        type: string
+      url:
+        type: string
+    type: object
+  models.Workspace:
+    properties:
+      avatarUrl:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      ownerId:
+        type: string
+      preferredRegion:
+        type: string
+      updatedAt:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -106,6 +606,13 @@ paths:
       consumes:
       - application/json
       description: Login endpoint
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.AuthRequest'
       produces:
       - application/json
       responses: {}
@@ -117,6 +624,13 @@ paths:
       consumes:
       - application/json
       description: Register endpoint
+      parameters:
+      - description: Registration credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.AuthRequest'
       produces:
       - application/json
       responses: {}
@@ -146,6 +660,19 @@ paths:
       description: |-
         Create endpoint
         Create Backup
+      parameters:
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.BackupConfig'
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.BackupConfig'
       produces:
       - application/json
       - application/json
@@ -267,6 +794,13 @@ paths:
       consumes:
       - application/json
       description: CreateDatabase endpoint
+      parameters:
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateDatabaseRequest'
       produces:
       - application/json
       responses: {}
@@ -317,6 +851,12 @@ paths:
         name: id
         required: true
         type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.DatabaseQueryRequest'
       produces:
       - application/json
       responses: {}
@@ -501,6 +1041,13 @@ paths:
       consumes:
       - application/json
       description: Connect endpoint
+      parameters:
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.GitConnectRequest'
       produces:
       - application/json
       responses: {}
@@ -697,6 +1244,13 @@ paths:
       consumes:
       - application/json
       description: CreateProject endpoint
+      parameters:
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateProjectRequest'
       produces:
       - application/json
       responses: {}
@@ -831,6 +1385,12 @@ paths:
         name: projectId
         required: true
         type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProjectMember'
       produces:
       - application/json
       responses: {}
@@ -896,6 +1456,12 @@ paths:
         name: projectId
         required: true
         type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTokenRequest'
       produces:
       - application/json
       responses: {}
@@ -951,6 +1517,12 @@ paths:
         name: projectId
         required: true
         type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Webhook'
       produces:
       - application/json
       responses: {}
@@ -994,6 +1566,13 @@ paths:
       consumes:
       - application/json
       description: CreateS3Destination endpoint
+      parameters:
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.S3Destination'
       produces:
       - application/json
       responses: {}
@@ -1136,11 +1715,23 @@ paths:
         Create endpoint
         Create Service Variable
       parameters:
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Variable'
       - description: Service ID
         in: path
         name: serviceId
         required: true
         type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Variable'
       produces:
       - application/json
       - application/json
@@ -1194,6 +1785,12 @@ paths:
         name: id
         required: true
         type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Variable'
       - description: Service ID
         in: path
         name: serviceId
@@ -1204,6 +1801,12 @@ paths:
         name: id
         required: true
         type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Variable'
       produces:
       - application/json
       - application/json
@@ -1227,6 +1830,13 @@ paths:
       consumes:
       - application/json
       description: UpdateSettings endpoint
+      parameters:
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ServerSettings'
       produces:
       - application/json
       responses: {}
@@ -1437,6 +2047,13 @@ paths:
       consumes:
       - application/json
       description: SaveChannel endpoint
+      parameters:
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.TeamNotificationChannel'
       produces:
       - application/json
       responses: {}
@@ -1502,6 +2119,13 @@ paths:
       consumes:
       - application/json
       description: SaveProvider endpoint
+      parameters:
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.OAuthProviderConfig'
       produces:
       - application/json
       responses: {}
@@ -1573,6 +2197,13 @@ paths:
       consumes:
       - application/json
       description: CreateStorage endpoint
+      parameters:
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Storage'
       produces:
       - application/json
       responses: {}
@@ -1842,6 +2473,12 @@ paths:
         name: teamId
         required: true
         type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.TeamAISettings'
       produces:
       - application/json
       responses: {}
@@ -1892,6 +2529,12 @@ paths:
         name: teamId
         required: true
         type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.TeamEmailSettings'
       produces:
       - application/json
       responses: {}
@@ -2108,6 +2751,12 @@ paths:
         name: id
         required: true
         type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Workspace'
       produces:
       - application/json
       responses: {}
