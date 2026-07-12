@@ -1,0 +1,55 @@
+import { Store } from '@tanstack/store';
+import type { User } from '#/interfaces';
+
+interface AuthState {
+  token: string | null;
+  user: User | null;
+  isAuthenticated: boolean;
+}
+
+const getInitialAuth = (): AuthState => {
+  const storedToken = localStorage.getItem('vessl_auth_token');
+  const storedUser = localStorage.getItem('vessl_auth_user');
+
+  return {
+    token: storedToken,
+    user: storedUser ? JSON.parse(storedUser) : null,
+    isAuthenticated: !!storedToken,
+  };
+};
+
+export const authStore = new Store<AuthState>(getInitialAuth());
+
+authStore.subscribe(() => {
+  const state = authStore.state;
+  if (state.token) {
+    localStorage.setItem('vessl_auth_token', state.token);
+  } else {
+    localStorage.removeItem('vessl_auth_token');
+  }
+
+  if (state.user) {
+    localStorage.setItem('vessl_auth_user', JSON.stringify(state.user));
+  } else {
+    localStorage.removeItem('vessl_auth_user');
+  }
+});
+
+export const authActions = {
+  setAuth: (token: string, user: User) => {
+    authStore.setState((state) => ({
+      ...state,
+      token,
+      user,
+      isAuthenticated: true,
+    }));
+  },
+  logout: () => {
+    authStore.setState((state) => ({
+      ...state,
+      token: null,
+      user: null,
+      isAuthenticated: false,
+    }));
+  },
+};

@@ -152,7 +152,7 @@ src/
 │
 ├── hooks/                     # Global utilities (useTheme, useToast)
 ├── lib/                       # API clients (axios/fetch), auth tokens, formatting
-└── types/                     # Global TypeScript interfaces
+└── interfaces/                # Global TypeScript interfaces
 ```
 
 ---
