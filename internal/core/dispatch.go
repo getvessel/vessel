@@ -19,9 +19,11 @@ type DispatcherService struct {
 	}
 }
 
-func NewDispatcherService(notifRepo repositories.NotificationRepository, settingsRepo repositories.SettingsRepository, mailer interface {
+type Mailer interface {
 	SendTeamEmail(ctx context.Context, teamID, templateName string, toAddress string, subject string, data any) error
-}) *DispatcherService {
+}
+
+func NewDispatcherService(notifRepo repositories.NotificationRepository, settingsRepo repositories.SettingsRepository, mailer Mailer) *DispatcherService {
 	return &DispatcherService{notifRepo: notifRepo, settingsRepo: settingsRepo, mailer: mailer}
 }
 

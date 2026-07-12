@@ -8,7 +8,6 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/labstack/echo/v4"
-	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/mark3labs/mcp-go/server"
 
 	"vessl.dev/vessl/internal/core"
@@ -66,39 +65,10 @@ type Server struct {
 }
 
 func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefikManager *proxy.TraefikManager, dockerClient *client.Client) *Server {
-	repos := initRepositories(db, vault)
-	svcs := initServices(repos, dockerClient, deployer)
-
-	mcpBridge := mcp.NewBridge(svcs.project, svcs.app, svcs.db)
-	authGuard := middleware.NewAuthGuard(svcs.token, svcs.settings, svcs.ps)
-
-	e := echo.New()
-	e.Use(echomiddleware.RequestLoggerWithConfig(echomiddleware.RequestLoggerConfig{
-		LogStatus: true,
-		LogURI:    true,
-		LogMethod: true,
-		LogValuesFunc: func(c echo.Context, v echomiddleware.RequestLoggerValues) error {
-			log.Printf("REQUEST: %s %s | status: %d", v.Method, v.URI, v.Status)
-			return nil
-		},
-	}))
-	e.Use(echomiddleware.Recover())
-	e.Use(echomiddleware.CORS())
-
-	srv := &Server{
-		router:            e,
-		mcpBridge:         mcpBridge,
-		deployer:          deployer,
-		traefikManager:    traefikManager,
-		dockerClient:      dockerClient,
-		tokenService:      svcs.token,
-		authGuard:         authGuard,
-		cronManager:       svcs.cronMgr,
-		serviceLinker:     svcs.svcLinker,
-		dispatcherService: svcs.dispatcher,
+	srv, err := BuildServer(db, vault, deployer, traefikManager, dockerClient)
+	if err != nil {
+		log.Fatalf("failed to build server: %v", err)
 	}
-
-	initHandlers(srv, svcs, dockerClient)
 
 	if srv.deployer != nil {
 		srv.deployer.EnvProvider = func(projectID string) (map[string]string, error) {
