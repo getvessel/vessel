@@ -1,2 +1,2 @@
-export * from './ObjectBrowser';
-export * from './StorageBucketList';
+export * from './object-browser';
+export * from './storage-bucket-list';

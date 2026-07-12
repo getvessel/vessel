@@ -1,3 +1,3 @@
-export * from './BackupManager';
-export * from './DatabaseList';
-export * from './SqlStudio';
+export * from './backup-manager';
+export * from './database-list';
+export * from './sql-studio';

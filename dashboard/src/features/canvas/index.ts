@@ -1,3 +1,3 @@
-export * from './CanvasEditor';
-export * from './EdgeProperties';
-export * from './NodePanel';
+export * from './canvas-editor';
+export * from './edge-properties';
+export * from './node-panel';

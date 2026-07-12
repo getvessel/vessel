@@ -1,2 +1,2 @@
-export * from './JobHistory';
-export * from './JobList';
+export * from './job-history';
+export * from './job-list';

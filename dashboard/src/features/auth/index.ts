@@ -1,3 +1,3 @@
-export * from './LoginForm';
-export * from './OAuthButtons';
-export * from './RegisterForm';
+export * from './login-form';
+export * from './o-auth-buttons';
+export * from './register-form';
