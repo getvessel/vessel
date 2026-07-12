@@ -224,9 +224,5 @@ func ExtractTokenFromRequest(c echo.Context) string {
 	if err == nil && cookie.Value != "" {
 		return strings.TrimSpace(cookie.Value)
 	}
-	queryToken := c.QueryParam("token")
-	if queryToken != "" {
-		return strings.TrimSpace(queryToken)
-	}
 	return ""
 }

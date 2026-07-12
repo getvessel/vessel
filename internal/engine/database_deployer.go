@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os"
-	"path/filepath"
 	"strings"
 
 	dockertypes "github.com/docker/docker/api/types"
@@ -105,11 +103,8 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 		_, _ = io.Copy(io.Discard, pullResp)
 		_ = pullResp.Close()
 	}
-	hostVolumeDir, err := filepath.Abs(filepath.Join("data", "databases", dbConfig.ID))
-	if err != nil {
-		return "", err
-	}
-	_ = os.MkdirAll(hostVolumeDir, 0o755)
+	volumeName := fmt.Sprintf("vessl-db-data-%s", dbConfig.ID)
+
 	if err := utils.EnsureVesslNetwork(ctx, d.dockerClient); err != nil {
 		return "", fmt.Errorf("failed to ensure Docker network: %w", err)
 	}
@@ -121,13 +116,13 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 	hostCfg := &container.HostConfig{
 		RestartPolicy: container.RestartPolicy{Name: "always"},
 		Resources: container.Resources{
-			Memory:   utils.MegaBytesToBytes(1024), // Default 1GB memory limit for DBs
+			Memory:   utils.MegaBytesToBytes(1024),    // Default 1GB memory limit for DBs
 			NanoCPUs: utils.CPURequestToNanoCPUs(1.0), // Default 1.0 CPU limit for DBs
 		},
 		Mounts: []mount.Mount{
 			{
-				Type:   mount.TypeBind,
-				Source: hostVolumeDir,
+				Type:   mount.TypeVolume,
+				Source: volumeName,
 				Target: containerMountPath,
 			},
 		},
