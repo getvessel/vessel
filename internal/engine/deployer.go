@@ -209,7 +209,7 @@ func (d *Deployer) startContainer(ctx context.Context, app *models.AppService, c
 }
 
 func (d *Deployer) verifyHealthCheck(ctx context.Context, app *models.AppService, containerName string, logWriter io.Writer) error {
-	healthy := d.waitForHealthyContainer(ctx, containerName, app.HealthCheckPath)
+	healthy := d.waitForHealthyContainer(ctx, containerName, app.HealthCheckPath, app.InternalPort)
 	if !healthy {
 		_ = d.containerManager.StopAndRemove(ctx, containerName)
 		if logWriter != nil {
@@ -244,7 +244,7 @@ func (d *Deployer) Remove(ctx context.Context, containerID string) error {
 	return nil
 }
 
-func (d *Deployer) waitForHealthyContainer(ctx context.Context, containerName string, healthCheckPath string) bool {
+func (d *Deployer) waitForHealthyContainer(ctx context.Context, containerName string, healthCheckPath string, internalPort int) bool {
 	for i := 0; i < 30; i++ {
 		time.Sleep(2 * time.Second)
 		inspect, err := d.containerManager.Inspect(ctx, containerName)
@@ -256,15 +256,16 @@ func (d *Deployer) waitForHealthyContainer(ctx context.Context, containerName st
 				continue
 			}
 			if healthCheckPath != "" {
-				var hostPort string
-				for _, bindings := range inspect.NetworkSettings.Ports {
-					if len(bindings) > 0 {
-						hostPort = bindings[0].HostPort
-						break
-					}
+				var containerIP string
+				if net, ok := inspect.NetworkSettings.Networks[utils.GetRuntimeNetwork()]; ok {
+					containerIP = net.IPAddress
 				}
-				if hostPort != "" {
-					resp, err := http.Get(fmt.Sprintf("http://127.0.0.1:%s%s", hostPort, healthCheckPath))
+				if containerIP != "" {
+					port := internalPort
+					if port <= 0 {
+						port = 3000
+					}
+					resp, err := http.Get(fmt.Sprintf("http://%s:%d%s", containerIP, port, healthCheckPath))
 					if err == nil {
 						resp.Body.Close()
 						if resp.StatusCode >= 200 && resp.StatusCode < 400 {

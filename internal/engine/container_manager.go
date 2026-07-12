@@ -45,9 +45,6 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, name, imageTag, s
 	}
 	hostConfig := &container.HostConfig{
 		RestartPolicy: container.RestartPolicy{Name: "always"},
-		PortBindings: nat.PortMap{
-			containerPort: []nat.PortBinding{{HostIP: "127.0.0.1", HostPort: "0"}},
-		},
 		Resources: container.Resources{
 			Memory:   utils.MegaBytesToBytes(memoryLimitMB),
 			NanoCPUs: utils.CPURequestToNanoCPUs(cpuRequest),
