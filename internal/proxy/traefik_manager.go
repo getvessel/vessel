@@ -16,7 +16,7 @@ import (
 
 const (
 	TraefikContainerName = "vessl-traefik"
-	VesslNetworkName    = "vessl-network"
+	VesslNetworkName     = "vessl-network"
 )
 
 type TraefikManager struct {
