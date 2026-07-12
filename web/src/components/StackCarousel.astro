@@ -40,10 +40,10 @@ const logoRows = [
 <section class="relative overflow-hidden py-24">
   <div class="mx-auto max-w-7xl px-6">
     <div class="mb-12 text-center">
-      <h2 class="text-[clamp(1.8rem,4vw,3.5rem)] font-extrabold leading-tight text-[var(--color-foreground)]">
-        Runs whatever your team ships<span class="text-[var(--color-primary)]">.</span>
+      <h2 class="text-[clamp(1.8rem,4vw,3.5rem)] font-extrabold leading-tight text-(--color-foreground)">
+        Runs whatever your team ships<span class="text-(--color-primary)">.</span>
       </h2>
-      <p class="mt-3 text-[var(--color-muted-foreground)] text-sm mx-auto max-w-md">
+      <p class="mt-3 text-(--color-muted-foreground) text-sm mx-auto max-w-md">
         If it has a Dockerfile — or even if it doesn't — Vessl can build and run it on your server.
       </p>
     </div>
@@ -51,7 +51,7 @@ const logoRows = [
     <div class="grid gap-6 overflow-hidden">
       {logoRows.map((logos, i) => (
         <div class="logo-marquee overflow-hidden py-2">
-          <div class={`logo-track flex w-max gap-10 pr-10 ${i % 2 === 1 ? 'reverse' : ''}`}>
+          <div class={`logo-track flex w-max gap-6 pr-6 ${i % 2 === 1 ? 'reverse' : ''}`}>
             {[...logos, ...logos, ...logos].map(logo => (
               <div class="flex h-20 w-24 items-center justify-center shrink-0">
                 <img
