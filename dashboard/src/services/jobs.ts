@@ -1,27 +1,46 @@
+import type { BaseResponse } from '#/interfaces/base';
 import type { CreateJobRequest, Job } from '#/interfaces/deployment';
-import { apiClient } from './instance';
+import { apiClient } from '#/lib/apiClient';
+import { handleApiError } from '#/lib/error';
 
 export const jobsService = {
-  listJobs: async (): Promise<Job[]> => {
-    const { data } = await apiClient.get<Job[]>('/jobs');
-    return data;
+  listJobs: async (projectId: string): Promise<BaseResponse<Job[]>> => {
+    try {
+      return await apiClient.get<BaseResponse<Job[]>>(`/jobs?projectId=${projectId}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
-  getJob: async (id: string): Promise<Job> => {
-    const { data } = await apiClient.get<Job>(`/jobs/${id}`);
-    return data;
+  getJob: async (id: string): Promise<BaseResponse<Job>> => {
+    try {
+      return await apiClient.get<BaseResponse<Job>>(`/jobs/${id}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
-  createJob: async (payload: CreateJobRequest): Promise<Job> => {
-    const { data } = await apiClient.post<Job>('/jobs', payload);
-    return data;
+  createJob: async (payload: CreateJobRequest): Promise<BaseResponse<Job>> => {
+    try {
+      return await apiClient.post<BaseResponse<Job>>('/jobs', payload);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
   deleteJob: async (id: string): Promise<void> => {
-    await apiClient.delete(`/jobs/${id}`);
+    try {
+      await apiClient.delete(`/jobs/${id}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
   triggerJob: async (id: string): Promise<void> => {
-    await apiClient.post(`/jobs/${id}/trigger`);
+    try {
+      await apiClient.post(`/jobs/${id}/trigger`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 };

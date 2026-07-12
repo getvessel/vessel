@@ -71,46 +71,6 @@ export interface Job {
   updatedAt: string;
 }
 
-export interface BackupConfig {
-  id: string;
-  projectId: string;
-  databaseId?: string;
-  storageId?: string;
-  s3DestinationId?: string;
-  name: string;
-  schedule: string;
-  retentionDays: number;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface BackupRecord {
-  id: string;
-  backupConfigId: string;
-  projectId: string;
-  databaseId?: string;
-  status: string;
-  filePath: string;
-  fileSizeBytes: number;
-  s3Url?: string;
-  logs: string;
-  startedAt: string;
-  completedAt: string;
-}
-
-export interface S3Destination {
-  id: string;
-  projectId: string;
-  name: string;
-  endpoint: string;
-  bucket: string;
-  region: string;
-  accessKeyId: string;
-  secretAccessKey: string;
-  createdAt: string;
-}
-
 export interface PRPreview {
   id: string;
   serviceId: string;

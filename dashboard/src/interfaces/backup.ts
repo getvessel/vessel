@@ -1,0 +1,69 @@
+import type { BaseResponse } from './base';
+
+export interface BackupConfig {
+  id: string;
+  projectId: string;
+  databaseId?: string;
+  storageId?: string;
+  s3DestinationId?: string;
+  name: string;
+  schedule: string;
+  retentionDays: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BackupRecord {
+  id: string;
+  backupConfigId: string;
+  projectId: string;
+  databaseId?: string;
+  status: string;
+  filePath: string;
+  fileSizeBytes: number;
+  s3Url?: string;
+  logs: string;
+  startedAt: string;
+  completedAt: string;
+}
+
+export interface S3Destination {
+  id: string;
+  projectId: string;
+  name: string;
+  endpoint: string;
+  bucket: string;
+  region: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+  createdAt: string;
+}
+
+export interface CreateBackupConfigRequest {
+  projectId: string;
+  name: string;
+  schedule: string;
+  retentionDays: number;
+  databaseId?: string;
+  storageId?: string;
+  s3DestinationId?: string;
+}
+
+export interface CreateS3DestinationRequest {
+  projectId: string;
+  name: string;
+  endpoint: string;
+  bucket: string;
+  region: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+}
+
+// Response Types
+export type ListBackupsResponse = BaseResponse<BackupConfig[]>;
+export type GetBackupResponse = BaseResponse<BackupConfig>;
+export type CreateBackupResponse = BaseResponse<BackupConfig>;
+export type ListBackupRecordsResponse = BaseResponse<BackupRecord[]>;
+export type ListS3DestinationsResponse = BaseResponse<S3Destination[]>;
+export type CreateS3DestinationResponse = BaseResponse<S3Destination>;

@@ -1,8 +1,15 @@
 export { appsService } from './apps';
 export { authService } from './auth';
+export { backupsService } from './backups';
 export { canvasService } from './canvas';
 export { databasesService } from './databases';
+export { deploymentsService } from './deployments';
 export { environmentsService } from './environments';
+export { gitService } from './git';
 export { jobsService } from './jobs';
+export { profileService } from './profile';
 export { projectsService } from './projects';
+export { serviceVarsService } from './services';
+export { storageService } from './storage';
+export { workspaceSettingsService } from './workspace-settings';
 export { workspacesService } from './workspaces';

@@ -1,18 +1,29 @@
 import type { AuthCredentials, AuthResponse, RegisterCredentials } from '#/interfaces/auth';
-import { apiClient } from './instance';
+import { apiClient } from '#/lib/apiClient';
+import { handleApiError } from '#/lib/error';
 
 export const authService = {
   login: async (credentials: AuthCredentials): Promise<AuthResponse> => {
-    const { data } = await apiClient.post<AuthResponse>('/auth/signin', credentials);
-    return data;
+    try {
+      return await apiClient.post<AuthResponse>('/auth/signin', credentials);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
   register: async (details: RegisterCredentials): Promise<AuthResponse> => {
-    const { data } = await apiClient.post<AuthResponse>('/auth/signup', details);
-    return data;
+    try {
+      return await apiClient.post<AuthResponse>('/auth/signup', details);
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 
   logout: async (): Promise<void> => {
-    await apiClient.post('/auth/logout');
+    try {
+      await apiClient.post('/auth/logout');
+    } catch (error) {
+      throw handleApiError(error);
+    }
   },
 };

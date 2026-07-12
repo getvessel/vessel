@@ -1,14 +1,14 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 
-	"vessl.dev/vessl/internal/utils"
-
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/services"
+	"vessl.dev/vessl/internal/utils"
 )
 
 type AISettingsHandler struct {
@@ -34,10 +34,15 @@ func (h *AISettingsHandler) Get(c echo.Context) error {
 
 	settings, err := h.aiService.Get(c.Request().Context(), workspaceID)
 	if err != nil {
+		var nfe *utils.NotFoundError
+		if errors.As(err, &nfe) {
+			// No settings configured yet — return empty defaults
+			return utils.Success(c, "Operation successful", &models.WorkspaceAISettings{WorkspaceID: workspaceID})
+		}
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 	if settings == nil {
-		return utils.Error(c, http.StatusNotFound, "Settings not found")
+		return utils.Success(c, "Operation successful", &models.WorkspaceAISettings{WorkspaceID: workspaceID})
 	}
 	return utils.Success(c, "Operation successful", settings)
 }

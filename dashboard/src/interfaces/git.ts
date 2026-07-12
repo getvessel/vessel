@@ -1,66 +1,32 @@
-export interface GitProviderConfig {
-  id: string;
-  userId: string;
+import type { BaseResponse } from './base';
+
+export interface GitStatus {
   provider: string;
-  accessToken?: string;
-  accountName: string;
-  createdAt: string;
-  updatedAt: string;
+  connected: boolean;
 }
 
-export interface GitRepository {
-  id: number;
+export interface GitRepo {
+  id: string;
   name: string;
   fullName: string;
-  private: boolean;
   cloneUrl: string;
-  htmlUrl: string;
+  private: boolean;
   defaultBranch: string;
+  updatedAt: string;
 }
 
-export interface GitConnectRequest {
+export interface GitBranch {
+  name: string;
+  sha: string;
+}
+
+export interface ConnectGitRequest {
   provider: string;
-  accessToken: string;
-  accountName: string;
+  code: string;
 }
 
-export interface GithubApp {
-  id: string;
-  workspaceId: string;
-  name: string;
-  appId: string;
-  installationId: string;
-  clientId: string;
-  clientSecret: string;
-  webhookSecret: string;
-  privateKey: string;
-  isPublic: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface GitlabApp {
-  id: string;
-  workspaceId: string;
-  name: string;
-  appId: string;
-  appSecret: string;
-  webhookSecret: string;
-  apiUrl: string;
-  isPublic: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface BitbucketApp {
-  id: string;
-  workspaceId: string;
-  name: string;
-  workspace: string;
-  clientId: string;
-  clientSecret: string;
-  webhookSecret: string;
-  isPublic: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+// Response Types
+export type GetGitStatusResponse = BaseResponse<GitStatus[]>;
+export type ListGitReposResponse = BaseResponse<GitRepo[]>;
+export type ListGitBranchesResponse = BaseResponse<GitBranch[]>;
+export type ConnectGitResponse = BaseResponse<GitStatus>;

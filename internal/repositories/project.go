@@ -66,7 +66,7 @@ func (r *ProjectSQLiteRepository) List(_ context.Context, workspaceID string, li
 func (r *ProjectSQLiteRepository) Get(_ context.Context, id string) (*models.ProjectConfig, error) {
 	row := r.db.QueryRow(`SELECT id, COALESCE(workspace_id, ''), name, COALESCE(description,''), created_at, updated_at FROM projects WHERE id = ?`, id)
 	var p models.ProjectConfig
-	err := row.Scan(&p.ID, &p.WorkspaceID, &p.WorkspaceID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt)
+	err := row.Scan(&p.ID, &p.WorkspaceID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}

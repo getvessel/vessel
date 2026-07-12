@@ -50,7 +50,7 @@ func (r *ProjectSettingsSQLiteRepository) CreateWebhook(ctx context.Context, w *
 	eventTypesStr := strings.Join(w.EventTypes, ",")
 	_, err := r.db.ExecContext(ctx,
 		`INSERT INTO project_webhooks (id, project_id, url, event_types, include_pr_environments, created_at, updated_at)
-		 VALUES (?, ?, ?, ?, ?, ?)`,
+		 VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		w.ID, w.ProjectID, w.URL, eventTypesStr, w.IncludePREnvironments, w.CreatedAt, w.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("create webhook: %w", err)
@@ -226,7 +226,7 @@ func (r *ProjectSettingsSQLiteRepository) AddMember(ctx context.Context, m *mode
 	_, err := r.db.ExecContext(ctx,
 		`INSERT INTO project_members (id, project_id, user_id, email, permission, status, invited_at, accepted_at)
 		 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-		 ON CONFLICT(project_id, email) DO UPDATE SET
+		 ON CONFLICT(project_id, user_id) DO UPDATE SET
 		 permission = excluded.permission,
 		 status = excluded.status`,
 		m.ID, m.ProjectID, m.UserID, m.Email, m.Permission, m.Status, m.InvitedAt, m.AcceptedAt)

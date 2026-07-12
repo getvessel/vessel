@@ -1,0 +1,90 @@
+import type {
+  CreateBackupConfigRequest,
+  CreateBackupResponse,
+  CreateS3DestinationRequest,
+  CreateS3DestinationResponse,
+  GetBackupResponse,
+  ListBackupRecordsResponse,
+  ListBackupsResponse,
+  ListS3DestinationsResponse,
+} from '#/interfaces/backup';
+import { apiClient } from '#/lib/apiClient';
+import { handleApiError } from '#/lib/error';
+
+export const backupsService = {
+  list: async (projectId: string): Promise<ListBackupsResponse> => {
+    try {
+      return await apiClient.get<ListBackupsResponse>(`/backups?projectId=${projectId}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  get: async (id: string): Promise<GetBackupResponse> => {
+    try {
+      return await apiClient.get<GetBackupResponse>(`/backups/${id}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  create: async (payload: CreateBackupConfigRequest): Promise<CreateBackupResponse> => {
+    try {
+      return await apiClient.post<CreateBackupResponse>('/backups', payload);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  delete: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/backups/${id}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  trigger: async (id: string): Promise<void> => {
+    try {
+      await apiClient.post(`/backups/${id}/trigger`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  listRecords: async (id: string): Promise<ListBackupRecordsResponse> => {
+    try {
+      return await apiClient.get<ListBackupRecordsResponse>(`/backups/${id}/records`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  listS3Destinations: async (projectId: string): Promise<ListS3DestinationsResponse> => {
+    try {
+      return await apiClient.get<ListS3DestinationsResponse>(
+        `/s3-destinations?projectId=${projectId}`
+      );
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  createS3Destination: async (
+    payload: CreateS3DestinationRequest
+  ): Promise<CreateS3DestinationResponse> => {
+    try {
+      return await apiClient.post<CreateS3DestinationResponse>('/s3-destinations', payload);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  deleteS3Destination: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/s3-destinations/${id}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+};
