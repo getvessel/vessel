@@ -1,0 +1,13 @@
+Subject: ❌ Deployment Failed: {{.ProjectName}}
+
+Your recent deployment for project **{{.ProjectName}}** has failed.
+
+- Environment: {{.Environment}}
+- Version: {{.Version}}
+- Time: {{.Time}}
+- Error: {{.ErrorSnippet}}
+
+Please check the full logs in your Vessl Dashboard to troubleshoot the issue:
+{{.DashboardLink}}
+
+— The Vessl Daemon
