@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -146,9 +147,21 @@ func (m *TraefikManager) buildTraefikMounts() []mount.Mount {
 }
 
 func (m *TraefikManager) buildPortBindings() nat.PortMap {
+	httpPort := os.Getenv("VESSL_TRAEFIK_HTTP_PORT")
+	if httpPort == "" {
+		httpPort = "80"
+	}
+	httpsPort := os.Getenv("VESSL_TRAEFIK_HTTPS_PORT")
+	if httpsPort == "" {
+		httpsPort = "443"
+	}
+	apiPort := os.Getenv("VESSL_TRAEFIK_API_PORT")
+	if apiPort == "" {
+		apiPort = "8080"
+	}
 	return nat.PortMap{
-		"80/tcp":   []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "80"}},
-		"443/tcp":  []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "443"}},
-		"8080/tcp": []nat.PortBinding{{HostIP: "127.0.0.1", HostPort: "8080"}},
+		"80/tcp":   []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: httpPort}},
+		"443/tcp":  []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: httpsPort}},
+		"8080/tcp": []nat.PortBinding{{HostIP: "127.0.0.1", HostPort: apiPort}},
 	}
 }

@@ -39,9 +39,9 @@ vessl/
 
 ## 📢 Notifications Architecture (Self-Hosted)
 
-Vessl (Self-Hosted) is completely standalone and fully owned by the administrator. 
+Vessl (Self-Hosted) is completely standalone and fully owned by the administrator.
 - **Database-Driven Channels:** There are NO environment variables for configuring notification channels (like SMTP, Slack, Discord). All channels are configured directly in the Dashboard UI and saved securely in the SQLite database (`ServerSettings`).
-- **No Hardcoded Fallbacks:** If a channel is toggled off or credentials are not provided in the UI, Vessl simply does not dispatch messages to that channel. 
+- **No Hardcoded Fallbacks:** If a channel is toggled off or credentials are not provided in the UI, Vessl simply does not dispatch messages to that channel.
 - **Isolated Dispatchers:** Each notification channel (Mailer, Discord, Telegram, Pushover, Slack) is separated cleanly inside `internal/notifications/`, making it incredibly easy to contribute new channels without touching core dispatch logic.
 ├── web/                  # 🌐 Marketing site — `vessl.dev`
 ├── docs/                 # 📖 Documentation — `docs.vessl.dev`
@@ -73,16 +73,16 @@ Vessl includes a comprehensive root-level `Makefile` to streamline local develop
 | `make all`             | Runs code checks (`make check`) and compiles all frontend & backend binaries (`make build`). |
 | `make check`           | Formats code with `go fmt ./...` and runs static analysis with `go vet ./...`.               |
 | `make test`            | Executes the complete Go unit and integration test suite (`go test ./... -v`).               |
-| `make build`           | Builds both the TanStack SPA dashboard and the Go daemon (`bin/vessld`).                    |
-| `make build-daemon`    | Compiles only the Go backend daemon binary into `bin/vessld`.                               |
+| `make build`           | Builds both the TanStack SPA dashboard and the Go daemon (`bin/vessld`).                     |
+| `make build-daemon`    | Compiles only the Go backend daemon binary into `bin/vessld`.                                |
 | `make build-dashboard` | Bundles the Vite + TanStack Router frontend GUI into `dashboard/dist/`.                      |
 | `make dev`             | Launches the backend daemon and dashboard dev servers concurrently (`npx concurrently`).     |
-| `make dev-daemon`      | Runs the standalone Go backend server (`go run ./cmd`).                              |
+| `make dev-daemon`      | Runs the standalone Go backend server (`go run ./cmd`).                                      |
 | `make dev-dashboard`   | Runs the standalone Vite frontend dev server on port `3000`.                                 |
 | `make dev-web`         | Runs the Astro marketing landing page dev server (`web/`).                                   |
-| `make docker-build`    | Builds the all-in-one Vessl container image via Docker Compose.                             |
-| `make docker-up`       | Starts the container stack (`vessld` + `docker.sock` mount) in detached mode (`-d`).        |
-| `make docker-down`     | Stops and removes the running Vessl container stack.                                        |
+| `make docker-build`    | Builds the all-in-one Vessl container image via Docker Compose.                              |
+| `make docker-up`       | Starts the container stack (`vessld` + `docker.sock` mount) in detached mode (`-d`).         |
+| `make docker-down`     | Stops and removes the running Vessl container stack.                                         |
 | `make clean`           | Removes compiled binaries, temporary build artifacts, and the `bin/` directory.              |
 
 ---
@@ -97,6 +97,8 @@ Vessl includes a comprehensive root-level `Makefile` to streamline local develop
    ```bash
    cp .env.example .env
    ```
+
+   > **Note on Port Conflicts (Local Dev):** If you already have Apache (`httpd`) or Nginx running on your machine, Traefik will fail to start on ports 80/443. You can easily resolve this by uncommenting and modifying the `VESSL_TRAEFIK_*` ports in your `.env` file (e.g., `VESSL_TRAEFIK_HTTP_PORT=8081`).
 
 3. **Start Dev Environment**:
 
@@ -123,7 +125,7 @@ MIT License. See `LICENSE` for details.
 
 ## 📢 Notifications Architecture (Self-Hosted)
 
-Vessl (Self-Hosted) uses an event-driven notification dispatcher located at `internal/services/notifications`. 
+Vessl (Self-Hosted) uses an event-driven notification dispatcher located at `internal/services/notifications`.
 Unlike managed cloud environments, the self-hosted daemon **does not rely on environment variables** for configuring SMTP, Slack, Discord, or Telegram. Instead, all notification channel settings are stored persistently in the local SQLite database.
 
 - **Dynamic Configuration:** Administrators configure their SMTP credentials and webhook URLs directly through the Vessl dashboard settings.
@@ -131,6 +133,7 @@ Unlike managed cloud environments, the self-hosted daemon **does not rely on env
 - **No Global Fallbacks:** Because each self-hosted instance is fully independent, there is no fallback to a "managed" or "global" provider. If the user hasn't configured SMTP, emails simply aren't sent.
 
 To contribute a new channel:
+
 1. Create a new file (e.g., `slack.go`) inside `internal/services/notifications/`.
 2. Implement the sending logic.
 3. Hook it into the central event dispatcher.
