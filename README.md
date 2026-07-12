@@ -32,9 +32,17 @@ vessl/
 │   ├── proxy/            # Traefik v3 reverse proxy controller
 │   ├── repositories/     # SQLite data access layer (per-domain repositories)
 │   ├── services/         # Business logic services (auth, cron, deploy, git, etc.)
-│   │   └── notifications/# Multi-channel notification dispatching (email, telegram, discord)
 │   └── vault/            # AES-256-GCM encryption vault for secrets
 ├── dashboard/            # 💻 Self-hosted dashboard — served by daemon binary
+
+---
+
+## 📢 Notifications Architecture (Self-Hosted)
+
+Vessl (Self-Hosted) is completely standalone and fully owned by the administrator. 
+- **Database-Driven Channels:** There are NO environment variables for configuring notification channels (like SMTP, Slack, Discord). All channels are configured directly in the Dashboard UI and saved securely in the SQLite database (`ServerSettings`).
+- **No Hardcoded Fallbacks:** If a channel is toggled off or credentials are not provided in the UI, Vessl simply does not dispatch messages to that channel. 
+- **Isolated Dispatchers:** Each notification channel (Mailer, Discord, Telegram, Pushover, Slack) is separated cleanly inside `internal/notifications/`, making it incredibly easy to contribute new channels without touching core dispatch logic.
 ├── web/                  # 🌐 Marketing site — `vessl.dev`
 ├── docs/                 # 📖 Documentation — `docs.vessl.dev`
 ├── bootstrap/            # 📦 One-line install server (`install.sh`)
