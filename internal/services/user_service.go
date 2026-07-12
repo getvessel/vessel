@@ -2,6 +2,8 @@ package services
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"time"
 
@@ -67,7 +69,9 @@ func (s *UserService) CreatePAT(ctx context.Context, userID, name string, expire
 	if userID == "" || name == "" {
 		return nil, "", errors.New("userId and name are required")
 	}
-	rawToken := uuid.New().String() + "-" + uuid.New().String()
+	bytes := make([]byte, 32)
+	rand.Read(bytes)
+	rawToken := "vpt_" + hex.EncodeToString(bytes)
 	hash, err := bcrypt.GenerateFromPassword([]byte(rawToken), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, "", err

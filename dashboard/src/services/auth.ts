@@ -1,5 +1,4 @@
 import type { AuthCredentials, AuthResponse, RegisterCredentials } from '#/interfaces/auth';
-import type { User } from '#/interfaces/users';
 import { apiClient } from './instance';
 
 export const authService = {
