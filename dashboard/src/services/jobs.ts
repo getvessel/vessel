@@ -1,4 +1,4 @@
-import type { CreateJobRequest, Job, UpdateJobRequest } from '#/interfaces/deployment';
+import type { CreateJobRequest, Job } from '#/interfaces/deployment';
 import { apiClient } from './instance';
 
 export const jobsService = {
