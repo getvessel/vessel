@@ -1,180 +1,212 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const features = [
-  {
-    icon: `<path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>`,
-    title: 'Any Language',
-    desc: 'Deploy any app regardless of language or framework — static sites, APIs, workers, and everything in between.',
-  },
-  {
-    icon: `<rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>`,
-    title: 'Any Server',
-    desc: 'Deploy to your own VPS, bare metal, Raspberry Pi, EC2, Hetzner, or DigitalOcean. All you need is an SSH connection.',
-  },
-  {
-    icon: `<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>`,
-    title: 'Push to Deploy',
-    desc: 'Connect GitHub, GitLab, Gitea, or any self-hosted Git. Every push triggers a clean build and deploy.',
-  },
-  {
-    icon: `<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>`,
-    title: 'Automatic SSL',
-    desc: "Let's Encrypt certificates provisioned and renewed automatically for every custom domain you connect.",
-  },
-  {
-    icon: `<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>`,
-    title: 'Databases',
-    desc: 'Postgres, MySQL, Redis, MongoDB, ClickHouse — one click to run on your server, fully managed.',
-  },
-  {
-    icon: `<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>`,
-    title: 'Real-time Terminal',
-    desc: 'SSH into any running container directly from your browser. No client or local keys required.',
-  },
-  {
-    icon: `<path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>`,
-    title: 'Usage Metering',
-    desc: 'Track container hours, deployments, and bandwidth. Get notified before you hit plan limits.',
-  },
-  {
-    icon: `<circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/>`,
-    title: 'PR Previews',
-    desc: 'Every pull request gets its own live preview environment. Merge with confidence.',
-  },
-  {
-    icon: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`,
-    title: 'Encrypted Secrets',
-    desc: 'Environment variables encrypted at rest. Never stored in plain text.',
-  },
-  {
-    icon: `<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>`,
-    title: 'Fleet Management',
-    desc: 'Control hundreds of servers from a single Vessl Cloud dashboard. Deploy everywhere at once.',
-  },
-  {
-    icon: `<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>`,
-    title: 'Webhooks & API',
-    desc: 'Integrate into your CI/CD pipeline or trigger deploys programmatically via the REST API.',
-  },
-  {
-    icon: `<path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>`,
-    title: 'Notifications',
-    desc: 'Get notified via email, webhook, or Discord when deployments succeed, fail, or exceed limits.',
-  },
+const marqueeItems = [
+  'agent.connected', 'ssl.issued', 'postgres.ready', 'build.success',
+  'redis.live', 'logs.streaming', 'domains.routed', 'fleet.synced',
+  'backup.done', 'pr-preview.up',
+];
+const doubled = [...marqueeItems, ...marqueeItems];
+
+const logoRows = [
+  [
+    { name: 'React',      icon: 'https://svgl.app/library/react_dark.svg' },
+    { name: 'Next.js',    icon: 'https://svgl.app/library/nextjs_icon_dark.svg' },
+    { name: 'Astro',      icon: 'https://svgl.app/library/astro-icon-dark.svg' },
+    { name: 'Vite',       icon: 'https://svgl.app/library/vite.svg' },
+    { name: 'Node.js',    icon: 'https://svgl.app/library/nodejs.svg' },
+    { name: 'Svelte',     icon: 'https://svgl.app/library/svelte.svg' },
+    { name: 'Nuxt',       icon: 'https://svgl.app/library/nuxt.svg' },
+    { name: 'Bun',        icon: 'https://svgl.app/library/bun.svg' },
+    { name: 'Docker',     icon: 'https://svgl.app/library/docker.svg' },
+    { name: 'Laravel',    icon: 'https://svgl.app/library/laravel.svg' },
+  ],
+  [
+    { name: 'PostgreSQL', icon: 'https://svgl.app/library/postgresql.svg' },
+    { name: 'Redis',      icon: 'https://svgl.app/library/redis.svg' },
+    { name: 'MongoDB',    icon: 'https://svgl.app/library/mongodb-icon-dark.svg' },
+    { name: 'MySQL',      icon: 'https://svgl.app/library/mysql-icon-dark.svg' },
+    { name: 'Prisma',     icon: 'https://svgl.app/library/prisma-dark.svg' },
+    { name: 'NestJS',     icon: 'https://svgl.app/library/nestjs.svg' },
+    { name: 'TanStack',   icon: 'https://svgl.app/library/tanstack.svg' },
+    { name: 'Vitest',     icon: 'https://svgl.app/library/vitest.svg' },
+    { name: 'Hono',       icon: 'https://svgl.app/library/hono.svg' },
+    { name: 'LangChain',  icon: 'https://svgl.app/library/langchain-logo.svg' },
+  ],
+  [
+    { name: 'Python',     icon: 'https://svgl.app/library/python.svg' },
+    { name: 'Go',         icon: 'https://svgl.app/library/golang_dark.svg' },
+    { name: 'TypeScript', icon: 'https://svgl.app/library/typescript.svg' },
+    { name: 'Rust',       icon: 'https://svgl.app/library/rust.svg' },
+    { name: 'Django',     icon: 'https://svgl.app/library/django.svg' },
+    { name: 'Rails',      icon: 'https://svgl.app/library/rails.svg' },
+    { name: 'Tailwind',   icon: 'https://svgl.app/library/tailwindcss.svg' },
+    { name: 'Supabase',   icon: 'https://svgl.app/library/supabase.svg' },
+    { name: 'Drizzle',    icon: 'https://svgl.app/library/drizzle-orm_dark.svg' },
+    { name: 'ClickHouse', icon: 'https://svgl.app/library/clickhouse.svg' },
+  ],
 ];
 
-const steps = [
-  {
-    n: '01',
-    title: 'Install the agent',
-    desc: 'Run a single curl command on any Linux server. The <30MB binary installs and connects in seconds.',
-  },
-  {
-    n: '02',
-    title: 'Connect to Vessl Cloud',
-    desc: 'Register your server with a Cloud token. It appears instantly in your fleet dashboard.',
-  },
-  {
-    n: '03',
-    title: 'Push and deploy',
-    desc: 'Push to your Git repo. Vessl builds, deploys, and routes traffic automatically. Done.',
-  },
+const features = [
+  { icon: `<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>`, title: 'Any Language', desc: 'Go, Node, Python, Rust, PHP — if it runs in a container or has a Dockerfile, Vessl deploys it.' },
+  { icon: `<rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>`, title: 'Any Server', desc: 'VPS, bare-metal, Raspberry Pi, EC2, Hetzner, DigitalOcean. All you need is an SSH connection.' },
+  { icon: `<path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 22-7z"/>`, title: 'Push to Deploy', desc: 'Connect GitHub, GitLab, or any Git host. Every push triggers a clean build and deploy.' },
+  { icon: `<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>`, title: 'Automatic SSL', desc: "Let's Encrypt certs provisioned and renewed automatically for every custom domain." },
+  { icon: `<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>`, title: 'Databases', desc: 'Postgres, MySQL, Redis, MongoDB, ClickHouse — one click, running on your server.' },
+  { icon: `<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>`, title: 'Real-time Terminal', desc: 'SSH into any running container from your browser. No local keys or client required.' },
+  { icon: `<path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>`, title: 'Usage Metering', desc: 'Track container hours, deployments, and bandwidth. Get alerted before you hit limits.' },
+  { icon: `<circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/>`, title: 'PR Previews', desc: 'Every pull request gets its own live preview URL. Merge with confidence.' },
+  { icon: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`, title: 'Encrypted Secrets', desc: 'Environment variables encrypted at rest. Never stored in plain text, never exposed in logs.' },
+  { icon: `<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>`, title: 'Fleet Management', desc: 'Control hundreds of servers from one dashboard. Deploy everywhere at once.' },
+  { icon: `<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>`, title: 'Webhooks & API', desc: 'Trigger deploys programmatically or hook into your existing CI/CD pipeline.' },
+  { icon: `<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 13.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.06 2.68h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/>`, title: 'Notifications', desc: 'Email, webhook, or Discord alerts on deploy success, failures, and billing events.' },
 ];
 ---
 
 <Layout title="Vessl — Self-hosting with superpowers" description="Deploy apps, databases & services to your own server. Open-source alternative to Heroku, Vercel, and Railway.">
 
-  <!-- Hero -->
-  <section class="text-center pt-16 md:pt-28 pb-4 px-4">
-    <h1 class="text-4xl md:text-6xl font-bold tracking-tight text-[var(--color-foreground)] mb-4">
-      Self-hosting with superpowers<span class="text-[var(--color-primary)]">.</span>
-    </h1>
-    <h2 class="text-base text-[var(--color-muted-foreground)] max-w-3xl mx-auto mb-2 leading-relaxed">
-      An open-source &amp; self-hostable alternative to Vercel, Heroku, Netlify, and Railway for easily deploying
-      apps, databases, and 80+ one-click services to your own server.
-    </h2>
-    <p class="text-sm text-[var(--color-muted-foreground)] mb-8">
-      Open source &amp; free forever, backed by <a href="/philosophy" class="underline text-[var(--color-foreground)] hover:text-[var(--color-primary)] transition-colors">our philosophy</a>.
-    </p>
+  <!-- ========================= HERO ========================= -->
+  <section class="relative isolate min-h-[calc(100svh-64px)] overflow-hidden bg-[var(--color-background)]">
+    <!-- Subtle grid -->
+    <div class="pointer-events-none absolute inset-0 -z-10 [background-image:linear-gradient(rgba(255,255,255,0.028)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.028)_1px,transparent_1px)] [background-size:64px_64px]" aria-hidden="true"></div>
+    <!-- Corner glow -->
+    <div class="pointer-events-none absolute -top-20 -left-40 w-[640px] h-[480px] -z-10 rounded-full [background:radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--color-primary)_12%,transparent)_0%,transparent_70%)]" aria-hidden="true"></div>
 
-    <!-- Two big hero buttons — Coolify style -->
-    <div class="flex flex-col sm:flex-row gap-4 justify-center pb-4">
+    <div class="relative mx-auto max-w-7xl px-6 grid grid-cols-1 lg:grid-cols-[1fr_480px] items-center gap-12 py-20 lg:py-28">
+      <!-- Left: Text -->
       <div>
-        <a href="https://app.vessl.dev" class="flex items-center justify-center gap-2 px-8 py-4 rounded-lg font-semibold text-sm bg-[var(--color-surface)] hover:bg-[#1e1e28] border border-[var(--color-border)] text-white transition-colors">
-          <svg class="size-5 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
-          Cloud
-        </a>
-        <p class="text-[var(--color-muted-foreground)] text-xs mt-2 text-center">
-          <span class="text-[var(--color-primary)] font-bold font-mono">1,200+</span> servers in the cloud.
+        <h1 class="text-[clamp(2.6rem,6vw,4.5rem)] font-bold tracking-tight leading-[0.96] text-[var(--color-foreground)]">
+          Self-hosting with<br/>superpowers<span class="text-[var(--color-primary)]">.</span>
+        </h1>
+        <p class="mt-6 text-[var(--color-muted-foreground)] text-base md:text-lg leading-relaxed max-w-[540px]">
+          An open-source &amp; self-hostable alternative to Vercel, Heroku, Netlify, and Railway for easily deploying apps,
+          databases, and 80+ one-click services to your own server.
         </p>
+        <p class="mt-3 text-sm text-[var(--color-muted-foreground)]">
+          Open source &amp; free forever, backed by <a href="/philosophy" class="text-[var(--color-foreground)] underline decoration-[var(--color-primary)]/60 underline-offset-2 hover:text-[var(--color-primary)] transition-colors">our philosophy</a>.
+        </p>
+
+        <!-- Two hero CTAs — Coolify exact style -->
+        <div class="mt-10 flex flex-col sm:flex-row gap-4">
+          <div>
+            <a href="https://app.vessl.dev" class="flex items-center justify-center gap-2.5 px-10 py-4 rounded-lg font-semibold text-sm bg-[var(--color-surface)] hover:bg-[#1e1e28] border border-[var(--color-border)] text-white transition-colors min-w-[180px]">
+              <svg class="size-5 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+              Cloud
+            </a>
+            <p class="text-[var(--color-primary)] text-xs font-bold mt-2 text-center">
+              1,200+ <span class="text-[var(--color-muted-foreground)] font-normal">servers in the cloud.</span>
+            </p>
+          </div>
+          <div>
+            <a href="https://docs.vessl.dev/self-host" target="_blank" class="flex items-center justify-center gap-2.5 px-10 py-4 rounded-lg font-semibold text-sm bg-[var(--color-surface)] hover:bg-[#1e1e28] border border-[var(--color-border)] text-white transition-colors min-w-[180px]">
+              <svg class="size-5 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+              Self-hosted
+            </a>
+            <p class="text-[var(--color-primary)] text-xs font-bold mt-2 text-center">
+              &lt;30MB <span class="text-[var(--color-muted-foreground)] font-normal">single binary.</span>
+            </p>
+          </div>
+        </div>
       </div>
-      <div>
-        <a href="https://docs.vessl.dev/self-host" target="_blank" class="flex items-center justify-center gap-2 px-8 py-4 rounded-lg font-semibold text-sm bg-[var(--color-surface)] hover:bg-[#1e1e28] border border-[var(--color-border)] text-white transition-colors">
-          <svg class="size-5 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-          Self-hosted
-        </a>
-        <p class="text-[var(--color-muted-foreground)] text-xs mt-2 text-center">
-          <span class="text-[var(--color-primary)] font-bold font-mono">&lt;30MB</span> single binary.
-        </p>
+
+      <!-- Right: Terminal panel — Aeroplane style -->
+      <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/70 overflow-hidden shadow-2xl font-mono text-xs backdrop-blur-sm">
+        <!-- Panel header -->
+        <div class="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-background)]/60">
+          <span class="text-[var(--color-muted-foreground)] text-[10px] font-bold uppercase tracking-widest">Bootstrap node</span>
+          <span class="text-green-400 text-[10px] font-semibold flex items-center gap-1">
+            <span class="size-1.5 rounded-full bg-green-400 inline-block animate-pulse"></span>
+            CONNECTED
+          </span>
+        </div>
+
+        <!-- Install command bar -->
+        <div class="flex items-center gap-2 border-b border-[var(--color-primary)]/25 bg-[#0d0d14] px-4 py-3.5">
+          <span class="text-[var(--color-primary)] font-bold">&gt;</span>
+          <code class="flex-1 text-[var(--color-foreground)] text-[0.75rem] truncate">curl -fsSL https://get.vessl.dev | sh</code>
+          <button id="copy-btn" title="Copy" class="shrink-0 p-1.5 rounded text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-border)] transition-colors">
+            <svg id="copy-icon" class="size-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+        </div>
+
+        <!-- Live info rows -->
+        <div class="px-4 py-4 space-y-3 border-b border-[var(--color-border)]">
+          {[
+            { k: 'SERVER',  v: 'hetzner-fsn1-cx22' },
+            { k: 'REGION',  v: 'eu-central-1' },
+            { k: 'AGENT',   v: 'v0.5.1' },
+            { k: 'FLEET',   v: '12 servers' },
+            { k: 'DEPLOY',  v: 'queued', accent: true },
+          ].map(r => (
+            <div class="flex items-center gap-3 text-[0.72rem]">
+              <span class="text-[var(--color-muted-foreground)] w-20 shrink-0">{r.k}</span>
+              <span class={r.accent ? 'text-[var(--color-primary)] font-bold' : 'text-[var(--color-foreground)]'}>{r.v}</span>
+            </div>
+          ))}
+        </div>
+
+        <!-- Preview lines — Aeroplane style -->
+        <div class="px-4 py-4 space-y-2.5">
+          <div class="text-[9px] tracking-widest uppercase text-[var(--color-muted-foreground)] mb-3">Capabilities</div>
+          {['apps', 'postgres', 'redis', 'domains', 'ssl', 'logs', 'backups', 'fleet'].map(cap => (
+            <div class="flex items-center gap-2 text-[0.7rem] text-[var(--color-muted-foreground)]">
+              <span class="size-1.5 rounded-full bg-[var(--color-primary)]/70 shrink-0"></span>
+              {cap}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
-  </section>
 
-  <!-- How it works — Aeroplane.run inspired -->
-  <section class="max-w-5xl mx-auto px-4 py-16">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-      <!-- Steps -->
-      <div class="space-y-0">
-        {steps.map((step, i) => (
-          <div class={`p-6 border border-[var(--color-border)] bg-[var(--color-surface)] ${i === 0 ? 'rounded-t-xl' : ''} ${i === steps.length - 1 ? 'rounded-b-xl' : 'border-b-0'}`}>
-            <div class="text-[var(--color-primary)] font-mono text-xs font-bold mb-2">{step.n}</div>
-            <h3 class="font-bold text-[var(--color-foreground)] mb-1">{step.title}</h3>
-            <p class="text-sm text-[var(--color-muted-foreground)] leading-relaxed" set:html={step.desc}/>
-          </div>
+    <!-- Marquee strip (Aeroplane) -->
+    <div class="absolute inset-x-0 bottom-0 z-10 overflow-hidden border-t border-[var(--color-border)] bg-[var(--color-background)]/95 py-3" aria-label="Platform status ticker">
+      <div class="flex w-max gap-10 pr-10 [animation:marquee_48s_linear_infinite] hover:[animation-play-state:paused]">
+        {doubled.map(item => (
+          <span class="shrink-0 font-mono text-[0.7rem] text-[var(--color-muted-foreground)]">
+            {item}
+            <span aria-hidden="true" class="ml-10 opacity-30">—</span>
+          </span>
         ))}
       </div>
-
-      <!-- Terminal mock — Aeroplane.run right panel style -->
-      <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden">
-        <div class="flex items-center justify-between px-4 py-2.5 border-b border-[var(--color-border)]">
-          <span class="text-xs text-[var(--color-muted-foreground)] font-mono">Vessl agent</span>
-          <span class="text-xs px-2 py-0.5 rounded bg-green-500/20 text-green-400 font-semibold">CONNECTED</span>
-        </div>
-        <div class="p-5 text-xs font-mono space-y-2">
-          {[
-            { label: 'SERVER', value: 'hetzner-fsn1-cx22' },
-            { label: 'REGION', value: 'fsn1' },
-            { label: 'AGENT', value: 'v0.4.0' },
-            { label: 'DEPLOY', value: 'queued', highlight: true },
-          ].map(row => (
-            <div class="flex items-center border-b border-[var(--color-border)] pb-2 last:border-0 last:pb-0">
-              <span class="text-[var(--color-muted-foreground)] w-24 shrink-0">{row.label}</span>
-              <span class={row.highlight ? 'text-[var(--color-primary)] font-bold' : 'text-[var(--color-foreground)]'}>{row.value}</span>
-            </div>
-          ))}
-        </div>
-        <div class="border-t border-[var(--color-border)] p-4 text-xs font-mono text-[var(--color-muted-foreground)] space-y-1">
-          <div class="font-semibold text-[var(--color-foreground)] text-[10px] tracking-widest uppercase mb-2">Included on deploy</div>
-          {['Git repo, branch & root dir', 'Build command & env vars', 'Custom domain routing', 'Automatic SSL cert'].map(item => (
-            <div class="flex items-center gap-2">
-              <span class="size-1.5 rounded-full bg-[var(--color-primary)] shrink-0"></span>
-              {item}
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   </section>
 
-  <!-- Features — plain grid no cards, Coolify style -->
-  <section id="features" class="max-w-5xl mx-auto px-4 py-16 scroll-mt-20">
-    <h2 class="text-4xl font-bold text-[var(--color-foreground)] text-center mb-16">Features</h2>
-    <dl class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12 text-left">
+  <!-- ========================= DEPLOY ANYTHING (Logo carousel) ========================= -->
+  <section class="relative overflow-hidden border-t border-[var(--color-border)] bg-[var(--color-background)] py-24">
+    <div class="pointer-events-none absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,0.022)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.022)_1px,transparent_1px)] [background-size:64px_64px]" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-64 [background:radial-gradient(ellipse_60%_50%_at_50%_0%,color-mix(in_srgb,var(--color-primary)_10%,transparent),transparent)]" aria-hidden="true"></div>
+
+    <div class="relative mx-auto max-w-7xl px-6">
+      <h2 class="text-[clamp(2rem,5vw,4rem)] font-bold leading-none text-[var(--color-foreground)]">
+        Deploy anything<span class="text-[var(--color-primary)]">.</span>
+      </h2>
+    </div>
+
+    <div class="relative mt-14 grid gap-5">
+      {logoRows.map((logos, i) => (
+        <div class="logo-marquee overflow-hidden py-4">
+          <div class={`logo-track flex w-max gap-10 pr-10 ${i % 2 === 1 ? 'reverse' : ''}`}>
+            {[...logos, ...logos, ...logos].map(logo => (
+              <div class="flex h-20 min-w-24 items-center justify-center px-2">
+                <img class="size-14 object-contain opacity-60 hover:opacity-100 transition-opacity" src={logo.icon} alt={`${logo.name} logo`} loading="lazy" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ========================= FEATURES ========================= -->
+  <section id="features" class="max-w-7xl mx-auto px-6 py-24 scroll-mt-20">
+    <h2 class="text-[clamp(2rem,5vw,4rem)] font-bold text-[var(--color-foreground)] mb-16">
+      Features<span class="text-[var(--color-primary)]">.</span>
+    </h2>
+    <dl class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12 text-left">
       {features.map(f => (
         <div class="flex flex-col">
-          <dt class="flex items-center gap-3 text-lg font-semibold text-[var(--color-foreground)] mb-3">
-            <svg class="size-6 text-[var(--color-primary)] shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" set:html={f.icon}/>
+          <dt class="flex items-center gap-3 font-semibold text-[var(--color-foreground)] mb-3">
+            <svg class="size-5 text-[var(--color-primary)] shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" set:html={f.icon}/>
             {f.title}
           </dt>
           <dd class="text-sm text-[var(--color-muted-foreground)] leading-relaxed">{f.desc}</dd>
@@ -183,9 +215,39 @@ const steps = [
     </dl>
   </section>
 
-  <!-- Jump to features floating button -->
-  <a href="#features" id="jump-btn" class="fixed bottom-5 right-5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg transition-all duration-300 z-40">
-    Jump to Features
-  </a>
-
 </Layout>
+
+<script>
+  const btn = document.getElementById('copy-btn');
+  const icon = document.getElementById('copy-icon');
+  btn?.addEventListener('click', () => {
+    navigator.clipboard.writeText('curl -fsSL https://get.vessl.dev | sh');
+    if (icon) icon.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+    setTimeout(() => {
+      if (icon) icon.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>';
+    }, 2000);
+  });
+</script>
+
+<style>
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .logo-track {
+    animation: logo-marquee 46s linear infinite;
+  }
+  .logo-track.reverse {
+    animation-direction: reverse;
+  }
+  .logo-marquee:hover .logo-track {
+    animation-play-state: paused;
+  }
+  @keyframes logo-marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-33.333%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .logo-track { animation: none; }
+  }
+</style>
