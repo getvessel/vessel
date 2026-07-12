@@ -1,19 +1,19 @@
 ---
-import { file, serverStack, gitDeploy, envScope, database, aiCode, usageMeter, cloud, secretVars, cronJobs, notifications, teamWorkspaces } from '../icons';
+import { Icon } from 'astro-icon/components';
 
 const features = [
-  { icon: file, title: 'Canvas View', desc: 'See your entire environment at a glance — apps, databases, and their connections laid out as a live topology map, not a flat list.' },
-  { icon: serverStack, title: 'Traefik-backed Routing', desc: 'Vessl spins up and manages Traefik automatically — zero-config load balancing, path routing, and automatic SSL for every service you deploy.' },
-  { icon: gitDeploy, title: 'Git-native Deployments', desc: 'Connect GitHub, GitLab, or Gitea. Push a branch, get a deployment. No YAML pipelines. No external CI required.' },
-  { icon: envScope, title: 'Environment Scoping', desc: 'Group apps and services into named environments — staging, production, preview — each with isolated variables and their own deployment flow.' },
-  { icon: database, title: 'Database Snapshots', desc: 'Schedule automatic database backups to any S3-compatible storage. Configure retention windows and restore from any checkpoint.' },
-  { icon: aiCode, title: 'AI Settings Layer', desc: 'Each team configures its own LLM provider — OpenAI, Anthropic, local Ollama. Vessl routes completions, never stores keys plaintext.' },
-  { icon: usageMeter, title: 'Usage Metering', desc: 'The cloud tracks container-hours, deployments, and bandwidth per team. Set thresholds, get notified, never hit an unexpected bill.' },
-  { icon: cloud, title: 'Yamux Tunnel Fleet', desc: 'Vessl Cloud connects to your daemons via an encrypted Yamux tunnel — no port-forwarding, no VPN. Your servers are never directly exposed.' },
-  { icon: secretVars, title: 'Scoped Secret Vars', desc: 'Inject environment variables per-service or per-environment. Secrets encrypted at rest, never visible in logs or build output.' },
-  { icon: cronJobs, title: 'Cron Jobs', desc: 'Define recurring jobs alongside your services — same project, same env vars, same log stream. No separate scheduler needed.' },
-  { icon: notifications, title: 'Notification Channels', desc: 'Route events — build failure, cert expiry, usage spikes — to email, webhook, or Discord. Configurable per project.' },
-  { icon: teamWorkspaces, title: 'Team Workspaces', desc: 'Invite members, assign roles, and isolate projects per team. The Cloud dashboard enforces plan limits so billing stays predictable.' },
+  { icon: 'lucide:file', title: 'Canvas View', desc: 'See your entire environment at a glance — apps, databases, and their connections laid out as a live topology map, not a flat list.' },
+  { icon: 'lucide:server', title: 'Traefik-backed Routing', desc: 'Vessl spins up and manages Traefik automatically — zero-config load balancing, path routing, and automatic SSL for every service you deploy.' },
+  { icon: 'lucide:rocket', title: 'Git-native Deployments', desc: 'Connect GitHub, GitLab, or Gitea. Push a branch, get a deployment. No YAML pipelines. No external CI required.' },
+  { icon: 'lucide:layers', title: 'Environment Scoping', desc: 'Group apps and services into named environments — staging, production, preview — each with isolated variables and their own deployment flow.' },
+  { icon: 'lucide:database', title: 'Database Snapshots', desc: 'Schedule automatic database backups to any S3-compatible storage. Configure retention windows and restore from any checkpoint.' },
+  { icon: 'lucide:code', title: 'AI Settings Layer', desc: 'Each team configures its own LLM provider — OpenAI, Anthropic, local Ollama. Vessl routes completions, never stores keys plaintext.' },
+  { icon: 'lucide:bar-chart-2', title: 'Usage Metering', desc: 'The cloud tracks container-hours, deployments, and bandwidth per team. Set thresholds, get notified, never hit an unexpected bill.' },
+  { icon: 'lucide:cloud', title: 'Yamux Tunnel Fleet', desc: 'Vessl Cloud connects to your daemons via an encrypted Yamux tunnel — no port-forwarding, no VPN. Your servers are never directly exposed.' },
+  { icon: 'lucide:shield', title: 'Scoped Secret Vars', desc: 'Inject environment variables per-service or per-environment. Secrets encrypted at rest, never visible in logs or build output.' },
+  { icon: 'lucide:clock', title: 'Cron Jobs', desc: 'Define recurring jobs alongside your services — same project, same env vars, same log stream. No separate scheduler needed.' },
+  { icon: 'lucide:bell', title: 'Notification Channels', desc: 'Route events — build failure, cert expiry, usage spikes — to email, webhook, or Discord. Configurable per project.' },
+  { icon: 'lucide:users', title: 'Team Workspaces', desc: 'Invite members, assign roles, and isolate projects per team. The Cloud dashboard enforces plan limits so billing stays predictable.' },
 ];
 ---
 
@@ -30,7 +30,7 @@ const features = [
         <div class="flex flex-col">
           <dt class="flex items-center gap-3 font-semibold text-sm text-(--color-foreground) mb-2">
             <span class="size-8 rounded-lg bg-(--color-primary)/10 border border-(--color-primary)/20 flex items-center justify-center shrink-0">
-              <svg class="size-4 text-(--color-primary)" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" set:html={f.icon}/>
+              <Icon name={f.icon} class="size-4 text-(--color-primary)" />
             </span>
             {f.title}
           </dt>

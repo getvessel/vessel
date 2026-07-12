@@ -1,5 +1,5 @@
 ---
-import { copy, cloud, serverStack } from '../icons';
+import { Icon } from 'astro-icon/components';
 
 const serverRows = [
   { k: 'HOST',    v: 'prod-eu-1.acme.com' },
@@ -40,7 +40,7 @@ const capabilities = [
       <span class="text-(--color-primary) font-bold shrink-0">$</span>
       <code class="flex-1 text-left text-(--color-foreground) truncate text-[0.8rem]">curl -fsSL https://get.vessl.dev | sh</code>
       <button id="copy-btn" aria-label="Copy install command" class="shrink-0 p-1.5 rounded text-(--color-muted-foreground) hover:text-(--color-foreground) hover:bg-(--color-border) transition-colors">
-        <svg id="copy-icon" class="size-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" set:html={copy}/>
+        <Icon id="copy-icon" name="lucide:copy" class="size-3.5" />
       </button>
     </div>
 
@@ -48,7 +48,7 @@ const capabilities = [
     <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
       <div class="flex flex-col items-center">
         <a href="https://app.vessl.dev" class="flex items-center justify-center gap-2.5 px-10 py-3.5 rounded-lg font-semibold text-sm bg-(--color-surface) hover:bg-(--color-border) border border-(--color-border) text-(--color-foreground) transition-colors whitespace-nowrap">
-          <svg class="size-4 text-(--color-primary)" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" set:html={cloud}/>
+          <Icon name="lucide:cloud" class="size-4 text-(--color-primary)" />
           Cloud
         </a>
         <p class="text-(--color-primary) text-xs font-bold mt-1.5">
@@ -57,7 +57,7 @@ const capabilities = [
       </div>
       <div class="flex flex-col items-center">
         <a href="https://docs.vessl.dev/self-host" target="_blank" class="flex items-center justify-center gap-2.5 px-10 py-3.5 rounded-lg font-semibold text-sm bg-(--color-surface) hover:bg-(--color-border) border border-(--color-border) text-(--color-foreground) transition-colors whitespace-nowrap">
-          <svg class="size-4 text-(--color-primary)" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" set:html={serverStack}/>
+          <Icon name="lucide:server" class="size-4 text-(--color-primary)" />
           Self-hosted
         </a>
         <p class="text-(--color-primary) text-xs font-bold mt-1.5">

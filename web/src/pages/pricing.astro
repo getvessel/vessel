@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { serverStack, cloud, checkmark, docs, infoCircle, arrowRight, chevronDown } from '../icons';
+import { Icon } from 'astro-icon/components';
 
 const tableRows = [
   { feature: 'App Deployments',            sh: true,                  cloud: true },
@@ -75,7 +75,7 @@ const faqs = [
       <div class="bg-[var(--color-surface)] p-7 rounded-xl border border-[var(--color-border)] flex flex-col">
         <div class="mb-6">
           <div class="flex items-center gap-2 mb-4">
-            <svg class="size-5 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" set:html={serverStack}/>
+            <Icon name="lucide:server" class="size-5 text-[var(--color-primary)]" />
             <h2 class="text-xl font-bold text-[var(--color-foreground)]">Self-hosted</h2>
           </div>
           <p class="text-3xl font-extrabold text-[var(--color-foreground)]">Free
@@ -98,14 +98,14 @@ const faqs = [
             'AI settings per team',
           ].map(f => (
             <li class="flex items-start gap-3 text-[var(--color-foreground)]">
-              <svg class="size-4 text-[var(--color-primary)] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" set:html={checkmark}/>
+              <Icon name="lucide:check" class="size-4 text-[var(--color-primary)] shrink-0 mt-0.5" />
               {f}
             </li>
           ))}
         </ul>
 
         <a href="https://docs.vessl.dev/self-host" target="_blank" class="mt-8 flex items-center justify-center gap-2 py-3.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] hover:bg-[var(--color-border)] text-[var(--color-foreground)] font-semibold text-sm transition-colors">
-          <svg class="size-4 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" set:html={docs}/>
+          <Icon name="lucide:book" class="size-4 text-[var(--color-primary)]" />
           Read the Docs
         </a>
       </div>
@@ -118,7 +118,7 @@ const faqs = [
         <div class="relative mb-6">
           <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
             <div class="flex items-center gap-2">
-              <svg class="size-5 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" set:html={cloud}/>
+              <Icon name="lucide:cloud" class="size-5 text-[var(--color-primary)]" />
               <h2 class="text-xl font-bold text-[var(--color-foreground)]">Cloud</h2>
             </div>
             <div class="inline-flex gap-1 p-1 bg-[var(--color-background)] rounded text-xs">
@@ -149,20 +149,20 @@ const faqs = [
             '14-day free trial · no card required',
           ].map(f => (
             <li class="flex items-start gap-3 text-[var(--color-foreground)]">
-              <svg class="size-4 text-[var(--color-primary)] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" set:html={checkmark}/>
+              <Icon name="lucide:check" class="size-4 text-[var(--color-primary)] shrink-0 mt-0.5" />
               {f}
             </li>
           ))}
         </ul>
 
         <div class="flex items-start gap-2 mt-4 p-3 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-muted-foreground)] relative">
-          <svg class="size-3.5 text-[var(--color-primary)] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" set:html={infoCircle}/>
+          <Icon name="lucide:info" class="size-3.5 text-[var(--color-primary)] shrink-0 mt-0.5" />
           Your apps run on <em>your</em> servers. Vessl Cloud only manages the control plane.
         </div>
 
         <a href="https://app.vessl.dev/register" class="mt-6 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white font-semibold text-sm transition-colors relative">
           Start 14-day trial
-          <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" set:html={arrowRight}/>
+          <Icon name="lucide:arrow-right" class="size-4" />
         </a>
       </div>
     </div>
@@ -183,13 +183,13 @@ const faqs = [
               <td class="px-5 py-3.5 text-[var(--color-foreground)]">{row.feature}</td>
               <td class="px-5 py-3.5">
                 {row.sh === true
-                  ? <svg class="size-4 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" set:html={checkmark}/>
+                  ? <Icon name="lucide:check" class="size-4 text-[var(--color-primary)]" />
                   : <span class="text-[var(--color-muted-foreground)] text-xs">{row.sh}</span>
                 }
               </td>
               <td class="px-5 py-3.5">
                 {row.cloud === true
-                  ? <svg class="size-4 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" set:html={checkmark}/>
+                  ? <Icon name="lucide:check" class="size-4 text-[var(--color-primary)]" />
                   : <span class="text-[var(--color-muted-foreground)] text-xs">{row.cloud}</span>
                 }
               </td>
@@ -207,7 +207,7 @@ const faqs = [
           <details class="py-4 group cursor-pointer">
             <summary class="w-full text-left text-sm font-semibold text-[var(--color-foreground)] flex justify-between items-center list-none gap-4">
               {faq.q}
-              <svg class="size-4 text-[var(--color-muted-foreground)] group-open:rotate-180 transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" set:html={chevronDown}/>
+              <Icon name="lucide:chevron-down" class="size-4 text-[var(--color-muted-foreground)] group-open:rotate-180 transition-transform duration-200 shrink-0" />
             </summary>
             <p class="mt-3 text-sm text-[var(--color-muted-foreground)] leading-relaxed pr-8">{faq.a}</p>
           </details>

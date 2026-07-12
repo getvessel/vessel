@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { checkCircle, github, cloud } from '../icons';
+import { Icon } from 'astro-icon/components';
 ---
 
 <Layout
@@ -53,7 +53,7 @@ import { checkCircle, github, cloud } from '../icons';
           },
         ].map(p => (
           <li class="flex gap-4">
-            <svg class="size-5 text-[var(--color-primary)] shrink-0 mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" set:html={checkCircle}/>
+            <Icon name="lucide:check-circle" class="size-5 text-[var(--color-primary)] shrink-0 mt-1" />
             <div>
               <strong class="text-[var(--color-foreground)] font-semibold">{p.title}</strong>
               <p class="mt-1 text-sm text-[var(--color-muted-foreground)] leading-relaxed">{p.body}</p>
@@ -92,12 +92,12 @@ import { checkCircle, github, cloud } from '../icons';
     <div class="pt-10 pb-4 flex flex-col sm:flex-row gap-4 justify-center">
       <a href="https://github.com/sponsors/techxteam" target="_blank"
         class="flex items-center justify-center gap-3 px-5 py-3.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-border)] text-[var(--color-foreground)] font-semibold text-sm transition-colors">
-        <svg class="size-6 shrink-0" fill="currentColor" viewBox="0 0 24 24" set:html={github}/>
+        <Icon name="simple-icons:github" class="size-6 shrink-0" />
         <span>GitHub Sponsors</span>
       </a>
 
       <a href="https://app.vessl.dev" class="flex items-center justify-center gap-3 px-5 py-3.5 rounded-lg border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/10 hover:bg-[var(--color-primary)]/20 text-[var(--color-foreground)] font-semibold text-sm transition-colors">
-        <svg class="size-6 text-[var(--color-primary)] shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" set:html={cloud}/>
+        <Icon name="lucide:cloud" class="size-6 text-[var(--color-primary)] shrink-0" />
         <span>Try Vessl Cloud</span>
       </a>
     </div>

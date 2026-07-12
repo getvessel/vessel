@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { philosophy, pricing, changelog, docs, github, discord, twitter } from '../icons';
+import { Icon } from 'astro-icon/components';
 
 interface Props {
   title?: string;
@@ -46,32 +46,32 @@ const {
         <div class="hidden lg:flex items-center gap-0.5 text-sm">
 
           <a href="/philosophy" class="flex items-center gap-1.5 px-3 py-2 rounded-md font-semibold text-[var(--color-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-colors">
-            <svg class="size-4 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" set:html={philosophy}/>
+            <Icon name="lucide:lightbulb" class="size-4 text-[var(--color-primary)]" />
             Philosophy
           </a>
 
           <a href="/pricing" class="flex items-center gap-1.5 px-3 py-2 rounded-md font-semibold text-[var(--color-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-colors">
-            <svg class="size-4 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" set:html={pricing}/>
+            <Icon name="lucide:dollar-sign" class="size-4 text-[var(--color-primary)]" />
             Pricing
           </a>
 
           <a href="/changelog" class="flex items-center gap-1.5 px-3 py-2 rounded-md font-semibold text-[var(--color-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-colors">
-            <svg class="size-4 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" set:html={changelog}/>
+            <Icon name="lucide:clock" class="size-4 text-[var(--color-primary)]" />
             Changelog
           </a>
 
           <a href="https://docs.vessl.dev" target="_blank" class="flex items-center gap-1.5 px-3 py-2 rounded-md font-semibold text-[var(--color-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-colors">
-            <svg class="size-4 text-[var(--color-primary)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" set:html={docs}/>
+            <Icon name="lucide:book" class="size-4 text-[var(--color-primary)]" />
             Docs
           </a>
 
           <a href="https://github.com/techxteam/vessl" target="_blank" class="flex items-center gap-1.5 px-3 py-2 rounded-md font-semibold text-[var(--color-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-colors">
-            <svg class="size-4 text-[var(--color-primary)]" fill="currentColor" viewBox="0 0 24 24" set:html={github}/>
+            <Icon name="simple-icons:github" class="size-4 text-[var(--color-primary)]" />
             GitHub
           </a>
 
           <a href="https://discord.gg/vessl" target="_blank" class="flex items-center gap-1.5 px-3 py-2 rounded-md font-semibold text-[var(--color-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-colors">
-            <svg class="size-4 text-[var(--color-primary)]" fill="currentColor" viewBox="0 0 24 24" set:html={discord}/>
+            <Icon name="simple-icons:discord" class="size-4 text-[var(--color-primary)]" />
             Community
           </a>
         </div>
@@ -104,17 +104,17 @@ const {
             <!-- GitHub -->
             <a href="https://github.com/techxteam/vessl" target="_blank" aria-label="GitHub"
               class="p-2 rounded-md text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-colors">
-              <svg class="size-4" fill="currentColor" viewBox="0 0 24 24" set:html={github}/>
+              <Icon name="simple-icons:github" class="size-4" />
             </a>
             <!-- X (Twitter) -->
             <a href="https://x.com/vessldotdev" target="_blank" aria-label="X / Twitter"
               class="p-2 rounded-md text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-colors">
-              <svg class="size-4" fill="currentColor" viewBox="0 0 24 24" set:html={twitter}/>
+              <Icon name="simple-icons:x" class="size-4" />
             </a>
             <!-- Discord -->
             <a href="https://discord.gg/vessl" target="_blank" aria-label="Discord"
               class="p-2 rounded-md text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-colors">
-              <svg class="size-4" fill="currentColor" viewBox="0 0 24 24" set:html={discord}/>
+              <Icon name="simple-icons:discord" class="size-4" />
             </a>
           </div>
         </div>
