@@ -19,10 +19,10 @@ import (
 	"vessl.dev/vessl/internal/handlers"
 	"vessl.dev/vessl/internal/http/middleware"
 	"vessl.dev/vessl/internal/mcp"
+	"vessl.dev/vessl/internal/notifications"
 	"vessl.dev/vessl/internal/proxy"
 	"vessl.dev/vessl/internal/repositories"
 	"vessl.dev/vessl/internal/services"
-	"vessl.dev/vessl/internal/services/notifications"
 	"vessl.dev/vessl/internal/vault"
 )
 

@@ -7,8 +7,8 @@ import (
 	"log"
 
 	"vessl.dev/vessl/internal/models"
+	"vessl.dev/vessl/internal/notifications"
 	"vessl.dev/vessl/internal/repositories"
-	"vessl.dev/vessl/internal/services/notifications"
 )
 
 type DispatcherService struct {
