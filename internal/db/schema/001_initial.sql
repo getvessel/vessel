@@ -5,8 +5,7 @@ CREATE TABLE IF NOT EXISTS projects (
 			description TEXT DEFAULT '',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		,
-			workspace_id TEXT DEFAULT '');;
+);
 
 CREATE TABLE IF NOT EXISTS domains (
 			id TEXT PRIMARY KEY,
