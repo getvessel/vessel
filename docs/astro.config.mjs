@@ -4,8 +4,7 @@ import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://vessl.dev',
-  base: '/docs',
+  site: 'https://docs.vessl.dev',
   integrations: [
     starlight({
       title: 'Vessl Docs',
