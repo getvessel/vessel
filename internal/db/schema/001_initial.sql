@@ -317,8 +317,7 @@ CREATE TABLE IF NOT EXISTS teams (
 			owner_id TEXT NOT NULL,
 			created_at TEXT,
 			updated_at TEXT
-		,
-			preferred_region TEXT DEFAULT 'local');;
+		);;
 
 CREATE TABLE IF NOT EXISTS team_members (
 			id TEXT PRIMARY KEY,
@@ -378,7 +377,7 @@ CREATE TABLE IF NOT EXISTS workspace_audit_logs (
 
 CREATE TABLE IF NOT EXISTS server_settings (
 			id TEXT PRIMARY KEY,
-			traefik_wildcard_ip TEXT DEFAULT '127.0.0.1',
+			caddy_wildcard_ip TEXT DEFAULT '127.0.0.1',
 			discord_webhook_url TEXT,
 			discord_ping_enabled BOOLEAN DEFAULT FALSE,
 			discord_enabled BOOLEAN DEFAULT FALSE,
