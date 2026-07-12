@@ -1,6 +1,6 @@
-# Vessel Dashboard
+# Vessl Dashboard
 
-**Self-hosted control panel** — served by the `vesseld` daemon binary on your own server.
+**Self-hosted control panel** — served by the `vessld` daemon binary on your own server.
 
 Built with React 19, TanStack Router, TanStack Query, Radix UI, and Tailwind CSS v4.
 
@@ -33,7 +33,7 @@ src/
 
 ## Domain
 
-This dashboard ships with the daemon binary. Access it at your instance's IP/domain after running `vesseld`. Not used by cloud users — they use `cloud.vessl.dev` instead.
+This dashboard ships with the daemon binary. Access it at your instance's IP/domain after running `vessld`. Not used by cloud users — they use `cloud.vessl.dev` instead.
 
 ## Learn More
 

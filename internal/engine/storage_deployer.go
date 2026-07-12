@@ -33,7 +33,7 @@ func (d *StorageDeployer) SpinUp(ctx context.Context, sc *models.Storage) (strin
 	if d.dockerClient == nil {
 		return "", fmt.Errorf("docker daemon connection is not available")
 	}
-	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessel-storage-%s", sc.Name))
+	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessl-storage-%s", sc.Name))
 	_ = d.dockerClient.ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true})
 	imageName := "minio/minio:latest"
 	envVars := []string{
@@ -51,7 +51,7 @@ func (d *StorageDeployer) SpinUp(ctx context.Context, sc *models.Storage) (strin
 		return "", err
 	}
 	_ = os.MkdirAll(hostVolumeDir, 0o755)
-	if err := utils.EnsureVesselNetwork(ctx, d.dockerClient); err != nil {
+	if err := utils.EnsureVesslNetwork(ctx, d.dockerClient); err != nil {
 		return "", fmt.Errorf("failed to ensure Docker network: %w", err)
 	}
 	containerCfg := &container.Config{
@@ -71,7 +71,7 @@ func (d *StorageDeployer) SpinUp(ctx context.Context, sc *models.Storage) (strin
 	}
 	netCfg := &network.NetworkingConfig{
 		EndpointsConfig: map[string]*network.EndpointSettings{
-			"vessel-net": {
+			"vessl-net": {
 				Aliases: []string{containerName, sc.Name},
 			},
 		},
@@ -105,7 +105,7 @@ func (d *StorageDeployer) Stop(ctx context.Context, storageID string) error {
 	if err != nil || sc == nil {
 		return fmt.Errorf("storage record not found")
 	}
-	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessel-storage-%s", sc.Name))
+	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessl-storage-%s", sc.Name))
 	_ = d.dockerClient.ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true})
 	return d.store.UpdateStorageStatus(storageID, "stopped", "")
 }

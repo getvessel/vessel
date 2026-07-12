@@ -35,7 +35,7 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 	if d.dockerClient == nil {
 		return "", fmt.Errorf("docker daemon connection is not available")
 	}
-	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessel-db-%s", dbConfig.Name))
+	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessl-db-%s", dbConfig.Name))
 	_ = d.dockerClient.ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true})
 	var imageName string
 	var envVars []string
@@ -110,7 +110,7 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 		return "", err
 	}
 	_ = os.MkdirAll(hostVolumeDir, 0o755)
-	if err := utils.EnsureVesselNetwork(ctx, d.dockerClient); err != nil {
+	if err := utils.EnsureVesslNetwork(ctx, d.dockerClient); err != nil {
 		return "", fmt.Errorf("failed to ensure Docker network: %w", err)
 	}
 	containerCfg := &container.Config{
@@ -164,7 +164,7 @@ func (d *DatabaseDeployer) Stop(ctx context.Context, dbID string) error {
 	if err != nil || dbConfig == nil {
 		return fmt.Errorf("database record not found")
 	}
-	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessel-db-%s", dbConfig.Name))
+	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessl-db-%s", dbConfig.Name))
 	_ = d.dockerClient.ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true})
 	return d.store.UpdateDatabaseStatus(dbID, "stopped", "")
 }

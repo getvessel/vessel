@@ -8,7 +8,7 @@ import (
 
 func GenerateSslipDomain(projectNameOrID string, hostIP string) string {
 	if hostIP == "" {
-		hostIP = os.Getenv("VESSEL_HOST_IP")
+		hostIP = os.Getenv("VESSL_HOST_IP")
 	}
 	if hostIP == "" {
 		hostIP = "127.0.0.1"

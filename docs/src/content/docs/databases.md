@@ -3,7 +3,7 @@ title: Databases
 description: Managed databases with one-click provisioning.
 ---
 
-Spin up managed databases directly from the Vessel dashboard.
+Spin up managed databases directly from the Vessl dashboard.
 
 ## Supported Engines
 

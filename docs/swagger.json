@@ -1,8 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "Vessel API Documentation",
-    "title": "Vessel API",
+    "description": "Vessl API Documentation",
+    "title": "Vessl API",
     "contact": {},
     "version": "1.0"
   },

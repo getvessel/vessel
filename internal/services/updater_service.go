@@ -110,17 +110,17 @@ func (u *UpdaterService) CheckForUpdates(ctx context.Context) (*UpdateInfo, erro
 	}
 	latestVer := currentVer
 	releaseNotes := "System is running optimal build."
-	downloadURL := os.Getenv("VESSEL_DOWNLOAD_URL")
+	downloadURL := os.Getenv("VESSL_DOWNLOAD_URL")
 	if downloadURL == "" {
 		downloadURL = "https://github.com/vesslhq/vessl/releases"
 	}
-	releaseAPI := os.Getenv("VESSEL_UPDATE_URL")
+	releaseAPI := os.Getenv("VESSL_UPDATE_URL")
 	if releaseAPI == "" {
 		releaseAPI = "https://api.github.com/repos/vesslhq/vessl/releases/latest"
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, releaseAPI, nil)
 	if err == nil {
-		req.Header.Set("User-Agent", "vessel-updater/"+currentVer)
+		req.Header.Set("User-Agent", "vessl-updater/"+currentVer)
 		if resp, err := u.httpClient.Do(req); err == nil {
 			defer resp.Body.Close()
 			if resp.StatusCode == http.StatusOK {
@@ -182,7 +182,7 @@ func (u *UpdaterService) DeployUpdate(ctx context.Context) error {
 	}
 
 	go func() {
-		scriptPath := "/vessel/scripts/upgrade.sh"
+		scriptPath := "/vessl/scripts/upgrade.sh"
 		if _, err := os.Stat(scriptPath); os.IsNotExist(err) {
 			scriptPath = "./scripts/upgrade.sh"
 		}

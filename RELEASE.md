@@ -2,14 +2,14 @@
 
 ## Versioning
 
-Vessel follows [Semantic Versioning](https://semver.org/) (`vMAJOR.MINOR.PATCH`). Until `v1.0.0`, breaking changes may occur in minor versions.
+Vessl follows [Semantic Versioning](https://semver.org/) (`vMAJOR.MINOR.PATCH`). Until `v1.0.0`, breaking changes may occur in minor versions.
 
 Current version: `v0.1.0-alpha`.
 
 ## Release Process
 
 1. **Branch**: Develop on `next`. Open a PR into `main`.
-2. **Version bump**: Update `const vesselVersion` in `cmd/main.go`.
+2. **Version bump**: Update `const vesslVersion` in `cmd/main.go`.
 3. **Changelog**: Summarise changes in the GitHub release body.
 4. **Tag & release**:
 
@@ -35,7 +35,7 @@ Downgrading is supported but not recommended (DB schema migrations may not be ba
 
 ```bash
 # Restore previous binary + data snapshot
-sudo vesselctl rollback
+sudo vesslctl rollback
 ```
 
 A manual downgrade requires restoring the previous binary and a database backup taken before the upgrade.

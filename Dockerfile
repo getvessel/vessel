@@ -14,7 +14,7 @@ RUN npm ci
 COPY dashboard/ ./dashboard/
 RUN npm run build:dashboard
 
-# Stage 2: Build the static Go daemon (`vesseld`)
+# Stage 2: Build the static Go daemon (`vessld`)
 FROM golang:1.24-alpine AS daemon-builder
 WORKDIR /src
 
@@ -32,27 +32,27 @@ COPY . .
 COPY --from=dashboard-builder /app/dashboard/dist ./dashboard/dist
 
 # Build self-contained binary with CGO disabled
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags="-w -s" -o /vesseld ./cmd
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags="-w -s" -o /vessld ./cmd
 
 # Stage 3: Minimal Production Runtime
 FROM alpine:3.21 AS production
-WORKDIR /var/www/vessel
+WORKDIR /var/www/vessl
 
 # Install ca-certificates, docker-cli, git, and openssh-client for container orchestration and git cloning
 RUN apk add --no-cache ca-certificates tzdata docker-cli git openssh-client curl
 
 # Copy binary from daemon-builder
-COPY --from=daemon-builder /vesseld /usr/local/bin/vesseld
+COPY --from=daemon-builder /vessld /usr/local/bin/vessld
 
 # Ensure data directory exists
-RUN mkdir -p /var/www/vessel/data
+RUN mkdir -p /var/www/vessl/data
 
 # Environment variables
 ENV PORT=8080 \
-    VESSEL_DATA_DIR=/var/www/vessel/data
+    VESSL_DATA_DIR=/var/www/vessl/data
 
 EXPOSE 8080 80 443
 
-VOLUME ["/var/www/vessel/data"]
+VOLUME ["/var/www/vessl/data"]
 
-ENTRYPOINT ["vesseld"]
+ENTRYPOINT ["vessld"]

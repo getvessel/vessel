@@ -1,8 +1,8 @@
-# Contributing to Vessel 🛰️
+# Contributing to Vessl 🛰️
 
 > "First, thanks for considering contributing. It really means a lot!"
 
-Ask for guidance on our [Discord server](https://discord.gg/vessel) in `#contribute`.
+Ask for guidance on our [Discord server](https://discord.gg/vessl) in `#contribute`.
 
 For the full tech stack, see [TECH_STACK.md](TECH_STACK.md).
 
@@ -14,7 +14,7 @@ For the full tech stack, see [TECH_STACK.md](TECH_STACK.md).
 2. [Verify Installation](#2-verify-installation)
 3. [Fork and Clone](#3-fork-and-clone)
 4. [Environment Variables](#4-environment-variables)
-5. [Start Vessel](#5-start-vessel)
+5. [Start Vessl](#5-start-vessl)
 6. [Start Developing](#6-start-developing)
 7. [Pull Requests](#7-pull-requests)
 8. [Development Notes](#8-development-notes)
@@ -76,12 +76,12 @@ npm --version
 
 ## 3. Fork and Clone
 
-1. Fork [vessel](https://github.com/vesslhq/vessl) on GitHub.
+1. Fork [vessl](https://github.com/vesslhq/vessl) on GitHub.
 2. Clone your fork:
 
 ```bash
-git clone https://github.com/<your-username>/vessel.git
-cd vessel
+git clone https://github.com/<your-username>/vessl.git
+cd vessl
 git remote add upstream https://github.com/vesslhq/vessl.git
 ```
 
@@ -96,13 +96,13 @@ cp .env.example .env
 | Variable            | Default          | Description                    |
 | ------------------- | ---------------- | ------------------------------ |
 | `PORT`              | `8080`           | Daemon HTTP port               |
-| `VESSEL_DATA_DIR`   | `data`           | SQLite DB + vault storage      |
-| `VESSEL_STATIC_DIR` | `dashboard/dist` | Built dashboard files          |
-| `VESSEL_TLS_EMAIL`  | —                | Let's Encrypt email (optional) |
+| `VESSL_DATA_DIR`   | `data`           | SQLite DB + vault storage      |
+| `VESSL_STATIC_DIR` | `dashboard/dist` | Built dashboard files          |
+| `VESSL_TLS_EMAIL`  | —                | Let's Encrypt email (optional) |
 
 ---
 
-## 5. Start Vessel
+## 5. Start Vessl
 
 Two terminals needed — daemon + dashboard.
 
@@ -216,7 +216,7 @@ tsc --noEmit
 
 | Problem                   | Fix                                                       |
 | ------------------------- | --------------------------------------------------------- |
-| Daemon won't start        | Delete `data/vessel.db` and restart (schema auto-creates) |
+| Daemon won't start        | Delete `data/vessl.db` and restart (schema auto-creates) |
 | Dashboard can't reach API | Ensure daemon runs on `:8080`                             |
 | Port conflict             | Change `PORT` in `.env`                                   |
 | Build errors after pull   | `go mod tidy` + `npm install`                             |
@@ -227,7 +227,7 @@ tsc --noEmit
 
 ```bash
 # Stop daemon (Ctrl+C), then:
-rm -f data/vessel.db data/.vault_key
+rm -f data/vessl.db data/.vault_key
 go run ./cmd
 ```
 
@@ -241,5 +241,5 @@ Include:
 
 - `uname -r` (kernel version)
 - `docker --version`
-- `vesseld` logs (run with `--debug` for verbose)
+- `vessld` logs (run with `--debug` for verbose)
 - Steps to reproduce

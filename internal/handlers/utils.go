@@ -11,7 +11,7 @@ import (
 
 func SetAuthCookie(c echo.Context, token string) {
 	c.SetCookie(&http.Cookie{
-		Name:     "vessel_token",
+		Name:     "vessl_token",
 		Value:    token,
 		Path:     "/",
 		HttpOnly: true,
@@ -23,7 +23,7 @@ func SetAuthCookie(c echo.Context, token string) {
 
 func ClearAuthCookie(c echo.Context) {
 	c.SetCookie(&http.Cookie{
-		Name:     "vessel_token",
+		Name:     "vessl_token",
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,

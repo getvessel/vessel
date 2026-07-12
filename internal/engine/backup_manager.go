@@ -188,15 +188,15 @@ func (bm *BackupManager) buildDumpCommand(cfg *models.BackupConfig) (string, []s
 			}
 		}
 
-		if tmplService.XVessel != nil && tmplService.XVessel.Backup != nil && len(tmplService.XVessel.Backup.Command) > 0 {
+		if tmplService.XVessl != nil && tmplService.XVessl.Backup != nil && len(tmplService.XVessl.Backup.Command) > 0 {
 			var dumpCmd []string
-			for _, c := range tmplService.XVessel.Backup.Command {
+			for _, c := range tmplService.XVessl.Backup.Command {
 				resolved := strings.ReplaceAll(c, "${db.password}", db.Password)
 				resolved = strings.ReplaceAll(resolved, "${db.username}", db.Username)
 				resolved = strings.ReplaceAll(resolved, "${db.database_name}", db.DatabaseName)
 				dumpCmd = append(dumpCmd, resolved)
 			}
-			return containerName, dumpCmd, tmplService.XVessel.Backup.FileExtension, nil
+			return containerName, dumpCmd, tmplService.XVessl.Backup.FileExtension, nil
 		}
 		return containerName, []string{"sh", "-c", "echo 'Generic volume snapshot'"}, ".tar.gz", nil
 
@@ -284,7 +284,7 @@ func (bm *BackupManager) uploadToS3(ctx context.Context, dest *models.S3Destinat
 	}
 	req.ContentLength = int64(len(data))
 	req.Header.Set("Content-Type", "application/octet-stream")
-	req.Header.Set("X-Vessel-S3-Access-Key", dest.AccessKeyID)
+	req.Header.Set("X-Vessl-S3-Access-Key", dest.AccessKeyID)
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {

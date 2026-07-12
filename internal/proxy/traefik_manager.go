@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	TraefikContainerName = "vessel-traefik"
-	VesselNetworkName    = "vessel-network"
+	TraefikContainerName = "vessl-traefik"
+	VesslNetworkName    = "vessl-network"
 )
 
 type TraefikManager struct {
@@ -53,10 +53,10 @@ func (m *TraefikManager) EnsureTraefikRunning(ctx context.Context) error {
 }
 
 func (m *TraefikManager) ensureNetwork(ctx context.Context) error {
-	_, err := m.dockerClient.NetworkInspect(ctx, VesselNetworkName, types.NetworkInspectOptions{})
+	_, err := m.dockerClient.NetworkInspect(ctx, VesslNetworkName, types.NetworkInspectOptions{})
 	if err != nil {
 		if client.IsErrNotFound(err) {
-			_, err = m.dockerClient.NetworkCreate(ctx, VesselNetworkName, types.NetworkCreate{
+			_, err = m.dockerClient.NetworkCreate(ctx, VesslNetworkName, types.NetworkCreate{
 				Driver: "bridge",
 			})
 			return err
@@ -93,7 +93,7 @@ func (m *TraefikManager) createTraefikContainer(ctx context.Context) error {
 		},
 	}, hostConfig, &network.NetworkingConfig{
 		EndpointsConfig: map[string]*network.EndpointSettings{
-			VesselNetworkName: {},
+			VesslNetworkName: {},
 		},
 	}, nil, TraefikContainerName)
 
@@ -110,7 +110,7 @@ func (m *TraefikManager) buildTraefikCmdArgs() []string {
 		"--api.insecure=true", // Enable dashboard (do not expose in prod)
 		"--providers.docker=true",
 		"--providers.docker.exposedbydefault=false",
-		"--providers.docker.network=" + VesselNetworkName,
+		"--providers.docker.network=" + VesslNetworkName,
 		"--entrypoints.web.address=:80",
 		"--entrypoints.websecure.address=:443",
 		"--entrypoints.web.http.redirections.entryPoint.to=websecure",
@@ -138,7 +138,7 @@ func (m *TraefikManager) buildTraefikMounts() []mount.Mount {
 	if m.tlsEmail != "" {
 		mounts = append(mounts, mount.Mount{
 			Type:   mount.TypeVolume,
-			Source: "vessel-traefik-acme",
+			Source: "vessl-traefik-acme",
 			Target: "/letsencrypt",
 		})
 	}

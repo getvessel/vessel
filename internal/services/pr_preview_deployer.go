@@ -138,7 +138,7 @@ func (s *PRPreviewService) updateCommitStatus(ctx context.Context, app *models.A
 		"state":       "success",
 		"target_url":  "https://" + previewDomain,
 		"description": "PR Preview is ready",
-		"context":     "vessel/pr-preview",
+		"context":     "vessl/pr-preview",
 	}
 	jsonPayload, _ := json.Marshal(payload)
 	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonPayload))

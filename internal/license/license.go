@@ -41,7 +41,7 @@ func GenerateLicense(privateKeyBase64, teamID, plan string, maxSeats int, expiry
 		MaxSeats: maxSeats,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiry),
-			Issuer:    "vessel-cloud",
+			Issuer:    "vessl-cloud",
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}

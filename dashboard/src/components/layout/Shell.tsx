@@ -71,7 +71,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <SidebarHeader className="h-16 flex items-center justify-center border-b border-zinc-800/50">
           <div className="flex items-center gap-2 font-bold text-lg tracking-tight text-zinc-100 w-full px-4">
             <HugeiconsIcon icon={CloudServerIcon} className="h-5 w-5 text-indigo-400" />
-            <span>Vessel</span>
+            <span>Vessl</span>
           </div>
         </SidebarHeader>
         <SidebarContent className="bg-transparent">
@@ -100,7 +100,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter className="border-t border-zinc-800/50 p-4">
-          <div className="text-xs text-zinc-500 text-center">Vessel Control Panel v0.1.0</div>
+          <div className="text-xs text-zinc-500 text-center">Vessl Control Panel v0.1.0</div>
         </SidebarFooter>
       </Sidebar>
 

@@ -1,6 +1,6 @@
-# Vessel Docs
+# Vessl Docs
 
-Documentation site for Vessel built with Astro 7 and Starlight.
+Documentation site for Vessl built with Astro 7 and Starlight.
 
 ```sh
 npm install

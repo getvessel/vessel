@@ -21,7 +21,7 @@ func NewDockerfileBuilder(dockerClient *client.Client) *DockerfileBuilder {
 }
 
 func (d *DockerfileBuilder) Build(ctx context.Context, opts BuildOptions) (string, error) {
-	imageTag := fmt.Sprintf("vessel-app-%s:latest", strings.ToLower(opts.ProjectID))
+	imageTag := fmt.Sprintf("vessl-app-%s:latest", strings.ToLower(opts.ProjectID))
 	if opts.LogWriter != nil {
 		fmt.Fprintf(opts.LogWriter, "📦 [Dockerfile] Packaging build context from %s...\n", opts.SourceDir)
 	}

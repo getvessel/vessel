@@ -47,7 +47,7 @@ func RunMigrations(db *sql.DB) error {
 		log.Printf("Applied migration: %s", file)
 	}
 
-	log.Println(" Vessel SQLite schema migrations up to date")
+	log.Println(" Vessl SQLite schema migrations up to date")
 	return nil
 }
 

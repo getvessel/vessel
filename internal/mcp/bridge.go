@@ -17,7 +17,7 @@ type Bridge struct {
 }
 
 func NewBridge(ps *services.ProjectService, as *services.AppService, db *services.DatabaseService) *Bridge {
-	mcpServer := server.NewMCPServer("vessel-mcp", "1.0.0", server.WithResourceCapabilities(true, true), server.WithPromptCapabilities(true))
+	mcpServer := server.NewMCPServer("vessl-mcp", "1.0.0", server.WithResourceCapabilities(true, true), server.WithPromptCapabilities(true))
 	b := &Bridge{
 		server:         mcpServer,
 		projectService: ps,
@@ -35,21 +35,21 @@ func (b *Bridge) MCPServer() *server.MCPServer {
 func (b *Bridge) registerTools() {
 	b.server.AddTool(
 		mcp.NewTool("list_projects",
-			mcp.WithDescription("List all deployment projects registered in this Vessel instance."),
+			mcp.WithDescription("List all deployment projects registered in this Vessl instance."),
 		),
 		b.handleListProjects,
 	)
 
 	b.server.AddTool(
 		mcp.NewTool("list_databases",
-			mcp.WithDescription("List all managed databases registered in this Vessel instance."),
+			mcp.WithDescription("List all managed databases registered in this Vessl instance."),
 		),
 		b.handleListDatabases,
 	)
 
 	b.server.AddTool(
 		mcp.NewTool("get_system_status",
-			mcp.WithDescription("Check basic operational and health metrics of the Vessel platform."),
+			mcp.WithDescription("Check basic operational and health metrics of the Vessl platform."),
 		),
 		b.handleGetSystemStatus,
 	)
@@ -61,7 +61,7 @@ func (b *Bridge) handleListProjects(ctx context.Context, request mcp.CallToolReq
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	res := "Vessel Projects:\n"
+	res := "Vessl Projects:\n"
 	for _, p := range projects {
 		res += fmt.Sprintf("- ID: %s | Name: %s\n", p.ID, p.Name)
 	}
@@ -77,7 +77,7 @@ func (b *Bridge) handleListDatabases(ctx context.Context, request mcp.CallToolRe
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	res := "Vessel Databases:\n"
+	res := "Vessl Databases:\n"
 	for _, d := range dbs {
 		res += fmt.Sprintf("- ID: %s | Name: %s | Engine: %s | Status: %s\n", d.ID, d.Name, d.Engine, d.Status)
 	}
@@ -88,6 +88,6 @@ func (b *Bridge) handleListDatabases(ctx context.Context, request mcp.CallToolRe
 }
 
 func (b *Bridge) handleGetSystemStatus(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	res := "Vessel Status: OK\nEngine: Active\nVersion: 1.0.0"
+	res := "Vessl Status: OK\nEngine: Active\nVersion: 1.0.0"
 	return mcp.NewToolResultText(res), nil
 }

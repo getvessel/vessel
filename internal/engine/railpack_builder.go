@@ -21,7 +21,7 @@ func NewRailpackBuilder(dockerClient *client.Client) *RailpackBuilder {
 }
 
 func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions, engineName string) (string, error) {
-	imageTag := fmt.Sprintf("vessel-app-%s:latest", strings.ToLower(opts.ProjectID))
+	imageTag := fmt.Sprintf("vessl-app-%s:latest", strings.ToLower(opts.ProjectID))
 	if opts.LogWriter != nil {
 		fmt.Fprintf(opts.LogWriter, "🌟 [Railpack/Nixpacks] Auto-detecting language & framework in %s...\n", opts.SourceDir)
 	}
@@ -65,13 +65,13 @@ func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions, engineNa
 	if err != nil {
 		return "", fmt.Errorf("failed to synthesize fallback dockerfile: %w", err)
 	}
-	dockerfilePath := filepath.Join(opts.SourceDir, ".vessel.Dockerfile")
+	dockerfilePath := filepath.Join(opts.SourceDir, ".vessl.Dockerfile")
 	if err := os.WriteFile(dockerfilePath, []byte(synthesizedDockerfile), 0o644); err != nil {
 		return "", fmt.Errorf("failed to write synthesized dockerfile: %w", err)
 	}
 	defer os.Remove(dockerfilePath)
 	fallbackOpts := opts
-	fallbackOpts.DockerfilePath = ".vessel.Dockerfile"
+	fallbackOpts.DockerfilePath = ".vessl.Dockerfile"
 	fallbackBuilder := NewDockerfileBuilder(r.dockerClient)
 	return fallbackBuilder.Build(ctx, fallbackOpts)
 }

@@ -1,6 +1,6 @@
-// @title Vessel API
+// @title Vessl API
 // @version 1.0
-// @description Vessel API Documentation
+// @description Vessl API Documentation
 // @host localhost:8080
 // @BasePath /api
 // @securityDefinitions.apikey BearerAuth
@@ -24,9 +24,9 @@ import (
 	_ "modernc.org/sqlite"
 
 	"vessl.dev/vessl/internal/core"
-	vesseldb "vessl.dev/vessl/internal/db"
+	vessldb "vessl.dev/vessl/internal/db"
 	"vessl.dev/vessl/internal/engine"
-	vesselhttp "vessl.dev/vessl/internal/http"
+	vesslhttp "vessl.dev/vessl/internal/http"
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/proxy"
 	"vessl.dev/vessl/internal/repositories"
@@ -34,7 +34,7 @@ import (
 	"vessl.dev/vessl/internal/vault"
 )
 
-const vesselVersion = "0.1.0-alpha"
+const vesslVersion = "0.1.0-alpha"
 
 // Unused proxy listers removed
 
@@ -72,10 +72,10 @@ func main() {
 	serverURL := flag.String("server", "", "Controller server WSS URL")
 	isMCP := flag.Bool("mcp", false, "Run local MCP stdio server")
 	flag.Parse()
-	log.Printf(" Booting Vessel Daemon (`vesseld`) v%s [%s/%s]...", vesselVersion, runtime.GOOS, runtime.GOARCH)
+	log.Printf(" Booting Vessl Daemon (`vessld`) v%s [%s/%s]...", vesslVersion, runtime.GOOS, runtime.GOARCH)
 	if *isAgent {
 		if *serverURL == "" {
-			log.Fatal(" Error: --server is required in agent mode (e.g. wss://vessel.domain.com/api/agent)")
+			log.Fatal(" Error: --server is required in agent mode (e.g. wss://vessl.domain.com/api/agent)")
 		}
 		if *agentToken == "" {
 			log.Fatal(" Error: --token is required in agent mode")
@@ -89,7 +89,7 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	dataDir := os.Getenv("VESSEL_DATA_DIR")
+	dataDir := os.Getenv("VESSL_DATA_DIR")
 	if dataDir == "" {
 		dataDir = "data"
 	}
@@ -100,33 +100,33 @@ func main() {
 	if err != nil {
 		log.Fatalf(" Failed to initialize secrets vault: %v", err)
 	}
-	dbPath := filepath.Join(dataDir, "vessel.db")
+	dbPath := filepath.Join(dataDir, "vessl.db")
 	db, err := sql.Open("sqlite", dbPath+"?_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=foreign_keys(ON)")
 	if err != nil {
 		log.Fatalf(" Failed to open SQLite database: %v", err)
 	}
 	defer db.Close()
-	if err := vesseldb.RunMigrations(db); err != nil {
+	if err := vessldb.RunMigrations(db); err != nil {
 		log.Fatalf("failed to run database migrations: %v", err)
 	}
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Printf(" Docker daemon connection warning: %v (container deployment features disabled)", err)
 	}
-	traefikMgr := proxy.NewTraefikManager(dockerClient, os.Getenv("VESSEL_TLS_EMAIL"))
+	traefikMgr := proxy.NewTraefikManager(dockerClient, os.Getenv("VESSL_TLS_EMAIL"))
 	if err := traefikMgr.EnsureTraefikRunning(context.Background()); err != nil {
 		log.Printf(" Warning: Failed to start Traefik proxy: %v", err)
 	}
 
 	// Start Telemetry Reporter
-	services.StartTelemetryReporter(db, vesselVersion)
+	services.StartTelemetryReporter(db, vesslVersion)
 
 	host := os.Getenv("HOST")
 
 	addr := host + ":" + port
 
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
-	apiServer := vesselhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
+	apiServer := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
 
 	if *isMCP {
 		log.Printf("Starting MCP stdio server...")
@@ -136,7 +136,7 @@ func main() {
 		return
 	}
 
-	log.Printf(" Vessel control plane listening on %s", addr)
+	log.Printf(" Vessl control plane listening on %s", addr)
 	if err := http.ListenAndServe(addr, apiServer.Handler()); err != nil {
 		log.Fatalf(" Server crashed: %v", err)
 	}

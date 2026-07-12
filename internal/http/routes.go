@@ -181,7 +181,7 @@ func (s *Server) registerRoutes() {
 }
 
 func (s *Server) setupSPAFallback() {
-	staticDir := os.Getenv("VESSEL_STATIC_DIR")
+	staticDir := os.Getenv("VESSL_STATIC_DIR")
 
 	if staticDir != "" {
 		if stat, err := os.Stat(staticDir); err == nil && stat.IsDir() {

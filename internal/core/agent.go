@@ -16,7 +16,7 @@ import (
 func Run(ctx context.Context, serverURL, token string) error {
 	headers := http.Header{}
 	headers.Add("Authorization", "Bearer "+token)
-	headers.Add("X-Vessel-Agent", "true")
+	headers.Add("X-Vessl-Agent", "true")
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 10 * time.Second,
 	}

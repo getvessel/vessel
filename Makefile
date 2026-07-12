@@ -1,5 +1,5 @@
 SERVICES = dashboard web docs
-BINARY_NAME = vesseld
+BINARY_NAME = vessld
 BUILD_DIR = bin
 
 .PHONY: help all build build-daemon build-dashboard dev dev-daemon dev-dashboard clean check fmt test install update organize-imports deploy deploy-web deploy-docs docker-build docker-up docker-down
@@ -7,7 +7,7 @@ BUILD_DIR = bin
 all: check build
 
 help:
-	@echo "Vessel — available commands:"
+	@echo "Vessl — available commands:"
 	@echo ""
 	@echo "  make install           Install all npm dependencies"
 	@echo "  make check             Run Go fmt + vet"
@@ -96,11 +96,11 @@ docker-build:
 	docker compose build
 
 docker-up:
-	@echo "🐳 Starting Vessel via Docker Compose..."
+	@echo "🐳 Starting Vessl via Docker Compose..."
 	docker compose up -d
 
 docker-down:
-	@echo "🐳 Stopping Vessel Docker stack..."
+	@echo "🐳 Stopping Vessl Docker stack..."
 	docker compose down
 
 clean:

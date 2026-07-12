@@ -9,14 +9,14 @@ import (
 )
 
 func GetRuntimeNetwork() string {
-	net := os.Getenv("VESSEL_RUNTIME_NETWORK")
+	net := os.Getenv("VESSL_RUNTIME_NETWORK")
 	if net == "" {
-		return "vessel-network"
+		return "vessl-network"
 	}
 	return net
 }
 
-func EnsureVesselNetwork(ctx context.Context, cli *client.Client) error {
+func EnsureVesslNetwork(ctx context.Context, cli *client.Client) error {
 	if cli == nil {
 		return nil
 	}

@@ -3,7 +3,7 @@ title: Deployment
 description: Deploy applications with zero-downtime.
 ---
 
-Vessel supports multiple build strategies to deploy your applications.
+Vessl supports multiple build strategies to deploy your applications.
 
 ## Deploy from Git
 
@@ -17,4 +17,4 @@ Connect your GitHub or GitLab account, select a repository, and deploy with one 
 
 ## Zero-Downtime Deployments
 
-Vessel performs health-checked container swaps. The new container must pass `/health` before traffic is routed to it.
+Vessl performs health-checked container swaps. The new container must pass `/health` before traffic is routed to it.

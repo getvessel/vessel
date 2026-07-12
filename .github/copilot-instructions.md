@@ -1,8 +1,8 @@
-# Vessel — Agent Instructions
+# Vessl — Agent Instructions
 
 ## What This Is
 
-This is the Vessel monorepo — an open-source, self-hosted PaaS that turns any bare-metal VPS into a private Vercel & Railway. It's written in Go (backend daemon) and TypeScript (dashboard UI, marketing site, docs).
+This is the Vessl monorepo — an open-source, self-hosted PaaS that turns any bare-metal VPS into a private Vercel & Railway. It's written in Go (backend daemon) and TypeScript (dashboard UI, marketing site, docs).
 
 - **Language (backend)**: Go — `cmd`, `internal/`
 - **Language (frontend)**: TypeScript/TSX — React 19, Astro 7

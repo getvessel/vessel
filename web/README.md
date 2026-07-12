@@ -1,4 +1,4 @@
-# Vessel Website
+# Vessl Website
 
 **Public marketing landing page** — hosted at `vessl.dev`.
 

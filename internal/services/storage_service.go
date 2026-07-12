@@ -103,13 +103,13 @@ func (s *StorageService) CreateStorageWithDefaults(ctx context.Context, st *mode
 		st.ConsolePort = 9001
 	}
 	if st.AccessKey == "" {
-		st.AccessKey = "vesseladmin"
+		st.AccessKey = "vessladmin"
 	}
 	if st.SecretKey == "" {
-		st.SecretKey = "vesselsecretkey123"
+		st.SecretKey = "vesslsecretkey123"
 	}
 	if st.BucketName == "" {
-		st.BucketName = "vessel-backups"
+		st.BucketName = "vessl-backups"
 	}
 	if st.Type == "" {
 		st.Type = "minio"

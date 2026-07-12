@@ -1,6 +1,6 @@
 ---
-title: Vessel Docs
-description: Documentation for Vessel - the ultra-sleek, lightweight self-hosted PaaS.
+title: Vessl Docs
+description: Documentation for Vessl - the ultra-sleek, lightweight self-hosted PaaS.
 template: splash
 hero:
   tagline: Turn any bare-metal VPS into your own private Vercel & Railway in 60 seconds.
@@ -13,11 +13,11 @@ hero:
       variant: secondary
 ---
 
-Welcome to the Vessel documentation. Choose a topic below to get started.
+Welcome to the Vessl documentation. Choose a topic below to get started.
 
 ## Quick Links
 
-- [Getting Started](/docs/getting-started/) — Install and run Vessel
+- [Getting Started](/docs/getting-started/) — Install and run Vessl
 - [Deployment](/docs/deployment/) — Deploy your applications
 - [Databases](/docs/databases/) — Managed database engines
 - [Configuration](/docs/configuration/) — Environment variables, domains, settings

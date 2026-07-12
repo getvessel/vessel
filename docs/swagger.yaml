@@ -2,8 +2,8 @@ basePath: /api
 host: localhost:8080
 info:
   contact: {}
-  description: Vessel API Documentation
-  title: Vessel API
+  description: Vessl API Documentation
+  title: Vessl API
   version: "1.0"
 paths:
   /api/auth/2fa/disable:

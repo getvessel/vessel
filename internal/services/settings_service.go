@@ -86,7 +86,7 @@ func (s *SettingsService) ExecuteMCPTool(ctx context.Context, toolName string) (
 		}, nil
 	case "get_system_status":
 		return []map[string]any{
-			{"type": "text", "text": "Vessel system is healthy and operational."},
+			{"type": "text", "text": "Vessl system is healthy and operational."},
 		}, nil
 	default:
 		return nil, fmt.Errorf("Method/Tool not found: %s", toolName)

@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-VESSEL_DIR=${VESSEL_DIR:-/vessel}
+VESSL_DIR=${VESSL_DIR:-/vessl}
 
-if [ ! -d "$VESSEL_DIR/data" ]; then
+if [ ! -d "$VESSL_DIR/data" ]; then
   if [ -d "./data" ]; then
-    VESSEL_DIR="."
+    VESSL_DIR="."
   else
-    echo "❌ No Vessel data directory found at $VESSEL_DIR/data."
+    echo "❌ No Vessl data directory found at $VESSL_DIR/data."
     exit 1
   fi
 fi
 
-BACKUP_DIR="${VESSEL_DIR}/data/backups"
+BACKUP_DIR="${VESSL_DIR}/data/backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-BACKUP_FILE="${BACKUP_DIR}/vessel-backup-${TIMESTAMP}.tar.gz"
+BACKUP_FILE="${BACKUP_DIR}/vessl-backup-${TIMESTAMP}.tar.gz"
 
-echo "📦 Starting Vessel automated backup to ${BACKUP_FILE}..."
+echo "📦 Starting Vessl automated backup to ${BACKUP_FILE}..."
 mkdir -p "${BACKUP_DIR}"
 
 # Archive data folder (SQLite DB, Traefik configs) excluding existing backups
-tar --exclude="backups" -czf "${BACKUP_FILE}" -C "${VESSEL_DIR}" data
+tar --exclude="backups" -czf "${BACKUP_FILE}" -C "${VESSL_DIR}" data
 echo "✅ Backup created successfully: ${BACKUP_FILE}"

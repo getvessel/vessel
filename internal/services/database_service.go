@@ -76,7 +76,7 @@ func (s *DatabaseService) CreateDatabaseFromRequest(ctx context.Context, req *mo
 		}
 	}
 	if req.Username == "" && strings.ToLower(req.Engine) != "redis" {
-		req.Username = "vesseladmin"
+		req.Username = "vessladmin"
 	}
 	if req.DatabaseName == "" {
 		req.DatabaseName = "appdb"

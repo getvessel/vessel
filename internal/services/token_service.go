@@ -17,10 +17,10 @@ type TokenService struct {
 func NewTokenService() *TokenService {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		secret = os.Getenv("VESSEL_JWT_SECRET")
+		secret = os.Getenv("VESSL_JWT_SECRET")
 	}
 	if secret == "" {
-		secret = "vessel-super-secret-jwt-signing-key-change-in-prod"
+		secret = "vessl-super-secret-jwt-signing-key-change-in-prod"
 	}
 	return &TokenService{
 		secretKey: []byte(secret),
@@ -38,7 +38,7 @@ func (ts *TokenService) GenerateToken(u *models.User) (string, error) {
 		"totpEnabled": u.TOTPEnabled,
 		"exp":         time.Now().Add(72 * time.Hour).Unix(),
 		"iat":         time.Now().Unix(),
-		"iss":         "vessel-auth",
+		"iss":         "vessl-auth",
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(ts.secretKey)

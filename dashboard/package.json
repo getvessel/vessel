@@ -2,7 +2,7 @@
   "name": "@vessl/dashboard",
   "private": true,
   "version": "0.1.0",
-  "description": "Vessel control panel GUI — React 19, TanStack Router, Tailwind CSS v4.",
+  "description": "Vessl control panel GUI — React 19, TanStack Router, Tailwind CSS v4.",
   "license": "MIT",
   "type": "module",
   "imports": {

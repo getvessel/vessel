@@ -47,7 +47,7 @@ type CloudTelemetryLog struct {
 	ReportedAt    time.Time
 }
 
-// CloudUser represents a user of the Vessel Cloud platform.
+// CloudUser represents a user of the Vessl Cloud platform.
 // It is backed by the cloud_users PostgreSQL table (managed via database/sql, not gorm).
 type CloudUser struct {
 	ID                   string

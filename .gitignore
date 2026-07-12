@@ -1,7 +1,7 @@
 # Binaries & builds
-/vesseld
-/vesselcloud
-/vessel-cli
+/vessld
+/vesslcloud
+/vessl-cli
 *.exe
 *.exe~
 *.dll
@@ -12,8 +12,8 @@ dist/
 build/
 
 # Runtime data & secrets
-data/vessel.db*
-**/data/vessel.db*
+data/vessl.db*
+**/data/vessl.db*
 data/backups/
 data/caddy/
 data/builds/

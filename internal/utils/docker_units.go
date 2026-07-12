@@ -20,5 +20,5 @@ func CPURequestToNanoCPUs(cores float64) int64 {
 }
 
 func NormalizeContainerName(projectID string) string {
-	return fmt.Sprintf("vessel-%s", strings.ToLower(strings.TrimSpace(projectID)))
+	return fmt.Sprintf("vessl-%s", strings.ToLower(strings.TrimSpace(projectID)))
 }

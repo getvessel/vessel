@@ -13,16 +13,16 @@ type ComposeService struct {
 	Volumes     []string        `yaml:"volumes,omitempty"`
 	Command     []string        `yaml:"command,omitempty"`
 	DependsOn   []string        `yaml:"depends_on,omitempty"`
-	XVessel     *VesselMetadata `yaml:"x-vessel,omitempty"`
+	XVessl     *VesslMetadata `yaml:"x-vessl,omitempty"`
 }
 
-type VesselMetadata struct {
+type VesslMetadata struct {
 	IsDatabase       bool                  `yaml:"is_database,omitempty"`
 	ConnectionString string                `yaml:"connection_string,omitempty"`
-	Backup           *VesselBackupMetadata `yaml:"backup,omitempty"`
+	Backup           *VesslBackupMetadata `yaml:"backup,omitempty"`
 }
 
-type VesselBackupMetadata struct {
+type VesslBackupMetadata struct {
 	Command       []string `yaml:"command,omitempty"`
 	FileExtension string   `yaml:"file_extension,omitempty"`
 }

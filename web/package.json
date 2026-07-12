@@ -1,8 +1,8 @@
 {
-  "name": "@vessel/web",
+  "name": "@vessl/web",
   "type": "module",
   "version": "0.1.0",
-  "description": "Vessel marketing landing page — Astro 7, Tailwind CSS v4.",
+  "description": "Vessl marketing landing page — Astro 7, Tailwind CSS v4.",
   "license": "MIT",
   "engines": {
     "node": ">=22.12.0"
@@ -14,7 +14,7 @@
     "astro": "astro",
     "format": "biome check src",
     "format:fix": "biome check --write src",
-    "deploy": "npm run build && wrangler pages deploy dist/ --project-name vessel-web"
+    "deploy": "npm run build && wrangler pages deploy dist/ --project-name vessl-web"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.2.2",

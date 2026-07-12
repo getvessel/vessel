@@ -79,7 +79,7 @@ func (g *AuthGuard) validateAPIToken(c echo.Context, tokenStr string, denyAPITok
 
 	return &models.UserClaims{
 		UserID: "api-token-" + pt.ID,
-		Email:  "api@" + pt.ProjectID + ".vessel.local",
+		Email:  "api@" + pt.ProjectID + ".vessl.local",
 		Role:   "api",
 	}, nil
 }
@@ -220,7 +220,7 @@ func ExtractTokenFromRequest(c echo.Context) string {
 	if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
 		return strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
 	}
-	cookie, err := c.Cookie("vessel_token")
+	cookie, err := c.Cookie("vessl_token")
 	if err == nil && cookie.Value != "" {
 		return strings.TrimSpace(cookie.Value)
 	}

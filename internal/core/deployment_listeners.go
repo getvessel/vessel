@@ -27,7 +27,7 @@ func (l *DeploymentListeners) SendNotification(e events.DeploymentCompleted) {
 		Level:     e.Status,
 		Title:     "Deployment " + e.Status,
 		Message:   msg,
-		URL:       fmt.Sprintf("https://vessel.local/projects/%s/services/%s", e.ProjectID, e.ServiceID),
+		URL:       fmt.Sprintf("https://vessl.local/projects/%s/services/%s", e.ProjectID, e.ServiceID),
 	}
 	l.dispatcher.Dispatch(notifEvent)
 }

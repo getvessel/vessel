@@ -1,9 +1,9 @@
 ---
 title: Getting Started
-description: Install and run Vessel on your VPS.
+description: Install and run Vessl on your VPS.
 ---
 
-Vessel turns any bare-metal VPS into your own private Vercel & Railway.
+Vessl turns any bare-metal VPS into your own private Vercel & Railway.
 
 ## One-Line Install
 
