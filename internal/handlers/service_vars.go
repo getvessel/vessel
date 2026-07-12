@@ -17,14 +17,10 @@ func NewServiceVarHandler(s *services.AppService) *ServiceVarHandler {
 	return &ServiceVarHandler{appService: s}
 }
 
-// @Summary List endpoint
-// @Description List endpoint
-// @Tags Workspaces
-// @Accept json
-// @Produce json
+
 // @Summary List Service Variables
 // @Description List Service Variables
-// @Tags ServiceVariables
+// @Tags AppServices
 // @Accept json
 // @Produce json
 // @Param serviceId path string true "Service ID"
@@ -38,15 +34,10 @@ func (h *ServiceVarHandler) List(c echo.Context) error {
 	return c.JSON(http.StatusOK, list)
 }
 
-// @Summary Create endpoint
-// @Description Create endpoint
-// @Tags Workspaces
-// @Accept json
-// @Produce json
-// @Param request body models.Variable true "Payload"
+
 // @Summary Create Service Variable
 // @Description Create Service Variable
-// @Tags ServiceVariables
+// @Tags AppServices
 // @Accept json
 // @Produce json
 // @Param serviceId path string true "Service ID"
@@ -72,16 +63,10 @@ func (h *ServiceVarHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, created)
 }
 
-// @Summary Update endpoint
-// @Description Update endpoint
-// @Tags Workspaces
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Param request body models.Variable true "Payload"
+
 // @Summary Update Service Variable
 // @Description Update Service Variable
-// @Tags ServiceVariables
+// @Tags AppServices
 // @Accept json
 // @Produce json
 // @Param serviceId path string true "Service ID"
@@ -103,15 +88,10 @@ func (h *ServiceVarHandler) Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, req)
 }
 
-// @Summary Delete endpoint
-// @Description Delete endpoint
-// @Tags Workspaces
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
+
 // @Summary Delete Service Variable
 // @Description Delete Service Variable
-// @Tags ServiceVariables
+// @Tags AppServices
 // @Accept json
 // @Produce json
 // @Param serviceId path string true "Service ID"

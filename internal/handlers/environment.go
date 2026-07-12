@@ -19,7 +19,7 @@ func NewEnvironmentHandler(s *services.EnvironmentService) *EnvironmentHandler {
 
 // @Summary ListByProject endpoint
 // @Description ListByProject endpoint
-// @Tags Projects
+// @Tags Environments
 // @Accept json
 // @Produce json
 // @Param id path string true "id"
@@ -38,7 +38,7 @@ func (h *EnvironmentHandler) ListByProject(c echo.Context) error {
 
 // @Summary Create endpoint
 // @Description Create endpoint
-// @Tags Workspaces
+// @Tags Environments
 // @Accept json
 // @Produce json
 // @Param request body models.EnvironmentConfig true "Payload"
@@ -63,12 +63,6 @@ func (h *EnvironmentHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, created)
 }
 
-// @Summary Delete endpoint
-// @Description Delete endpoint
-// @Tags Workspaces
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
 // @Summary Delete Environment
 // @Description Delete Environment
 // @Tags Environments

@@ -17,11 +17,6 @@ func NewBackupHandler(s *services.BackupService) *BackupHandler {
 	return &BackupHandler{backupService: s}
 }
 
-// @Summary List endpoint
-// @Description List endpoint
-// @Tags Workspaces
-// @Accept json
-// @Produce json
 // @Summary List Backups
 // @Description List Backups
 // @Tags Backups
@@ -40,12 +35,6 @@ func (h *BackupHandler) List(c echo.Context) error {
 	return c.JSON(http.StatusOK, list)
 }
 
-// @Summary Create endpoint
-// @Description Create endpoint
-// @Tags Workspaces
-// @Accept json
-// @Produce json
-// @Param request body models.BackupConfig true "Payload"
 // @Summary Create Backup
 // @Description Create Backup
 // @Tags Backups
@@ -64,12 +53,6 @@ func (h *BackupHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, cfg)
 }
 
-// @Summary Get endpoint
-// @Description Get endpoint
-// @Tags Teams
-// @Accept json
-// @Produce json
-// @Param teamId path string true "teamId"
 // @Summary Get Backup
 // @Description Get Backup
 // @Tags Backups
@@ -89,12 +72,6 @@ func (h *BackupHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, cfg)
 }
 
-// @Summary Delete endpoint
-// @Description Delete endpoint
-// @Tags Workspaces
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
 // @Summary Delete Backup
 // @Description Delete Backup
 // @Tags Backups
@@ -153,7 +130,7 @@ func (h *BackupHandler) ListRecords(c echo.Context) error {
 
 // @Summary ListS3Destinations endpoint
 // @Description ListS3Destinations endpoint
-// @Tags S3-destinations
+// @Tags Backups
 // @Accept json
 // @Produce json
 // @Router /api/s3-destinations [get]
@@ -171,7 +148,7 @@ func (h *BackupHandler) ListS3Destinations(c echo.Context) error {
 
 // @Summary CreateS3Destination endpoint
 // @Description CreateS3Destination endpoint
-// @Tags S3-destinations
+// @Tags Backups
 // @Accept json
 // @Produce json
 // @Param request body models.S3Destination true "Payload"
@@ -188,7 +165,7 @@ func (h *BackupHandler) CreateS3Destination(c echo.Context) error {
 
 // @Summary DeleteS3Destination endpoint
 // @Description DeleteS3Destination endpoint
-// @Tags S3-destinations
+// @Tags Backups
 // @Accept json
 // @Produce json
 // @Param id path string true "id"

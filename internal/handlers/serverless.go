@@ -24,7 +24,7 @@ type SaveCodeRequest struct {
 
 // @Summary SaveCode endpoint
 // @Description SaveCode endpoint
-// @Tags Services
+// @Tags AppServices
 // @Accept json
 // @Produce json
 // @Param serviceId path string true "serviceId"
@@ -53,7 +53,7 @@ func (h *ServerlessHandler) SaveCode(c echo.Context) error {
 
 // @Summary GetCode endpoint
 // @Description GetCode endpoint
-// @Tags Services
+// @Tags AppServices
 // @Accept json
 // @Produce json
 // @Param serviceId path string true "serviceId"

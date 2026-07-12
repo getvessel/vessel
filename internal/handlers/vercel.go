@@ -18,7 +18,7 @@ func NewVercelHandler(vs *services.VercelService) *VercelHandler {
 
 // @Summary Callback endpoint
 // @Description Callback endpoint
-// @Tags Oauth
+// @Tags Auth
 // @Accept json
 // @Produce json
 // @Router /api/oauth/vercel/callback [get]
@@ -46,7 +46,7 @@ func (h *VercelHandler) Callback(c echo.Context) error {
 
 // @Summary ListProjects endpoint
 // @Description ListProjects endpoint
-// @Tags Vercel
+// @Tags Projects
 // @Accept json
 // @Produce json
 // @Router /api/vercel/projects [get]
@@ -74,7 +74,7 @@ func (h *VercelHandler) ListProjects(c echo.Context) error {
 
 // @Summary GetProjectEnv endpoint
 // @Description GetProjectEnv endpoint
-// @Tags Vercel
+// @Tags Projects
 // @Accept json
 // @Produce json
 // @Param id path string true "id"

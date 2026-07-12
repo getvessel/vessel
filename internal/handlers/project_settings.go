@@ -213,7 +213,7 @@ func (h *ProjectSettingsHandler) AddMember(c echo.Context) error {
 // @Param userId path string true "userId"
 // @Summary Remove Project Member
 // @Description Remove Project Member
-// @Tags ProjectSettings
+// @Tags Projects
 // @Accept json
 // @Produce json
 // @Param projectId path string true "Project ID"

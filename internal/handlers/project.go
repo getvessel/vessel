@@ -20,7 +20,7 @@ func NewProjectHandler(s *services.ProjectService) *ProjectHandler {
 
 // @Summary ListProjects endpoint
 // @Description ListProjects endpoint
-// @Tags Vercel
+// @Tags Projects
 // @Accept json
 // @Produce json
 // @Router /api/projects [get]

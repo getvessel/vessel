@@ -37,7 +37,7 @@ func (h *JobHandler) ListProjectJobs(c echo.Context) error {
 
 // @Summary Create endpoint
 // @Description Create endpoint
-// @Tags Workspaces
+// @Tags Jobs
 // @Accept json
 // @Produce json
 // @Param request body models.Job true "Payload"
@@ -54,12 +54,6 @@ func (h *JobHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, created)
 }
 
-// @Summary Get endpoint
-// @Description Get endpoint
-// @Tags Teams
-// @Accept json
-// @Produce json
-// @Param teamId path string true "teamId"
 // @Summary Get Job
 // @Description Get Job
 // @Tags Jobs
@@ -79,18 +73,13 @@ func (h *JobHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, j)
 }
 
-// @Summary Delete endpoint
-// @Description Delete endpoint
-// @Tags Workspaces
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
 // @Summary Delete Job
 // @Description Delete Job
 // @Tags Jobs
 // @Accept json
 // @Produce json
 // @Param id path string true "Job ID"
+// @Router /api/jobs/{id} [delete]
 func (h *JobHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {

@@ -25,11 +25,6 @@ type InviteTeamMemberRequest struct {
 	Role  string `json:"role"`
 }
 
-// @Summary List endpoint
-// @Description List endpoint
-// @Tags Workspaces
-// @Accept json
-// @Produce json
 // @Summary List Teams
 // @Description List Teams
 // @Tags Teams
@@ -48,11 +43,6 @@ func (h *TeamHandler) List(c echo.Context) error {
 	return c.JSON(http.StatusOK, teams)
 }
 
-// @Summary Create endpoint
-// @Description Create endpoint
-// @Tags Workspaces
-// @Accept json
-// @Produce json
 // @Summary Create Team
 // @Description Create Team
 // @Tags Teams
@@ -76,12 +66,6 @@ func (h *TeamHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, team)
 }
 
-// @Summary Get endpoint
-// @Description Get endpoint
-// @Tags Teams
-// @Accept json
-// @Produce json
-// @Param teamId path string true "teamId"
 // @Summary Get Team
 // @Description Get Team
 // @Tags Teams
@@ -101,12 +85,6 @@ func (h *TeamHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, team)
 }
 
-// @Summary Delete endpoint
-// @Description Delete endpoint
-// @Tags Workspaces
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
 // @Summary Delete Team
 // @Description Delete Team
 // @Tags Teams
@@ -194,7 +172,7 @@ func (h *TeamHandler) RemoveMember(c echo.Context) error {
 
 // @Summary GetInvite endpoint
 // @Description GetInvite endpoint
-// @Tags Team-invites
+// @Tags Teams
 // @Accept json
 // @Produce json
 // @Param token path string true "token"
@@ -213,7 +191,7 @@ func (h *TeamHandler) GetInvite(c echo.Context) error {
 
 // @Summary AcceptInvite endpoint
 // @Description AcceptInvite endpoint
-// @Tags Team-invites
+// @Tags Teams
 // @Accept json
 // @Produce json
 // @Param token path string true "token"

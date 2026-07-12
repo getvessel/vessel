@@ -25,7 +25,7 @@ func NewDeploymentHandler(ds *services.DeploymentService, as *services.AppServic
 
 // @Summary ListServiceDeployments endpoint
 // @Description ListServiceDeployments endpoint
-// @Tags Services
+// @Tags AppServices
 // @Accept json
 // @Produce json
 // @Param serviceId path string true "serviceId"
@@ -42,12 +42,6 @@ func (h *DeploymentHandler) ListServiceDeployments(c echo.Context) error {
 	return c.JSON(http.StatusOK, deps)
 }
 
-// @Summary Trigger endpoint
-// @Description Trigger endpoint
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
 // @Summary Trigger Deployment
 // @Description Trigger Deployment
 // @Tags Deployments
@@ -139,7 +133,7 @@ func (h *DeploymentHandler) GetLogs(c echo.Context) error {
 
 // @Summary GetMetrics endpoint
 // @Description GetMetrics endpoint
-// @Tags Services
+// @Tags AppServices
 // @Accept json
 // @Produce json
 // @Param serviceId path string true "serviceId"

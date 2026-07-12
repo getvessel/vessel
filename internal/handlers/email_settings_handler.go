@@ -17,7 +17,7 @@ func NewEmailSettingsHandler(svc *services.EmailSettingsService) *EmailSettingsH
 
 // @Summary Get Team Email Settings
 // @Description Get Team Email Settings
-// @Tags EmailSettings
+// @Tags Settings
 // @Accept json
 // @Produce json
 // @Param teamId path string true "Team ID"
@@ -39,7 +39,7 @@ func (h *EmailSettingsHandler) GetTeamEmailSettings(c echo.Context) error {
 
 // @Summary Save Team Email Settings
 // @Description Save Team Email Settings
-// @Tags EmailSettings
+// @Tags Settings
 // @Accept json
 // @Produce json
 // @Param teamId path string true "Team ID"

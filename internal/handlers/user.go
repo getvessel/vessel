@@ -42,7 +42,7 @@ func (h *UserHandler) ListUsers(c echo.Context) error {
 
 // @Summary GetProfile endpoint
 // @Description GetProfile endpoint
-// @Tags Profile
+// @Tags Users
 // @Accept json
 // @Produce json
 // @Router /api/profile [get]
@@ -62,7 +62,7 @@ func (h *UserHandler) GetProfile(c echo.Context) error {
 
 // @Summary UpdateProfile endpoint
 // @Description UpdateProfile endpoint
-// @Tags Profile
+// @Tags Users
 // @Accept json
 // @Produce json
 // @Param request body handlers.UpdateProfileRequest true "Payload"
@@ -96,7 +96,7 @@ func (h *UserHandler) UpdateProfile(c echo.Context) error {
 
 // @Summary CreatePAT endpoint
 // @Description CreatePAT endpoint
-// @Tags Profile
+// @Tags Users
 // @Accept json
 // @Produce json
 // @Param request body handlers.CreatePATRequest true "Payload"
@@ -122,7 +122,7 @@ func (h *UserHandler) CreatePAT(c echo.Context) error {
 
 // @Summary ListPATs endpoint
 // @Description ListPATs endpoint
-// @Tags Profile
+// @Tags Users
 // @Accept json
 // @Produce json
 // @Router /api/profile/tokens [get]
@@ -140,7 +140,7 @@ func (h *UserHandler) ListPATs(c echo.Context) error {
 
 // @Summary DeletePAT endpoint
 // @Description DeletePAT endpoint
-// @Tags Profile
+// @Tags Users
 // @Accept json
 // @Produce json
 // @Param id path string true "id"

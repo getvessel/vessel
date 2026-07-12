@@ -46,7 +46,7 @@ func NewTerminalHandler(
 
 // @Summary HandleWebSocket endpoint
 // @Description HandleWebSocket endpoint
-// @Tags Ws
+// @Tags Terminal
 // @Accept json
 // @Produce json
 // @Param id path string true "id"

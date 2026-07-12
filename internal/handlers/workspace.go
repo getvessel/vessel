@@ -72,7 +72,7 @@ func (h *WorkspaceHandler) Create(c echo.Context) error {
 
 // @Summary Get endpoint
 // @Description Get endpoint
-// @Tags Teams
+// @Tags Workspaces
 // @Accept json
 // @Produce json
 // @Param teamId path string true "teamId"
@@ -134,7 +134,7 @@ func (h *WorkspaceHandler) Delete(c echo.Context) error {
 
 // @Summary ListTrustedDomains endpoint
 // @Description ListTrustedDomains endpoint
-// @Tags Teams
+// @Tags Workspaces
 // @Accept json
 // @Produce json
 // @Param teamId path string true "teamId"
@@ -153,7 +153,7 @@ func (h *WorkspaceHandler) ListTrustedDomains(c echo.Context) error {
 
 // @Summary CreateTrustedDomain endpoint
 // @Description CreateTrustedDomain endpoint
-// @Tags Teams
+// @Tags Workspaces
 // @Accept json
 // @Produce json
 // @Param teamId path string true "teamId"
@@ -177,7 +177,7 @@ func (h *WorkspaceHandler) CreateTrustedDomain(c echo.Context) error {
 
 // @Summary DeleteTrustedDomain endpoint
 // @Description DeleteTrustedDomain endpoint
-// @Tags Trusted-domains
+// @Tags Workspaces
 // @Accept json
 // @Produce json
 // @Param id path string true "id"
@@ -194,7 +194,7 @@ func (h *WorkspaceHandler) DeleteTrustedDomain(c echo.Context) error {
 
 // @Summary ListSSHKeys endpoint
 // @Description ListSSHKeys endpoint
-// @Tags Teams
+// @Tags Workspaces
 // @Accept json
 // @Produce json
 // @Param teamId path string true "teamId"
@@ -213,7 +213,7 @@ func (h *WorkspaceHandler) ListSSHKeys(c echo.Context) error {
 
 // @Summary CreateSSHKey endpoint
 // @Description CreateSSHKey endpoint
-// @Tags Teams
+// @Tags Workspaces
 // @Accept json
 // @Produce json
 // @Param teamId path string true "teamId"
@@ -237,7 +237,7 @@ func (h *WorkspaceHandler) CreateSSHKey(c echo.Context) error {
 
 // @Summary DeleteSSHKey endpoint
 // @Description DeleteSSHKey endpoint
-// @Tags Ssh-keys
+// @Tags Workspaces
 // @Accept json
 // @Produce json
 // @Param id path string true "id"
@@ -254,7 +254,7 @@ func (h *WorkspaceHandler) DeleteSSHKey(c echo.Context) error {
 
 // @Summary ListAuditLogs endpoint
 // @Description ListAuditLogs endpoint
-// @Tags Teams
+// @Tags Workspaces
 // @Accept json
 // @Produce json
 // @Param teamId path string true "teamId"

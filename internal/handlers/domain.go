@@ -19,7 +19,7 @@ func NewDomainHandler(s *services.EnvironmentService) *DomainHandler {
 
 // @Summary List domains by project
 // @Description List domains by project
-// @Tags Domains
+// @Tags Projects
 // @Accept json
 // @Produce json
 // @Param id path string true "Project ID"
@@ -38,7 +38,7 @@ func (h *DomainHandler) ListByProject(c echo.Context) error {
 
 // @Summary Create domain
 // @Description Create domain
-// @Tags Domains
+// @Tags Projects
 // @Accept json
 // @Produce json
 // @Param id path string true "Project ID"
@@ -66,7 +66,7 @@ func (h *DomainHandler) Create(c echo.Context) error {
 
 // @Summary Delete Domain
 // @Description Delete Domain
-// @Tags Domains
+// @Tags Projects
 // @Accept json
 // @Produce json
 // @Param id path string true "Domain ID"

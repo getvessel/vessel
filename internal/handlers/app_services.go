@@ -36,7 +36,7 @@ func (h *AppHandler) verifyProjectOwnership(c echo.Context, projectID string) er
 
 // @Summary Create endpoint
 // @Description Create endpoint
-// @Tags Workspaces
+// @Tags AppServices
 // @Accept json
 // @Produce json
 // @Param id path string true "Environment ID"
@@ -67,7 +67,7 @@ func (h *AppHandler) Create(c echo.Context) error {
 
 // @Summary ListByEnvironment endpoint
 // @Description ListByEnvironment endpoint
-// @Tags Environments
+// @Tags AppServices
 // @Accept json
 // @Produce json
 // @Param id path string true "id"
@@ -94,7 +94,7 @@ func (h *AppHandler) ListByEnvironment(c echo.Context) error {
 
 // @Summary ListByProject endpoint
 // @Description ListByProject endpoint
-// @Tags Projects
+// @Tags AppServices
 // @Accept json
 // @Produce json
 // @Param id path string true "id"
@@ -111,14 +111,13 @@ func (h *AppHandler) ListByProject(c echo.Context) error {
 	return c.JSON(http.StatusOK, apps)
 }
 
-// @Summary Get endpoint
-// @Description Get endpoint
-// @Tags Teams
-// @Accept json
-// @Produce json
 // @Summary Get App Service
 // @Description Get App Service
 // @Tags AppServices
+// @Accept json
+// @Produce json
+// @Param id path string true "App ID"
+// @Router /api/apps/{id} [get]
 func (h *AppHandler) Get(c echo.Context) error {
 	id := c.Param("id")
 	svc, err := h.appService.GetAppService(c.Request().Context(), id)
@@ -131,14 +130,14 @@ func (h *AppHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, svc)
 }
 
-// @Summary Update endpoint
-// @Description Update endpoint
-// @Tags Workspaces
 // @Summary Update App Service
 // @Description Update App Service
 // @Tags AppServices
 // @Accept json
 // @Produce json
+// @Param id path string true "App ID"
+// @Param request body models.AppService true "Payload"
+// @Router /api/apps/{id} [put]
 func (h *AppHandler) Update(c echo.Context) error {
 	id := c.Param("id")
 	existing, err := h.appService.GetAppService(c.Request().Context(), id)
@@ -171,7 +170,6 @@ func (h *AppHandler) Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, existing)
 }
 
-// @Summary Delete endpoint
 // @Summary Delete App Service
 // @Description Delete App Service
 // @Tags AppServices
