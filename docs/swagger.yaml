@@ -6,6 +6,23 @@ info:
   title: Vessl API
   version: "1.0"
 paths:
+  /api/apps/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete App Service
+      parameters:
+      - description: App ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Delete App Service
+      tags:
+      - AppServices
   /api/auth/2fa/disable:
     post:
       consumes:
@@ -106,6 +123,85 @@ paths:
       summary: Register endpoint
       tags:
       - Auth
+  /api/backups:
+    get:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        List endpoint
+        List Backups
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: List Backups
+      tags:
+      - Workspaces
+      - Backups
+    post:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Create endpoint
+        Create Backup
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Create Backup
+      tags:
+      - Workspaces
+      - Backups
+  /api/backups/{id}:
+    delete:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Delete endpoint
+        Delete Backup
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Backup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Delete Backup
+      tags:
+      - Workspaces
+      - Backups
+    get:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Get endpoint
+        Get Backup
+      parameters:
+      - description: Backup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Get Backup
+      tags:
+      - Teams
+      - Backups
   /api/backups/{id}/records:
     get:
       consumes:
@@ -127,7 +223,10 @@ paths:
     post:
       consumes:
       - application/json
-      description: Trigger endpoint
+      - application/json
+      description: |-
+        Trigger endpoint
+        Trigger Deployment
       parameters:
       - description: id
         in: path
@@ -136,10 +235,12 @@ paths:
         type: string
       produces:
       - application/json
+      - application/json
       responses: {}
-      summary: Trigger endpoint
+      summary: Trigger Deployment
       tags:
       - Backups
+      - Deployments
   /api/canvas/projects:
     get:
       consumes:
@@ -307,6 +408,60 @@ paths:
       summary: Rollback endpoint
       tags:
       - Deployments
+  /api/domains/{id}:
+    delete:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Delete endpoint
+        Delete Domain
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Domain ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Delete Domain
+      tags:
+      - Workspaces
+      - Domains
+  /api/environments/{id}:
+    delete:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Delete endpoint
+        Delete Environment
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Environment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Delete Environment
+      tags:
+      - Workspaces
+      - Environments
   /api/environments/{id}/apps:
     get:
       consumes:
@@ -402,6 +557,54 @@ paths:
       summary: ListProjectJobs endpoint
       tags:
       - Jobs
+  /api/jobs/{id}:
+    delete:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Delete endpoint
+        Delete Job
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Delete Job
+      tags:
+      - Workspaces
+      - Jobs
+    get:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Get endpoint
+        Get Job
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Get Job
+      tags:
+      - Teams
+      - Jobs
   /api/jobs/{id}/trigger:
     post:
       consumes:
@@ -419,17 +622,6 @@ paths:
       summary: Run endpoint
       tags:
       - Jobs
-  /api/mcp:
-    post:
-      consumes:
-      - application/json
-      description: HandleMCPRequest endpoint
-      produces:
-      - application/json
-      responses: {}
-      summary: HandleMCPRequest endpoint
-      tags:
-      - Mcp
   /api/oauth/vercel/callback:
     get:
       consumes:
@@ -645,6 +837,38 @@ paths:
       summary: AddMember endpoint
       tags:
       - Projects
+  /api/projects/{projectId}/members/{id}:
+    delete:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        RemoveMember endpoint
+        Remove Project Member
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Remove Project Member
+      tags:
+      - Teams
+      - ProjectSettings
   /api/projects/{projectId}/tokens:
     get:
       consumes:
@@ -793,6 +1017,28 @@ paths:
       summary: DeleteS3Destination endpoint
       tags:
       - S3-destinations
+  /api/services/{serviceId}/deploy:
+    post:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Trigger endpoint
+        Trigger Deployment
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Trigger Deployment
+      tags:
+      - Backups
+      - Deployments
   /api/services/{serviceId}/deployments:
     get:
       consumes:
@@ -860,6 +1106,112 @@ paths:
       summary: SaveCode endpoint
       tags:
       - Services
+  /api/services/{serviceId}/variables:
+    get:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        List endpoint
+        List Service Variables
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: List Service Variables
+      tags:
+      - Workspaces
+      - ServiceVariables
+    post:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Create endpoint
+        Create Service Variable
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Create Service Variable
+      tags:
+      - Workspaces
+      - ServiceVariables
+  /api/services/{serviceId}/variables/{id}:
+    delete:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Delete endpoint
+        Delete Service Variable
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      - description: Variable ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Delete Service Variable
+      tags:
+      - Workspaces
+      - ServiceVariables
+    put:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Update endpoint
+        Update Service Variable
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      - description: Variable ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Update Service Variable
+      tags:
+      - Workspaces
+      - ServiceVariables
   /api/settings:
     get:
       consumes:
@@ -1053,6 +1405,22 @@ paths:
       responses: {}
       summary: GetGitlabApp endpoint
       tags:
+      - Settings
+  /api/settings/license:
+    post:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Activates offline license key
+        Activate License
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Activate License
+      tags:
+      - Settings
       - Settings
   /api/settings/notifications:
     get:
@@ -1312,6 +1680,85 @@ paths:
       summary: AcceptInvite endpoint
       tags:
       - Team-invites
+  /api/teams:
+    get:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        List endpoint
+        List Teams
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: List Teams
+      tags:
+      - Workspaces
+      - Teams
+    post:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Create endpoint
+        Create Team
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Create Team
+      tags:
+      - Workspaces
+      - Teams
+  /api/teams/{id}:
+    delete:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Delete endpoint
+        Delete Team
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Team ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Delete Team
+      tags:
+      - Workspaces
+      - Teams
+    get:
+      consumes:
+      - application/json
+      - application/json
+      description: |-
+        Get endpoint
+        Get Team
+      parameters:
+      - description: Team ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      - application/json
+      responses: {}
+      summary: Get Team
+      tags:
+      - Teams
+      - Teams
   /api/teams/{id}/invite:
     post:
       consumes:
@@ -1418,6 +1865,39 @@ paths:
       summary: ListAuditLogs endpoint
       tags:
       - Teams
+  /api/teams/{teamId}/email_settings:
+    get:
+      consumes:
+      - application/json
+      description: Get Team Email Settings
+      parameters:
+      - description: Team ID
+        in: path
+        name: teamId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Get Team Email Settings
+      tags:
+      - EmailSettings
+    post:
+      consumes:
+      - application/json
+      description: Save Team Email Settings
+      parameters:
+      - description: Team ID
+        in: path
+        name: teamId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Save Team Email Settings
+      tags:
+      - EmailSettings
   /api/teams/{teamId}/ssh-keys:
     get:
       consumes:
@@ -1638,7 +2118,9 @@ paths:
     get:
       consumes:
       - application/json
-      description: HandleWebSocket endpoint
+      description: |-
+        HandleWebSocket endpoint
+        Handle Terminal WebSocket
       parameters:
       - description: id
         in: path
@@ -1648,9 +2130,30 @@ paths:
       produces:
       - application/json
       responses: {}
-      summary: HandleWebSocket endpoint
+      summary: Handle Terminal WebSocket
       tags:
       - Ws
+      - Terminal
+  /api/ws/terminal/{id}:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        HandleWebSocket endpoint
+        Handle Terminal WebSocket
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Handle Terminal WebSocket
+      tags:
+      - Ws
+      - Terminal
 securityDefinitions:
   BearerAuth:
     in: header
