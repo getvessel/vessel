@@ -110,8 +110,8 @@ func NewServer(db *sql.DB, v *vault.Vault, deployer *engine.Deployer, traefikMan
 
 	authGuard := middleware.NewAuthGuard(tokenService, settingsService, projectSettingsService)
 
-	appHandler := handlers.NewAppHandler(appService)
-	databaseHandler := handlers.NewDatabaseHandler(databaseService)
+	appHandler := handlers.NewAppHandler(appService, projectService)
+	databaseHandler := handlers.NewDatabaseHandler(databaseService, projectService)
 	storageHandler := handlers.NewStorageHandler(storageService)
 	jobHandler := handlers.NewJobHandler(jobService)
 	canvasHandler := handlers.NewCanvasHandler(canvasService)

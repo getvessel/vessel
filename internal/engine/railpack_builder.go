@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/docker/docker/client"
-	"vessl.dev/vessl/internal/utils"
 )
 
 type RailpackBuilder struct {
@@ -30,32 +29,38 @@ func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions, engineNa
 		fmt.Fprintf(opts.LogWriter, "🛠️ [Railpack/Nixpacks] Stack detected: %s\n", stack)
 	}
 	if engineName == "buildpacks" {
-		packPath, err := exec.LookPath("pack")
-		if err == nil {
-			if opts.LogWriter != nil {
-				fmt.Fprintf(opts.LogWriter, "⚙️ [Buildpacks] Executing pack builder engine (%s)...\n", packPath)
-			}
-			cmd := exec.CommandContext(ctx, packPath, "build", imageTag, "--path", opts.SourceDir, "--builder", "paketobuildpacks/builder:base")
-			cmd.Stdout = opts.LogWriter
-			cmd.Stderr = opts.LogWriter
-			if err := cmd.Run(); err != nil {
-				return "", utils.NewDeploymentError("buildpacks execution failed", err)
-			}
+		if opts.LogWriter != nil {
+			fmt.Fprintf(opts.LogWriter, "⚙️ [Buildpacks] Executing pack builder engine via Docker container...\n")
+		}
+		cmd := exec.CommandContext(ctx, "docker", "run", "--rm",
+			"-v", "/var/run/docker.sock:/var/run/docker.sock",
+			"-v", fmt.Sprintf("%s:/app", opts.SourceDir),
+			"buildpacksio/pack:latest", "build", imageTag, "--path", "/app", "--builder", "paketobuildpacks/builder:base")
+		cmd.Stdout = opts.LogWriter
+		cmd.Stderr = opts.LogWriter
+		if err := cmd.Run(); err == nil {
 			return imageTag, nil
+		} else {
+			if opts.LogWriter != nil {
+				fmt.Fprintf(opts.LogWriter, "⚠️ [Buildpacks] Container execution failed, falling back to synthesized Dockerfile. Error: %v\n", err)
+			}
 		}
 	} else {
-		nixpacksPath, err := exec.LookPath("nixpacks")
-		if err == nil {
-			if opts.LogWriter != nil {
-				fmt.Fprintf(opts.LogWriter, "⚙️ [Nixpacks] Executing Nixpacks builder engine (%s)...\n", nixpacksPath)
-			}
-			cmd := exec.CommandContext(ctx, nixpacksPath, "build", opts.SourceDir, "--name", imageTag)
-			cmd.Stdout = opts.LogWriter
-			cmd.Stderr = opts.LogWriter
-			if err := cmd.Run(); err != nil {
-				return "", utils.NewDeploymentError("nixpacks execution failed", err)
-			}
+		if opts.LogWriter != nil {
+			fmt.Fprintf(opts.LogWriter, "⚙️ [Nixpacks] Executing Nixpacks builder engine via Docker container...\n")
+		}
+		cmd := exec.CommandContext(ctx, "docker", "run", "--rm",
+			"-v", "/var/run/docker.sock:/var/run/docker.sock",
+			"-v", fmt.Sprintf("%s:/app", opts.SourceDir),
+			"ghcr.io/railwayapp/nixpacks:latest", "build", "/app", "--name", imageTag)
+		cmd.Stdout = opts.LogWriter
+		cmd.Stderr = opts.LogWriter
+		if err := cmd.Run(); err == nil {
 			return imageTag, nil
+		} else {
+			if opts.LogWriter != nil {
+				fmt.Fprintf(opts.LogWriter, "⚠️ [Nixpacks] Container execution failed, falling back to synthesized Dockerfile. Error: %v\n", err)
+			}
 		}
 	}
 	if opts.LogWriter != nil {

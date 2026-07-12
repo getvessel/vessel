@@ -130,6 +130,8 @@ func (g *AuthGuard) RequireAuth() echo.MiddlewareFunc {
 				return err
 			}
 			c.Set("user", userClaims)
+			ctx := context.WithValue(c.Request().Context(), userClaimsKey, userClaims)
+			c.SetRequest(c.Request().WithContext(ctx))
 			return next(c)
 		}
 	}
@@ -203,6 +205,8 @@ func (g *AuthGuard) RequireRole(requiredRole string) echo.MiddlewareFunc {
 				return c.JSON(http.StatusForbidden, map[string]string{"error": "insufficient permissions"})
 			}
 			c.Set("user", userClaims)
+			ctx := context.WithValue(c.Request().Context(), userClaimsKey, userClaims)
+			c.SetRequest(c.Request().WithContext(ctx))
 			return next(c)
 		}
 	}
