@@ -77,7 +77,7 @@ func (h *WorkspaceHandler) Create(c echo.Context) error {
 // @Tags Workspaces
 // @Accept json
 // @Produce json
-// @Param teamId path string true "teamId"
+// @Param id path string true "id"
 // @Router /workspaces/{id} [get]
 func (h *WorkspaceHandler) Get(c echo.Context) error {
 	id := c.Param("id")

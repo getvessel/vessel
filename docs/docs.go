@@ -3075,8 +3075,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "teamId",
-                        "name": "teamId",
+                        "description": "id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
