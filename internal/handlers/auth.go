@@ -21,19 +21,25 @@ type AuthRequest struct {
 	Password string `json:"password"`
 }
 
+type RegisterRequest struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 // @Summary Register endpoint
 // @Description Register endpoint
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param request body AuthRequest true "Registration credentials"
+// @Param request body RegisterRequest true "Registration credentials"
 // @Router /api/auth/signup [post]
 func (h *AuthHandler) Register(c echo.Context) error {
-	var payload AuthRequest
+	var payload RegisterRequest
 	if err := c.Bind(&payload); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid payload"})
 	}
-	u, token, err := h.authService.Register(c.Request().Context(), payload.Email, payload.Password)
+	u, token, err := h.authService.Register(c.Request().Context(), payload.Name, payload.Email, payload.Password)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}

@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS domains (
 CREATE TABLE IF NOT EXISTS users (
 			id TEXT PRIMARY KEY,
 			email TEXT UNIQUE NOT NULL,
+			name TEXT DEFAULT '',
 			password_hash TEXT NOT NULL,
 			role TEXT DEFAULT 'developer',
 			totp_enabled BOOLEAN DEFAULT FALSE,

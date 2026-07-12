@@ -5,6 +5,7 @@ import "time"
 type User struct {
 	ID            string    `json:"id"`
 	Email         string    `json:"email"`
+	Name          string    `json:"name"`
 	PasswordHash  string    `json:"-"`
 	Role          string    `json:"role"`
 	TOTPEnabled   bool      `json:"totpEnabled"`
@@ -32,6 +33,7 @@ type PersonalAccessToken struct {
 
 type UpdateProfileRequest struct {
 	Email string `json:"email"`
+	Name  string `json:"name"`
 }
 
 type CreatePATRequest struct {

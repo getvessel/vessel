@@ -43,8 +43,8 @@ func (r *UserSQLiteRepository) CreateUser(ctx context.Context, u *models.User) e
 	u.UpdatedAt = now
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	_, err := r.db.ExecContext(ctx, `INSERT INTO users (id, email, password_hash, role, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?)`, u.ID, u.Email, u.PasswordHash, u.Role, u.CreatedAt, u.UpdatedAt)
+	_, err := r.db.ExecContext(ctx, `INSERT INTO users (id, email, name, password_hash, role, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?)`, u.ID, u.Email, u.Name, u.PasswordHash, u.Role, u.CreatedAt, u.UpdatedAt)
 	return err
 }
 
@@ -52,8 +52,8 @@ func (r *UserSQLiteRepository) GetUserByEmail(ctx context.Context, email string)
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var u models.User
-	err := r.db.QueryRowContext(ctx, `SELECT id, email, password_hash, role, created_at, updated_at
-		FROM users WHERE email = ?`, email).Scan(&u.ID, &u.Email, &u.PasswordHash, &u.Role, &u.CreatedAt, &u.UpdatedAt)
+	err := r.db.QueryRowContext(ctx, `SELECT id, email, name, password_hash, role, created_at, updated_at
+		FROM users WHERE email = ?`, email).Scan(&u.ID, &u.Email, &u.Name, &u.PasswordHash, &u.Role, &u.CreatedAt, &u.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, utils.NewNotFoundError("User", email)
 	}
@@ -67,8 +67,8 @@ func (r *UserSQLiteRepository) GetUserByID(ctx context.Context, id string) (*mod
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var u models.User
-	err := r.db.QueryRowContext(ctx, `SELECT id, email, password_hash, role, created_at, updated_at
-		FROM users WHERE id = ?`, id).Scan(&u.ID, &u.Email, &u.PasswordHash, &u.Role, &u.CreatedAt, &u.UpdatedAt)
+	err := r.db.QueryRowContext(ctx, `SELECT id, email, name, password_hash, role, created_at, updated_at
+		FROM users WHERE id = ?`, id).Scan(&u.ID, &u.Email, &u.Name, &u.PasswordHash, &u.Role, &u.CreatedAt, &u.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, utils.NewNotFoundError("User", id)
 	}
@@ -81,7 +81,7 @@ func (r *UserSQLiteRepository) GetUserByID(ctx context.Context, id string) (*mod
 func (r *UserSQLiteRepository) ListUsers(ctx context.Context) ([]models.User, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	rows, err := r.db.QueryContext(ctx, `SELECT id, email, password_hash, role, created_at, updated_at FROM users ORDER BY created_at ASC`)
+	rows, err := r.db.QueryContext(ctx, `SELECT id, email, name, password_hash, role, created_at, updated_at FROM users ORDER BY created_at ASC`)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (r *UserSQLiteRepository) ListUsers(ctx context.Context) ([]models.User, er
 	var users []models.User
 	for rows.Next() {
 		var u models.User
-		if err := rows.Scan(&u.ID, &u.Email, &u.PasswordHash, &u.Role, &u.CreatedAt, &u.UpdatedAt); err != nil {
+		if err := rows.Scan(&u.ID, &u.Email, &u.Name, &u.PasswordHash, &u.Role, &u.CreatedAt, &u.UpdatedAt); err != nil {
 			return nil, err
 		}
 		users = append(users, u)
@@ -101,8 +101,8 @@ func (r *UserSQLiteRepository) UpdateUser(ctx context.Context, u *models.User) e
 	u.UpdatedAt = time.Now()
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	_, err := r.db.ExecContext(ctx, `UPDATE users SET email = ?, password_hash = ?, role = ?, updated_at = ? WHERE id = ?`,
-		u.Email, u.PasswordHash, u.Role, u.UpdatedAt, u.ID)
+	_, err := r.db.ExecContext(ctx, `UPDATE users SET email = ?, name = ?, password_hash = ?, role = ?, updated_at = ? WHERE id = ?`,
+		u.Email, u.Name, u.PasswordHash, u.Role, u.UpdatedAt, u.ID)
 	return err
 }
 

@@ -70,6 +70,15 @@ definitions:
       role:
         type: string
     type: object
+  handlers.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
   handlers.TestNotificationRequest:
     properties:
       channelId:
@@ -759,7 +768,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/handlers.AuthRequest'
+          $ref: '#/definitions/handlers.RegisterRequest'
       produces:
       - application/json
       responses: {}

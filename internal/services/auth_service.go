@@ -27,9 +27,9 @@ func NewAuthService(ur repositories.UserRepository, sr repositories.SettingsRepo
 	}
 }
 
-func (a *AuthService) Register(ctx context.Context, email, password string) (*models.User, string, error) {
-	if email == "" || password == "" {
-		return nil, "", errors.New("email and password are required")
+func (a *AuthService) Register(ctx context.Context, name, email, password string) (*models.User, string, error) {
+	if email == "" || password == "" || name == "" {
+		return nil, "", errors.New("name, email and password are required")
 	}
 	users, _ := a.userRepo.ListUsers(ctx)
 	isInitial := len(users) == 0
@@ -65,6 +65,7 @@ func (a *AuthService) Register(ctx context.Context, email, password string) (*mo
 	u := &models.User{
 		ID:           uuid.New().String(),
 		Email:        email,
+		Name:         name,
 		PasswordHash: string(hashed),
 		Role:         role,
 		CreatedAt:    time.Now(),
