@@ -24,7 +24,7 @@ func (h *EmailSettingsHandler) GetTeamEmailSettings(c echo.Context) error {
 	if settings == nil {
 		return c.JSON(http.StatusOK, map[string]interface{}{"configured": false})
 	}
-	// Hide passwords
+
 	settings.SMTPPassword = ""
 	settings.ResendAPIKey = ""
 	return c.JSON(http.StatusOK, settings)

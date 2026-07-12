@@ -51,7 +51,7 @@ func pingTelemetry(db *sql.DB, version string) {
 	apps, err := appRepo.ListAll(context.Background())
 	activeApps := 0
 	if err == nil {
-		activeApps = len(apps) // simplified, usually you'd filter by active status
+		activeApps = len(apps)
 	}
 
 	payload := TelemetryPayload{
@@ -59,7 +59,7 @@ func pingTelemetry(db *sql.DB, version string) {
 		Version:       version,
 		OS:            runtime.GOOS,
 		Arch:          runtime.GOARCH,
-		ActiveServers: 1, // OSS is 1 server
+		ActiveServers: 1,
 		ActiveApps:    activeApps,
 	}
 
@@ -77,7 +77,7 @@ func pingTelemetry(db *sql.DB, version string) {
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return // Silently fail to not spam logs for offline instances
+		return
 	}
 	defer resp.Body.Close()
 

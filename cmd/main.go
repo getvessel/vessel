@@ -36,8 +36,6 @@ import (
 
 const vesslVersion = "0.1.0-alpha"
 
-// Unused proxy listers removed
-
 type dbDeployerStore struct {
 	db    *sql.DB
 	vault *vault.Vault
@@ -118,7 +116,6 @@ func main() {
 		log.Printf(" Warning: Failed to start Traefik proxy: %v", err)
 	}
 
-	// Start Telemetry Reporter
 	services.StartTelemetryReporter(db, vesslVersion)
 
 	host := os.Getenv("HOST")

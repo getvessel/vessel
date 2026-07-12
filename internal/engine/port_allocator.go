@@ -28,7 +28,7 @@ func GetAvailablePort() (int, error) {
 	}
 
 	if start > end {
-		start, end = end, start // swap if inverted
+		start, end = end, start
 	}
 
 	for port := start; port <= end; port++ {

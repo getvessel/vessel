@@ -44,7 +44,6 @@ func Run(ctx context.Context, serverURL, token string) error {
 	defer session.Close()
 	log.Println(" Secure tunnel established. Listening for controller commands...")
 
-	// Start telemetry background task
 	go startTelemetryLoop(ctx, serverURL, token)
 
 	for {
@@ -181,7 +180,7 @@ func startTelemetryLoop(ctx context.Context, serverURL, token string) {
 
 			payload := map[string]interface{}{
 				"deployments":     0,
-				"container_hours": vesslContainers, // 1 hour elapsed * N containers
+				"container_hours": vesslContainers,
 				"bandwidth_gb":    0,
 			}
 			body, _ := json.Marshal(payload)

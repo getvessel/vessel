@@ -22,7 +22,7 @@ import (
 )
 
 func NewServer(db *sql.DB, v *vault.Vault, deployer *engine.Deployer, traefikManager *proxy.TraefikManager, dockerClient *client.Client) *Server {
-	// Base router setup
+
 	e := echo.New()
 	e.Use(echomiddleware.RequestLoggerWithConfig(echomiddleware.RequestLoggerConfig{
 		LogStatus: true,
@@ -36,7 +36,6 @@ func NewServer(db *sql.DB, v *vault.Vault, deployer *engine.Deployer, traefikMan
 	e.Use(echomiddleware.Recover())
 	e.Use(echomiddleware.CORS())
 
-	// Repositories
 	environmentSQLiteRepository := repositories.NewEnvironmentSQLiteRepository(db)
 	projectSQLiteRepository := repositories.NewProjectSQLiteRepository(db, environmentSQLiteRepository)
 	appServiceSQLiteRepository := repositories.NewAppServiceSQLiteRepository(db)
@@ -65,7 +64,6 @@ func NewServer(db *sql.DB, v *vault.Vault, deployer *engine.Deployer, traefikMan
 	teamAISettingsSQLiteRepository := repositories.NewTeamAISettingsSQLiteRepository(db, v)
 	vercelRepository := repositories.NewVercelRepository(db, v)
 
-	// Engine & Deployers
 	httpEngineAdapter := newEngineAdapter(settingsSQLiteRepository, appServiceSQLiteRepository, envSQLiteRepository, databaseSQLiteRepository, storageSQLiteRepository, projectSQLiteRepository, jobSQLiteRepository, backupSQLiteRepository, s3DestinationSQLiteRepository, serviceVarSQLiteRepository, serverlessRepository)
 	databaseDeployer := engine.NewDatabaseDeployer(dockerClient, httpEngineAdapter)
 	storageDeployer := engine.NewStorageDeployer(dockerClient, httpEngineAdapter)
@@ -76,7 +74,6 @@ func NewServer(db *sql.DB, v *vault.Vault, deployer *engine.Deployer, traefikMan
 	backupManager := engine.NewBackupManager(dockerClient, httpEngineAdapter, "")
 	_ = backupManager.Start()
 
-	// Services
 	projectService := services.NewProjectService(projectSQLiteRepository, environmentSQLiteRepository, appServiceSQLiteRepository, serviceVarSQLiteRepository)
 	appService := services.NewAppService(appServiceSQLiteRepository, serviceVarSQLiteRepository)
 	databaseService := services.NewDatabaseService(databaseSQLiteRepository, databaseDeployer)
@@ -109,13 +106,10 @@ func NewServer(db *sql.DB, v *vault.Vault, deployer *engine.Deployer, traefikMan
 	updaterService := services.NewUpdaterService(settingsSQLiteRepository)
 	updaterService.Start(context.Background())
 
-	// MCP Bridge
 	bridge := mcp.NewBridge(projectService, appService, databaseService)
 
-	// Auth Guard
 	authGuard := middleware.NewAuthGuard(tokenService, settingsService, projectSettingsService)
 
-	// Handlers
 	appHandler := handlers.NewAppHandler(appService)
 	databaseHandler := handlers.NewDatabaseHandler(databaseService)
 	storageHandler := handlers.NewStorageHandler(storageService)

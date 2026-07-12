@@ -75,7 +75,7 @@ func (s *VercelService) HandleCallback(ctx context.Context, userID, code string)
 	account := &models.UserVercelAccount{
 		UserID:      userID,
 		AccessToken: result.AccessToken,
-		AccountName: "Vercel Account", // We could fetch user info to get the real name, but this is a default
+		AccountName: "Vercel Account",
 	}
 
 	if result.TeamID != "" {

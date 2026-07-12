@@ -167,7 +167,7 @@ func (s *Server) registerRoutes() {
 
 	authGroup.GET("/teams/:teamId/ai_settings", s.aiSettingsHandler.Get)
 	apiGroup.PUT("/teams/:teamId/ai_settings", s.aiSettingsHandler.Save, s.authGuard.RequireAuth())
-	// Email Settings
+
 	authGroup.GET("/teams/:teamId/email_settings", s.emailSettingsHandler.GetTeamEmailSettings)
 	apiGroup.PUT("/teams/:teamId/email_settings", s.emailSettingsHandler.SaveTeamEmailSettings, s.authGuard.RequireAuth())
 	authGroup.POST("/deployments/:id/diagnostics", s.aiDiagnosticsHandler.Analyze)

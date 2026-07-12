@@ -107,7 +107,7 @@ func (m *TraefikManager) createTraefikContainer(ctx context.Context) error {
 
 func (m *TraefikManager) buildTraefikCmdArgs() []string {
 	cmdArgs := []string{
-		"--api.insecure=true", // Enable dashboard (do not expose in prod)
+		"--api.insecure=true",
 		"--providers.docker=true",
 		"--providers.docker.exposedbydefault=false",
 		"--providers.docker.network=" + VesslNetworkName,
@@ -149,6 +149,6 @@ func (m *TraefikManager) buildPortBindings() nat.PortMap {
 	return nat.PortMap{
 		"80/tcp":   []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "80"}},
 		"443/tcp":  []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "443"}},
-		"8080/tcp": []nat.PortBinding{{HostIP: "127.0.0.1", HostPort: "8080"}}, // Dashboard (local only)
+		"8080/tcp": []nat.PortBinding{{HostIP: "127.0.0.1", HostPort: "8080"}},
 	}
 }

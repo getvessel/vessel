@@ -21,7 +21,7 @@ func NewMailerService(settingsService *services.EmailSettingsService) *MailerSer
 }
 
 func (s *MailerService) SendTeamEmail(ctx context.Context, teamID, templateName string, toAddress string, subject string, data any) error {
-	// Fetch DB settings
+
 	settings, err := s.settingsService.GetTeamEmailSettings(ctx, teamID)
 	if err != nil {
 		return fmt.Errorf("fetching team email settings: %w", err)
@@ -53,7 +53,6 @@ func (s *MailerService) SendTeamEmail(ctx context.Context, teamID, templateName 
 		return fmt.Errorf("executing template %s: %w", templateName, err)
 	}
 
-	// Send email
 	msg := fmt.Appendf(nil, "To: %s\r\n"+
 		"From: %s\r\n"+
 		"Subject: %s\r\n"+

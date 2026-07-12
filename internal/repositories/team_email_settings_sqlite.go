@@ -64,7 +64,7 @@ func (r *TeamEmailSettingsSQLiteRepository) GetByTeamID(ctx context.Context, tea
 	var s models.TeamEmailSettings
 	err := scanTeamEmailSettings(row, &s, r.vault)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil // No settings configured yet
+		return nil, nil
 	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to get team email settings: %w", err)
