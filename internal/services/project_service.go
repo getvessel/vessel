@@ -109,8 +109,8 @@ func (s *ProjectService) GetProject(ctx context.Context, id string) (*models.Pro
 	return s.projectRepo.Get(ctx, id)
 }
 
-func (s *ProjectService) ListProjects(ctx context.Context) ([]models.ProjectConfig, error) {
-	return s.projectRepo.List(ctx)
+func (s *ProjectService) ListProjects(ctx context.Context, teamID string, limit, offset int) ([]models.ProjectConfig, int, error) {
+	return s.projectRepo.List(ctx, teamID, limit, offset)
 }
 
 func (s *ProjectService) DeleteProject(ctx context.Context, id string) error {

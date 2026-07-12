@@ -1,4 +1,4 @@
-export interface BaseResponse<T = any> {
+export interface BaseResponse<T = unknown> {
   status: 'success' | 'error' | 'warning';
   message: string;
   data: T;

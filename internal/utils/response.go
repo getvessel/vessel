@@ -8,18 +8,18 @@ import (
 )
 
 type APIResponse struct {
-	Status        string      `json:"status"`
-	Message       string      `json:"message"`
-	Data          interface{} `json:"data,omitempty"`
-	Path          string      `json:"path,omitempty"`
-	ExecutionTime float64     `json:"executionTime,omitempty"`
+	Status        string  `json:"status"`
+	Message       string  `json:"message"`
+	Data          any     `json:"data,omitempty"`
+	Path          string  `json:"path,omitempty"`
+	ExecutionTime float64 `json:"executionTime,omitempty"`
 }
 
 type PaginatedData struct {
-	Records    interface{} `json:"records"`
-	Total      int         `json:"total"`
-	Page       int         `json:"page"`
-	TotalPages int         `json:"totalPages"`
+	Records    any `json:"records"`
+	Total      int `json:"total"`
+	Page       int `json:"page"`
+	TotalPages int `json:"totalPages"`
 }
 
 // Success returns a standardized success response

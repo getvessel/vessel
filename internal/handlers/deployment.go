@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -31,17 +32,30 @@ func NewDeploymentHandler(ds *services.DeploymentService, as *services.AppServic
 // @Accept json
 // @Produce json
 // @Param serviceId path string true "serviceId"
+// @Param page query int false "Page number"
+// @Param limit query int false "Items per page"
 // @Router /services/{serviceId}/deployments [get]
 func (h *DeploymentHandler) ListServiceDeployments(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	if serviceID == "" {
 		return utils.Error(c, http.StatusBadRequest, "missing serviceId parameter")
 	}
-	deps, err := h.deploymentService.ListByService(c.Request().Context(), serviceID)
+
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	if page < 1 {
+		page = 1
+	}
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+	if limit < 1 {
+		limit = 10
+	}
+	offset := (page - 1) * limit
+
+	deps, total, err := h.deploymentService.ListByService(c.Request().Context(), serviceID, limit, offset)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
-	return utils.Success(c, "Operation successful", deps)
+	return utils.Paginated(c, "Deployments retrieved", deps, total, page, limit)
 }
 
 // @Summary Trigger Deployment

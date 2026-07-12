@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -28,8 +29,26 @@ type CreatePATRequest struct {
 	Name string `json:"name"`
 }
 
+// @Summary ListUsers endpoint
+// @Description ListUsers endpoint
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number"
+// @Param limit query int false "Items per page"
+// @Router /users [get]
 func (h *UserHandler) ListUsers(c echo.Context) error {
-	users, err := h.userService.ListUsers(c.Request().Context())
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	if page < 1 {
+		page = 1
+	}
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+	if limit < 1 {
+		limit = 10
+	}
+	offset := (page - 1) * limit
+
+	users, total, err := h.userService.ListUsers(c.Request().Context(), limit, offset)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
@@ -38,7 +57,7 @@ func (h *UserHandler) ListUsers(c echo.Context) error {
 		u.PasswordHash = ""
 		out = append(out, u)
 	}
-	return utils.Success(c, "Users retrieved", out)
+	return utils.Paginated(c, "Users retrieved", out, total, page, limit)
 }
 
 // @Summary GetProfile endpoint

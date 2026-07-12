@@ -16,7 +16,7 @@ import (
 type DeploymentRepository interface {
 	Create(ctx context.Context, d *models.Deployment) error
 	GetByID(ctx context.Context, id string) (*models.Deployment, error)
-	ListByService(ctx context.Context, serviceID string) ([]*models.Deployment, error)
+	ListByService(ctx context.Context, serviceID string, limit, offset int) ([]*models.Deployment, int, error)
 	Update(ctx context.Context, d *models.Deployment) error
 	UpdateStatus(ctx context.Context, id, status, buildLogs, containerID string) error
 }
@@ -76,12 +76,17 @@ func (r *DeploymentSQLiteRepository) GetByID(_ context.Context, id string) (*mod
 	return &d, nil
 }
 
-func (r *DeploymentSQLiteRepository) ListByService(_ context.Context, serviceID string) ([]*models.Deployment, error) {
+func (r *DeploymentSQLiteRepository) ListByService(_ context.Context, serviceID string, limit, offset int) ([]*models.Deployment, int, error) {
+	var total int
+	if err := r.db.QueryRow(`SELECT COUNT(*) FROM deployments WHERE service_id = ?`, serviceID).Scan(&total); err != nil {
+		return nil, 0, err
+	}
+
 	rows, err := r.db.Query(`SELECT id, service_id, environment_id, project_id, status, commit_hash,
 		commit_message, branch, trigger, build_logs, container_id, created_at, updated_at, finished_at
-		FROM deployments WHERE service_id = ? ORDER BY created_at DESC`, serviceID)
+		FROM deployments WHERE service_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`, serviceID, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query service deployments: %w", err)
+		return nil, 0, fmt.Errorf("failed to query service deployments: %w", err)
 	}
 	defer rows.Close()
 	var deps []*models.Deployment
@@ -92,14 +97,14 @@ func (r *DeploymentSQLiteRepository) ListByService(_ context.Context, serviceID 
 			&d.ID, &d.ServiceID, &d.EnvironmentID, &d.ProjectID, &d.Status, &d.CommitHash,
 			&d.CommitMessage, &d.Branch, &d.Trigger, &d.BuildLogs, &d.ContainerID, &d.CreatedAt, &d.UpdatedAt, &finishedAt,
 		); err != nil {
-			return nil, fmt.Errorf("failed to scan deployment row: %w", err)
+			return nil, 0, fmt.Errorf("failed to scan deployment row: %w", err)
 		}
 		if finishedAt.Valid {
 			d.FinishedAt = finishedAt.Time
 		}
 		deps = append(deps, &d)
 	}
-	return deps, rows.Err()
+	return deps, total, rows.Err()
 }
 
 func (r *DeploymentSQLiteRepository) Update(_ context.Context, d *models.Deployment) error {

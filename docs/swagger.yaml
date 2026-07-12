@@ -1336,6 +1336,15 @@ paths:
       consumes:
       - application/json
       description: ListProjects endpoint
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses: {}
@@ -1803,6 +1812,14 @@ paths:
         name: serviceId
         required: true
         type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses: {}
@@ -2540,6 +2557,26 @@ paths:
       summary: CreateTrustedDomain endpoint
       tags:
       - Workspaces
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: ListUsers endpoint
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: ListUsers endpoint
+      tags:
+      - Users
   /vercel/projects:
     get:
       consumes:

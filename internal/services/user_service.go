@@ -51,8 +51,8 @@ func (s *UserService) GetUserByID(ctx context.Context, id string) (*models.User,
 	return s.userRepo.GetUserByID(ctx, id)
 }
 
-func (s *UserService) ListUsers(ctx context.Context) ([]models.User, error) {
-	return s.userRepo.ListUsers(ctx)
+func (s *UserService) ListUsers(ctx context.Context, limit, offset int) ([]models.User, int, error) {
+	return s.userRepo.ListUsers(ctx, limit, offset)
 }
 
 func (s *UserService) UpdateUser(ctx context.Context, u *models.User) error {

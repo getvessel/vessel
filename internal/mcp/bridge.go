@@ -56,7 +56,7 @@ func (b *Bridge) registerTools() {
 }
 
 func (b *Bridge) handleListProjects(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	projects, err := b.projectService.ListProjects(ctx)
+	projects, _, err := b.projectService.ListProjects(ctx, "", 100, 0)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}

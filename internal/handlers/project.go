@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 
@@ -25,23 +26,32 @@ func NewProjectHandler(s *services.ProjectService) *ProjectHandler {
 // @Tags Projects
 // @Accept json
 // @Produce json
+// @Param page query int false "Page number"
+// @Param limit query int false "Items per page"
 // @Router /projects [get]
 func (h *ProjectHandler) ListProjects(c echo.Context) error {
-	projects, err := h.projectService.ListProjects(c.Request().Context())
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	if page < 1 {
+		page = 1
+	}
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+	if limit < 1 {
+		limit = 10
+	}
+	offset := (page - 1) * limit
+
+	var teamID string
+	user := middleware.GetUserClaimsFromContext(c.Request().Context())
+	if user != nil && user.Role != "admin" {
+		teamID = user.UserID
+	}
+
+	projects, total, err := h.projectService.ListProjects(c.Request().Context(), teamID, limit, offset)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
-	user := middleware.GetUserClaimsFromContext(c.Request().Context())
-	if user != nil && user.Role != "admin" {
-		var filtered []models.ProjectConfig
-		for _, p := range projects {
-			if p.TeamID == user.UserID {
-				filtered = append(filtered, p)
-			}
-		}
-		return utils.Success(c, "Operation successful", filtered)
-	}
-	return utils.Success(c, "Operation successful", projects)
+
+	return utils.Paginated(c, "Operation successful", projects, total, page, limit)
 }
 
 // @Summary CreateProject endpoint

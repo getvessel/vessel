@@ -11,7 +11,7 @@ import (
 )
 
 type ProjectRepository interface {
-	List(ctx context.Context) ([]models.ProjectConfig, error)
+	List(ctx context.Context, teamID string, limit, offset int) ([]models.ProjectConfig, int, error)
 	Get(ctx context.Context, id string) (*models.ProjectConfig, error)
 	Create(ctx context.Context, p *models.ProjectConfig) error
 	Delete(ctx context.Context, id string) error
@@ -31,21 +31,36 @@ func NewProjectSQLiteRepository(db *sql.DB, envRepo EnvironmentRepository) *Proj
 	return &ProjectSQLiteRepository{db: db, environments: envRepo}
 }
 
-func (r *ProjectSQLiteRepository) List(_ context.Context) ([]models.ProjectConfig, error) {
-	rows, err := r.db.Query(`SELECT id, COALESCE(workspace_id, ''), COALESCE(team_id,''), name, COALESCE(description,''), created_at, updated_at FROM projects ORDER BY created_at DESC`)
+func (r *ProjectSQLiteRepository) List(_ context.Context, teamID string, limit, offset int) ([]models.ProjectConfig, int, error) {
+	var total int
+	var err error
+	var rows *sql.Rows
+
+	if teamID != "" {
+		if err = r.db.QueryRow(`SELECT COUNT(*) FROM projects WHERE team_id = ?`, teamID).Scan(&total); err != nil {
+			return nil, 0, err
+		}
+		rows, err = r.db.Query(`SELECT id, COALESCE(workspace_id, ''), COALESCE(team_id,''), name, COALESCE(description,''), created_at, updated_at FROM projects WHERE team_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`, teamID, limit, offset)
+	} else {
+		if err = r.db.QueryRow(`SELECT COUNT(*) FROM projects`).Scan(&total); err != nil {
+			return nil, 0, err
+		}
+		rows, err = r.db.Query(`SELECT id, COALESCE(workspace_id, ''), COALESCE(team_id,''), name, COALESCE(description,''), created_at, updated_at FROM projects ORDER BY created_at DESC LIMIT ? OFFSET ?`, limit, offset)
+	}
+
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 	var projects []models.ProjectConfig
 	for rows.Next() {
 		var p models.ProjectConfig
 		if err := rows.Scan(&p.ID, &p.WorkspaceID, &p.TeamID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt); err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		projects = append(projects, p)
 	}
-	return projects, rows.Err()
+	return projects, total, rows.Err()
 }
 
 func (r *ProjectSQLiteRepository) Get(_ context.Context, id string) (*models.ProjectConfig, error) {

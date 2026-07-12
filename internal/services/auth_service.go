@@ -31,8 +31,8 @@ func (a *AuthService) Register(ctx context.Context, name, email, password string
 	if email == "" || password == "" || name == "" {
 		return nil, "", errors.New("name, email and password are required")
 	}
-	users, _ := a.userRepo.ListUsers(ctx)
-	isInitial := len(users) == 0
+	_, total, _ := a.userRepo.ListUsers(ctx, 1, 0)
+	isInitial := total == 0
 	cfg, _ := a.settingsRepo.GetServerSettings(ctx)
 	if cfg != nil && !cfg.RegistrationEnabled && !isInitial {
 		return nil, "", errors.New("user registration is disabled on this server")

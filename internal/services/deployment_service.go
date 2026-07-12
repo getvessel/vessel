@@ -62,11 +62,11 @@ func (s *DeploymentService) GetDeployment(ctx context.Context, id string) (*mode
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *DeploymentService) ListByService(ctx context.Context, serviceID string) ([]*models.Deployment, error) {
+func (s *DeploymentService) ListByService(ctx context.Context, serviceID string, limit, offset int) ([]*models.Deployment, int, error) {
 	if serviceID == "" {
-		return nil, errors.New("service id required")
+		return nil, 0, errors.New("service id required")
 	}
-	return s.repo.ListByService(ctx, serviceID)
+	return s.repo.ListByService(ctx, serviceID, limit, offset)
 }
 
 func (s *DeploymentService) UpdateDeployment(ctx context.Context, d *models.Deployment) error {

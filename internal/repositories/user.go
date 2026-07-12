@@ -18,7 +18,7 @@ type UserRepository interface {
 	CreateUser(ctx context.Context, u *models.User) error
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 	GetUserByID(ctx context.Context, id string) (*models.User, error)
-	ListUsers(ctx context.Context) ([]models.User, error)
+	ListUsers(ctx context.Context, limit, offset int) ([]models.User, int, error)
 	UpdateUser(ctx context.Context, u *models.User) error
 	CreatePAT(ctx context.Context, pat *models.PersonalAccessToken) error
 	ListPATs(ctx context.Context, userID string) ([]*models.PersonalAccessToken, error)
@@ -78,23 +78,29 @@ func (r *UserSQLiteRepository) GetUserByID(ctx context.Context, id string) (*mod
 	return &u, nil
 }
 
-func (r *UserSQLiteRepository) ListUsers(ctx context.Context) ([]models.User, error) {
+func (r *UserSQLiteRepository) ListUsers(ctx context.Context, limit, offset int) ([]models.User, int, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	rows, err := r.db.QueryContext(ctx, `SELECT id, email, name, password_hash, role, created_at, updated_at FROM users ORDER BY created_at ASC`)
+
+	var total int
+	if err := r.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM users`).Scan(&total); err != nil {
+		return nil, 0, err
+	}
+
+	rows, err := r.db.QueryContext(ctx, `SELECT id, email, name, password_hash, role, created_at, updated_at FROM users ORDER BY created_at ASC LIMIT ? OFFSET ?`, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 	var users []models.User
 	for rows.Next() {
 		var u models.User
 		if err := rows.Scan(&u.ID, &u.Email, &u.Name, &u.PasswordHash, &u.Role, &u.CreatedAt, &u.UpdatedAt); err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		users = append(users, u)
 	}
-	return users, nil
+	return users, total, nil
 }
 
 func (r *UserSQLiteRepository) UpdateUser(ctx context.Context, u *models.User) error {
