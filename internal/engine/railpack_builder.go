@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"os"
 	"os/exec"
@@ -106,62 +107,26 @@ func (r *RailpackBuilder) detectLanguageStack(sourceDir string) string {
 	return "Static / Universal HTML"
 }
 
+//go:embed templates/*.Dockerfile
+var templateFS embed.FS
+
 func (r *RailpackBuilder) synthesizeDockerfile(stack string, opts BuildOptions) (string, error) {
+	var templateName string
 	switch {
 	case strings.HasPrefix(stack, "Node.js"):
-		return `FROM node:22-alpine
-WORKDIR /app
-COPY package*.json ./
-# Install all dependencies (including devDependencies) so build scripts work
-RUN npm install
-COPY . .
-# Execute build script if defined in package.json
-RUN npm run build --if-present
-# Prune devDependencies after build
-RUN npm prune --production
-EXPOSE 3000
-CMD ["npm", "start"]
-`, nil
+		templateName = "templates/nodejs.Dockerfile"
 	case strings.HasPrefix(stack, "Go"):
-		return `FROM golang:1.24-alpine AS builder
-WORKDIR /app
-COPY go.mod go.sum* ./
-RUN go mod download
-COPY . .
-# Find the directory containing main.go and build it
-RUN MAIN_PKG=$(find . -name main.go | head -n 1 | xargs dirname); if [ -z "$MAIN_PKG" ]; then MAIN_PKG="."; fi; CGO_ENABLED=0 GOOS=linux go build -o /app/server $MAIN_PKG
-FROM alpine:latest
-WORKDIR /app
-COPY --from=builder /app/server /app/server
-EXPOSE 3000
-CMD ["/app/server"]
-`, nil
+		templateName = "templates/go.Dockerfile"
 	case strings.HasPrefix(stack, "Python"):
-		return `FROM python:3.12-slim
-WORKDIR /app
-COPY requirements.txt* pyproject.toml* ./
-RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; fi
-COPY . .
-EXPOSE 3000
-# Smarter python entrypoint detection
-CMD ["sh", "-c", "if [ -f main.py ]; then python main.py; elif [ -f app.py ]; then python app.py; else python3 -m http.server 3000; fi"]
-`, nil
+		templateName = "templates/python.Dockerfile"
 	case strings.HasPrefix(stack, "Rust"):
-		return `FROM rust:1.83-alpine AS builder
-WORKDIR /app
-COPY . .
-RUN cargo build --release
-FROM alpine:latest
-WORKDIR /app
-COPY --from=builder /app/target/release/* /app/server
-EXPOSE 3000
-CMD ["/app/server"]
-`, nil
+		templateName = "templates/rust.Dockerfile"
 	default:
-		return `FROM nginx:alpine
-COPY . /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-`, nil
+		templateName = "templates/static.Dockerfile"
 	}
+	content, err := templateFS.ReadFile(templateName)
+	if err != nil {
+		return "", fmt.Errorf("failed to read embedded dockerfile template %s: %w", templateName, err)
+	}
+	return string(content), nil
 }
