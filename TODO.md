@@ -48,18 +48,6 @@
 
 ---
 
-## 🌐 Phase 4: Public Marketing Site (`web/`)
-
-- [ ] **Hero Section & Quick-Install Banner**:
-  - High-conversion hero banner with one-click copyable install command: `curl -fsSL https://get.vessl.dev | sh`.
-  - Interactive terminal mockup tabs showing instant container rollouts & CPU/RAM usage.
-- [ ] **Comparison Tables vs. Existing Solutions**:
-  - Comparison grid highlighting `<30MB RAM` Go daemon vs. Coolify/CapRover/Dokku/Railway/Vercel.
-- [ ] **Documentation & FAQ pages**:
-  - Setup guides for DigitalOcean, Hetzner, AWS EC2, and local bare-metal servers.
-
----
-
 ## 🤖 Phase 7: AI Agent Protocol (MCP) & API Ecosystem
 
 > The MCP server and API Ecosystem is a core feature built into the `vessld` Go daemon directly so self-hosters can use it for free. Cloud-specific proxying lives in the `vessl-cloud` repository.
