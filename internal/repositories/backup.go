@@ -100,7 +100,7 @@ func (r *BackupSQLiteRepository) CreateConfig(_ context.Context, cfg *models.Bac
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	_, err := r.db.Exec(`INSERT INTO backup_configs (id, project_id, database_id, storage_id, s3_destination_id, name, schedule, retention_days, status, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		cfg.ID, cfg.ProjectID, cfg.DatabaseID, cfg.StorageID, cfg.S3DestinationID, cfg.Name, cfg.Schedule, cfg.RetentionDays, cfg.Status, cfg.CreatedAt, cfg.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("failed to create backup config: %w", err)

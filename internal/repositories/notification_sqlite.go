@@ -26,7 +26,7 @@ func NewNotificationSQLiteRepository(db *sql.DB) *NotificationSQLiteRepository {
 }
 
 func (r *NotificationSQLiteRepository) ListChannelsByTeam(ctx context.Context, workspaceID string) ([]models.WorkspaceNotificationChannel, error) {
-	query := `SELECT id, team_id, provider, config, events, is_enabled, created_at, updated_at FROM team_notification_channels WHERE team_id = ? ORDER BY created_at DESC`
+	query := `SELECT id, workspace_id, provider, config, events, is_enabled, created_at, updated_at FROM workspace_notification_channels WHERE workspace_id = ? ORDER BY created_at DESC`
 	rows, err := r.db.QueryContext(ctx, query, workspaceID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list channels: %w", err)
@@ -48,7 +48,7 @@ func (r *NotificationSQLiteRepository) ListChannelsByTeam(ctx context.Context, w
 }
 
 func (r *NotificationSQLiteRepository) GetChannel(ctx context.Context, id string) (*models.WorkspaceNotificationChannel, error) {
-	query := `SELECT id, team_id, provider, config, events, is_enabled, created_at, updated_at FROM team_notification_channels WHERE id = ?`
+	query := `SELECT id, workspace_id, provider, config, events, is_enabled, created_at, updated_at FROM workspace_notification_channels WHERE id = ?`
 	row := r.db.QueryRowContext(ctx, query, id)
 	var c models.WorkspaceNotificationChannel
 	var configStr, eventsStr string
@@ -70,9 +70,9 @@ func (r *NotificationSQLiteRepository) SaveChannel(ctx context.Context, c *model
 	}
 	c.UpdatedAt = now
 
-	query := `INSERT INTO team_notification_channels (
-		id, team_id, provider, config, events, is_enabled, created_at, updated_at
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+	query := `INSERT INTO workspace_notification_channels (
+		id, workspace_id, provider, config, events, is_enabled, created_at, updated_at
+	) VALUES (?, ?, ?, ?, ?, ?, ?)
 	ON CONFLICT(id) DO UPDATE SET
 		provider = excluded.provider,
 		config = excluded.config,
@@ -90,7 +90,7 @@ func (r *NotificationSQLiteRepository) SaveChannel(ctx context.Context, c *model
 }
 
 func (r *NotificationSQLiteRepository) DeleteChannel(ctx context.Context, id string) error {
-	_, err := r.db.ExecContext(ctx, `DELETE FROM team_notification_channels WHERE id = ?`, id)
+	_, err := r.db.ExecContext(ctx, `DELETE FROM workspace_notification_channels WHERE id = ?`, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete channel: %w", err)
 	}

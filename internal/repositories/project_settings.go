@@ -50,7 +50,7 @@ func (r *ProjectSettingsSQLiteRepository) CreateWebhook(ctx context.Context, w *
 	eventTypesStr := strings.Join(w.EventTypes, ",")
 	_, err := r.db.ExecContext(ctx,
 		`INSERT INTO project_webhooks (id, project_id, url, event_types, include_pr_environments, created_at, updated_at)
-		 VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		 VALUES (?, ?, ?, ?, ?, ?)`,
 		w.ID, w.ProjectID, w.URL, eventTypesStr, w.IncludePREnvironments, w.CreatedAt, w.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("create webhook: %w", err)

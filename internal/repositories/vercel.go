@@ -33,9 +33,9 @@ func (r *VercelRepository) SaveAccount(ctx context.Context, account *models.User
 	}
 
 	query := `
-		INSERT INTO user_vercel_accounts (id, user_id, encrypted_access_token, team_id, account_name, created_at, updated_at)
+		INSERT INTO user_vercel_accounts (id, user_id, encrypted_access_token, workspace_id, account_name, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?, ?, ?)
-		ON CONFLICT(user_id, team_id) DO UPDATE SET
+		ON CONFLICT(user_id, workspace_id) DO UPDATE SET
 			encrypted_access_token = excluded.encrypted_access_token,
 			account_name = excluded.account_name,
 			updated_at = excluded.updated_at
@@ -60,9 +60,9 @@ func (r *VercelRepository) GetAccount(ctx context.Context, userID string, teamID
 	var sqlTeamID sql.NullString
 
 	query := `
-		SELECT id, user_id, encrypted_access_token, team_id, account_name, created_at, updated_at
+		SELECT id, user_id, encrypted_access_token, workspace_id, account_name, created_at, updated_at
 		FROM user_vercel_accounts
-		WHERE user_id = ? AND team_id IS ?
+		WHERE user_id = ? AND workspace_id IS ?
 	`
 
 	var tID interface{} = nil
@@ -96,7 +96,7 @@ func (r *VercelRepository) GetAccount(ctx context.Context, userID string, teamID
 
 func (r *VercelRepository) GetAccountsForUser(ctx context.Context, userID string) ([]*models.UserVercelAccount, error) {
 	query := `
-		SELECT id, user_id, encrypted_access_token, team_id, account_name, created_at, updated_at
+		SELECT id, user_id, encrypted_access_token, workspace_id, account_name, created_at, updated_at
 		FROM user_vercel_accounts
 		WHERE user_id = ?
 	`

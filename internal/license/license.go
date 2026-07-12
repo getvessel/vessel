@@ -11,7 +11,7 @@ import (
 )
 
 type Claims struct {
-	WorkspaceID string `json:"team_id"`
+	WorkspaceID string `json:"workspace_id"`
 	Plan        string `json:"plan"` // e.g. "enterprise"
 	MaxSeats    int    `json:"max_seats"`
 	ExpiresAt   int64  `json:"exp"`

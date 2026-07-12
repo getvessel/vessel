@@ -1,6 +1,6 @@
 export interface TeamNotificationChannel {
   id: string;
-  teamId: string;
+  workspaceId: string;
   provider: string;
   config: Record<string, unknown>;
   events: Record<string, unknown>;
@@ -14,7 +14,7 @@ export interface NotificationEvent {
   message: string;
   level: string;
   eventType: string;
-  teamId: string;
+  workspaceId: string;
   projectId?: string;
   url?: string;
 }

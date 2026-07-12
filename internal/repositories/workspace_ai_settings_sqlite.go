@@ -26,7 +26,7 @@ func NewWorkspaceAISettingsSQLiteRepository(db *sql.DB, vault Vault) *WorkspaceA
 }
 
 func (r *WorkspaceAISettingsSQLiteRepository) Get(ctx context.Context, workspaceID string) (*models.WorkspaceAISettings, error) {
-	query := `SELECT id, team_id, provider, encrypted_api_key, created_at, updated_at FROM team_ai_settings WHERE team_id = ?`
+	query := `SELECT id, workspace_id, provider, encrypted_api_key, created_at, updated_at FROM workspace_ai_settings WHERE workspace_id = ?`
 	row := r.db.QueryRowContext(ctx, query, workspaceID)
 
 	var s models.WorkspaceAISettings
@@ -49,9 +49,9 @@ func (r *WorkspaceAISettingsSQLiteRepository) Get(ctx context.Context, workspace
 
 func (r *WorkspaceAISettingsSQLiteRepository) Save(ctx context.Context, settings *models.WorkspaceAISettings) error {
 	query := `
-		INSERT INTO team_ai_settings (id, team_id, provider, encrypted_api_key, created_at, updated_at)
+		INSERT INTO workspace_ai_settings (id, workspace_id, provider, encrypted_api_key, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?, ?)
-		ON CONFLICT(team_id) DO UPDATE SET
+		ON CONFLICT(workspace_id) DO UPDATE SET
 			provider = excluded.provider,
 			encrypted_api_key = excluded.encrypted_api_key,
 			updated_at = CURRENT_TIMESTAMP

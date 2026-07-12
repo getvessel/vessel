@@ -1,5 +1,6 @@
-export interface Deployment {
-  id: string;
+import type { BaseEntity } from './base';
+
+export interface Deployment extends BaseEntity {
   serviceId: string;
   environmentId: string;
   projectId: string;
@@ -10,8 +11,6 @@ export interface Deployment {
   trigger?: string;
   buildLogs?: string;
   containerId?: string;
-  createdAt: string;
-  updatedAt: string;
   finishedAt?: string;
 }
 
@@ -27,8 +26,7 @@ export interface TriggerDeploymentRequest {
   branch?: string;
 }
 
-export interface AppService {
-  id: string;
+export interface AppService extends BaseEntity {
   projectId: string;
   environmentId: string;
   name: string;
@@ -44,8 +42,6 @@ export interface AppService {
   healthCheckPath: string;
   containerId: string;
   status: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface CreateAppServiceRequest {
@@ -79,16 +75,13 @@ export interface UpdateAppServiceRequest {
   status: string;
 }
 
-export interface Variable {
-  id: string;
+export interface Variable extends BaseEntity {
   serviceId: string;
   projectId: string;
   environmentId: string;
   key: string;
   value: string;
   isSecret: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface CreateServiceVarRequest {
@@ -103,8 +96,7 @@ export interface UpdateServiceVarRequest {
   isSecret: boolean;
 }
 
-export interface Job {
-  id: string;
+export interface Job extends BaseEntity {
   projectId: string;
   name: string;
   schedule: string;
@@ -112,8 +104,6 @@ export interface Job {
   status: string;
   lastRunAt: string;
   lastOutput: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface CreateJobRequest {
@@ -130,8 +120,7 @@ export interface UpdateJobRequest {
   status?: string;
 }
 
-export interface BackupConfig {
-  id: string;
+export interface BackupConfig extends BaseEntity {
   projectId: string;
   databaseId?: string;
   storageId?: string;
@@ -140,8 +129,6 @@ export interface BackupConfig {
   schedule: string;
   retentionDays: number;
   status: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface BackupRecord {
@@ -170,8 +157,7 @@ export interface S3Destination {
   createdAt: string;
 }
 
-export interface PRPreview {
-  id: string;
+export interface PRPreview extends BaseEntity {
   serviceId: string;
   projectId: string;
   prNumber: number;
@@ -180,6 +166,4 @@ export interface PRPreview {
   status: string;
   previewDomain: string;
   containerId: string;
-  createdAt: string;
-  updatedAt: string;
 }

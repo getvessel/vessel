@@ -1,53 +1,37 @@
+import type { BaseEntity } from './base';
 import type { Database } from './database';
 import type { AppService } from './deployment';
 
-export interface ProjectConfig {
-  id: string;
+export interface ProjectConfig extends BaseEntity {
   workspaceId?: string;
-  teamId?: string;
   name: string;
   description?: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
-export interface DomainConfig {
-  id: string;
+export interface DomainConfig extends BaseEntity {
   projectId: string;
   domainName: string;
   redirectTo?: string;
   sslCertStatus: string;
   pathPrefix: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
-export interface ServerlessFunctionCode {
-  id: string;
+export interface ServerlessFunctionCode extends BaseEntity {
   serviceId: string;
   runtime: string;
   codeContent: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
-export interface EnvironmentConfig {
-  id: string;
+export interface EnvironmentConfig extends BaseEntity {
   projectId: string;
   name: string;
   isDefault: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
-export interface CanvasSummary {
-  id: string;
+export interface CanvasSummary extends BaseEntity {
   workspaceId?: string;
-  teamId?: string;
   name: string;
   description?: string;
-  createdAt: string;
-  updatedAt: string;
   environmentsCount: number;
   appsCount: number;
   databasesCount: number;
@@ -66,15 +50,13 @@ export interface EnvironmentCanvas {
 }
 
 export interface CreateProjectRequest {
-  id: string;
-  teamId?: string;
+  id?: string;
+  workspaceId?: string;
   name: string;
   description?: string;
   repositoryUrl?: string;
-  repository_url?: string;
   branch?: string;
   internalPort?: number;
-  internal_port?: number;
   domain?: string;
 }
 

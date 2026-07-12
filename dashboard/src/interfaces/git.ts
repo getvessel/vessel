@@ -26,7 +26,7 @@ export interface GitConnectRequest {
 
 export interface GithubApp {
   id: string;
-  teamId: string;
+  workspaceId: string;
   name: string;
   appId: string;
   installationId: string;
@@ -41,7 +41,7 @@ export interface GithubApp {
 
 export interface GitlabApp {
   id: string;
-  teamId: string;
+  workspaceId: string;
   name: string;
   appId: string;
   appSecret: string;
@@ -54,7 +54,7 @@ export interface GitlabApp {
 
 export interface BitbucketApp {
   id: string;
-  teamId: string;
+  workspaceId: string;
   name: string;
   workspace: string;
   clientId: string;

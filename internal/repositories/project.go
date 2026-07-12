@@ -37,10 +37,10 @@ func (r *ProjectSQLiteRepository) List(_ context.Context, workspaceID string, li
 	var rows *sql.Rows
 
 	if workspaceID != "" {
-		if err = r.db.QueryRow(`SELECT COUNT(*) FROM projects WHERE team_id = ?`, workspaceID).Scan(&total); err != nil {
+		if err = r.db.QueryRow(`SELECT COUNT(*) FROM projects WHERE workspace_id = ?`, workspaceID).Scan(&total); err != nil {
 			return nil, 0, err
 		}
-		rows, err = r.db.Query(`SELECT id, COALESCE(workspace_id, ''), name, COALESCE(description,''), created_at, updated_at FROM projects WHERE team_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`, workspaceID, limit, offset)
+		rows, err = r.db.Query(`SELECT id, COALESCE(workspace_id, ''), name, COALESCE(description,''), created_at, updated_at FROM projects WHERE workspace_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`, workspaceID, limit, offset)
 	} else {
 		if err = r.db.QueryRow(`SELECT COUNT(*) FROM projects`).Scan(&total); err != nil {
 			return nil, 0, err
@@ -55,7 +55,7 @@ func (r *ProjectSQLiteRepository) List(_ context.Context, workspaceID string, li
 	var projects []models.ProjectConfig
 	for rows.Next() {
 		var p models.ProjectConfig
-		if err := rows.Scan(&p.ID, &p.WorkspaceID, &p.WorkspaceID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.WorkspaceID, &p.Name, &p.Description, &p.CreatedAt, &p.UpdatedAt); err != nil {
 			return nil, 0, err
 		}
 		projects = append(projects, p)
@@ -84,8 +84,8 @@ func (r *ProjectSQLiteRepository) Create(ctx context.Context, p *models.ProjectC
 	p.CreatedAt = now
 	p.UpdatedAt = now
 	_, err := r.db.Exec(
-		`INSERT INTO projects (id, workspace_id, team_id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		p.ID, p.WorkspaceID, p.WorkspaceID, p.Name, p.Description, p.CreatedAt, p.UpdatedAt,
+		`INSERT INTO projects (id, workspace_id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`,
+		p.ID, p.WorkspaceID, p.Name, p.Description, p.CreatedAt, p.UpdatedAt,
 	)
 	if err != nil {
 		return err

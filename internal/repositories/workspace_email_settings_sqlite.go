@@ -27,7 +27,7 @@ func NewWorkspaceEmailSettingsSQLiteRepository(db *sql.DB, v Vault) *WorkspaceEm
 	}
 }
 
-const teamEmailSettingsColumns = `id, team_id, smtp_host, smtp_port, smtp_user, encrypted_smtp_password, smtp_from_name, smtp_from_address, encrypted_resend_api_key, use_resend, created_at, updated_at`
+const teamEmailSettingsColumns = `id, workspace_id, smtp_host, smtp_port, smtp_user, encrypted_smtp_password, smtp_from_name, smtp_from_address, encrypted_resend_api_key, use_resend, created_at, updated_at`
 
 func scanWorkspaceEmailSettings(scanner interface{ Scan(dest ...any) error }, s *models.WorkspaceEmailSettings, v Vault) error {
 	var encryptedSMTPPassword, encryptedResendAPIKey string
@@ -58,7 +58,7 @@ func scanWorkspaceEmailSettings(scanner interface{ Scan(dest ...any) error }, s 
 }
 
 func (r *WorkspaceEmailSettingsSQLiteRepository) GetByWorkspaceID(ctx context.Context, workspaceID string) (*models.WorkspaceEmailSettings, error) {
-	query := fmt.Sprintf(`SELECT %s FROM team_email_settings WHERE team_id = ? LIMIT 1`, teamEmailSettingsColumns)
+	query := fmt.Sprintf(`SELECT %s FROM workspace_email_settings WHERE workspace_id = ? LIMIT 1`, teamEmailSettingsColumns)
 	row := r.db.QueryRowContext(ctx, query, workspaceID)
 
 	var s models.WorkspaceEmailSettings
@@ -93,9 +93,9 @@ func (r *WorkspaceEmailSettingsSQLiteRepository) Save(ctx context.Context, s *mo
 	}
 
 	query := fmt.Sprintf(`
-		INSERT INTO team_email_settings (%s)
+		INSERT INTO workspace_email_settings (%s)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		ON CONFLICT(team_id) DO UPDATE SET
+		ON CONFLICT(workspace_id) DO UPDATE SET
 			smtp_host = excluded.smtp_host,
 			smtp_port = excluded.smtp_port,
 			smtp_user = excluded.smtp_user,

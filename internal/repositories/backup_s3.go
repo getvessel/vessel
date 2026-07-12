@@ -40,7 +40,7 @@ func (r *S3DestinationSQLiteRepository) CreateS3Destination(_ context.Context, d
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	_, err := r.db.Exec(`INSERT INTO s3_destinations (id, project_id, name, endpoint, bucket, region, access_key_id, secret_access_key, created_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
 		dest.ID, dest.ProjectID, dest.Name, dest.Endpoint, dest.Bucket, dest.Region, dest.AccessKeyID, dest.SecretAccessKey, dest.CreatedAt)
 	if err != nil {
 		return fmt.Errorf("failed to create s3 destination: %w", err)

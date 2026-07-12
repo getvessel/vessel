@@ -1,9 +1,11 @@
+import type { PaginatedData } from '#/interfaces/base';
 import type { CreateProjectRequest, ProjectConfig } from '#/interfaces/project';
 import { apiClient } from './instance';
 
 export const projectsService = {
-  listProjects: async (): Promise<ProjectConfig[]> => {
-    const { data } = await apiClient.get<ProjectConfig[]>('/projects');
+  listProjects: async (workspaceId?: string): Promise<PaginatedData<ProjectConfig>> => {
+    const params = workspaceId ? { workspaceId } : {};
+    const { data } = await apiClient.get<PaginatedData<ProjectConfig>>('/projects', { params });
     return data;
   },
 

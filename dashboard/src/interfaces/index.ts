@@ -6,6 +6,6 @@ export * from './git';
 export * from './notification';
 export * from './project';
 export * from './settings';
-export * from './team';
 export * from './users';
 export * from './vercel';
+export * from './workspace';

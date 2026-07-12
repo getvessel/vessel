@@ -1,34 +1,31 @@
-export interface Team {
-  id: string;
+import type { BaseEntity } from "./base";
+
+export interface Workspace extends BaseEntity {
   name: string;
   avatarUrl?: string;
   preferredRegion?: string;
   ownerId: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
-export interface TeamMember {
+export interface WorkspaceMember {
   id: string;
-  teamId: string;
+  workspaceId: string;
   userId: string;
   userEmail: string;
   role: string;
   joinedAt: string;
 }
 
-export interface TeamInvite {
-  id: string;
-  teamId: string;
+export interface WorkspaceInvite extends BaseEntity {
+  workspaceId: string;
   email: string;
   role: string;
   token: string;
   invitedBy: string;
   expiresAt: string;
-  createdAt: string;
 }
 
-export interface CreateTeamRequest {
+export interface CreateWorkspaceRequest {
   name: string;
   avatarUrl?: string;
   preferredRegion?: string;
@@ -43,24 +40,14 @@ export interface AcceptInviteRequest {
   token: string;
 }
 
-export interface GetTeamResponse {
-  team: Team;
-  members: TeamMember[];
-}
-
-export interface Workspace {
-  id: string;
-  name: string;
-  avatarUrl?: string;
-  preferredRegion?: string;
-  ownerId: string;
-  createdAt: string;
-  updatedAt: string;
+export interface GetWorkspaceResponse {
+  workspace: Workspace;
+  members: WorkspaceMember[];
 }
 
 export interface TrustedDomain {
   id: string;
-  teamId: string;
+  workspaceId: string;
   domain: string;
   role: string;
   createdAt: string;
@@ -68,7 +55,7 @@ export interface TrustedDomain {
 
 export interface SSHKey {
   id: string;
-  teamId: string;
+  workspaceId: string;
   name: string;
   publicKey: string;
   createdAt: string;
@@ -76,7 +63,7 @@ export interface SSHKey {
 
 export interface AuditLog {
   id: string;
-  teamId: string;
+  workspaceId: string;
   userId?: string;
   projectId?: string;
   environmentId?: string;
@@ -86,12 +73,6 @@ export interface AuditLog {
   ipAddress?: string;
   createdAt: string;
   timestamp?: string;
-}
-
-export interface CreateWorkspaceRequest {
-  name: string;
-  avatarUrl?: string;
-  preferredRegion?: string;
 }
 
 export interface UpdateWorkspaceRequest {

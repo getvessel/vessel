@@ -67,7 +67,7 @@ func (r *OAuthSQLiteRepository) SaveProvider(ctx context.Context, p *models.OAut
 	p.UpdatedAt = now
 	query := `INSERT INTO oauth_providers (
 		id, provider_name, enabled, client_id, client_secret, redirect_uri, base_url, tenant, created_at, updated_at
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	ON CONFLICT(id) DO UPDATE SET
 		provider_name = excluded.provider_name,
 		enabled = excluded.enabled,
