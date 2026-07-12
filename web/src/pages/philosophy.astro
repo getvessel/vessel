@@ -11,7 +11,7 @@ import { Icon } from 'astro-icon/components';
 
     <!-- Hero -->
     <div class="pt-16 md:pt-24 pb-6">
-      <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground whitespace-nowrap">
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground text-balance leading-tight">
         Infrastructure that belongs to you<span class="text-primary">.</span>
       </h1>
       <p class="mt-5 text-muted-foreground text-base leading-relaxed max-w-2xl mx-auto">
@@ -89,15 +89,15 @@ import { Icon } from 'astro-icon/components';
     </div>
 
     <!-- Support buttons -->
-    <div class="pt-10 pb-4 flex flex-col sm:flex-row gap-4 justify-center">
+    <div class="pt-10 pb-4 flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4">
       <a href="https://github.com/sponsors/techxteam" target="_blank"
-        class="flex items-center justify-center gap-3 px-5 py-3.5 rounded-lg border border-border bg-surface hover:bg-border text-foreground font-semibold text-sm transition-colors">
-        <Icon name="simple-icons:github" class="size-6 shrink-0" />
+        class="flex items-center justify-center gap-2.5 px-6 sm:px-10 py-3.5 rounded-lg border border-border bg-surface hover:bg-border text-foreground font-semibold text-sm transition-colors whitespace-nowrap">
+        <Icon name="simple-icons:github" class="size-5 shrink-0" />
         <span>GitHub Sponsors</span>
       </a>
 
-      <a href="https://app.vessl.dev" class="flex items-center justify-center gap-3 px-5 py-3.5 rounded-lg border border-primary/30 bg-primary/10 hover:bg-primary/20 text-foreground font-semibold text-sm transition-colors">
-        <Icon name="lucide:cloud" class="size-6 text-primary shrink-0" />
+      <a href="https://app.vessl.dev" class="flex items-center justify-center gap-2.5 px-6 sm:px-10 py-3.5 rounded-lg border border-primary/30 bg-primary/10 hover:bg-primary/20 text-foreground font-semibold text-sm transition-colors whitespace-nowrap">
+        <Icon name="lucide:cloud" class="size-5 text-primary shrink-0" />
         <span>Try Vessl Cloud</span>
       </a>
     </div>

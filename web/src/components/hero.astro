@@ -25,7 +25,7 @@ const capabilities = [
     </div>
 
     <!-- Heading -->
-    <h1 class="text-[clamp(2rem,4vw,3.2rem)] font-extrabold tracking-tight leading-none text-(--color-foreground) whitespace-nowrap">
+    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight sm:leading-none text-(--color-foreground) text-balance">
       Deploy anything, own every bit<span class="text-(--color-primary)">.</span>
     </h1>
 
@@ -45,23 +45,23 @@ const capabilities = [
     </div>
 
     <!-- CTA buttons -->
-    <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+    <div class="mt-6 flex flex-row items-start justify-center gap-3 sm:gap-4">
       <div class="flex flex-col items-center">
-        <a href="https://app.vessl.dev" class="flex items-center justify-center gap-2.5 px-10 py-3.5 rounded-lg font-semibold text-sm bg-(--color-surface) hover:bg-(--color-border) border border-(--color-border) text-(--color-foreground) transition-colors whitespace-nowrap">
+        <a href="https://app.vessl.dev" class="flex items-center justify-center gap-2 px-6 sm:px-10 py-3.5 rounded-lg font-semibold text-sm bg-(--color-surface) hover:bg-(--color-border) border border-(--color-border) text-(--color-foreground) transition-colors whitespace-nowrap">
           <Icon name="lucide:cloud" class="size-4 text-(--color-primary)" />
           Cloud
         </a>
-        <p class="text-(--color-primary) text-xs font-bold mt-1.5">
-          1,200+ <span class="text-(--color-muted-foreground) font-normal">servers online</span>
+        <p class="text-(--color-primary) text-[10px] sm:text-xs font-bold mt-2 text-center">
+          1,200+ <span class="text-(--color-muted-foreground) font-normal block sm:inline">servers online</span>
         </p>
       </div>
       <div class="flex flex-col items-center">
-        <a href="https://docs.vessl.dev/self-host" target="_blank" class="flex items-center justify-center gap-2.5 px-10 py-3.5 rounded-lg font-semibold text-sm bg-(--color-surface) hover:bg-(--color-border) border border-(--color-border) text-(--color-foreground) transition-colors whitespace-nowrap">
+        <a href="https://docs.vessl.dev/self-host" target="_blank" class="flex items-center justify-center gap-2 px-6 sm:px-10 py-3.5 rounded-lg font-semibold text-sm bg-(--color-surface) hover:bg-(--color-border) border border-(--color-border) text-(--color-foreground) transition-colors whitespace-nowrap">
           <Icon name="lucide:server" class="size-4 text-(--color-primary)" />
           Self-hosted
         </a>
-        <p class="text-(--color-primary) text-xs font-bold mt-1.5">
-          &lt;30MB <span class="text-(--color-muted-foreground) font-normal">single binary</span>
+        <p class="text-(--color-primary) text-[10px] sm:text-xs font-bold mt-2 text-center">
+          &lt;30MB <span class="text-(--color-muted-foreground) font-normal block sm:inline">single binary</span>
         </p>
       </div>
     </div>

@@ -37,13 +37,13 @@ const navLinks = [
 
     <!-- Mobile Menu Toggle -->
     <button id="mobile-menu-btn" class="lg:hidden p-2 -mr-2 text-foreground relative z-50" aria-label="Toggle Menu">
-      <Icon name="lucide:menu" class="size-6" id="menu-icon-open" />
-      <Icon name="lucide:x" class="size-6 hidden" id="menu-icon-close" />
+      <span id="menu-icon-open"><Icon name="lucide:menu" class="size-6" /></span>
+      <span id="menu-icon-close" class="hidden"><Icon name="lucide:x" class="size-6" /></span>
     </button>
   </nav>
 
   <!-- Mobile nav -->
-  <div id="mobile-menu" class="fixed inset-0 top-[65px] bg-[#111111] z-40 hidden flex-col px-4 py-6 lg:hidden h-[calc(100vh-65px)] overflow-y-auto">
+  <div id="mobile-menu" class="absolute top-full left-0 right-0 bg-[#111111] border-b border-border z-40 hidden flex-col px-4 py-6 lg:hidden shadow-2xl">
     <div class="flex flex-col gap-1">
       {navLinks.map(link => (
         <a href={link.href} target={link.href.startsWith('http') ? '_blank' : undefined} class="flex items-center gap-4 px-3 py-3 rounded-md font-medium text-sm text-foreground hover:bg-white/5 transition-colors">
@@ -53,7 +53,7 @@ const navLinks = [
       ))}
     </div>
 
-    <div class="mt-8 mb-4">
+    <div class="mt-8 mb-2">
       <a href="https://app.vessl.dev" class="flex items-center justify-center w-full py-3.5 rounded-md text-sm font-bold text-white transition-colors bg-[#231247] hover:bg-[#2d185e] border border-[#3e257f]">
         To Cloud
       </a>
