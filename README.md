@@ -29,10 +29,10 @@ vessl/
 │   ├── http/             # HTTP server setup, routes, CORS, auth middleware
 │   ├── middleware/       # Authentication guards & CORS configuration
 │   ├── models/           # Domain model structs (project, database, user, etc.)
-│   ├── notifier/         # Multi-channel notification dispatcher
 │   ├── proxy/            # Traefik v3 reverse proxy controller
 │   ├── repositories/     # SQLite data access layer (per-domain repositories)
 │   ├── services/         # Business logic services (auth, cron, deploy, git, etc.)
+│   │   └── notifications/# Multi-channel notification dispatching (email, telegram, discord)
 │   └── vault/            # AES-256-GCM encryption vault for secrets
 ├── dashboard/            # 💻 Self-hosted dashboard — served by daemon binary
 ├── web/                  # 🌐 Marketing site — `vessl.dev`
@@ -112,3 +112,17 @@ make docker-up
 ## 📄 License
 
 MIT License. See `LICENSE` for details.
+
+## 📢 Notifications Architecture (Self-Hosted)
+
+Vessl (Self-Hosted) uses an event-driven notification dispatcher located at `internal/services/notifications`. 
+Unlike managed cloud environments, the self-hosted daemon **does not rely on environment variables** for configuring SMTP, Slack, Discord, or Telegram. Instead, all notification channel settings are stored persistently in the local SQLite database.
+
+- **Dynamic Configuration:** Administrators configure their SMTP credentials and webhook URLs directly through the Vessl dashboard settings.
+- **Enabled Toggles:** A channel (e.g., Email, Telegram) is considered "enabled" if its respective settings exist in the database and the `Enabled` flag is true.
+- **No Global Fallbacks:** Because each self-hosted instance is fully independent, there is no fallback to a "managed" or "global" provider. If the user hasn't configured SMTP, emails simply aren't sent.
+
+To contribute a new channel:
+1. Create a new file (e.g., `slack.go`) inside `internal/services/notifications/`.
+2. Implement the sending logic.
+3. Hook it into the central event dispatcher.

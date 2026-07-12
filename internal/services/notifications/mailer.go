@@ -1,4 +1,4 @@
-package services
+package notifications
 
 import (
 	"bytes"
@@ -6,14 +6,15 @@ import (
 	"fmt"
 	"net/smtp"
 
+	"vessl.dev/vessl/internal/services"
 	"vessl.dev/vessl/internal/views"
 )
 
 type MailerService struct {
-	settingsService *EmailSettingsService
+	settingsService *services.EmailSettingsService
 }
 
-func NewMailerService(settingsService *EmailSettingsService) *MailerService {
+func NewMailerService(settingsService *services.EmailSettingsService) *MailerService {
 	return &MailerService{
 		settingsService: settingsService,
 	}

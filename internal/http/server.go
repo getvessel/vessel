@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"database/sql"
+	"log"
 	"net/http"
 
 	"github.com/docker/docker/client"
@@ -72,7 +73,15 @@ func NewServer(db *sql.DB, vault *vault.Vault, deployer *engine.Deployer, traefi
 	authGuard := middleware.NewAuthGuard(svcs.token, svcs.settings, svcs.ps)
 
 	e := echo.New()
-	e.Use(echomiddleware.Logger())
+	e.Use(echomiddleware.RequestLoggerWithConfig(echomiddleware.RequestLoggerConfig{
+		LogStatus: true,
+		LogURI:    true,
+		LogMethod: true,
+		LogValuesFunc: func(c echo.Context, v echomiddleware.RequestLoggerValues) error {
+			log.Printf("REQUEST: %s %s | status: %d", v.Method, v.URI, v.Status)
+			return nil
+		},
+	}))
 	e.Use(echomiddleware.Recover())
 	e.Use(echomiddleware.CORS())
 

@@ -11,6 +11,7 @@ import (
 	"vessl.dev/vessl/internal/handlers"
 	"vessl.dev/vessl/internal/repositories"
 	"vessl.dev/vessl/internal/services"
+	"vessl.dev/vessl/internal/services/notifications"
 	"vessl.dev/vessl/internal/vault"
 )
 
@@ -123,7 +124,7 @@ func initServices(repos *appRepositories, dockerClient *client.Client, deployer 
 
 	settingsSvc := services.NewSettingsService(repos.settings, repos.notification)
 	teamEmailSettingsSvc := services.NewEmailSettingsService(repos.emailSettings)
-	mailerSvc := services.NewMailerService(teamEmailSettingsSvc)
+	mailerSvc := notifications.NewMailerService(teamEmailSettingsSvc)
 
 	dispatcherSvc := core.NewDispatcherService(repos.notification, repos.settings, mailerSvc)
 	deploymentListeners := core.NewDeploymentListeners(dispatcherSvc)
