@@ -53,11 +53,11 @@ func (s *MailerService) SendTeamEmail(ctx context.Context, teamID, templateName 
 	}
 
 	// Send email
-	msg := []byte(fmt.Sprintf("To: %s\r\n"+
+	msg := fmt.Appendf(nil, "To: %s\r\n"+
 		"From: %s\r\n"+
 		"Subject: %s\r\n"+
 		"Content-Type: text/html; charset=UTF-8\r\n\r\n"+
-		"%s", toAddress, from, subject, buf.String()))
+		"%s", toAddress, from, subject, buf.String())
 
 	auth := smtp.PlainAuth("", user, pass, host)
 	addr := fmt.Sprintf("%s:%s", host, port)
