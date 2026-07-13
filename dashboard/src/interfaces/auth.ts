@@ -17,3 +17,12 @@ export interface AuthCredentials {
 export interface RegisterCredentials extends AuthCredentials {
   name: string;
 }
+
+export interface Setup2FAResponse {
+  secret: string;
+  qrCodeUrl: string;
+}
+
+export interface Verify2FARequest {
+  token: string;
+}

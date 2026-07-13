@@ -14,7 +14,7 @@ The layout utilizes a contextual **Sidebar** and a global **Topbar**.
 
 ### Topbar
 
-- **Workspace/Team Context Switcher:** Allows users to switch between Personal Account, various Teams, or Workspaces.
+- **Workspace Context Switcher:** Allows users to switch between Personal Account, and various Workspaces.
 - **Global Command Menu (Cmd+K):** Deep-link search across all projects, environments, databases, and settings.
 - **Notification Center:** Real-time updates via SSE for deployments, backup completions, or team invites.
 - **Profile / Theme:** Dark/Light mode, link to Personal Settings.
@@ -30,11 +30,11 @@ _Applies when no specific project is selected._
 - **Databases:** Global view of all DBs (Postgres, MySQL, Redis, etc.) across the workspace.
 - **Storage:** S3-compatible MinIO instances.
 - **Backups & S3 Destinations:** Global backup policies and connected S3 buckets.
-- **Teams & Workspaces:**
+- **Workspaces:**
   - Members & Roles
   - Trusted Domains (SSO config)
   - SSH Keys
-  - Audit Logs (`/teams/:teamId/audit-logs`)
+  - Audit Logs (`/workspaces/:workspaceId/audit-logs`)
 - **Git Integrations:** GitHub/GitLab/Bitbucket app connections.
 - **AI & Notifications:**
   - AI Settings (OpenAI/Anthropic keys for the team)
@@ -124,7 +124,7 @@ src/
 │   ├── databases/             # DB instances, SQL Studio, Backups
 │   ├── storage/               # Object storage buckets
 │   ├── jobs/                  # Background Cron Tasks
-│   ├── workspaces/            # Team settings, Members, Integrations
+│   ├── workspaces/            # Workspace settings, Members, Integrations
 │   └── instance/              # Super Admin Vessl settings, Updates
 │
 ├── routes/                    # TanStack file-based routing
@@ -191,7 +191,7 @@ src/
 
 ### Phase 5: Admin & Enterprise Polish
 
-- [ ] Team management, RBAC, and Invites UI.
+- [ ] Workspace management, RBAC, and Invites UI.
 - [ ] Git webhook and repository connection flow.
 - [ ] "Super Admin" settings panel for self-hosted Vessl instance updates.
 - [ ] Dark Mode refinements and responsive design checks.
