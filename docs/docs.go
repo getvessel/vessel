@@ -2909,24 +2909,36 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/ws/terminal/{id}": {
+        "/ws/services/{id}/terminal": {
             "get": {
-                "description": "HandleWebSocket endpoint\nHandle Terminal WebSocket",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "Upgrade connection to WebSocket and attach to container terminal",
                 "tags": [
-                    "Terminal",
                     "Terminal"
                 ],
                 "summary": "Handle Terminal WebSocket",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "id",
+                        "description": "Service ID or Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/ws/terminal/{id}": {
+            "get": {
+                "description": "Upgrade connection to WebSocket and attach to container terminal",
+                "tags": [
+                    "Terminal"
+                ],
+                "summary": "Handle Terminal WebSocket",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service ID or Container ID",
                         "name": "id",
                         "in": "path",
                         "required": true

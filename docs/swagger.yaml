@@ -2566,25 +2566,31 @@ paths:
       summary: CreateTrustedDomain endpoint
       tags:
       - Workspaces
-  /ws/terminal/{id}:
+  /ws/services/{id}/terminal:
     get:
-      consumes:
-      - application/json
-      description: |-
-        HandleWebSocket endpoint
-        Handle Terminal WebSocket
+      description: Upgrade connection to WebSocket and attach to container terminal
       parameters:
-      - description: id
+      - description: Service ID or Container ID
         in: path
         name: id
         required: true
         type: string
-      produces:
-      - application/json
       responses: {}
       summary: Handle Terminal WebSocket
       tags:
       - Terminal
+  /ws/terminal/{id}:
+    get:
+      description: Upgrade connection to WebSocket and attach to container terminal
+      parameters:
+      - description: Service ID or Container ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: Handle Terminal WebSocket
+      tags:
       - Terminal
 securityDefinitions:
   BearerAuth:

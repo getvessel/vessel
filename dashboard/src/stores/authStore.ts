@@ -53,3 +53,9 @@ export const authActions = {
     }));
   },
 };
+
+import { useSelector } from '@tanstack/react-store';
+
+export const useAuthState = () => {
+  return useSelector(authStore, (state) => state);
+};

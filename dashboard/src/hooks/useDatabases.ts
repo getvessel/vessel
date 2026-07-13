@@ -1,1 +1,70 @@
-export const useDatabases = () => {};
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { databasesService } from '#/services/databases';
+
+export const useListDatabases = () => {
+  return useQuery({
+    queryKey: ['databases', 'listDatabases'].filter(Boolean),
+    queryFn: () => databasesService.listDatabases(),
+  });
+};
+
+export const useGetDatabase = (id: string) => {
+  return useQuery({
+    queryKey: ['databases', 'getDatabase', id].filter(Boolean),
+    queryFn: () => databasesService.getDatabase(id),
+  });
+};
+
+export const useCreateDatabase = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { payload: Parameters<typeof databasesService.createDatabase>[0] }) =>
+      databasesService.createDatabase(payload.payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['databases'] });
+    },
+  });
+};
+
+export const useDeleteDatabase = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { id: string }) => databasesService.deleteDatabase(payload.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['databases'] });
+    },
+  });
+};
+
+export const useStartDatabase = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { id: string }) => databasesService.startDatabase(payload.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['databases'] });
+    },
+  });
+};
+
+export const useStopDatabase = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { id: string }) => databasesService.stopDatabase(payload.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['databases'] });
+    },
+  });
+};
+
+export const useQueryDatabase = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: {
+      id: string;
+      payload: Parameters<typeof databasesService.queryDatabase>[1];
+    }) => databasesService.queryDatabase(payload.id, payload.payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['databases'] });
+    },
+  });
+};
