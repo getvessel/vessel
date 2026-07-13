@@ -7,14 +7,14 @@ import (
 	"time"
 
 	"gorm.io/gorm"
-	"vessl.dev/vessl/internal/cloud/models"
+	"vessl.dev/vessl/internal/models"
 )
 
 type CloudRepo interface {
 	GetTeamByID(id uint) (*models.CloudTeam, error)
 	GetTeamByName(name string) (*models.CloudTeam, error)
-	GetTeamMember(teamID uint, userID string) (*models.TeamMember, error)
-	GetTeamOwners(teamID uint) ([]models.TeamMember, error)
+	GetTeamMember(teamID uint, userID string) (*models.WorkspaceMember, error)
+	GetTeamOwners(teamID uint) ([]models.WorkspaceMember, error)
 	UpdateTeam(team *models.CloudTeam) error
 	GetActiveServerCount(teamID uint) (int64, error)
 	GetServerByToken(token string) (*models.CloudServer, error)
@@ -61,8 +61,8 @@ func (r *cloudRepo) GetTeamByName(name string) (*models.CloudTeam, error) {
 	return &team, nil
 }
 
-func (r *cloudRepo) GetTeamMember(teamID uint, userID string) (*models.TeamMember, error) {
-	var member models.TeamMember
+func (r *cloudRepo) GetTeamMember(teamID uint, userID string) (*models.WorkspaceMember, error) {
+	var member models.WorkspaceMember
 	if err := r.db.Where("team_id = ? AND user_id = ?", fmt.Sprintf("%d", teamID), userID).First(&member).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -72,8 +72,8 @@ func (r *cloudRepo) GetTeamMember(teamID uint, userID string) (*models.TeamMembe
 	return &member, nil
 }
 
-func (r *cloudRepo) GetTeamOwners(teamID uint) ([]models.TeamMember, error) {
-	var members []models.TeamMember
+func (r *cloudRepo) GetTeamOwners(teamID uint) ([]models.WorkspaceMember, error) {
+	var members []models.WorkspaceMember
 	if err := r.db.Where("team_id = ? AND role = ?", fmt.Sprintf("%d", teamID), "owner").Find(&members).Error; err != nil {
 		return nil, err
 	}
@@ -153,12 +153,12 @@ func (r *cloudRepo) GetActiveSubscriptions(ctx context.Context) (int64, error) {
 
 func (r *cloudRepo) RegisterServer(ctx context.Context, teamID uint, token string, name string, ip string) error {
 	server := &models.CloudServer{
-		TeamID:    teamID,
-		ServerID:  token,
-		Name:      name,
-		IPAddress: ip,
-		IsActive:  true,
-		LastPing:  time.Now(),
+		WorkspaceID: teamID,
+		ServerID:    token,
+		Name:        name,
+		IPAddress:   ip,
+		IsActive:    true,
+		LastPing:    time.Now(),
 	}
 	return r.db.WithContext(ctx).Create(server).Error
 }

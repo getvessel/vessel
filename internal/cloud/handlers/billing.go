@@ -333,14 +333,14 @@ func paddlePriceID(plan string) string {
 // @Router /cloud/billing/stripe/portal [post]
 func (h *BillingHandler) CreateStripePortal(c echo.Context) error {
 	var req struct {
-		TeamID    uint   `json:"team_id"`
-		ReturnURL string `json:"return_url"`
+		WorkspaceID uint   `json:"team_id"`
+		ReturnURL   string `json:"return_url"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "Invalid request")
 	}
 
-	team, err := h.cloudRepo.GetTeamByID(req.TeamID)
+	team, err := h.cloudRepo.GetTeamByID(req.WorkspaceID)
 	if err != nil || team == nil || team.StripeCustomerID == "" {
 		return utils.Error(c, http.StatusBadRequest, "Team has no Stripe customer")
 	}

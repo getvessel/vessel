@@ -130,7 +130,7 @@ func (h *AgentHandler) DeployToFleet(c echo.Context) error {
 		server, err := h.repo.GetServerByToken(token)
 		if err == nil && server != nil {
 
-			_ = h.meteringService.RecordUsage(server.TeamID, 1, 0, 0)
+			_ = h.meteringService.RecordUsage(server.WorkspaceID, 1, 0, 0)
 		}
 
 		successfulDispatches++

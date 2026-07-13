@@ -6,7 +6,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"vessl.dev/vessl/internal/cloud/models"
+	"vessl.dev/vessl/internal/models"
 )
 
 func InitDatabase() *gorm.DB {

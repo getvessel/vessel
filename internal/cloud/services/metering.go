@@ -8,9 +8,9 @@ import (
 
 	"github.com/stripe/stripe-go/v78"
 	"github.com/stripe/stripe-go/v78/billing/meterevent"
-	"vessl.dev/vessl/internal/cloud/models"
 	"vessl.dev/vessl/internal/cloud/notifications"
 	repos "vessl.dev/vessl/internal/cloud/repositories"
+	"vessl.dev/vessl/internal/models"
 )
 
 type MeteringService interface {
@@ -28,7 +28,7 @@ func NewMeteringService(repo repos.CloudRepo, mailer *notifications.MailerServic
 
 func (s *DefaultMeteringService) RecordUsage(teamID uint, deployments int, containerHours int, bandwidthGB int) error {
 	err := s.repo.LogUsage(&models.CloudUsageLog{
-		TeamID:         teamID,
+		WorkspaceID:    teamID,
 		Deployments:    deployments,
 		ContainerHours: containerHours,
 		BandwidthGB:    bandwidthGB,

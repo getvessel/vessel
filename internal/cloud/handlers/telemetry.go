@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"vessl.dev/vessl/internal/cloud/models"
 	"vessl.dev/vessl/internal/cloud/repositories"
+	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/utils"
 )
 

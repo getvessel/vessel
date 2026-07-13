@@ -13,9 +13,9 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"vessl.dev/vessl/internal/cloud/models"
 	"vessl.dev/vessl/internal/cloud/notifications"
 	"vessl.dev/vessl/internal/cloud/repositories"
+	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/utils"
 )
 

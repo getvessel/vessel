@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"time"
 
-	"vessl.dev/vessl/internal/cloud/models"
+	"vessl.dev/vessl/internal/models"
 )
 
 // AuthRepo defines the data-access interface for cloud user authentication.

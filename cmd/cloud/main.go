@@ -11,7 +11,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 
-	"vessl.dev/vessl/dashboard"
 	cloudhttp "vessl.dev/vessl/internal/cloud/http"
 )
 
@@ -34,12 +33,8 @@ func main() {
 	// Mount the Cloud SaaS API routes
 	cloudhttp.MountCloudRoutes(e)
 
-	// Embed the React Dashboard if serving statically
-	if os.Getenv("VESSL_STATIC_DIR") != "" {
-		e.Static("/*", os.Getenv("VESSL_STATIC_DIR"))
-	} else {
-		dashboard.RegisterHandlers(e)
-	}
+	// Note: In Cloud Mode, the dashboard is deployed separately (e.g., to Vercel or Cloudflare Pages)
+	// so the Cloud API server does not need to serve the React assets itself.
 
 	log.Printf(" Vessl Cloud SaaS listening on %s", addr)
 	if err := http.ListenAndServe(addr, e); err != nil {

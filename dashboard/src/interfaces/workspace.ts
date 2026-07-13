@@ -6,6 +6,8 @@ export interface Workspace {
   avatarUrl?: string;
   preferredRegion?: string;
   ownerId: string;
+  subscriptionStatus?: string;
+  subscriptionPlan?: string;
   createdAt: string;
   updatedAt: string;
 }

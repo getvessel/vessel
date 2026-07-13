@@ -55,13 +55,13 @@ func (h *MeteringHandler) ReportUsage(c echo.Context) error {
 		return utils.Error(c, http.StatusUnauthorized, "Invalid or unknown Agent token")
 	}
 
-	err = h.meteringService.RecordUsage(server.TeamID, req.Deployments, req.ContainerHours, req.BandwidthGB)
+	err = h.meteringService.RecordUsage(server.WorkspaceID, req.Deployments, req.ContainerHours, req.BandwidthGB)
 	if err != nil {
-		log.Printf("Error recording usage for team %d: %v", server.TeamID, err)
+		log.Printf("Error recording usage for team %d: %v", server.WorkspaceID, err)
 		return utils.Error(c, http.StatusInternalServerError, "Failed to record usage")
 	}
 
-	log.Printf("Successfully recorded usage report for team %d: %d deploys, %d hours", server.TeamID, req.Deployments, req.ContainerHours)
+	log.Printf("Successfully recorded usage report for team %d: %d deploys, %d hours", server.WorkspaceID, req.Deployments, req.ContainerHours)
 
 	return utils.Success(c, "recorded", nil)
 }

@@ -1,3 +1,4 @@
+import { useStore } from '@tanstack/react-store';
 import {
   Bell,
   Cloud,
@@ -11,6 +12,8 @@ import {
   Settings,
   Users,
 } from 'lucide-react';
+import { useGetPublicSettings } from '#/hooks/useSettings';
+import { workspaceStore } from '#/stores/workspaceStore';
 import { NavItem } from './nav-item';
 import { UserMenu } from './user-menu';
 import { WorkspaceSwitcher } from './workspace-switcher';
@@ -48,6 +51,18 @@ const bottomNav = [
 ];
 
 export function AppSidebar() {
+  const { data: settings } = useGetPublicSettings();
+  const { activeWorkspace } = useStore(workspaceStore);
+
+  const isCloudMode = settings?.data?.isCloudMode;
+  const isSubscribed = activeWorkspace?.subscriptionStatus === 'active';
+  const requiresSubscription = isCloudMode && !isSubscribed && activeWorkspace;
+
+  const visibleMainNav = requiresSubscription ? [] : mainNav;
+  const visibleBottomNav = requiresSubscription
+    ? bottomNav.filter((n) => n.title === 'Feedback')
+    : bottomNav;
+
   return (
     <aside className="fixed inset-y-0 left-0 z-20 flex w-60 flex-col border-r border-sidebar-border bg-sidebar">
       <div className="flex h-14 shrink-0 items-center gap-2.5 px-4 border-b border-sidebar-border">
@@ -67,13 +82,13 @@ export function AppSidebar() {
       </div>
 
       <nav className="flex flex-1 flex-col overflow-y-auto px-3 py-2 gap-1">
-        {mainNav.map((item) => (
+        {visibleMainNav.map((item) => (
           <NavItem key={item.url} item={item} exact={item.exact} />
         ))}
       </nav>
 
       <div className="mt-auto flex flex-col px-3 pb-2 gap-1">
-        {bottomNav.map((item) => (
+        {visibleBottomNav.map((item) => (
           <NavItem key={item.url} item={item} />
         ))}
       </div>
