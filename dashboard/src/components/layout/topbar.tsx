@@ -24,7 +24,9 @@ export function Topbar() {
         <div>
           <h1 className="text-sm font-semibold text-foreground leading-none">{current.title}</h1>
           {current.description && (
-            <p className="text-xs text-muted-foreground mt-0.5 leading-none">{current.description}</p>
+            <p className="text-xs text-muted-foreground mt-0.5 leading-none">
+              {current.description}
+            </p>
           )}
         </div>
       </div>
@@ -60,12 +62,6 @@ export function Topbar() {
           <HugeiconsIcon icon={BellIcon} className="h-4 w-4" />
           <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-primary" />
         </button>
-
-        {/* System status pill */}
-        <div className="hidden md:flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          All systems online
-        </div>
       </div>
     </header>
   );
