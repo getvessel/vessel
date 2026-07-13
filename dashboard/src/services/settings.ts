@@ -40,7 +40,6 @@ export const settingsService = {
     }
   },
 
-  // TODO: Update exact shape
   saveNotificationChannel: async (payload: unknown): Promise<BaseResponse<unknown>> => {
     try {
       return await apiClient.put<BaseResponse<unknown>>('/settings/notifications', payload);
@@ -49,7 +48,6 @@ export const settingsService = {
     }
   },
 
-  // TODO: Update exact shape
   testNotification: async (payload: unknown): Promise<BaseResponse<unknown>> => {
     try {
       return await apiClient.post<BaseResponse<unknown>>('/settings/notifications/test', payload);
@@ -66,8 +64,6 @@ export const settingsService = {
     }
   },
 
-  // --- GIT APPS ---
-
   getGitApps: async (provider: string): Promise<BaseResponse<unknown>> => {
     try {
       return await apiClient.get<BaseResponse<unknown>>(`/settings/git_apps/${provider}`);
@@ -76,7 +72,6 @@ export const settingsService = {
     }
   },
 
-  // TODO: Update exact shape
   saveGitApp: async (provider: string, payload: unknown): Promise<BaseResponse<unknown>> => {
     try {
       return await apiClient.put<BaseResponse<unknown>>(`/settings/git_apps/${provider}`, payload);
@@ -93,7 +88,6 @@ export const settingsService = {
     }
   },
 
-  // TODO: Update exact shape
   exchangeGithubManifest: async (payload: unknown): Promise<BaseResponse<unknown>> => {
     try {
       return await apiClient.post<BaseResponse<unknown>>(
@@ -104,8 +98,6 @@ export const settingsService = {
       throw handleApiError(error);
     }
   },
-
-  // --- UPDATES & SYSTEM ---
 
   checkUpdate: async (): Promise<BaseResponse<unknown>> => {
     try {
@@ -123,7 +115,6 @@ export const settingsService = {
     }
   },
 
-  // TODO: Update exact shape
   activateLicense: async (payload: unknown): Promise<BaseResponse<unknown>> => {
     try {
       return await apiClient.post<BaseResponse<unknown>>('/settings/license', payload);

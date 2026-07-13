@@ -68,8 +68,6 @@ export const useExchangeGithubManifest = () => {
   });
 };
 
-// --- UPDATES & SYSTEM ---
-
 export const useCheckUpdate = () => {
   return useMutation({
     mutationFn: () => settingsService.checkUpdate(),

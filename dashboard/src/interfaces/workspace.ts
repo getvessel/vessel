@@ -97,7 +97,6 @@ interface GetWorkspaceData {
   members: WorkspaceMember[];
 }
 
-// Response Types
 export type ListWorkspacesResponse = BaseResponse<Workspace[]>;
 export type GetWorkspaceResponse = BaseResponse<GetWorkspaceData>;
 export type CreateWorkspaceResponse = BaseResponse<Workspace>;

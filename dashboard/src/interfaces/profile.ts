@@ -22,6 +22,5 @@ export interface ChangePasswordRequest {
   newPassword?: string;
 }
 
-// Response Types
 export type GetProfileResponse = BaseResponse<UserProfile>;
 export type UpdateProfileResponse = BaseResponse<UserProfile>;

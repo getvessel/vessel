@@ -17,13 +17,10 @@ export const useLogin = () => {
         return;
       }
 
-      // 1. Persist auth state FIRST
       authActions.setAuth(data.token, data.user);
 
-      // 2. Clear stale queries
       queryClient.clear();
 
-      // 3. Navigate — invalidate happens automatically via beforeLoad
       await router.navigate({ to: '/' });
 
       toast.success('Welcome back!');
@@ -101,7 +98,6 @@ export const useLogout = () => {
       await router.navigate({ to: '/login' });
     },
     onError: () => {
-      // Even if the server logout fails, clear local state
       authActions.logout();
       queryClient.clear();
       router.navigate({ to: '/login' });

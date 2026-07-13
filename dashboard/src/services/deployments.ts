@@ -54,8 +54,6 @@ export const deploymentsService = {
     }
   },
 
-  // POST /deployments/:id/diagnostics
-  // TODO: Update the return type once we know the exact shape of the AI Diagnostics response
   diagnostics: async (deploymentId: string): Promise<BaseResponse<unknown>> => {
     try {
       return await apiClient.post<BaseResponse<unknown>>(

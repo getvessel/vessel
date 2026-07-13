@@ -33,7 +33,6 @@ export interface SaveEmailSettingsRequest {
   smtpPassword?: string;
 }
 
-// Response Types
 export type GetAISettingsResponse = BaseResponse<AISettings>;
 export type SaveAISettingsResponse = BaseResponse<AISettings>;
 export type GetEmailSettingsResponse = BaseResponse<EmailSettings>;

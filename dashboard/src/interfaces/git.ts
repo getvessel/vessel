@@ -25,7 +25,6 @@ export interface ConnectGitRequest {
   code: string;
 }
 
-// Response Types
 export type GetGitStatusResponse = BaseResponse<GitStatus[]>;
 export type ListGitReposResponse = BaseResponse<GitRepo[]>;
 export type ListGitBranchesResponse = BaseResponse<GitBranch[]>;

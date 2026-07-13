@@ -20,7 +20,6 @@ export interface CreateStorageRequest {
   environmentId?: string;
 }
 
-// Response Types
 export type ListStorageResponse = BaseResponse<StorageVolume[]>;
 export type GetStorageResponse = BaseResponse<StorageVolume>;
 export type CreateStorageResponse = BaseResponse<StorageVolume>;

@@ -116,7 +116,6 @@ export interface AddMemberRequest {
   permission: string;
 }
 
-// Response Types
 export type ListProjectsResponse = BaseResponse<PaginatedData<ProjectConfig>>;
 export type GetProjectResponse = BaseResponse<ProjectConfig>;
 export type CreateProjectResponse = BaseResponse<ProjectConfig>;

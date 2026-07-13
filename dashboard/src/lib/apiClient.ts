@@ -1,8 +1,3 @@
-/**
- * A lightweight fetch wrapper for interacting with the Vessl Go Daemon API.
- * Designed to be used seamlessly with TanStack Query.
- */
-
 import { env } from '#/env';
 import { authStore } from '#/stores/authStore';
 

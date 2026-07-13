@@ -146,7 +146,6 @@ export interface UpdateJobRequest {
   status?: string;
 }
 
-// Response Types
 export type ListAppsResponse = BaseResponse<AppService[]>;
 export type GetAppResponse = BaseResponse<AppService>;
 export type CreateAppResponse = BaseResponse<AppService>;

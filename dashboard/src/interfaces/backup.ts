@@ -60,7 +60,6 @@ export interface CreateS3DestinationRequest {
   secretAccessKey: string;
 }
 
-// Response Types
 export type ListBackupsResponse = BaseResponse<BackupConfig[]>;
 export type GetBackupResponse = BaseResponse<BackupConfig>;
 export type CreateBackupResponse = BaseResponse<BackupConfig>;

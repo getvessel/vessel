@@ -29,7 +29,6 @@ export const useSystemStore = create<SystemState>((set) => ({
       });
     } catch (error) {
       console.error('Failed to fetch public settings:', error);
-      // Fallback defaults or just keep current state
       set({ isLoaded: true });
     } finally {
       set({ isLoading: false });

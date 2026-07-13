@@ -2,7 +2,6 @@ import type { BaseResponse } from '#/interfaces/base';
 import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
 
-// TODO: Update unknown with exact Variable interface when known
 export const serviceVariablesService = {
   list: async (serviceId: string): Promise<BaseResponse<unknown[]>> => {
     try {
