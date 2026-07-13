@@ -7,10 +7,10 @@ import (
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
 	"vessl.dev/vessl/internal/cloud/handlers"
-	vesslMiddleware "vessl.dev/vessl/internal/cloud/middleware"
 	"vessl.dev/vessl/internal/cloud/notifications"
 	repos "vessl.dev/vessl/internal/cloud/repositories"
 	"vessl.dev/vessl/internal/cloud/services"
+	vesslMiddleware "vessl.dev/vessl/internal/http/middleware"
 )
 
 // Server is the Vessl Cloud API server.

@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"vessl.dev/vessl/internal/cloud/license"
 	"vessl.dev/vessl/internal/cloud/repositories"
-	"vessl.dev/vessl/internal/cloud/utils"
+	"vessl.dev/vessl/internal/utils"
 )
 
 type AdminHandler struct {

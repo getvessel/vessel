@@ -16,7 +16,7 @@ import (
 	"vessl.dev/vessl/internal/cloud/models"
 	"vessl.dev/vessl/internal/cloud/notifications"
 	"vessl.dev/vessl/internal/cloud/repositories"
-	"vessl.dev/vessl/internal/cloud/utils"
+	"vessl.dev/vessl/internal/utils"
 )
 
 // Sentinel errors for auth operations.

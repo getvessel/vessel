@@ -14,7 +14,7 @@ import (
 	checkoutsession "github.com/stripe/stripe-go/v78/checkout/session"
 	"github.com/stripe/stripe-go/v78/webhook"
 	"vessl.dev/vessl/internal/cloud/repositories"
-	"vessl.dev/vessl/internal/cloud/utils"
+	"vessl.dev/vessl/internal/utils"
 )
 
 type BillingHandler struct {

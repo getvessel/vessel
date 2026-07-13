@@ -119,16 +119,10 @@ func main() {
 	services.StartTelemetryReporter(db, vesslVersion)
 
 	host := os.Getenv("HOST")
-
 	addr := host + ":" + port
 
-	isCloudMode := os.Getenv("CLOUD_MODE") == "true"
-	if isCloudMode {
-		log.Printf(" Cloud mode enabled (CLOUD_MODE=true)")
-	}
-
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
-	apiServer := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient, isCloudMode)
+	apiServer := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
 
 	if *isMCP {
 		log.Printf("Starting MCP stdio server...")

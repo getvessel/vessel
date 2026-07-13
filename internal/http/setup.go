@@ -21,7 +21,7 @@ import (
 	"vessl.dev/vessl/internal/vault"
 )
 
-func NewServer(db *sql.DB, v *vault.Vault, deployer *engine.Deployer, traefikManager *proxy.TraefikManager, dockerClient *client.Client, isCloudMode bool) *Server {
+func NewServer(db *sql.DB, v *vault.Vault, deployer *engine.Deployer, traefikManager *proxy.TraefikManager, dockerClient *client.Client) *Server {
 
 	e := echo.New()
 	e.Use(echomiddleware.RequestLoggerWithConfig(echomiddleware.RequestLoggerConfig{
@@ -141,7 +141,6 @@ func NewServer(db *sql.DB, v *vault.Vault, deployer *engine.Deployer, traefikMan
 
 	srv := &Server{
 		router:                 e,
-		isCloudMode:            isCloudMode,
 		mcpBridge:              bridge,
 		deployer:               deployer,
 		traefikManager:         traefikManager,

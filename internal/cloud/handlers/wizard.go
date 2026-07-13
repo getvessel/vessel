@@ -10,7 +10,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	repos "vessl.dev/vessl/internal/cloud/repositories"
-	"vessl.dev/vessl/internal/cloud/utils"
+	"vessl.dev/vessl/internal/utils"
 )
 
 type WizardHandler struct {

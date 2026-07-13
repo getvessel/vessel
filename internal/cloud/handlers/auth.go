@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"vessl.dev/vessl/internal/cloud/services"
-	"vessl.dev/vessl/internal/cloud/utils"
+	"vessl.dev/vessl/internal/utils"
 )
 
 // AuthHandler wires HTTP routes to the AuthService.

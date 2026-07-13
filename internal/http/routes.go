@@ -9,14 +9,9 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"vessl.dev/vessl/dashboard"
 	_ "vessl.dev/vessl/docs"
-	cloud "vessl.dev/vessl/internal/cloud/http"
 )
 
 func (s *Server) registerRoutes() {
-	if s.isCloudMode {
-		cloud.MountCloudRoutes(s.router)
-	}
-
 	apiGroup := s.router.Group("/api")
 
 	s.router.GET("/docs", func(c echo.Context) error {
@@ -202,29 +197,6 @@ func (s *Server) setupSPAFallback() {
 		}
 	}
 
-	s.router.GET("/*", func(c echo.Context) error {
-		reqPath := filepath.Clean(c.Request().URL.Path)
-		if reqPath == "/" || reqPath == "." {
-			reqPath = "index.html"
-		}
-
-		content, err := dashboard.DistFS.ReadFile("dist/" + reqPath)
-		if err != nil {
-			indexContent, err := dashboard.DistFS.ReadFile("dist/index.html")
-			if err != nil {
-				return c.String(http.StatusNotFound, "Dashboard not built. Please run 'npm run build' in the dashboard directory.")
-			}
-			return c.HTMLBlob(http.StatusOK, indexContent)
-		}
-
-		contentType := http.DetectContentType(content)
-		if filepath.Ext(reqPath) == ".css" {
-			contentType = "text/css"
-		} else if filepath.Ext(reqPath) == ".js" {
-			contentType = "application/javascript"
-		} else if filepath.Ext(reqPath) == ".svg" {
-			contentType = "image/svg+xml"
-		}
-		return c.Blob(http.StatusOK, contentType, content)
-	})
+	// Mount the dashboard UI next
+	dashboard.RegisterHandlers(s.router)
 }
