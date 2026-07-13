@@ -1,4 +1,3 @@
-import { useStore } from '@tanstack/react-store';
 import {
   Bell,
   Cloud,
@@ -12,8 +11,6 @@ import {
   Settings,
   Users,
 } from 'lucide-react';
-import { useGetPublicSettings } from '#/hooks/useSettings';
-import { workspaceStore } from '#/stores/workspaceStore';
 import { NavItem } from './nav-item';
 import { UserMenu } from './user-menu';
 import { WorkspaceSwitcher } from './workspace-switcher';
@@ -51,9 +48,6 @@ const bottomNav = [
 ];
 
 export function AppSidebar() {
-  const { data: settings } = useGetPublicSettings();
-  const { activeWorkspace } = useStore(workspaceStore);
-
   const visibleMainNav = mainNav;
   const visibleBottomNav = bottomNav;
 

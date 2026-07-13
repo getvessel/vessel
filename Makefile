@@ -63,50 +63,29 @@ test:
 	@echo "🧪 Running full test suite..."
 	go test ./... -v
 
-build: build-dashboard build-daemon build-cloud
+build: build-dashboard build-daemon
 	@echo "✅ Build complete! Binaries available in $(BUILD_DIR)/ and GUI at dashboard/dist"
 
 build-daemon:
 	@echo "⚙️  Building Go daemon binary ($(BINARY_NAME))..."
 	mkdir -p $(BUILD_DIR)
-	go build -ldflags "-s -w" -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/vessld
-
-build-cloud:
-	@echo "☁️  Building Go Cloud SaaS binary (vesslcloud)..."
-	mkdir -p $(BUILD_DIR)
-	go build -ldflags "-s -w" -o $(BUILD_DIR)/vesslcloud ./cmd/cloud
+	go build -ldflags "-s -w" -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd
 
 build-dashboard:
 	@echo "💻 Building TanStack + Vite Dashboard GUI..."
 	npm run build:dashboard
 
-build-dashboard-cloud:
-	@echo "☁️  Building Dashboard for Cloud SaaS..."
-	npm run build:dashboard-cloud
-
 dev:
 	@echo "🚀 Launching self-hosted backend daemon and frontend GUI concurrently..."
 	npx concurrently -k "make dev-daemon" "make dev-dashboard"
 
-dev-cloud:
-	@echo "☁️  Launching Cloud SaaS backend and frontend GUI concurrently..."
-	npx concurrently -k "make dev-daemon-cloud" "make dev-dashboard-cloud"
-
 dev-daemon:
 	@echo "🚀 Running Go daemon in dev mode..."
-	go run ./cmd/vessld
-
-dev-daemon-cloud:
-	@echo "☁️  Running Go Cloud backend in dev mode..."
-	go run ./cmd/cloud
+	go run ./cmd
 
 dev-dashboard:
 	@echo "💻 Running Dashboard dev server on port 3000..."
 	npm run dev:dashboard
-
-dev-dashboard-cloud:
-	@echo "☁️  Running Dashboard dev server for Cloud..."
-	npm run dev:dashboard-cloud
 
 dev-website:
 	@echo "🌐 Running Astro Marketing site dev server..."

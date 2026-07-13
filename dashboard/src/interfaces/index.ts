@@ -1,7 +1,7 @@
 export * from './auth';
 export * from './backup';
 export * from './base';
-export * from './cloud';
+
 export * from './database';
 export * from './deployment';
 export * from './git';

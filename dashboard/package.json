@@ -10,10 +10,8 @@
   },
   "scripts": {
     "dev": "vite dev --port 3000",
-    "dev:cloud": "VITE_API_URL=https://api.vessl.dev/api vite dev --port 3000",
     "generate-routes": "tsr generate",
     "build": "vite build",
-    "build:cloud": "VITE_API_URL=https://api.vessl.dev/api vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "biome check src",

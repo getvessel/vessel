@@ -17,7 +17,6 @@ export const settingsService = {
       registrationEnabled: boolean;
       siteName?: string;
       emailEnabled: boolean;
-      isCloudMode?: boolean;
     }>
   > => {
     try {
@@ -26,7 +25,6 @@ export const settingsService = {
           registrationEnabled: boolean;
           siteName?: string;
           emailEnabled: boolean;
-          isCloudMode?: boolean;
         }>
       >('/system/public');
     } catch (error) {

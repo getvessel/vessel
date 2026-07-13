@@ -7,7 +7,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
-	"vessl.dev/vessl/dashboard"
 	_ "vessl.dev/vessl/docs"
 )
 
@@ -196,7 +195,4 @@ func (s *Server) setupSPAFallback() {
 			return
 		}
 	}
-
-	// Mount the dashboard UI next
-	dashboard.RegisterHandlers(s.router)
 }

@@ -23,7 +23,6 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	"vessl.dev/vessl/internal/core"
 	vessldb "vessl.dev/vessl/internal/db"
 	"vessl.dev/vessl/internal/engine"
 	vesslhttp "vessl.dev/vessl/internal/http"
@@ -65,24 +64,9 @@ func (a *dbDeployerStore) GetServerlessFunctionCode(serviceID string) (*models.S
 
 func main() {
 	_ = godotenv.Load()
-	isAgent := flag.Bool("agent", false, "Run in agent mode")
-	agentToken := flag.String("token", "", "Agent auth token")
-	serverURL := flag.String("server", "", "Controller server WSS URL")
 	isMCP := flag.Bool("mcp", false, "Run local MCP stdio server")
 	flag.Parse()
 	log.Printf(" Booting Vessl Daemon (`vessld`) v%s [%s/%s]...", vesslVersion, runtime.GOOS, runtime.GOARCH)
-	if *isAgent {
-		if *serverURL == "" {
-			log.Fatal(" Error: --server is required in agent mode (e.g. wss://vessl.domain.com/api/agent)")
-		}
-		if *agentToken == "" {
-			log.Fatal(" Error: --token is required in agent mode")
-		}
-		if err := core.Run(context.Background(), *serverURL, *agentToken); err != nil {
-			log.Fatalf(" Agent mode exited: %v", err)
-		}
-		return
-	}
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"

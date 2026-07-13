@@ -9,10 +9,10 @@ Turn any bare-metal Linux VPS into your own private Vercel, Railway, or Heroku i
 ## ✨ Features
 
 - **⚡ Blazing-Fast Go Daemon (`vessld`)**: Uses native Go concurrency and official Docker SDK with `< 30MB RAM` idle overhead.
-- **💻 Self-Hosted Dashboard (`dashboard/`)**: Built with **Vite + TanStack Router + React + Tailwind CSS**. Served directly by the Go daemon. Features live `@xterm/xterm` terminal logs, real-time CPU/RAM stats, and dark-mode glassmorphism.
+- **💻 Self-Hosted Dashboard (`dashboard/`)**: Built with **Vite + TanStack Router + React + Tailwind CSS**. Decoupled frontend for independent hosting. Features live `@xterm/xterm` terminal logs, real-time CPU/RAM stats, and dark-mode glassmorphism.
 - **🔒 Automated Edge Routing (`Traefik v3`)**: Zero-config Let's Encrypt SSL/TLS certificates and automatic reverse proxy configuration.
 - **🔐 Encrypted `.env` Vault**: AES-256 encrypted environment variables stored inside an embedded SQLite database.
-- **☁️ Native Cloud Backend**: Easily compile the SaaS backend (`vesslcloud`) to act as a managed multi-tenant UI proxy with Postgres and Stripe billing.
+- **💖 Donation Supported**: Vessl is 100% self-hosted and community-driven. If you like the project, please consider sponsoring us!
 
 ---
 
@@ -21,11 +21,9 @@ Turn any bare-metal Linux VPS into your own private Vercel, Railway, or Heroku i
 ```text
 vessl/
 ├── cmd/
-│   ├── vessld/           # Self-Hosted Go Daemon entrypoint
-│   └── cloud/            # SaaS Cloud Control Plane entrypoint
+│   └── main.go           # Self-Hosted Go Daemon entrypoint
 ├── internal/             # Core Go packages
-│   ├── cloud/            # Cloud-only features (Billing, Multi-tenant routing, Webhooks)
-│   ├── core/             # Agent and Docker engine components
+│   ├── core/             # Docker engine components
 │   ├── http/             # Unified HTTP handlers, routes, and middleware
 │   ├── models/           # Domain models (project, database, user)
 │   ├── proxy/            # Traefik v3 reverse proxy controller
@@ -49,17 +47,10 @@ Access your dashboard at `http://your-server-ip:3000`.
 
 ## ⚡ Makefile Commands & Local Development
 
-Vessl includes a comprehensive root-level `Makefile` to streamline local development for both Self-Hosted and Cloud mode.
+Vessl includes a comprehensive root-level `Makefile` to streamline local development.
 
-**Self-Hosted Edition (`vessld`)**
-
-- `make dev`: Launches the backend daemon (`cmd/vessld`) and dashboard dev servers concurrently.
+- `make dev`: Launches the backend daemon (`cmd/main.go`) and dashboard dev servers concurrently.
 - `make build`: Builds both the dashboard and the `bin/vessld` binary.
-
-**Cloud SaaS Edition (`vesslcloud`)**
-
-- `make dev-cloud`: Launches the Postgres SaaS backend (`cmd/cloud`) and cloud-configured dashboard concurrently.
-- `make build-cloud`: Builds the SaaS backend into `bin/vesslcloud`.
 
 ### Getting Started Locally
 
