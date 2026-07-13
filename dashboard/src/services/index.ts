@@ -8,6 +8,7 @@ export { domainsService } from './domains';
 export { environmentsService } from './environments';
 export { gitService } from './git';
 export { jobsService } from './jobs';
+export * from './oauth';
 export { profileService } from './profile';
 export { projectSettingsService } from './project-settings';
 export { projectsService } from './projects';

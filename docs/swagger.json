@@ -47,7 +47,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.AppService"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.AppService"
             }
           }
         ],
@@ -105,7 +105,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/handlers.Verify2FARequest"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_handlers.Verify2FARequest"
             }
           }
         ],
@@ -119,6 +119,16 @@
         "produces": ["application/json"],
         "tags": ["Auth"],
         "summary": "Logout endpoint",
+        "responses": {}
+      }
+    },
+    "/auth/oauth/providers/enabled": {
+      "get": {
+        "description": "ListEnabledProviders endpoint",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Auth"],
+        "summary": "ListEnabledProviders endpoint",
         "responses": {}
       }
     },
@@ -174,7 +184,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/handlers.AuthRequest"
+              "$ref": "#/definitions/internal_handlers.AuthRequest"
             }
           }
         ],
@@ -195,7 +205,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/handlers.RegisterRequest"
+              "$ref": "#/definitions/internal_handlers.RegisterRequest"
             }
           }
         ],
@@ -224,7 +234,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.BackupConfig"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.BackupConfig"
             }
           }
         ],
@@ -308,7 +318,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.CreateDatabaseRequest"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.CreateDatabaseRequest"
             }
           }
         ],
@@ -372,7 +382,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.DatabaseQueryRequest"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.DatabaseQueryRequest"
             }
           }
         ],
@@ -550,7 +560,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.AppService"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.AppService"
             }
           }
         ],
@@ -590,7 +600,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.GitConnectRequest"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.GitConnectRequest"
             }
           }
         ],
@@ -658,7 +668,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.Job"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.Job"
             }
           }
         ],
@@ -752,7 +762,28 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/handlers.UpdateProfileRequest"
+              "$ref": "#/definitions/internal_handlers.UpdateProfileRequest"
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/profile/password": {
+      "put": {
+        "description": "ChangePassword endpoint",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Users"],
+        "summary": "ChangePassword endpoint",
+        "parameters": [
+          {
+            "description": "Payload",
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/internal_handlers.ChangePasswordRequest"
             }
           }
         ],
@@ -781,7 +812,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/handlers.CreatePATRequest"
+              "$ref": "#/definitions/internal_handlers.CreatePATRequest"
             }
           }
         ],
@@ -843,7 +874,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.CreateProjectRequest"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.CreateProjectRequest"
             }
           }
         ],
@@ -962,7 +993,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.DomainConfig"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.DomainConfig"
             }
           }
         ],
@@ -1036,7 +1067,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.EnvironmentConfig"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.EnvironmentConfig"
             }
           }
         ],
@@ -1100,7 +1131,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.ProjectMember"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.ProjectMember"
             }
           }
         ],
@@ -1185,7 +1216,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.CreateTokenRequest"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.CreateTokenRequest"
             }
           }
         ],
@@ -1256,7 +1287,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.Webhook"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.Webhook"
             }
           }
         ],
@@ -1461,7 +1492,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.Variable"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.Variable"
             }
           }
         ],
@@ -1496,7 +1527,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.Variable"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.Variable"
             }
           }
         ],
@@ -1541,7 +1572,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.ServerSettings"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.ServerSettings"
             }
           }
         ],
@@ -1581,7 +1612,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/handlers.GitAppsManifestRequest"
+              "$ref": "#/definitions/internal_handlers.GitAppsManifestRequest"
             }
           }
         ],
@@ -1602,7 +1633,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/handlers.ActivateLicenseRequest"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_handlers.ActivateLicenseRequest"
             }
           }
         ],
@@ -1631,7 +1662,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.WorkspaceNotificationChannel"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.WorkspaceNotificationChannel"
             }
           }
         ],
@@ -1652,7 +1683,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/handlers.TestNotificationRequest"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_handlers.TestNotificationRequest"
             }
           }
         ],
@@ -1717,7 +1748,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.OAuthProviderConfig"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.OAuthProviderConfig"
             }
           }
         ],
@@ -1748,7 +1779,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.Storage"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.Storage"
             }
           }
         ],
@@ -1924,7 +1955,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/handlers.GithubWebhookPayload"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_handlers.GithubWebhookPayload"
             }
           }
         ],
@@ -1945,7 +1976,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/handlers.CreateWorkspaceRequest"
+              "$ref": "#/definitions/internal_handlers.CreateWorkspaceRequest"
             }
           }
         ],
@@ -1990,7 +2021,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.Workspace"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.Workspace"
             }
           }
         ],
@@ -2052,7 +2083,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.WorkspaceAISettings"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.WorkspaceAISettings"
             }
           }
         ],
@@ -2116,7 +2147,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/models.WorkspaceEmailSettings"
+              "$ref": "#/definitions/vessl_dev_vessl_internal_models.WorkspaceEmailSettings"
             }
           }
         ],
@@ -2161,7 +2192,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/handlers.CreateSSHKeyRequest"
+              "$ref": "#/definitions/internal_handlers.CreateSSHKeyRequest"
             }
           }
         ],
@@ -2206,7 +2237,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/handlers.CreateTrustedDomainRequest"
+              "$ref": "#/definitions/internal_handlers.CreateTrustedDomainRequest"
             }
           }
         ],
@@ -2249,7 +2280,7 @@
     }
   },
   "definitions": {
-    "handlers.ActivateLicenseRequest": {
+    "internal_handlers.ActivateLicenseRequest": {
       "type": "object",
       "properties": {
         "license_key": {
@@ -2257,7 +2288,7 @@
         }
       }
     },
-    "handlers.AuthRequest": {
+    "internal_handlers.AuthRequest": {
       "type": "object",
       "properties": {
         "email": {
@@ -2268,7 +2299,19 @@
         }
       }
     },
-    "handlers.CreatePATRequest": {
+    "internal_handlers.ChangePasswordRequest": {
+      "type": "object",
+      "required": ["newPassword", "oldPassword"],
+      "properties": {
+        "newPassword": {
+          "type": "string"
+        },
+        "oldPassword": {
+          "type": "string"
+        }
+      }
+    },
+    "internal_handlers.CreatePATRequest": {
       "type": "object",
       "properties": {
         "name": {
@@ -2276,7 +2319,7 @@
         }
       }
     },
-    "handlers.CreateSSHKeyRequest": {
+    "internal_handlers.CreateSSHKeyRequest": {
       "type": "object",
       "properties": {
         "name": {
@@ -2287,7 +2330,7 @@
         }
       }
     },
-    "handlers.CreateTrustedDomainRequest": {
+    "internal_handlers.CreateTrustedDomainRequest": {
       "type": "object",
       "properties": {
         "domain": {
@@ -2295,7 +2338,7 @@
         }
       }
     },
-    "handlers.CreateWorkspaceRequest": {
+    "internal_handlers.CreateWorkspaceRequest": {
       "type": "object",
       "properties": {
         "name": {
@@ -2303,7 +2346,7 @@
         }
       }
     },
-    "handlers.GitAppsManifestRequest": {
+    "internal_handlers.GitAppsManifestRequest": {
       "type": "object",
       "properties": {
         "code": {
@@ -2314,7 +2357,7 @@
         }
       }
     },
-    "handlers.GithubWebhookPayload": {
+    "internal_handlers.GithubWebhookPayload": {
       "type": "object",
       "properties": {
         "action": {
@@ -2341,7 +2384,7 @@
         }
       }
     },
-    "handlers.RegisterRequest": {
+    "internal_handlers.RegisterRequest": {
       "type": "object",
       "properties": {
         "email": {
@@ -2355,7 +2398,7 @@
         }
       }
     },
-    "handlers.TestNotificationRequest": {
+    "internal_handlers.TestNotificationRequest": {
       "type": "object",
       "properties": {
         "channelId": {
@@ -2369,7 +2412,7 @@
         }
       }
     },
-    "handlers.UpdateProfileRequest": {
+    "internal_handlers.UpdateProfileRequest": {
       "type": "object",
       "properties": {
         "email": {
@@ -2380,7 +2423,7 @@
         }
       }
     },
-    "handlers.Verify2FARequest": {
+    "internal_handlers.Verify2FARequest": {
       "type": "object",
       "properties": {
         "passcode": {
@@ -2388,7 +2431,158 @@
         }
       }
     },
-    "models.AppService": {
+    "vessl_dev_vessl_internal_handlers.ActivateLicenseRequest": {
+      "type": "object",
+      "properties": {
+        "license_key": {
+          "type": "string"
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_handlers.AuthRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_handlers.ChangePasswordRequest": {
+      "type": "object",
+      "required": ["newPassword", "oldPassword"],
+      "properties": {
+        "newPassword": {
+          "type": "string"
+        },
+        "oldPassword": {
+          "type": "string"
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_handlers.CreatePATRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_handlers.CreateSSHKeyRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "publicKey": {
+          "type": "string"
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_handlers.CreateTrustedDomainRequest": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "string"
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_handlers.CreateWorkspaceRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_handlers.GitAppsManifestRequest": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "workspaceId": {
+          "type": "string"
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_handlers.GithubWebhookPayload": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "number": {
+          "type": "integer"
+        },
+        "pull_request": {
+          "type": "object",
+          "properties": {
+            "head": {
+              "type": "object",
+              "properties": {
+                "ref": {
+                  "type": "string"
+                },
+                "sha": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_handlers.RegisterRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_handlers.TestNotificationRequest": {
+      "type": "object",
+      "properties": {
+        "channelId": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "workspaceId": {
+          "type": "string"
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_handlers.UpdateProfileRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_handlers.Verify2FARequest": {
+      "type": "object",
+      "properties": {
+        "passcode": {
+          "type": "string"
+        }
+      }
+    },
+    "vessl_dev_vessl_internal_models.AppService": {
       "type": "object",
       "properties": {
         "branch": {
@@ -2447,7 +2641,7 @@
         }
       }
     },
-    "models.BackupConfig": {
+    "vessl_dev_vessl_internal_models.BackupConfig": {
       "type": "object",
       "properties": {
         "createdAt": {
@@ -2485,7 +2679,7 @@
         }
       }
     },
-    "models.CreateDatabaseRequest": {
+    "vessl_dev_vessl_internal_models.CreateDatabaseRequest": {
       "type": "object",
       "properties": {
         "customArgs": {
@@ -2523,7 +2717,7 @@
         }
       }
     },
-    "models.CreateProjectRequest": {
+    "vessl_dev_vessl_internal_models.CreateProjectRequest": {
       "type": "object",
       "properties": {
         "branch": {
@@ -2558,7 +2752,7 @@
         }
       }
     },
-    "models.CreateTokenRequest": {
+    "vessl_dev_vessl_internal_models.CreateTokenRequest": {
       "type": "object",
       "properties": {
         "environmentId": {
@@ -2584,7 +2778,7 @@
         }
       }
     },
-    "models.DatabaseQueryRequest": {
+    "vessl_dev_vessl_internal_models.DatabaseQueryRequest": {
       "type": "object",
       "properties": {
         "query": {
@@ -2592,7 +2786,7 @@
         }
       }
     },
-    "models.DomainConfig": {
+    "vessl_dev_vessl_internal_models.DomainConfig": {
       "type": "object",
       "properties": {
         "createdAt": {
@@ -2621,7 +2815,7 @@
         }
       }
     },
-    "models.EnvironmentConfig": {
+    "vessl_dev_vessl_internal_models.EnvironmentConfig": {
       "type": "object",
       "properties": {
         "createdAt": {
@@ -2644,7 +2838,7 @@
         }
       }
     },
-    "models.GitConnectRequest": {
+    "vessl_dev_vessl_internal_models.GitConnectRequest": {
       "type": "object",
       "properties": {
         "accessToken": {
@@ -2658,7 +2852,7 @@
         }
       }
     },
-    "models.Job": {
+    "vessl_dev_vessl_internal_models.Job": {
       "type": "object",
       "properties": {
         "command": {
@@ -2693,7 +2887,7 @@
         }
       }
     },
-    "models.OAuthProviderConfig": {
+    "vessl_dev_vessl_internal_models.OAuthProviderConfig": {
       "type": "object",
       "properties": {
         "baseUrl": {
@@ -2728,7 +2922,7 @@
         }
       }
     },
-    "models.ProjectMember": {
+    "vessl_dev_vessl_internal_models.ProjectMember": {
       "type": "object",
       "properties": {
         "acceptedAt": {
@@ -2757,7 +2951,7 @@
         }
       }
     },
-    "models.S3Destination": {
+    "vessl_dev_vessl_internal_models.S3Destination": {
       "type": "object",
       "properties": {
         "accessKeyId": {
@@ -2789,7 +2983,7 @@
         }
       }
     },
-    "models.ServerSettings": {
+    "vessl_dev_vessl_internal_models.ServerSettings": {
       "type": "object",
       "properties": {
         "autoUpdateEnabled": {
@@ -2926,7 +3120,7 @@
         }
       }
     },
-    "models.Storage": {
+    "vessl_dev_vessl_internal_models.Storage": {
       "type": "object",
       "properties": {
         "accessKey": {
@@ -2982,7 +3176,7 @@
         }
       }
     },
-    "models.Variable": {
+    "vessl_dev_vessl_internal_models.Variable": {
       "type": "object",
       "properties": {
         "createdAt": {
@@ -3014,7 +3208,7 @@
         }
       }
     },
-    "models.Webhook": {
+    "vessl_dev_vessl_internal_models.Webhook": {
       "type": "object",
       "properties": {
         "createdAt": {
@@ -3043,7 +3237,7 @@
         }
       }
     },
-    "models.Workspace": {
+    "vessl_dev_vessl_internal_models.Workspace": {
       "type": "object",
       "properties": {
         "avatarUrl": {
@@ -3069,7 +3263,7 @@
         }
       }
     },
-    "models.WorkspaceAISettings": {
+    "vessl_dev_vessl_internal_models.WorkspaceAISettings": {
       "type": "object",
       "properties": {
         "apiKey": {
@@ -3092,7 +3286,7 @@
         }
       }
     },
-    "models.WorkspaceEmailSettings": {
+    "vessl_dev_vessl_internal_models.WorkspaceEmailSettings": {
       "type": "object",
       "properties": {
         "createdAt": {
@@ -3133,7 +3327,7 @@
         }
       }
     },
-    "models.WorkspaceNotificationChannel": {
+    "vessl_dev_vessl_internal_models.WorkspaceNotificationChannel": {
       "type": "object"
     }
   },

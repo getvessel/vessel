@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"golang.org/x/crypto/bcrypt"
 	"time"
 
 	"crypto/sha256"
@@ -55,6 +56,25 @@ func (s *UserService) GetUserByID(ctx context.Context, id string) (*models.User,
 
 func (s *UserService) ListUsers(ctx context.Context, limit, offset int) ([]models.User, int, error) {
 	return s.userRepo.ListUsers(ctx, limit, offset)
+}
+
+func (s *UserService) ChangePassword(ctx context.Context, userID, oldPassword, newPassword string) error {
+	u, err := s.userRepo.GetUserByID(ctx, userID)
+	if err != nil {
+		return errors.New("user not found")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(oldPassword)); err != nil {
+		return errors.New("invalid old password")
+	}
+
+	hashed, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return errors.New("failed to hash new password")
+	}
+
+	u.PasswordHash = string(hashed)
+	return s.userRepo.UpdateUser(ctx, u)
 }
 
 func (s *UserService) UpdateUser(ctx context.Context, u *models.User) error {

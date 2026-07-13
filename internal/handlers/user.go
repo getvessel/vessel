@@ -60,6 +60,36 @@ func (h *UserHandler) ListUsers(c echo.Context) error {
 	return utils.Paginated(c, "Users retrieved", out, total, page, limit)
 }
 
+type ChangePasswordRequest struct {
+	OldPassword string `json:"oldPassword" validate:"required"`
+	NewPassword string `json:"newPassword" validate:"required"`
+}
+
+// @Summary ChangePassword endpoint
+// @Description ChangePassword endpoint
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param request body handlers.ChangePasswordRequest true "Payload"
+// @Router /profile/password [put]
+func (h *UserHandler) ChangePassword(c echo.Context) error {
+	userID := ExtractUserID(c)
+	if userID == "" {
+		return utils.Error(c, http.StatusUnauthorized, "unauthorized access")
+	}
+	var payload ChangePasswordRequest
+	if err := c.Bind(&payload); err != nil {
+		return utils.Error(c, http.StatusBadRequest, "invalid request payload")
+	}
+	if payload.OldPassword == "" || payload.NewPassword == "" {
+		return utils.Error(c, http.StatusBadRequest, "old and new passwords are required")
+	}
+	if err := h.userService.ChangePassword(c.Request().Context(), userID, payload.OldPassword, payload.NewPassword); err != nil {
+		return utils.Error(c, http.StatusBadRequest, err.Error())
+	}
+	return utils.Success(c, "Password changed successfully", nil)
+}
+
 // @Summary GetProfile endpoint
 // @Description GetProfile endpoint
 // @Tags Users

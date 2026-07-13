@@ -29,6 +29,22 @@ func (s *OAuthService) ListProviders(ctx context.Context) ([]models.OAuthProvide
 	return s.oauthRepo.ListProviders(ctx)
 }
 
+func (s *OAuthService) ListEnabledProviders(ctx context.Context) ([]models.OAuthProviderConfig, error) {
+	allProviders, err := s.oauthRepo.ListProviders(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var enabledProviders []models.OAuthProviderConfig
+	for _, p := range allProviders {
+		if p.Enabled {
+			// Strip secrets before returning to unauthorized clients
+			p.ClientSecret = ""
+			enabledProviders = append(enabledProviders, p)
+		}
+	}
+	return enabledProviders, nil
+}
+
 func (s *OAuthService) GetProvider(ctx context.Context, idOrName string) (*models.OAuthProviderConfig, error) {
 	if idOrName == "" {
 		return nil, errors.New("provider id or name required")

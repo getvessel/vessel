@@ -11,11 +11,18 @@ export const useGetProfile = () => {
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { payload: Parameters<typeof profileService.updateProfile>[0] }) =>
-      profileService.updateProfile(payload.payload),
+    mutationFn: (payload: Parameters<typeof profileService.updateProfile>[0]) =>
+      profileService.updateProfile(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
     },
+  });
+};
+
+export const useChangePassword = () => {
+  return useMutation({
+    mutationFn: (payload: Parameters<typeof profileService.changePassword>[0]) =>
+      profileService.changePassword(payload),
   });
 };
 

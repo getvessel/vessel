@@ -40,6 +40,23 @@ func (h *OAuthHandler) ListProviders(c echo.Context) error {
 	return utils.Success(c, "Operation successful", providers)
 }
 
+// @Summary ListEnabledProviders endpoint
+// @Description ListEnabledProviders endpoint
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Router /auth/oauth/providers/enabled [get]
+func (h *OAuthHandler) ListEnabledProviders(c echo.Context) error {
+	providers, err := h.oauthService.ListEnabledProviders(c.Request().Context())
+	if err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+	if providers == nil {
+		providers = []models.OAuthProviderConfig{}
+	}
+	return utils.Success(c, "Operation successful", providers)
+}
+
 // @Summary SaveProvider endpoint
 // @Description SaveProvider endpoint
 // @Tags Settings

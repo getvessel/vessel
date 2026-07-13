@@ -13,7 +13,13 @@ export interface UserProfile {
 
 export interface UpdateProfileRequest {
   name?: string;
+  email?: string;
   avatarUrl?: string;
+}
+
+export interface ChangePasswordRequest {
+  oldPassword?: string;
+  newPassword?: string;
 }
 
 // Response Types

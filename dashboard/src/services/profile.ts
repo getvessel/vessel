@@ -1,8 +1,8 @@
 import type { BaseResponse } from '#/interfaces/base';
 import type {
+  ChangePasswordRequest,
   GetProfileResponse,
   UpdateProfileRequest,
-  UpdateProfileResponse,
 } from '#/interfaces/profile';
 import type { CreatePATResponse, PersonalAccessToken } from '#/interfaces/users';
 import { apiClient } from '#/lib/apiClient';
@@ -20,9 +20,17 @@ export const profileService = {
     }
   },
 
-  updateProfile: async (payload: UpdateProfileRequest): Promise<UpdateProfileResponse> => {
+  updateProfile: async (payload: UpdateProfileRequest): Promise<void> => {
     try {
-      return await apiClient.put<UpdateProfileResponse>('/profile', payload);
+      await apiClient.put('/api/v1/profile', payload);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  changePassword: async (payload: ChangePasswordRequest): Promise<void> => {
+    try {
+      await apiClient.put('/api/v1/profile/password', payload);
     } catch (error) {
       throw handleApiError(error);
     }
