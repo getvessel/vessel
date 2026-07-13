@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	paddle "github.com/PaddleHQ/paddle-go-sdk/v5"
 	"github.com/labstack/echo/v4"
@@ -76,6 +77,10 @@ func (h *BillingHandler) HandleStripeWebhook(c echo.Context) error {
 	log.Printf("Received Stripe webhook event: %s", event.Type)
 
 	switch event.Type {
+	case "checkout.session.completed":
+		if err := h.handleStripeCheckoutCompleted(event); err != nil {
+			return utils.Error(c, http.StatusBadRequest, err.Error())
+		}
 	case "customer.subscription.created", "customer.subscription.updated":
 		if err := h.handleStripeSubscriptionUpdate(event); err != nil {
 			return utils.Error(c, http.StatusBadRequest, err.Error())
@@ -106,6 +111,37 @@ func (h *BillingHandler) parseStripeEvent(payload []byte, sigHeader string) (str
 		}
 	}
 	return event, nil
+}
+
+func (h *BillingHandler) handleStripeCheckoutCompleted(event stripe.Event) error {
+	var session stripe.CheckoutSession
+	if err := json.Unmarshal(event.Data.Raw, &session); err != nil {
+		return err
+	}
+
+	workspaceIDStr := session.ClientReferenceID
+	if workspaceIDStr == "" || session.Customer == nil {
+		log.Println("Checkout completed, but no workspaceID or customer found in session")
+		return nil
+	}
+
+	workspaceID, err := strconv.ParseUint(workspaceIDStr, 10, 32)
+	if err != nil {
+		log.Printf("Invalid workspace ID format: %s\n", workspaceIDStr)
+		return nil
+	}
+
+	team, err := h.cloudRepo.GetTeamByID(uint(workspaceID))
+	if err != nil || team == nil {
+		log.Printf("Checkout completed, but workspace %d not found\n", workspaceID)
+		return nil
+	}
+
+	team.StripeCustomerID = session.Customer.ID
+	h.cloudRepo.UpdateTeam(team)
+
+	log.Printf("Checkout Completed | Workspace: %s | Customer: %s", workspaceID, session.Customer.ID)
+	return nil
 }
 
 func (h *BillingHandler) handleStripeSubscriptionUpdate(event stripe.Event) error {
@@ -232,8 +268,9 @@ func (h *BillingHandler) handlePaddleSubscriptionCanceled(event map[string]inter
 }
 
 type CheckoutRequest struct {
-	PlanID    string `json:"plan_id"`
-	ReturnURL string `json:"return_url"`
+	PlanID      string `json:"plan_id"`
+	ReturnURL   string `json:"return_url"`
+	WorkspaceID string `json:"workspace_id"`
 }
 
 // @Summary Create Stripe Checkout
@@ -255,6 +292,7 @@ func (h *BillingHandler) CreateStripeCheckout(c echo.Context) error {
 	}
 
 	params := &stripe.CheckoutSessionParams{
+		ClientReferenceID:  stripe.String(req.WorkspaceID),
 		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
