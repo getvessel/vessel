@@ -65,9 +65,6 @@ export interface ServerSettings {
   updateCheckCron: string;
   autoUpdateEnabled: boolean;
   telemetryEnabled: boolean;
-  licenseKey?: string;
-  plan: string;
-  maxSeats: number;
   currentVersion: string;
   latestVersion: string;
   lastUpdateCheck: string;

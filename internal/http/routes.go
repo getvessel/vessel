@@ -122,7 +122,6 @@ func (s *Server) registerRoutes() {
 	authGroup.GET("/workspaces/:workspaceId/audit-logs", s.workspaceHandler.ListAuditLogs)
 	authGroup.GET("/settings", s.settingsHandler.GetSettings)
 	apiGroup.PUT("/settings", s.settingsHandler.UpdateSettings, s.authGuard.RequireRole("admin"))
-	apiGroup.POST("/settings/license", s.settingsHandler.ActivateLicense, s.authGuard.RequireRole("admin"))
 	authGroup.GET("/settings/updates/status", s.updaterHandler.GetUpdateStatus)
 	apiGroup.POST("/settings/updates/check", s.updaterHandler.CheckUpdate, s.authGuard.RequireRole("admin"))
 	apiGroup.POST("/settings/updates/deploy", s.updaterHandler.DeployUpdate, s.authGuard.RequireRole("admin"))

@@ -122,12 +122,4 @@ export const settingsService = {
       throw handleApiError(error);
     }
   },
-
-  activateLicense: async (payload: unknown): Promise<BaseResponse<unknown>> => {
-    try {
-      return await apiClient.post<BaseResponse<unknown>>('/settings/license', payload);
-    } catch (error) {
-      throw handleApiError(error);
-    }
-  },
 };

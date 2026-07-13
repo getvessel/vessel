@@ -80,12 +80,6 @@ export const useDeployUpdate = () => {
   });
 };
 
-export const useActivateLicense = () => {
-  return useMutation({
-    mutationFn: (payload: unknown) => settingsService.activateLicense(payload),
-  });
-};
-
 export const useSaveNotificationChannel = () => {
   const queryClient = useQueryClient();
   return useMutation({

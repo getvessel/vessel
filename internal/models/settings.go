@@ -69,9 +69,6 @@ type ServerSettings struct {
 	UpdateCheckCron             string `json:"updateCheckCron"`
 	AutoUpdateEnabled           bool   `json:"autoUpdateEnabled"`
 	TelemetryEnabled            bool   `json:"telemetryEnabled"`
-	LicenseKey                  string `json:"licenseKey,omitempty"`
-	Plan                        string `json:"plan"`
-	MaxSeats                    int    `json:"maxSeats"`
 	CurrentVersion              string `json:"currentVersion"`
 	LatestVersion               string `json:"latestVersion"`
 	LastUpdateCheck             string `json:"lastUpdateCheck"`
