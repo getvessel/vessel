@@ -11,9 +11,22 @@ export default defineConfig({
       customCss: ['./src/styles/theme.css'],
       sidebar: [
         { label: 'Getting Started', slug: 'getting-started' },
-        { label: 'Deployment', slug: 'deployment' },
+        {
+          label: 'Deployment',
+          collapsed: false,
+          items: [
+            { label: 'Overview', slug: 'deployment' },
+            { label: 'Projects & Environments', slug: 'projects' },
+            { label: 'Serverless Functions', slug: 'serverless' },
+          ],
+        },
         { label: 'Databases', slug: 'databases' },
+        { label: 'Storage', slug: 'storage' },
+        { label: 'Workspaces & Teams', slug: 'workspaces' },
+        { label: 'Integrations', slug: 'integrations' },
         { label: 'Configuration', slug: 'configuration' },
+        { label: 'Administration', slug: 'admin' },
+        { label: 'API Reference', slug: 'api' },
       ],
     }),
   ],

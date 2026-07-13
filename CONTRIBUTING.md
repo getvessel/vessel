@@ -4,8 +4,6 @@
 
 Ask for guidance on our [Discord server](https://discord.gg/vessl) in `#contribute`.
 
-For the full tech stack, see [TECH_STACK.md](TECH_STACK.md).
-
 ---
 
 ## Table of Contents
