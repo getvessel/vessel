@@ -169,7 +169,7 @@ func (h *SettingsHandler) ActivateLicense(c echo.Context) error {
 		return utils.Error(c, http.StatusInternalServerError, "failed to save license to settings")
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{
+	return utils.Success(c, "License activated successfully", map[string]string{
 		"status": "activated",
 		"plan":   claims.Plan,
 	})

@@ -131,7 +131,7 @@ func (h *ProjectSettingsHandler) CreateToken(c echo.Context) error {
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusCreated, map[string]any{
+	return utils.Created(c, "Token created successfully", map[string]any{
 		"id":          token.ID,
 		"name":        token.Name,
 		"token":       raw,

@@ -60,7 +60,5 @@ func (h *UpdaterHandler) DeployUpdate(c echo.Context) error {
 	if err := h.updaterService.DeployUpdate(c.Request().Context()); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusAccepted, map[string]string{
-		"message": "update deployment triggered",
-	})
+	return utils.Accepted(c, "update deployment triggered", nil)
 }

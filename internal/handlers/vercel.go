@@ -40,8 +40,7 @@ func (h *VercelHandler) Callback(c echo.Context) error {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Vercel account linked successfully",
+	return utils.Success(c, "Vercel account linked successfully", map[string]interface{}{
 		"account": account,
 	})
 }
@@ -69,7 +68,7 @@ func (h *VercelHandler) ListProjects(c echo.Context) error {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return utils.Success(c, "Projects fetched successfully", map[string]interface{}{
 		"projects": projects,
 	})
 }
@@ -103,7 +102,7 @@ func (h *VercelHandler) GetProjectEnv(c echo.Context) error {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return utils.Success(c, "Environment variables fetched successfully", map[string]interface{}{
 		"envs": envs,
 	})
 }

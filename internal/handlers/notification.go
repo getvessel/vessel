@@ -112,10 +112,7 @@ func (h *NotificationHandler) TestNotification(c echo.Context) error {
 		if err != nil {
 			return utils.Error(c, http.StatusBadRequest, err.Error())
 		}
-		return c.JSON(http.StatusOK, map[string]string{
-			"status":  "ok",
-			"message": "Global test notification queued",
-		})
+		return utils.Success(c, "Global test notification queued", nil)
 	}
 
 	err := h.notificationService.TestTeamNotification(c.Request().Context(), req.WorkspaceID, req.ChannelID)
@@ -123,8 +120,5 @@ func (h *NotificationHandler) TestNotification(c echo.Context) error {
 		return utils.Error(c, http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{
-		"status":  "ok",
-		"message": "Test notification queued",
-	})
+	return utils.Success(c, "Test notification queued", nil)
 }

@@ -72,10 +72,7 @@ func (h *WebhookHandler) HandleProjectWebhook(c echo.Context) error {
 		sourceDir := filepath.Join("data", "builds", project.ID)
 		_, _ = h.deploymentService.DeployProject(ctx, project.ID, sourceDir, nil)
 	}()
-	return c.JSON(http.StatusAccepted, map[string]string{
-		"status":  "accepted",
-		"message": fmt.Sprintf("triggering background build & deployment for %s", project.Name),
-	})
+	return utils.Accepted(c, fmt.Sprintf("triggering background build & deployment for %s", project.Name), nil)
 }
 
 // @Summary HandleServiceWebhook endpoint
@@ -111,10 +108,7 @@ func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 		dep, _ = h.deploymentService.CreateDeployment(ctx, dep)
 		h.deploymentService.ExecuteDeploymentAsync(dep)
 	}()
-	return c.JSON(http.StatusAccepted, map[string]string{
-		"status":  "accepted",
-		"message": fmt.Sprintf("triggering background build & rollout for service %s", appSvc.Name),
-	})
+	return utils.Accepted(c, fmt.Sprintf("triggering background build & rollout for service %s", appSvc.Name), nil)
 }
 
 // @Summary HandleGitHubWebhook endpoint
@@ -144,13 +138,13 @@ func (h *WebhookHandler) HandleGitHubWebhook(c echo.Context) error {
 				ctx := context.Background()
 				_, _ = h.prPreviewService.DeployPRPreview(ctx, serviceID, payload.Number, payload.PullRequest.Head.Sha, payload.PullRequest.Head.Ref)
 			}()
-			return c.JSON(http.StatusAccepted, map[string]string{"message": "Deploying PR preview"})
+			return utils.Accepted(c, "Deploying PR preview", nil)
 		} else if payload.Action == "closed" {
 			go func() {
 				ctx := context.Background()
 				_ = h.prPreviewService.DestroyPRPreview(ctx, serviceID, payload.Number)
 			}()
-			return c.JSON(http.StatusAccepted, map[string]string{"message": "Destroying PR preview"})
+			return utils.Accepted(c, "Destroying PR preview", nil)
 		}
 	}
 	return utils.Success(c, "Operation successful", map[string]string{"message": "Event ignored"})

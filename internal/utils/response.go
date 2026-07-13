@@ -51,6 +51,16 @@ func Created(c echo.Context, message string, data interface{}) error {
 	})
 }
 
+// Accepted returns a standardized 202 response
+func Accepted(c echo.Context, message string, data interface{}) error {
+	return c.JSON(http.StatusAccepted, APIResponse{
+		Status:  "success",
+		Message: message,
+		Data:    data,
+		Path:    c.Request().URL.Path,
+	})
+}
+
 // Error returns a standardized error response
 func Error(c echo.Context, statusCode int, message string) error {
 	return c.JSON(statusCode, APIResponse{

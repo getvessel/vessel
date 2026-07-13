@@ -90,7 +90,7 @@ func (h *DeploymentHandler) Trigger(c echo.Context) error {
 
 	h.deploymentService.ExecuteDeploymentAsync(created)
 
-	return c.JSON(http.StatusAccepted, created)
+	return utils.Accepted(c, "Deployment created", created)
 }
 
 // @Summary Rollback endpoint
@@ -127,7 +127,7 @@ func (h *DeploymentHandler) Rollback(c echo.Context) error {
 
 	h.deploymentService.ExecuteDeploymentAsync(created)
 
-	return c.JSON(http.StatusAccepted, created)
+	return utils.Accepted(c, "Rollback created", created)
 }
 
 // @Summary GetLogs endpoint
@@ -146,7 +146,7 @@ func (h *DeploymentHandler) GetLogs(c echo.Context) error {
 	if err != nil || dep == nil {
 		return utils.Error(c, http.StatusNotFound, "deployment not found")
 	}
-	return c.JSON(http.StatusOK, map[string]string{
+	return utils.Success(c, "Logs fetched successfully", map[string]string{
 		"id":        dep.ID,
 		"buildLogs": dep.BuildLogs,
 		"status":    dep.Status,
@@ -207,7 +207,7 @@ func (h *DeploymentHandler) DeployProject(c echo.Context) error {
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, map[string]string{
+	return utils.Success(c, "Project deployed successfully", map[string]string{
 		"status":       "deployed",
 		"container_id": containerID,
 	})
