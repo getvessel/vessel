@@ -13,7 +13,7 @@ function ServiceDetailsPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold tracking-tight">Service Details</h1>
       </div>
-      
+
       <div className="grid gap-6">
         <section>
           <h2 className="text-lg font-semibold mb-4">Real-time Metrics</h2>

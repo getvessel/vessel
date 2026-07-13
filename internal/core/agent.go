@@ -9,6 +9,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -59,26 +60,33 @@ func Run(ctx context.Context, serverURL, token string) error {
 				log.Printf(" Yamux accept error: %v", err)
 				continue
 			}
-			go handleDockerStream(stream)
+			go handleAPIStream(stream)
 		}
 	}
 }
 
-func handleDockerStream(stream *yamux.Stream) {
+func handleAPIStream(stream *yamux.Stream) {
 	defer stream.Close()
-	dockerConn, err := net.Dial("unix", "/var/run/docker.sock")
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	vesslConn, err := net.Dial("tcp", "localhost:"+port)
 	if err != nil {
-		log.Printf(" Failed to connect to local Docker daemon: %v", err)
+		log.Printf(" Failed to connect to local Vessl API daemon: %v", err)
 		return
 	}
-	defer dockerConn.Close()
+	defer vesslConn.Close()
+
 	errc := make(chan error, 2)
 	go func() {
-		_, err := io.Copy(dockerConn, stream)
+		_, err := io.Copy(vesslConn, stream)
 		errc <- err
 	}()
 	go func() {
-		_, err := io.Copy(stream, dockerConn)
+		_, err := io.Copy(stream, vesslConn)
 		errc <- err
 	}()
 	<-errc

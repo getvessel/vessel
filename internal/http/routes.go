@@ -9,9 +9,14 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"vessl.dev/vessl/dashboard"
 	_ "vessl.dev/vessl/docs"
+	cloud "vessl.dev/vessl/internal/cloud/http"
 )
 
 func (s *Server) registerRoutes() {
+	if s.isCloudMode {
+		cloud.MountCloudRoutes(s.router)
+	}
+
 	apiGroup := s.router.Group("/api")
 
 	s.router.GET("/docs", func(c echo.Context) error {

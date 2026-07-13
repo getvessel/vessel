@@ -122,8 +122,13 @@ func main() {
 
 	addr := host + ":" + port
 
+	isCloudMode := os.Getenv("CLOUD_MODE") == "true"
+	if isCloudMode {
+		log.Printf(" Cloud mode enabled (CLOUD_MODE=true)")
+	}
+
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
-	apiServer := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
+	apiServer := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient, isCloudMode)
 
 	if *isMCP {
 		log.Printf("Starting MCP stdio server...")

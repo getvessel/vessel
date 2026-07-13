@@ -20,6 +20,7 @@ import (
 
 type Server struct {
 	router                 *echo.Echo
+	isCloudMode            bool
 	mcpBridge              *mcp.Bridge
 	deployer               *engine.Deployer
 	traefikManager         *proxy.TraefikManager

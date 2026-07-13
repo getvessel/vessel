@@ -51,11 +51,14 @@ func (h *SettingsHandler) GetPublicSettings(c echo.Context) error {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 
+	isCloudMode := os.Getenv("CLOUD_MODE") == "true" || os.Getenv("CLOUD_MODE") == "1"
+
 	// Only return safe public settings
 	publicSettings := map[string]any{
 		"registrationEnabled": s.RegistrationEnabled,
 		"siteName":            s.SiteName,
 		"emailEnabled":        s.SMTPEnabled || s.ResendEnabled,
+		"isCloudMode":         isCloudMode,
 	}
 	return utils.Success(c, "Operation successful", publicSettings)
 }

@@ -1,7 +1,7 @@
-import { useGetMetrics } from '#/hooks/useDeployments';
-import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card';
 import { Activity, Cpu, HardDrive } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card';
 import { Skeleton } from '#/components/ui/skeleton';
+import { useGetMetrics } from '#/hooks/useDeployments';
 
 interface ServiceMetricsPanelProps {
   serviceId: string;
@@ -33,13 +33,11 @@ export function ServiceMetricsPanel({ serviceId }: ServiceMetricsPanelProps) {
           {isLoading ? (
             <Skeleton className="h-8 w-1/2" />
           ) : (
-            <div className="text-2xl font-bold capitalize">
-              {metrics?.status || 'Unknown'}
-            </div>
+            <div className="text-2xl font-bold capitalize">{metrics?.status || 'Unknown'}</div>
           )}
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium">CPU Usage</CardTitle>
@@ -49,9 +47,7 @@ export function ServiceMetricsPanel({ serviceId }: ServiceMetricsPanelProps) {
           {isLoading ? (
             <Skeleton className="h-8 w-1/2" />
           ) : (
-            <div className="text-2xl font-bold">
-              {metrics?.cpuUsagePercentage?.toFixed(2)}%
-            </div>
+            <div className="text-2xl font-bold">{metrics?.cpuUsagePercentage?.toFixed(2)}%</div>
           )}
         </CardContent>
       </Card>
@@ -87,5 +83,5 @@ function formatBytes(bytes: number, decimals = 2) {
 
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
 }
