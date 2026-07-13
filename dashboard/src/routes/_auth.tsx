@@ -1,6 +1,5 @@
-import { Layers01Icon } from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { Layers } from 'lucide-react';
 
 import { authStore } from '#/stores/authStore';
 
@@ -21,7 +20,7 @@ function AuthLayout() {
         {/* Top Logo */}
         <div className="flex items-center justify-center gap-2 font-bold text-xl mb-8">
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
-            <HugeiconsIcon icon={Layers01Icon} className="h-5 w-5" />
+            <Layers className="h-5 w-5" />
           </div>
           Vessl
         </div>

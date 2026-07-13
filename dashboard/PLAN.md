@@ -6,7 +6,7 @@ After a deep secondary analysis of the existing Go handlers and API routes, this
 
 - **Framework:** React 19 + TanStack Router
 - **Styling:** Tailwind CSS v4, Radix UI Primitives
-- **Icons:** **Hugeicons (`@hugeicons/react`)** - _(Do not use Lucide)_
+- **Icons:** **Lucide (`lucide-react`)**
 
 ## 1. Core Layout & Navigation Architecture
 

@@ -1,6 +1,5 @@
-import { Mail01Icon } from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { Link } from '@tanstack/react-router';
+import { Mail } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '#/components/ui/button';
@@ -26,7 +25,7 @@ export const ForgotPasswordForm = () => {
           </Label>
           <div className="relative">
             <div className="absolute left-3 top-3.5 text-muted-foreground">
-              <HugeiconsIcon icon={Mail01Icon} className="h-5 w-5" />
+              <Mail className="h-5 w-5" />
             </div>
             <Input
               id="email"

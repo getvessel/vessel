@@ -1,6 +1,5 @@
-import { SidebarLeftIcon } from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { PanelLeftIcon } from 'lucide-react';
 import { Slot } from 'radix-ui';
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
@@ -262,7 +261,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
       }}
       {...props}
     >
-      <HugeiconsIcon icon={SidebarLeftIcon} strokeWidth={2} />
+      <PanelLeftIcon className="size-4" strokeWidth={2} />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );

@@ -1,6 +1,5 @@
-import { AddCircleIcon, BellIcon, Search01Icon } from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { useRouterState } from '@tanstack/react-router';
+import { BellIcon, PlusIcon, SearchIcon } from 'lucide-react';
 
 const routeLabels: Record<string, { title: string; description: string }> = {
   '/': { title: 'Dashboard', description: 'Overview of your infrastructure' },
@@ -38,7 +37,7 @@ export function Topbar() {
           type="button"
           className="flex items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-colors duration-150"
         >
-          <HugeiconsIcon icon={Search01Icon} className="h-3.5 w-3.5" />
+          <SearchIcon className="h-3.5 w-3.5" />
           <span className="hidden sm:inline text-xs">Search...</span>
           <kbd className="hidden sm:inline-flex h-4 items-center gap-0.5 rounded border border-border bg-background px-1 font-mono text-[9px] text-muted-foreground">
             ⌘K
@@ -50,7 +49,7 @@ export function Topbar() {
           type="button"
           className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
         >
-          <HugeiconsIcon icon={AddCircleIcon} className="h-3.5 w-3.5" />
+          <PlusIcon className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">New</span>
         </button>
 
@@ -59,7 +58,7 @@ export function Topbar() {
           type="button"
           className="relative flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors duration-150"
         >
-          <HugeiconsIcon icon={BellIcon} className="h-4 w-4" />
+          <BellIcon className="h-4 w-4" />
           <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-primary" />
         </button>
       </div>

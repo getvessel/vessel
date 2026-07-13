@@ -1,11 +1,5 @@
-import {
-  Mail01Icon,
-  SecurityPasswordIcon,
-  ViewIcon,
-  ViewOffIcon,
-} from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { Link } from '@tanstack/react-router';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
@@ -42,7 +36,7 @@ export const LoginForm = () => {
         </Label>
         <div className="relative">
           <div className="absolute left-3 top-3.5 text-muted-foreground">
-            <HugeiconsIcon icon={Mail01Icon} className="h-5 w-5" />
+            <Mail className="h-5 w-5" />
           </div>
           <Input
             id="email"
@@ -67,7 +61,7 @@ export const LoginForm = () => {
         </div>
         <div className="relative">
           <div className="absolute left-3 top-3.5 text-muted-foreground">
-            <HugeiconsIcon icon={SecurityPasswordIcon} className="h-5 w-5" />
+            <Lock className="h-5 w-5" />
           </div>
           <Input
             id="password"
@@ -82,7 +76,7 @@ export const LoginForm = () => {
             className="absolute right-3 top-3.5 text-muted-foreground hover:text-foreground transition-colors"
             onClick={() => setShowPassword(!showPassword)}
           >
-            <HugeiconsIcon icon={showPassword ? ViewOffIcon : ViewIcon} className="h-5 w-5" />
+            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
           </button>
         </div>
       </div>
