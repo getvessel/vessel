@@ -9,7 +9,7 @@ Current version: `v0.1.0-alpha`.
 ## Release Process
 
 1. **Branch**: Develop on `next`. Open a PR into `main`.
-2. **Version bump**: Update `const vesslVersion` in `cmd/main.go`.
+2. **Version bump**: Update `const vesslVersion` in `cmd/vessld/main.go`.
 3. **Changelog**: Summarise changes in the GitHub release body.
 4. **Tag & release**:
 

@@ -61,6 +61,17 @@ func (s *Server) registerRoutes() {
 		return c.JSON(200, map[string]string{"status": "ok", "service": "vessl-cloud"})
 	})
 
+	api.GET("/system/public", func(c echo.Context) error {
+		return c.JSON(200, map[string]interface{}{
+			"data": map[string]interface{}{
+				"registrationEnabled": true,
+				"siteName":            "Vessl Cloud",
+				"emailEnabled":        true,
+				"isCloudMode":         true,
+			},
+		})
+	})
+
 	api.GET("/agent/connect", s.agentHandler.AcceptConnection)
 	api.Any("/servers/:serverId/proxy/*", s.agentHandler.ProxyToServer, vesslMiddleware.RequireCloudAuth())
 	api.POST("/wizard/token", s.wizardHandler.GenerateAgentToken, vesslMiddleware.SeatLimitGuard(s.repo))

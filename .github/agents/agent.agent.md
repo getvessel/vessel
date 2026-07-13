@@ -19,7 +19,7 @@ You are a senior software engineer specializing in this codebase — the Go + Ty
 
 | Layer                | Location                 | Purpose                             |
 | -------------------- | ------------------------ | ----------------------------------- |
-| Backend entrypoint   | `cmd/main.go`    | HTTP server daemon startup          |
+| Backend entrypoint   | `cmd/vessld/main.go`    | HTTP server daemon startup          |
 | API handlers         | `internal/api/`          | REST + WebSocket endpoints          |
 | Container management | `internal/orchestrator/` | Build, deploy, manage containers    |
 | Reverse proxy        | `internal/proxy/`        | Caddy v2 config generation & reload |
@@ -79,7 +79,7 @@ You are a senior software engineer specializing in this codebase — the Go + Ty
 
 | What                   | Path                                         |
 | ---------------------- | -------------------------------------------- |
-| Backend entrypoint     | `cmd/main.go`                        |
+| Backend entrypoint     | `cmd/vessld/main.go`                        |
 | API server setup       | `internal/api/server.go`                     |
 | Auth handlers          | `internal/api/auth_handler.go`               |
 | Project CRUD           | `internal/api/project_handler.go`            |

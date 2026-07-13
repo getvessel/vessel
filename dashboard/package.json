@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "Vessl control panel GUI — React 19, TanStack Router, Tailwind CSS v4.",
-  "license": "MIT",
+  "license": "Vessl Source-Available License",
   "type": "module",
   "imports": {
     "#/*": "./src/*"

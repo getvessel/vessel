@@ -16,7 +16,7 @@ This is the Vessl monorepo — an open-source, self-hosted PaaS that turns any b
 
 ### Backend (`cmd/`, `internal/`)
 
-1. **Entrypoint** — `cmd/main.go`: HTTP server daemon, wires dependencies
+1. **Entrypoint** — `cmd/vessld/main.go`: HTTP server daemon, wires dependencies
 2. **API Handlers** — `internal/api/`: REST + WebSocket endpoints (projects, databases, env vars, git, terminal)
 3. **Orchestrator** — `internal/orchestrator/`: Multi-language build engine (Dockerfile, Railpack, Nixpacks), container lifecycle, zero-downtime deploys
 4. **Proxy** — `internal/proxy/`: Dynamic Caddy v2 reverse proxy config generation and hot-reload
