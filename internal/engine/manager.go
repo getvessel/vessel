@@ -1,4 +1,4 @@
-package templates
+package engine
 
 import (
 	"embed"
@@ -12,12 +12,12 @@ import (
 //go:embed compose/*.yaml
 var templateFiles embed.FS
 
-type Manager struct {
+type TemplateManager struct {
 	templates map[string]ComposeTemplate
 }
 
-func NewManager() (*Manager, error) {
-	mgr := &Manager{
+func NewTemplateManager() (*TemplateManager, error) {
+	mgr := &TemplateManager{
 		templates: make(map[string]ComposeTemplate),
 	}
 
@@ -29,7 +29,7 @@ func NewManager() (*Manager, error) {
 	return mgr, nil
 }
 
-func (m *Manager) walkDir(path string, d fs.DirEntry, err error) error {
+func (m *TemplateManager) walkDir(path string, d fs.DirEntry, err error) error {
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func (m *Manager) walkDir(path string, d fs.DirEntry, err error) error {
 	return nil
 }
 
-func (m *Manager) GetTemplate(id string) (ComposeTemplate, error) {
+func (m *TemplateManager) GetTemplate(id string) (ComposeTemplate, error) {
 	tmpl, exists := m.templates[id]
 	if !exists {
 		return ComposeTemplate{}, fmt.Errorf("template not found: %s", id)
@@ -60,7 +60,7 @@ func (m *Manager) GetTemplate(id string) (ComposeTemplate, error) {
 	return tmpl, nil
 }
 
-func (m *Manager) ListTemplates() []string {
+func (m *TemplateManager) ListTemplates() []string {
 	list := make([]string, 0, len(m.templates))
 	for id := range m.templates {
 		list = append(list, id)

@@ -1,4 +1,4 @@
-package templates
+package engine
 
 type ComposeTemplate struct {
 	Version  string                    `yaml:"version,omitempty"`

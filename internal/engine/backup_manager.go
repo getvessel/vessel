@@ -20,7 +20,7 @@ import (
 	"github.com/robfig/cron/v3"
 
 	"vessl.dev/vessl/internal/models"
-	"vessl.dev/vessl/internal/templates"
+
 	"vessl.dev/vessl/internal/utils"
 )
 
@@ -170,7 +170,7 @@ func (bm *BackupManager) buildDumpCommand(cfg *models.BackupConfig) (string, []s
 			return "", nil, "", fmt.Errorf("target database %s not found", cfg.DatabaseID)
 		}
 		containerName := utils.NormalizeContainerName(db.ID)
-		tmplMgr, err := templates.NewManager()
+		tmplMgr, err := NewTemplateManager()
 		if err != nil {
 			return "", nil, "", fmt.Errorf("failed to init template manager: %v", err)
 		}

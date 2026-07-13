@@ -23,21 +23,19 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	vessldb "vessl.dev/vessl/internal/db"
 	"vessl.dev/vessl/internal/engine"
 	vesslhttp "vessl.dev/vessl/internal/http"
 	"vessl.dev/vessl/internal/models"
-	"vessl.dev/vessl/internal/proxy"
 	"vessl.dev/vessl/internal/repositories"
 	"vessl.dev/vessl/internal/services"
-	"vessl.dev/vessl/internal/vault"
+	"vessl.dev/vessl/internal/utils"
 )
 
 const vesslVersion = "0.1.0-alpha"
 
 type dbDeployerStore struct {
 	db    *sql.DB
-	vault *vault.Vault
+	vault *utils.Vault
 }
 
 func (a *dbDeployerStore) GetServerSettings() (*models.ServerSettings, error) {
@@ -78,7 +76,7 @@ func main() {
 	if err := os.MkdirAll(dataDir, 0o755); err != nil {
 		log.Fatalf(" Failed to create data directory: %v", err)
 	}
-	vlt, err := vault.NewVault(dataDir)
+	vlt, err := utils.NewVault(dataDir)
 	if err != nil {
 		log.Fatalf(" Failed to initialize secrets vault: %v", err)
 	}
@@ -88,14 +86,14 @@ func main() {
 		log.Fatalf(" Failed to open SQLite database: %v", err)
 	}
 	defer db.Close()
-	if err := vessldb.RunMigrations(db); err != nil {
+	if err := repositories.RunMigrations(db); err != nil {
 		log.Fatalf("failed to run database migrations: %v", err)
 	}
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Printf(" Docker daemon connection warning: %v (container deployment features disabled)", err)
 	}
-	traefikMgr := proxy.NewTraefikManager(dockerClient, os.Getenv("VESSL_TLS_EMAIL"))
+	traefikMgr := engine.NewTraefikManager(dockerClient, os.Getenv("VESSL_TLS_EMAIL"))
 	if err := traefikMgr.EnsureTraefikRunning(context.Background()); err != nil {
 		log.Printf(" Warning: Failed to start Traefik proxy: %v", err)
 	}

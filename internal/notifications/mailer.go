@@ -7,7 +7,6 @@ import (
 	"net/smtp"
 
 	"vessl.dev/vessl/internal/services"
-	"vessl.dev/vessl/internal/views"
 )
 
 type MailerService struct {
@@ -51,7 +50,7 @@ func (s *MailerService) SendTeamEmail(ctx context.Context, workspaceID, template
 
 	// Render template
 	var buf bytes.Buffer
-	if err := views.HTMLTemplates.ExecuteTemplate(&buf, templateName, data); err != nil {
+	if err := HTMLTemplates.ExecuteTemplate(&buf, templateName, data); err != nil {
 		return fmt.Errorf("executing template %s: %w", templateName, err)
 	}
 
@@ -94,7 +93,7 @@ func (s *MailerService) SendSystemEmail(ctx context.Context, templateName string
 
 	// Render template
 	var buf bytes.Buffer
-	if err := views.HTMLTemplates.ExecuteTemplate(&buf, templateName, data); err != nil {
+	if err := HTMLTemplates.ExecuteTemplate(&buf, templateName, data); err != nil {
 		return fmt.Errorf("executing template %s: %w", templateName, err)
 	}
 

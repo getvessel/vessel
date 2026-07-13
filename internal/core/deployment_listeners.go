@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	"vessl.dev/vessl/internal/events"
 	"vessl.dev/vessl/internal/models"
 )
 
@@ -16,7 +15,7 @@ func NewDeploymentListeners(dispatcher *DispatcherService) *DeploymentListeners 
 	return &DeploymentListeners{dispatcher: dispatcher}
 }
 
-func (l *DeploymentListeners) SendNotification(e events.DeploymentCompleted) {
+func (l *DeploymentListeners) SendNotification(e DeploymentCompleted) {
 	commit := e.CommitHash
 	if len(commit) > 7 {
 		commit = commit[:7]
@@ -32,16 +31,16 @@ func (l *DeploymentListeners) SendNotification(e events.DeploymentCompleted) {
 	l.dispatcher.Dispatch(notifEvent)
 }
 
-func (l *DeploymentListeners) UpdateAuditLog(e events.DeploymentCompleted) {
+func (l *DeploymentListeners) UpdateAuditLog(e DeploymentCompleted) {
 	log.Printf("[Audit] Action: deployment.completed, ResourceID: %s, Status: %s", e.ServiceID, e.Status)
 }
 
-func (l *DeploymentListeners) TriggerWebhook(e events.DeploymentCompleted) {
+func (l *DeploymentListeners) TriggerWebhook(e DeploymentCompleted) {
 	log.Printf("[Webhook] Triggering webhook for ProjectID: %s", e.ProjectID)
 }
 
 func (l *DeploymentListeners) Register() {
-	events.On("deployment.completed", l.SendNotification)
-	events.On("deployment.completed", l.UpdateAuditLog)
-	events.On("deployment.completed", l.TriggerWebhook)
+	On("deployment.completed", l.SendNotification)
+	On("deployment.completed", l.UpdateAuditLog)
+	On("deployment.completed", l.TriggerWebhook)
 }

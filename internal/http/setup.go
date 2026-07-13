@@ -13,15 +13,13 @@ import (
 	"vessl.dev/vessl/internal/engine"
 	"vessl.dev/vessl/internal/handlers"
 	"vessl.dev/vessl/internal/http/middleware"
-	"vessl.dev/vessl/internal/mcp"
 	"vessl.dev/vessl/internal/notifications"
-	"vessl.dev/vessl/internal/proxy"
 	"vessl.dev/vessl/internal/repositories"
 	"vessl.dev/vessl/internal/services"
-	"vessl.dev/vessl/internal/vault"
+	"vessl.dev/vessl/internal/utils"
 )
 
-func NewServer(db *sql.DB, v *vault.Vault, deployer *engine.Deployer, traefikManager *proxy.TraefikManager, dockerClient *client.Client) *Server {
+func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikManager *engine.TraefikManager, dockerClient *client.Client) *Server {
 
 	e := echo.New()
 	e.Use(echomiddleware.RequestLoggerWithConfig(echomiddleware.RequestLoggerConfig{
@@ -105,7 +103,7 @@ func NewServer(db *sql.DB, v *vault.Vault, deployer *engine.Deployer, traefikMan
 	updaterService := services.NewUpdaterService(settingsSQLiteRepository)
 	updaterService.Start(context.Background())
 
-	bridge := mcp.NewBridge(projectService, appService, databaseService)
+	bridge := NewBridge(projectService, appService, databaseService)
 
 	authGuard := middleware.NewAuthGuard(tokenService, settingsService, projectSettingsService)
 

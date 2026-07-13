@@ -13,7 +13,7 @@ import (
 	"github.com/docker/docker/client"
 
 	"vessl.dev/vessl/internal/models"
-	"vessl.dev/vessl/internal/templates"
+
 	"vessl.dev/vessl/internal/utils"
 )
 
@@ -39,7 +39,7 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 	var envVars []string
 	var cmd []string
 	var containerMountPath string
-	tmplMgr, err := templates.NewManager()
+	tmplMgr, err := NewTemplateManager()
 	if err != nil {
 		return "", fmt.Errorf("failed to initialize template manager: %w", err)
 	}

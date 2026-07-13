@@ -12,17 +12,15 @@ import (
 	"vessl.dev/vessl/internal/engine"
 	"vessl.dev/vessl/internal/handlers"
 	"vessl.dev/vessl/internal/http/middleware"
-	"vessl.dev/vessl/internal/mcp"
 	"vessl.dev/vessl/internal/models"
-	"vessl.dev/vessl/internal/proxy"
 	"vessl.dev/vessl/internal/services"
 )
 
 type Server struct {
 	router                 *echo.Echo
-	mcpBridge              *mcp.Bridge
+	mcpBridge              *Bridge
 	deployer               *engine.Deployer
-	traefikManager         *proxy.TraefikManager
+	traefikManager         *engine.TraefikManager
 	dockerClient           *client.Client
 	tokenService           *services.TokenService
 	authGuard              *middleware.AuthGuard

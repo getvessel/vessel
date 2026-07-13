@@ -1,4 +1,4 @@
-package views
+package notifications
 
 import (
 	"embed"

@@ -8,15 +8,15 @@ import (
 
 	"github.com/google/uuid"
 	"vessl.dev/vessl/internal/models"
-	"vessl.dev/vessl/internal/vault"
+	"vessl.dev/vessl/internal/utils"
 )
 
 type VercelRepository struct {
 	db    *sql.DB
-	vault *vault.Vault
+	vault *utils.Vault
 }
 
-func NewVercelRepository(db *sql.DB, v *vault.Vault) *VercelRepository {
+func NewVercelRepository(db *sql.DB, v *utils.Vault) *VercelRepository {
 	return &VercelRepository{db: db, vault: v}
 }
 
