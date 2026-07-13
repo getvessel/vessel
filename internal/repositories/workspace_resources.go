@@ -105,23 +105,6 @@ func (r *WorkspaceSQLiteRepository) DeleteSSHKey(ctx context.Context, id string)
 	return err
 }
 
-func (r *WorkspaceSQLiteRepository) CreateAuditLog(ctx context.Context, log *models.AuditLog) error {
-	if log.ID == "" {
-		log.ID = uuid.NewString()
-	}
-	if log.CreatedAt.IsZero() {
-		log.CreatedAt = time.Now().UTC()
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	_, err := r.db.ExecContext(ctx, `INSERT INTO workspace_audit_logs (id, workspace_id, project_id, environment_id, action, actor, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		log.ID, log.WorkspaceID, log.ProjectID, log.EnvironmentID, log.Action, log.Actor, log.CreatedAt.Format(time.RFC3339))
-	if err != nil {
-		return fmt.Errorf("create audit log: %w", err)
-	}
-	return nil
-}
-
 func (r *WorkspaceSQLiteRepository) ListAuditLogs(ctx context.Context, workspaceID string, limit, offset int) ([]*models.AuditLog, int, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()

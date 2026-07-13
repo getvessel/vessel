@@ -26,12 +26,10 @@ type WorkspaceRepository interface {
 	CreateSSHKey(ctx context.Context, key *models.SSHKey) error
 	ListSSHKeys(ctx context.Context, workspaceID string) ([]*models.SSHKey, error)
 	DeleteSSHKey(ctx context.Context, id string) error
-	CreateAuditLog(ctx context.Context, log *models.AuditLog) error
 	ListAuditLogs(ctx context.Context, workspaceID string, limit, offset int) ([]*models.AuditLog, int, error)
 	ListWorkspacesByUser(ctx context.Context, userID string) ([]*models.Workspace, error)
 	AddMember(ctx context.Context, member *models.WorkspaceMember) error
 	RemoveMember(ctx context.Context, workspaceID, userID string) error
-	GetMember(ctx context.Context, workspaceID, userID string) (*models.WorkspaceMember, error)
 	ListMembers(ctx context.Context, workspaceID string) ([]*models.WorkspaceMember, error)
 	CreateInvite(ctx context.Context, invite *models.WorkspaceInvite) error
 	GetInviteByToken(ctx context.Context, token string) (*models.WorkspaceInvite, error)
@@ -181,61 +179,6 @@ func (r *WorkspaceSQLiteRepository) Delete(ctx context.Context, id, ownerID stri
 	return err
 }
 
-func (r *WorkspaceSQLiteRepository) CreateWorkspace(ctx context.Context, workspace *models.Workspace) error {
-	if workspace.ID == "" {
-		workspace.ID = uuid.NewString()
-	}
-	now := time.Now().UTC()
-	if workspace.CreatedAt.IsZero() {
-		workspace.CreatedAt = now
-	}
-	workspace.UpdatedAt = workspace.CreatedAt
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	tx, err := r.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-	_, err = tx.ExecContext(ctx, `INSERT INTO workspaces (id, name, avatar_url, preferred_region, owner_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		workspace.ID, workspace.Name, workspace.AvatarURL, workspace.PreferredRegion, workspace.OwnerID, workspace.CreatedAt.Format(time.RFC3339), workspace.UpdatedAt.Format(time.RFC3339))
-	if err != nil {
-		return fmt.Errorf("insert workspace: %w", err)
-	}
-	ownerMember := &models.WorkspaceMember{
-		ID:          uuid.NewString(),
-		WorkspaceID: workspace.ID,
-		UserID:      workspace.OwnerID,
-		UserEmail:   "",
-		Role:        "Owner",
-		JoinedAt:    now,
-	}
-	_, err = tx.ExecContext(ctx, `INSERT INTO workspace_members (id, workspace_id, user_id, user_email, role, joined_at) VALUES (?, ?, ?, ?, ?, ?)`,
-		ownerMember.ID, ownerMember.WorkspaceID, ownerMember.UserID, ownerMember.UserEmail, ownerMember.Role, ownerMember.JoinedAt.Format(time.RFC3339))
-	if err != nil {
-		return fmt.Errorf("insert workspace owner: %w", err)
-	}
-	return tx.Commit()
-}
-
-func (r *WorkspaceSQLiteRepository) GetWorkspaceByID(ctx context.Context, id string) (*models.Workspace, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	var t models.Workspace
-	var createdStr, updatedStr string
-	err := r.db.QueryRowContext(ctx, `SELECT id, name, avatar_url, preferred_region, owner_id, created_at, updated_at FROM workspaces WHERE id = ?`, id).
-		Scan(&t.ID, &t.Name, &t.AvatarURL, &t.PreferredRegion, &t.OwnerID, &createdStr, &updatedStr)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, utils.NewNotFoundError("Workspace", id)
-	}
-	if err != nil {
-		return nil, fmt.Errorf("get workspace %s: %w", id, err)
-	}
-	t.CreatedAt, _ = time.Parse(time.RFC3339, createdStr)
-	t.UpdatedAt, _ = time.Parse(time.RFC3339, updatedStr)
-	return &t, nil
-}
-
 func (r *WorkspaceSQLiteRepository) ListWorkspacesByUser(ctx context.Context, userID string) ([]*models.Workspace, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -260,31 +203,6 @@ func (r *WorkspaceSQLiteRepository) ListWorkspacesByUser(ctx context.Context, us
 		list = append(list, &t)
 	}
 	return list, nil
-}
-
-func (r *WorkspaceSQLiteRepository) UpdateWorkspace(ctx context.Context, workspace *models.Workspace) error {
-	workspace.UpdatedAt = time.Now().UTC()
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	_, err := r.db.ExecContext(ctx, `UPDATE workspaces SET name = ?, avatar_url = ?, preferred_region = ?, updated_at = ? WHERE id = ?`,
-		workspace.Name, workspace.AvatarURL, workspace.PreferredRegion, workspace.UpdatedAt.Format(time.RFC3339), workspace.ID)
-	return err
-}
-
-func (r *WorkspaceSQLiteRepository) DeleteWorkspace(ctx context.Context, id, ownerID string) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	res, err := r.db.ExecContext(ctx, `DELETE FROM workspaces WHERE id = ? AND owner_id = ?`, id, ownerID)
-	if err != nil {
-		return fmt.Errorf("delete workspace: %w", err)
-	}
-	affected, _ := res.RowsAffected()
-	if affected == 0 {
-		return errors.New("workspace not found or unauthorized (must be owner)")
-	}
-	_, _ = r.db.ExecContext(ctx, `DELETE FROM workspace_members WHERE workspace_id = ?`, id)
-	_, _ = r.db.ExecContext(ctx, `DELETE FROM workspace_invites WHERE workspace_id = ?`, id)
-	return nil
 }
 
 func (r *WorkspaceSQLiteRepository) AddMember(ctx context.Context, member *models.WorkspaceMember) error {
@@ -319,23 +237,6 @@ func (r *WorkspaceSQLiteRepository) RemoveMember(ctx context.Context, workspaceI
 		return errors.New("member not found or cannot remove workspace Owner")
 	}
 	return nil
-}
-
-func (r *WorkspaceSQLiteRepository) GetMember(ctx context.Context, workspaceID, userID string) (*models.WorkspaceMember, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	var m models.WorkspaceMember
-	var joinedStr string
-	err := r.db.QueryRowContext(ctx, `SELECT id, workspace_id, user_id, user_email, role, joined_at FROM workspace_members WHERE workspace_id = ? AND user_id = ?`, workspaceID, userID).
-		Scan(&m.ID, &m.WorkspaceID, &m.UserID, &m.UserEmail, &m.Role, &joinedStr)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, fmt.Errorf("get workspace member: %w", err)
-	}
-	m.JoinedAt, _ = time.Parse(time.RFC3339, joinedStr)
-	return &m, nil
 }
 
 func (r *WorkspaceSQLiteRepository) ListMembers(ctx context.Context, workspaceID string) ([]*models.WorkspaceMember, error) {
