@@ -12,7 +12,7 @@ export const ForgotPasswordForm = () => {
   const [email, setEmail] = useState('');
   const { mutate, isPending, isSuccess } = useForgotPassword();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!email) return;
     mutate(email);

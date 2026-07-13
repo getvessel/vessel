@@ -1,18 +1,18 @@
 basePath: /api
 definitions:
-  internal_handlers.ActivateLicenseRequest:
+  handlers.ActivateLicenseRequest:
     properties:
       license_key:
         type: string
     type: object
-  internal_handlers.AuthRequest:
+  handlers.AuthRequest:
     properties:
       email:
         type: string
       password:
         type: string
     type: object
-  internal_handlers.ChangePasswordRequest:
+  handlers.ChangePasswordRequest:
     properties:
       newPassword:
         type: string
@@ -22,36 +22,41 @@ definitions:
     - newPassword
     - oldPassword
     type: object
-  internal_handlers.CreatePATRequest:
+  handlers.CreatePATRequest:
     properties:
       name:
         type: string
     type: object
-  internal_handlers.CreateSSHKeyRequest:
+  handlers.CreateSSHKeyRequest:
     properties:
       name:
         type: string
       publicKey:
         type: string
     type: object
-  internal_handlers.CreateTrustedDomainRequest:
+  handlers.CreateTrustedDomainRequest:
     properties:
       domain:
         type: string
     type: object
-  internal_handlers.CreateWorkspaceRequest:
+  handlers.CreateWorkspaceRequest:
     properties:
       name:
         type: string
     type: object
-  internal_handlers.GitAppsManifestRequest:
+  handlers.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+    type: object
+  handlers.GitAppsManifestRequest:
     properties:
       code:
         type: string
       workspaceId:
         type: string
     type: object
-  internal_handlers.GithubWebhookPayload:
+  handlers.GithubWebhookPayload:
     properties:
       action:
         type: string
@@ -68,7 +73,7 @@ definitions:
             type: object
         type: object
     type: object
-  internal_handlers.RegisterRequest:
+  handlers.RegisterRequest:
     properties:
       email:
         type: string
@@ -77,105 +82,14 @@ definitions:
       password:
         type: string
     type: object
-  internal_handlers.TestNotificationRequest:
-    properties:
-      channelId:
-        type: string
-      provider:
-        type: string
-      workspaceId:
-        type: string
-    type: object
-  internal_handlers.UpdateProfileRequest:
-    properties:
-      email:
-        type: string
-      role:
-        type: string
-    type: object
-  internal_handlers.Verify2FARequest:
-    properties:
-      passcode:
-        type: string
-    type: object
-  vessl_dev_vessl_internal_handlers.ActivateLicenseRequest:
-    properties:
-      license_key:
-        type: string
-    type: object
-  vessl_dev_vessl_internal_handlers.AuthRequest:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    type: object
-  vessl_dev_vessl_internal_handlers.ChangePasswordRequest:
+  handlers.ResetPasswordRequest:
     properties:
       newPassword:
         type: string
-      oldPassword:
-        type: string
-    required:
-    - newPassword
-    - oldPassword
-    type: object
-  vessl_dev_vessl_internal_handlers.CreatePATRequest:
-    properties:
-      name:
+      token:
         type: string
     type: object
-  vessl_dev_vessl_internal_handlers.CreateSSHKeyRequest:
-    properties:
-      name:
-        type: string
-      publicKey:
-        type: string
-    type: object
-  vessl_dev_vessl_internal_handlers.CreateTrustedDomainRequest:
-    properties:
-      domain:
-        type: string
-    type: object
-  vessl_dev_vessl_internal_handlers.CreateWorkspaceRequest:
-    properties:
-      name:
-        type: string
-    type: object
-  vessl_dev_vessl_internal_handlers.GitAppsManifestRequest:
-    properties:
-      code:
-        type: string
-      workspaceId:
-        type: string
-    type: object
-  vessl_dev_vessl_internal_handlers.GithubWebhookPayload:
-    properties:
-      action:
-        type: string
-      number:
-        type: integer
-      pull_request:
-        properties:
-          head:
-            properties:
-              ref:
-                type: string
-              sha:
-                type: string
-            type: object
-        type: object
-    type: object
-  vessl_dev_vessl_internal_handlers.RegisterRequest:
-    properties:
-      email:
-        type: string
-      name:
-        type: string
-      password:
-        type: string
-    type: object
-  vessl_dev_vessl_internal_handlers.TestNotificationRequest:
+  handlers.TestNotificationRequest:
     properties:
       channelId:
         type: string
@@ -184,19 +98,19 @@ definitions:
       workspaceId:
         type: string
     type: object
-  vessl_dev_vessl_internal_handlers.UpdateProfileRequest:
+  handlers.UpdateProfileRequest:
     properties:
       email:
         type: string
       role:
         type: string
     type: object
-  vessl_dev_vessl_internal_handlers.Verify2FARequest:
+  handlers.Verify2FARequest:
     properties:
       passcode:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.AppService:
+  models.AppService:
     properties:
       branch:
         type: string
@@ -235,7 +149,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.BackupConfig:
+  models.BackupConfig:
     properties:
       createdAt:
         type: string
@@ -260,7 +174,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.CreateDatabaseRequest:
+  models.CreateDatabaseRequest:
     properties:
       customArgs:
         type: string
@@ -285,7 +199,7 @@ definitions:
       volumePath:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.CreateProjectRequest:
+  models.CreateProjectRequest:
     properties:
       branch:
         type: string
@@ -308,7 +222,7 @@ definitions:
       workspaceId:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.CreateTokenRequest:
+  models.CreateTokenRequest:
     properties:
       environmentId:
         type: string
@@ -325,12 +239,12 @@ definitions:
           type: string
         type: array
     type: object
-  vessl_dev_vessl_internal_models.DatabaseQueryRequest:
+  models.DatabaseQueryRequest:
     properties:
       query:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.DomainConfig:
+  models.DomainConfig:
     properties:
       createdAt:
         type: string
@@ -349,7 +263,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.EnvironmentConfig:
+  models.EnvironmentConfig:
     properties:
       createdAt:
         type: string
@@ -364,7 +278,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.GitConnectRequest:
+  models.GitConnectRequest:
     properties:
       accessToken:
         type: string
@@ -373,7 +287,7 @@ definitions:
       provider:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.Job:
+  models.Job:
     properties:
       command:
         type: string
@@ -396,7 +310,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.OAuthProviderConfig:
+  models.OAuthProviderConfig:
     properties:
       baseUrl:
         type: string
@@ -419,7 +333,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.ProjectMember:
+  models.ProjectMember:
     properties:
       acceptedAt:
         type: string
@@ -438,7 +352,7 @@ definitions:
       userId:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.S3Destination:
+  models.S3Destination:
     properties:
       accessKeyId:
         type: string
@@ -459,7 +373,7 @@ definitions:
       secretAccessKey:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.ServerSettings:
+  models.ServerSettings:
     properties:
       autoUpdateEnabled:
         type: boolean
@@ -473,6 +387,8 @@ definitions:
         type: string
       defaultWildcardDomain:
         type: string
+      disableTwoStepConfirmation:
+        type: boolean
       discordEnabled:
         type: boolean
       discordPingEnabled:
@@ -503,6 +419,10 @@ definitions:
         type: boolean
       plan:
         type: string
+      publicIpv4:
+        type: string
+      publicIpv6:
+        type: string
       pushoverApiToken:
         type: string
       pushoverEnabled:
@@ -517,6 +437,10 @@ definitions:
         type: string
       resendEnabled:
         type: boolean
+      showSponsorshipPopup:
+        type: boolean
+      siteName:
+        type: string
       slackEnabled:
         type: boolean
       slackWebhookUrl:
@@ -550,7 +474,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.Storage:
+  models.Storage:
     properties:
       accessKey:
         type: string
@@ -587,7 +511,7 @@ definitions:
       volumePath:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.Variable:
+  models.Variable:
     properties:
       createdAt:
         type: string
@@ -608,7 +532,7 @@ definitions:
       value:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.Webhook:
+  models.Webhook:
     properties:
       createdAt:
         type: string
@@ -627,7 +551,7 @@ definitions:
       url:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.Workspace:
+  models.Workspace:
     properties:
       avatarUrl:
         type: string
@@ -644,7 +568,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.WorkspaceAISettings:
+  models.WorkspaceAISettings:
     properties:
       apiKey:
         type: string
@@ -659,7 +583,7 @@ definitions:
       workspaceId:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.WorkspaceEmailSettings:
+  models.WorkspaceEmailSettings:
     properties:
       createdAt:
         type: string
@@ -686,7 +610,7 @@ definitions:
       workspaceId:
         type: string
     type: object
-  vessl_dev_vessl_internal_models.WorkspaceNotificationChannel:
+  models.WorkspaceNotificationChannel:
     type: object
 host: localhost:8080
 info:
@@ -743,7 +667,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.AppService'
+          $ref: '#/definitions/models.AppService'
       produces:
       - application/json
       responses: {}
@@ -783,11 +707,29 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_handlers.Verify2FARequest'
+          $ref: '#/definitions/handlers.Verify2FARequest'
       produces:
       - application/json
       responses: {}
       summary: Verify2FA endpoint
+      tags:
+      - Auth
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Forgot Password endpoint
+      parameters:
+      - description: Forgot password credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: Forgot Password endpoint
       tags:
       - Auth
   /auth/logout:
@@ -846,6 +788,24 @@ paths:
       summary: ListEnabledProviders endpoint
       tags:
       - Auth
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset Password endpoint
+      parameters:
+      - description: Reset password credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: Reset Password endpoint
+      tags:
+      - Auth
   /auth/signin:
     post:
       consumes:
@@ -857,7 +817,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.AuthRequest'
+          $ref: '#/definitions/handlers.AuthRequest'
       produces:
       - application/json
       responses: {}
@@ -875,7 +835,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.RegisterRequest'
+          $ref: '#/definitions/handlers.RegisterRequest'
       produces:
       - application/json
       responses: {}
@@ -903,7 +863,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.BackupConfig'
+          $ref: '#/definitions/models.BackupConfig'
       produces:
       - application/json
       responses: {}
@@ -981,7 +941,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.CreateDatabaseRequest'
+          $ref: '#/definitions/models.CreateDatabaseRequest'
       produces:
       - application/json
       responses: {}
@@ -1037,7 +997,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.DatabaseQueryRequest'
+          $ref: '#/definitions/models.DatabaseQueryRequest'
       produces:
       - application/json
       responses: {}
@@ -1195,7 +1155,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.AppService'
+          $ref: '#/definitions/models.AppService'
       produces:
       - application/json
       responses: {}
@@ -1230,7 +1190,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.GitConnectRequest'
+          $ref: '#/definitions/models.GitConnectRequest'
       produces:
       - application/json
       responses: {}
@@ -1297,7 +1257,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.Job'
+          $ref: '#/definitions/models.Job'
       produces:
       - application/json
       responses: {}
@@ -1386,7 +1346,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.UpdateProfileRequest'
+          $ref: '#/definitions/handlers.UpdateProfileRequest'
       produces:
       - application/json
       responses: {}
@@ -1404,7 +1364,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.ChangePasswordRequest'
+          $ref: '#/definitions/handlers.ChangePasswordRequest'
       produces:
       - application/json
       responses: {}
@@ -1432,7 +1392,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.CreatePATRequest'
+          $ref: '#/definitions/handlers.CreatePATRequest'
       produces:
       - application/json
       responses: {}
@@ -1486,7 +1446,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.CreateProjectRequest'
+          $ref: '#/definitions/models.CreateProjectRequest'
       produces:
       - application/json
       responses: {}
@@ -1592,7 +1552,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.DomainConfig'
+          $ref: '#/definitions/models.DomainConfig'
       produces:
       - application/json
       responses: {}
@@ -1659,7 +1619,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.EnvironmentConfig'
+          $ref: '#/definitions/models.EnvironmentConfig'
       produces:
       - application/json
       responses: {}
@@ -1715,7 +1675,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.ProjectMember'
+          $ref: '#/definitions/models.ProjectMember'
       produces:
       - application/json
       responses: {}
@@ -1791,7 +1751,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.CreateTokenRequest'
+          $ref: '#/definitions/models.CreateTokenRequest'
       produces:
       - application/json
       responses: {}
@@ -1852,7 +1812,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.Webhook'
+          $ref: '#/definitions/models.Webhook'
       produces:
       - application/json
       responses: {}
@@ -2033,7 +1993,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.Variable'
+          $ref: '#/definitions/models.Variable'
       produces:
       - application/json
       responses: {}
@@ -2082,7 +2042,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.Variable'
+          $ref: '#/definitions/models.Variable'
       produces:
       - application/json
       responses: {}
@@ -2100,7 +2060,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.ServerSettings'
+          $ref: '#/definitions/models.ServerSettings'
       produces:
       - application/json
       responses: {}
@@ -2135,7 +2095,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.GitAppsManifestRequest'
+          $ref: '#/definitions/handlers.GitAppsManifestRequest'
       produces:
       - application/json
       responses: {}
@@ -2156,7 +2116,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_handlers.ActivateLicenseRequest'
+          $ref: '#/definitions/handlers.ActivateLicenseRequest'
       produces:
       - application/json
       - application/json
@@ -2186,7 +2146,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.WorkspaceNotificationChannel'
+          $ref: '#/definitions/models.WorkspaceNotificationChannel'
       produces:
       - application/json
       responses: {}
@@ -2237,7 +2197,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_handlers.TestNotificationRequest'
+          $ref: '#/definitions/handlers.TestNotificationRequest'
       produces:
       - application/json
       responses: {}
@@ -2265,7 +2225,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.OAuthProviderConfig'
+          $ref: '#/definitions/models.OAuthProviderConfig'
       produces:
       - application/json
       responses: {}
@@ -2294,7 +2254,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.Storage'
+          $ref: '#/definitions/models.Storage'
       produces:
       - application/json
       responses: {}
@@ -2352,6 +2312,18 @@ paths:
       summary: StopStorage endpoint
       tags:
       - Storage
+  /system/public:
+    get:
+      consumes:
+      - application/json
+      description: Get public settings for the frontend (e.g., if registration is
+        enabled)
+      produces:
+      - application/json
+      responses: {}
+      summary: GetPublicSettings endpoint
+      tags:
+      - Settings
   /users:
     get:
       consumes:
@@ -2450,7 +2422,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_handlers.GithubWebhookPayload'
+          $ref: '#/definitions/handlers.GithubWebhookPayload'
       produces:
       - application/json
       responses: {}
@@ -2468,7 +2440,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.CreateWorkspaceRequest'
+          $ref: '#/definitions/handlers.CreateWorkspaceRequest'
       produces:
       - application/json
       responses: {}
@@ -2523,7 +2495,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.Workspace'
+          $ref: '#/definitions/models.Workspace'
       produces:
       - application/json
       responses: {}
@@ -2562,7 +2534,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.WorkspaceAISettings'
+          $ref: '#/definitions/models.WorkspaceAISettings'
       produces:
       - application/json
       responses: {}
@@ -2618,7 +2590,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/vessl_dev_vessl_internal_models.WorkspaceEmailSettings'
+          $ref: '#/definitions/models.WorkspaceEmailSettings'
       produces:
       - application/json
       responses: {}
@@ -2657,7 +2629,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.CreateSSHKeyRequest'
+          $ref: '#/definitions/handlers.CreateSSHKeyRequest'
       produces:
       - application/json
       responses: {}
@@ -2696,7 +2668,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.CreateTrustedDomainRequest'
+          $ref: '#/definitions/handlers.CreateTrustedDomainRequest'
       produces:
       - application/json
       responses: {}

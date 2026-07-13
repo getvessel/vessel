@@ -16,7 +16,7 @@ export const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
 
   const { mutate, isPending } = useResetPassword();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newPassword || !confirmPassword) return;
 
