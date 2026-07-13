@@ -13,7 +13,7 @@ import {
 import { useTheme } from 'next-themes';
 import { useEffect, useRef, useState } from 'react';
 import { useLogout } from '#/hooks/useAuth';
-import { authStore, useAuthState } from '#/stores/authStore';
+import { useAuthState } from '#/stores/authStore';
 
 export function UserMenu() {
   const { theme, setTheme } = useTheme();
