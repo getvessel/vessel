@@ -3,11 +3,11 @@ package services
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"vessl.dev/vessl/internal/engine"
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/repositories"
+	"vessl.dev/vessl/internal/utils"
 )
 
 type CronService struct {
@@ -35,11 +35,8 @@ func (cs *CronService) CreateJob(ctx context.Context, j *models.Job) error {
 		return errors.New("command is required")
 	}
 	project, err := cs.projects.Get(ctx, j.ProjectID)
-	if err != nil {
-		return fmt.Errorf("failed to verify project existence: %w", err)
-	}
-	if project == nil {
-		return fmt.Errorf("project with ID %s not found", j.ProjectID)
+	if err != nil || project == nil {
+		return utils.NewNotFoundError("project", j.ProjectID)
 	}
 	if err := cs.jobs.Create(ctx, j); err != nil {
 		return err

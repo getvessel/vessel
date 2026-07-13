@@ -12,6 +12,7 @@ import (
 
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/services"
+	"vessl.dev/vessl/internal/utils"
 )
 
 type contextKey string
@@ -47,28 +48,28 @@ func (g *AuthGuard) checkIPAllowlist(c echo.Context) error {
 	}
 	clientIP := c.RealIP()
 	if !IsIPAllowed(clientIP, settings.IPAllowlist) {
-		return c.JSON(http.StatusForbidden, map[string]string{"error": fmt.Sprintf("access denied from IP address %s by server allowlist policy", clientIP)})
+		return utils.Error(c, http.StatusForbidden, fmt.Sprintf("access denied from IP address %s by server allowlist policy", clientIP))
 	}
 	return nil
 }
 
 func (g *AuthGuard) validateAPIToken(c echo.Context, tokenStr string, denyAPITokens bool) (*models.UserClaims, error) {
 	if denyAPITokens {
-		return nil, c.JSON(http.StatusForbidden, map[string]string{"error": "API tokens cannot access role-restricted endpoints"})
+		return nil, utils.Error(c, http.StatusForbidden, "API tokens cannot access role-restricted endpoints")
 	}
 	if g.ProjectTokens == nil {
-		return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "API tokens not supported"})
+		return nil, utils.Error(c, http.StatusUnauthorized, "API tokens not supported")
 	}
 	pt, err := g.ProjectTokens.GetTokenByHash(c.Request().Context(), tokenStr)
 	if err != nil {
-		return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid or revoked API token"})
+		return nil, utils.Error(c, http.StatusUnauthorized, "invalid or revoked API token")
 	}
 	if pt.ExpiresAt != nil && pt.ExpiresAt.Before(time.Now()) {
-		return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "API token has expired"})
+		return nil, utils.Error(c, http.StatusUnauthorized, "API token has expired")
 	}
 	if len(pt.IPAllowlist) > 0 {
 		if !IsIPAllowed(c.RealIP(), strings.Join(pt.IPAllowlist, ",")) {
-			return nil, c.JSON(http.StatusForbidden, map[string]string{"error": "IP address not allowed for this API token"})
+			return nil, utils.Error(c, http.StatusForbidden, "IP address not allowed for this API token")
 		}
 	}
 	_ = g.ProjectTokens.UpdateTokenLastUsed(c.Request().Context(), pt.ID)
@@ -87,7 +88,7 @@ func (g *AuthGuard) validateAPIToken(c echo.Context, tokenStr string, denyAPITok
 func (g *AuthGuard) validateJWT(c echo.Context, tokenStr string) (*models.UserClaims, error) {
 	claimsMap, err := g.TokenService.ValidateToken(tokenStr)
 	if err != nil {
-		return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid authentication token: " + err.Error()})
+		return nil, utils.Error(c, http.StatusUnauthorized, "invalid authentication token: "+err.Error())
 	}
 
 	totpEnabled, _ := claimsMap["totpEnabled"].(bool)
@@ -112,7 +113,7 @@ func (g *AuthGuard) baseAuth(c echo.Context, denyAPITokens bool) (*models.UserCl
 				Role:   "admin",
 			}, nil
 		}
-		return nil, c.JSON(http.StatusUnauthorized, map[string]string{"error": "missing authentication token"})
+		return nil, utils.Error(c, http.StatusUnauthorized, "missing authentication token")
 	}
 
 	if strings.HasPrefix(tokenStr, "vsl_tok_") {
@@ -171,12 +172,12 @@ func (g *AuthGuard) RequireScope(requiredScope string) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			userClaims, ok := c.Get("user").(*models.UserClaims)
 			if !ok {
-				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "unauthorized"})
+				return utils.Error(c, http.StatusUnauthorized, "unauthorized")
 			}
 			if userClaims.Role == "api" {
 				scopes, ok := c.Get("api_scopes").([]string)
 				if !ok {
-					return c.JSON(http.StatusForbidden, map[string]string{"error": "insufficient scopes"})
+					return utils.Error(c, http.StatusForbidden, "insufficient scopes")
 				}
 				hasScope := false
 				for _, s := range scopes {
@@ -186,7 +187,7 @@ func (g *AuthGuard) RequireScope(requiredScope string) echo.MiddlewareFunc {
 					}
 				}
 				if !hasScope {
-					return c.JSON(http.StatusForbidden, map[string]string{"error": "missing required scope: " + requiredScope})
+					return utils.Error(c, http.StatusForbidden, "missing required scope: "+requiredScope)
 				}
 			}
 			return next(c)
@@ -202,7 +203,7 @@ func (g *AuthGuard) RequireRole(requiredRole string) echo.MiddlewareFunc {
 				return err
 			}
 			if userClaims.Role != requiredRole && userClaims.Role != "admin" {
-				return c.JSON(http.StatusForbidden, map[string]string{"error": "insufficient permissions"})
+				return utils.Error(c, http.StatusForbidden, "insufficient permissions")
 			}
 			c.Set("user", userClaims)
 			ctx := context.WithValue(c.Request().Context(), userClaimsKey, userClaims)

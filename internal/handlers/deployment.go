@@ -161,13 +161,26 @@ func (h *DeploymentHandler) GetLogs(c echo.Context) error {
 // @Param serviceId path string true "serviceId"
 // @Router /services/{serviceId}/metrics [get]
 func (h *DeploymentHandler) GetMetrics(c echo.Context) error {
+	serviceID := c.Param("serviceId")
+	if serviceID == "" {
+		return utils.Error(c, http.StatusBadRequest, "serviceId is required")
+	}
+
+	health, err := h.deploymentService.GetMetrics(c.Request().Context(), serviceID)
+	if err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+
+	// For the dashboard, we return an array. We can simulate the 5-minute window or just return the current one.
 	now := time.Now().UTC()
 	metrics := []map[string]any{
-		{"timestamp": now.Add(-4 * time.Minute).Format(time.RFC3339), "cpuPercent": 1.2, "memoryMB": 64.5, "networkRx": 12.4, "networkTx": 8.1},
-		{"timestamp": now.Add(-3 * time.Minute).Format(time.RFC3339), "cpuPercent": 2.1, "memoryMB": 66.0, "networkRx": 15.0, "networkTx": 10.2},
-		{"timestamp": now.Add(-2 * time.Minute).Format(time.RFC3339), "cpuPercent": 1.8, "memoryMB": 65.2, "networkRx": 14.1, "networkTx": 9.4},
-		{"timestamp": now.Add(-1 * time.Minute).Format(time.RFC3339), "cpuPercent": 3.4, "memoryMB": 68.1, "networkRx": 45.2, "networkTx": 22.0},
-		{"timestamp": now.Format(time.RFC3339), "cpuPercent": 1.5, "memoryMB": 66.8, "networkRx": 18.0, "networkTx": 11.5},
+		{
+			"timestamp":  now.Format(time.RFC3339),
+			"cpuPercent": health.CPUUsagePercentage,
+			"memoryMB":   float64(health.MemoryUsageBytes) / 1024 / 1024,
+			"status":     health.Status,
+			"uptime":     health.UptimeSeconds,
+		},
 	}
 	return utils.Success(c, "Operation successful", metrics)
 }

@@ -15,11 +15,12 @@ import (
 )
 
 type DeploymentService struct {
-	repo        repositories.DeploymentRepository
-	appRepo     repositories.AppServiceRepository
-	projectRepo repositories.ProjectRepository
-	deployer    *engine.Deployer
-	gitService  *GitService
+	repo         repositories.DeploymentRepository
+	appRepo      repositories.AppServiceRepository
+	projectRepo  repositories.ProjectRepository
+	deployer     *engine.Deployer
+	gitService   *GitService
+	statsMonitor *engine.StatsMonitor
 }
 
 func NewDeploymentService(
@@ -28,13 +29,15 @@ func NewDeploymentService(
 	pr repositories.ProjectRepository,
 	d *engine.Deployer,
 	gs *GitService,
+	sm *engine.StatsMonitor,
 ) *DeploymentService {
 	return &DeploymentService{
-		repo:        r,
-		appRepo:     ar,
-		projectRepo: pr,
-		deployer:    d,
-		gitService:  gs,
+		repo:         r,
+		appRepo:      ar,
+		projectRepo:  pr,
+		deployer:     d,
+		gitService:   gs,
+		statsMonitor: sm,
 	}
 }
 
@@ -161,4 +164,18 @@ func (s *DeploymentService) DeployProject(ctx context.Context, projectID, source
 		}
 	}
 	return containerID, err
+}
+
+func (s *DeploymentService) GetMetrics(ctx context.Context, appID string) (*engine.ContainerHealth, error) {
+	app, err := s.appRepo.GetByID(ctx, appID)
+	if err != nil {
+		return nil, err
+	}
+	if app.ContainerID == "" {
+		return &engine.ContainerHealth{Status: "not_deployed"}, nil
+	}
+	if s.statsMonitor == nil {
+		return nil, errors.New("stats monitor not available")
+	}
+	return s.statsMonitor.GetHealth(ctx, app.ContainerID)
 }
