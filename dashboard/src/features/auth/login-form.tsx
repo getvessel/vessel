@@ -28,9 +28,9 @@ export const LoginForm = () => {
     }
 
     try {
-      await login({ credentials: { email, password } });
-    } catch (error: unknown) {
-      toast.error((error as Error)?.message || 'Failed to login');
+      await login({ email, password });
+    } catch {
+      // errors handled in onError inside useLogin
     }
   };
 

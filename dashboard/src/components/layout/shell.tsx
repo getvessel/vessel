@@ -1,19 +1,17 @@
 import type * as React from 'react';
-
-import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar';
 import { AppSidebar } from './app-sidebar';
 import { Topbar } from './topbar';
 
 export function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
+    <div className="flex min-h-screen bg-background">
       <AppSidebar />
-      <SidebarInset className="bg-background flex flex-col min-h-screen">
+      <div className="flex flex-1 flex-col pl-[220px]">
         <Topbar />
-        <main className="flex-1 overflow-auto bg-background p-6">
+        <main className="flex-1 overflow-auto p-6">
           <div className="mx-auto max-w-7xl w-full">{children}</div>
         </main>
-      </SidebarInset>
-    </SidebarProvider>
+      </div>
+    </div>
   );
 }

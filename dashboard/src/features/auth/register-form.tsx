@@ -29,9 +29,9 @@ export const RegisterForm = () => {
     }
 
     try {
-      await register({ details: { name, email, password } });
-    } catch (error: unknown) {
-      toast.error((error as Error)?.message || 'Failed to create account');
+      await register({ name, email, password });
+    } catch {
+      // errors handled in onError inside useRegister
     }
   };
 

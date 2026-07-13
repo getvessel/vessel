@@ -1,113 +1,71 @@
-import { Logout01Icon, Settings01Icon } from '@hugeicons/core-free-icons';
+import { AddCircleIcon, BellIcon, Search01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { useNavigate } from '@tanstack/react-router';
-import { useStore } from '@tanstack/react-store';
+import { useRouterState } from '@tanstack/react-router';
 
-import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '#/components/ui/dropdown-menu';
-import { SidebarTrigger } from '#/components/ui/sidebar';
-import { useLogout } from '#/hooks/useAuth';
-import { authStore } from '#/stores/authStore';
+const routeLabels: Record<string, { title: string; description: string }> = {
+  '/': { title: 'Dashboard', description: 'Overview of your infrastructure' },
+  '/projects': { title: 'Projects', description: 'Manage your projects and services' },
+  '/databases': { title: 'Databases', description: 'Your databases and storage' },
+  '/deployments': { title: 'Deployments', description: 'Recent and ongoing deployments' },
+  '/teams': { title: 'Teams', description: 'Manage team members and access' },
+  '/settings': { title: 'Settings', description: 'Account and workspace settings' },
+  '/support': { title: 'Support', description: 'Get help and documentation' },
+};
 
 export function Topbar() {
-  const authState = useStore(authStore);
-  const { mutateAsync: logout } = useLogout();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate({ to: '/login' });
-  };
-
-  const user = authState.user;
-  const initials = user?.name
-    ? user.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-    : 'U';
+  const routerState = useRouterState();
+  const pathname = routerState.location.pathname;
+  const current = routeLabels[pathname] ?? { title: 'Dashboard', description: '' };
 
   return (
-    <header className="h-16 shrink-0 border-b flex items-center justify-between px-4 sticky top-0 bg-background/80 backdrop-blur-md z-10">
-      <div className="flex items-center gap-4">
-        <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
-
-        {/* System Health Indicators */}
-        <div className="hidden md:flex items-center gap-4 text-sm font-medium">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20"></span>
-            Docker: Online
-          </div>
-          <div className="h-4 w-px bg-border"></div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <span>
-              CPU: <span className="text-foreground">12%</span>
-            </span>
-          </div>
-          <div className="h-4 w-px bg-border"></div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <span>
-              RAM: <span className="text-foreground">4.2GB</span>
-            </span>
-          </div>
+    <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border bg-background/95 px-6 backdrop-blur-sm">
+      {/* Page title */}
+      <div className="flex items-center gap-3">
+        <div>
+          <h1 className="text-sm font-semibold text-foreground leading-none">{current.title}</h1>
+          {current.description && (
+            <p className="text-xs text-muted-foreground mt-0.5 leading-none">{current.description}</p>
+          )}
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="hidden sm:block bg-primary/10 text-primary border border-primary/20 px-2 py-1 rounded-md text-xs font-medium">
-          v0.1.0 Available
-        </div>
+      {/* Right actions */}
+      <div className="flex items-center gap-2">
+        {/* Search */}
+        <button
+          type="button"
+          className="flex items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-colors duration-150"
+        >
+          <HugeiconsIcon icon={Search01Icon} className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline text-xs">Search...</span>
+          <kbd className="hidden sm:inline-flex h-4 items-center gap-0.5 rounded border border-border bg-background px-1 font-mono text-[9px] text-muted-foreground">
+            ⌘K
+          </kbd>
+        </button>
 
-        {/* Auth User Menu */}
-        {user && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-full"
-              >
-                <Avatar className="h-8 w-8 border border-border">
-                  <AvatarImage
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`}
-                    alt={user.name}
-                  />
-                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user.name}</p>
-                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-muted-foreground hover:text-foreground cursor-pointer">
-                <HugeiconsIcon icon={Settings01Icon} className="mr-2 h-4 w-4" />
-                <span>Account Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="text-destructive focus:text-destructive cursor-pointer"
-              >
-                <HugeiconsIcon icon={Logout01Icon} className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        {/* New resource button */}
+        <button
+          type="button"
+          className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors duration-150"
+        >
+          <HugeiconsIcon icon={AddCircleIcon} className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">New</span>
+        </button>
+
+        {/* Notifications */}
+        <button
+          type="button"
+          className="relative flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors duration-150"
+        >
+          <HugeiconsIcon icon={BellIcon} className="h-4 w-4" />
+          <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-primary" />
+        </button>
+
+        {/* System status pill */}
+        <div className="hidden md:flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          All systems online
+        </div>
       </div>
     </header>
   );

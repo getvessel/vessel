@@ -5,9 +5,7 @@ import { authStore } from '#/stores/authStore';
 export const Route = createFileRoute('/_workspace')({
   beforeLoad: () => {
     if (!authStore.state.isAuthenticated) {
-      throw redirect({
-        to: '/login',
-      });
+      throw redirect({ to: '/login' });
     }
   },
   component: () => (
