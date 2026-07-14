@@ -12,25 +12,23 @@ var logoutCmd = &cobra.Command{
 	Use:   "logout",
 	Short: "Log out of your Vessl account and clear credentials",
 	Run: func(cmd *cobra.Command, args []string) {
-		// Attempt to hit the logout endpoint if we have a valid client
 		cfg, err := config.Load()
 		if err == nil && cfg.Token != "" && cfg.ServerURL != "" {
-			client := getClient() // getClient calls os.Exit if not logged in, but we checked token
-			_ = client.Logout()   // ignore error, we just want to clear local config
+			client := getClient()
+			_ = client.Logout()
 		}
 
-		// Clear local config
-		emptyCfg := &config.Config{
-			ServerURL: "",
-			Token:     "",
-		}
-		if err := config.Save(emptyCfg); err != nil {
+		if err := clearConfig(); err != nil {
 			fmt.Printf("❌ Failed to clear config: %v\n", err)
 			os.Exit(1)
 		}
 
 		fmt.Println("👋 Successfully logged out.")
 	},
+}
+
+func clearConfig() error {
+	return config.Save(&config.Config{})
 }
 
 func init() {
