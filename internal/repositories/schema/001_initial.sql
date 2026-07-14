@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS domains (
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS users (
 			id TEXT PRIMARY KEY,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS users (
 			oauth_provider TEXT DEFAULT '',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS invites (
 			id TEXT PRIMARY KEY,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS invites (
 			expires_at DATETIME NOT NULL,
 			accepted_at DATETIME,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS env_vars (
 			id TEXT PRIMARY KEY,
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS env_vars (
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
 			UNIQUE(project_id, key)
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS databases (
 			id TEXT PRIMARY KEY,
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS databases (
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		,
-			environment_id TEXT DEFAULT '');;
+			environment_id TEXT DEFAULT '');
 
 CREATE TABLE IF NOT EXISTS storage (
 			id TEXT PRIMARY KEY,
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS storage (
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		,
-			environment_id TEXT DEFAULT '');;
+			environment_id TEXT DEFAULT '');
 
 CREATE TABLE IF NOT EXISTS jobs (
 			id TEXT PRIMARY KEY,
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS jobs (
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS user_git_providers (
 			id TEXT PRIMARY KEY,
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS user_git_providers (
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			UNIQUE(user_id, provider)
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS user_vercel_accounts (
 			id TEXT PRIMARY KEY,
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS user_vercel_accounts (
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			UNIQUE(user_id, vercel_team_id)
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS environments (
 			id TEXT PRIMARY KEY,
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS environments (
 			created_at DATETIME NOT NULL,
 			updated_at DATETIME NOT NULL,
 			UNIQUE(project_id, name)
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS app_services (
 			id TEXT PRIMARY KEY,
@@ -174,8 +174,9 @@ CREATE TABLE IF NOT EXISTS app_services (
 			public_networking_domain TEXT DEFAULT '',
 			private_networking_internal TEXT DEFAULT '',
 			enable_outbound_ipv6 BOOLEAN DEFAULT 0,
+			image_ref TEXT NOT NULL DEFAULT '',
 			UNIQUE(environment_id, name)
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS deployments (
 			id TEXT PRIMARY KEY,
@@ -192,7 +193,7 @@ CREATE TABLE IF NOT EXISTS deployments (
 			created_at DATETIME NOT NULL,
 			updated_at DATETIME NOT NULL,
 			finished_at DATETIME
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS pr_previews (
 			id TEXT PRIMARY KEY,
@@ -206,7 +207,7 @@ CREATE TABLE IF NOT EXISTS pr_previews (
 			container_id TEXT,
 			created_at DATETIME,
 			updated_at DATETIME
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS service_vars (
 			id TEXT PRIMARY KEY,
@@ -218,7 +219,7 @@ CREATE TABLE IF NOT EXISTS service_vars (
 			created_at DATETIME,
 			updated_at DATETIME,
 			UNIQUE(service_id, key)
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS project_webhooks (
 			id TEXT PRIMARY KEY,
@@ -229,8 +230,11 @@ CREATE TABLE IF NOT EXISTS project_webhooks (
 			auto_deploy BOOLEAN DEFAULT 1,
 			branch TEXT DEFAULT 'main',
 			created_at TEXT,
-			updated_at TEXT
-		);;
+			updated_at TEXT,
+			url TEXT DEFAULT '',
+			event_types TEXT DEFAULT '',
+			include_pr_environments BOOLEAN DEFAULT FALSE
+		);
 
 CREATE TABLE IF NOT EXISTS serverless_functions_code (
 			id TEXT PRIMARY KEY,
@@ -240,7 +244,7 @@ CREATE TABLE IF NOT EXISTS serverless_functions_code (
 			created_at DATETIME,
 			updated_at DATETIME,
 			UNIQUE(service_id)
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS project_tokens (
 			id TEXT PRIMARY KEY,
@@ -254,7 +258,7 @@ CREATE TABLE IF NOT EXISTS project_tokens (
 			expires_at TEXT,
 			last_used_at TEXT,
 			created_at TEXT
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS project_members (
 			id TEXT PRIMARY KEY,
@@ -263,8 +267,13 @@ CREATE TABLE IF NOT EXISTS project_members (
 			user_email TEXT DEFAULT '',
 			role TEXT NOT NULL,
 			joined_at TEXT,
+			email TEXT DEFAULT '',
+			permission TEXT DEFAULT 'Can Edit',
+			status TEXT DEFAULT 'pending',
+			invited_at TEXT,
+			accepted_at TEXT,
 			UNIQUE(project_id, user_id)
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS backup_configs (
 			id TEXT PRIMARY KEY,
@@ -278,7 +287,7 @@ CREATE TABLE IF NOT EXISTS backup_configs (
 			status TEXT DEFAULT 'active',
 			created_at TEXT,
 			updated_at TEXT
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS backup_records (
 			id TEXT PRIMARY KEY,
@@ -292,7 +301,7 @@ CREATE TABLE IF NOT EXISTS backup_records (
 			logs TEXT,
 			started_at TEXT,
 			completed_at TEXT
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS s3_destinations (
 			id TEXT PRIMARY KEY,
@@ -304,7 +313,7 @@ CREATE TABLE IF NOT EXISTS s3_destinations (
 			access_key_id TEXT NOT NULL,
 			secret_access_key TEXT NOT NULL,
 			created_at TEXT
-		);;
+		);
 
 
 
@@ -312,7 +321,7 @@ CREATE TABLE IF NOT EXISTS s3_destinations (
 
 CREATE TABLE IF NOT EXISTS server_settings (
 			id TEXT PRIMARY KEY,
-			caddy_wildcard_ip TEXT DEFAULT '127.0.0.1',
+			traefik_wildcard_ip TEXT DEFAULT '127.0.0.1',
 			discord_webhook_url TEXT,
 			discord_ping_enabled BOOLEAN DEFAULT FALSE,
 			discord_enabled BOOLEAN DEFAULT FALSE,
@@ -349,8 +358,21 @@ CREATE TABLE IF NOT EXISTS server_settings (
 			current_version TEXT DEFAULT '0.1.0',
 			latest_version TEXT DEFAULT '0.1.0',
 			last_update_check TEXT DEFAULT '',
-			updated_at TEXT
-		);;
+			updated_at TEXT,
+			notification_alerts TEXT DEFAULT '',
+			site_name TEXT DEFAULT '',
+			public_ipv4 TEXT DEFAULT '',
+			public_ipv6 TEXT DEFAULT '',
+			show_sponsorship_popup BOOLEAN DEFAULT 1,
+			disable_two_step_confirmation BOOLEAN DEFAULT 0,
+			panel_domain TEXT NOT NULL DEFAULT '',
+			concurrent_builds INTEGER NOT NULL DEFAULT 2,
+			deployment_timeout INTEGER NOT NULL DEFAULT 3600,
+			server_timezone TEXT NOT NULL DEFAULT 'UTC',
+			docker_cleanup_cron TEXT NOT NULL DEFAULT '0 0 * * *',
+			disk_usage_threshold INTEGER NOT NULL DEFAULT 80,
+			disk_usage_cron TEXT NOT NULL DEFAULT '0 23 * * *'
+		);
 
 CREATE TABLE IF NOT EXISTS personal_access_tokens (
 			id TEXT PRIMARY KEY,
@@ -360,7 +382,7 @@ CREATE TABLE IF NOT EXISTS personal_access_tokens (
 			prefix TEXT NOT NULL,
 			expires_at TEXT,
 			created_at TEXT
-		);;
+		);
 
 
 
@@ -376,7 +398,7 @@ CREATE TABLE IF NOT EXISTS github_apps (
 			is_public BOOLEAN DEFAULT FALSE,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS gitlab_apps (
 			id TEXT PRIMARY KEY,
@@ -388,7 +410,7 @@ CREATE TABLE IF NOT EXISTS gitlab_apps (
 			is_public BOOLEAN DEFAULT FALSE,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS bitbucket_apps (
 			id TEXT PRIMARY KEY,
@@ -400,7 +422,7 @@ CREATE TABLE IF NOT EXISTS bitbucket_apps (
 			is_public BOOLEAN DEFAULT FALSE,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);;
+		);
 
 CREATE TABLE IF NOT EXISTS oauth_providers (
 			id TEXT PRIMARY KEY,
@@ -413,33 +435,6 @@ CREATE TABLE IF NOT EXISTS oauth_providers (
 			tenant TEXT DEFAULT '',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);;
+		);
 
-ALTER TABLE server_settings RENAME COLUMN caddy_wildcard_ip TO traefik_wildcard_ip;
--- Add missing notification_alerts column to server_settings
-ALTER TABLE server_settings ADD COLUMN notification_alerts TEXT DEFAULT '';
 
--- Fix project_webhooks: add missing columns used by the repository
-ALTER TABLE project_webhooks ADD COLUMN url TEXT DEFAULT '';
-ALTER TABLE project_webhooks ADD COLUMN event_types TEXT DEFAULT '';
-ALTER TABLE project_webhooks ADD COLUMN include_pr_environments BOOLEAN DEFAULT FALSE;
-
--- Fix project_members: add missing columns used by the repository
-ALTER TABLE project_members ADD COLUMN email TEXT DEFAULT '';
-ALTER TABLE project_members ADD COLUMN permission TEXT DEFAULT 'Can Edit';
-ALTER TABLE project_members ADD COLUMN status TEXT DEFAULT 'pending';
-ALTER TABLE project_members ADD COLUMN invited_at TEXT;
-ALTER TABLE project_members ADD COLUMN accepted_at TEXT;
-ALTER TABLE server_settings ADD COLUMN site_name TEXT DEFAULT '';
-ALTER TABLE server_settings ADD COLUMN public_ipv4 TEXT DEFAULT '';
-ALTER TABLE server_settings ADD COLUMN public_ipv6 TEXT DEFAULT '';
-ALTER TABLE server_settings ADD COLUMN show_sponsorship_popup BOOLEAN DEFAULT 1;
-ALTER TABLE server_settings ADD COLUMN disable_two_step_confirmation BOOLEAN DEFAULT 0;
-ALTER TABLE server_settings ADD COLUMN panel_domain TEXT NOT NULL DEFAULT '';
-ALTER TABLE server_settings ADD COLUMN concurrent_builds INTEGER NOT NULL DEFAULT 2;
-ALTER TABLE server_settings ADD COLUMN deployment_timeout INTEGER NOT NULL DEFAULT 3600;
-ALTER TABLE server_settings ADD COLUMN server_timezone TEXT NOT NULL DEFAULT 'UTC';
-ALTER TABLE server_settings ADD COLUMN docker_cleanup_cron TEXT NOT NULL DEFAULT '0 0 * * *';
-ALTER TABLE server_settings ADD COLUMN disk_usage_threshold INTEGER NOT NULL DEFAULT 80;
-ALTER TABLE server_settings ADD COLUMN disk_usage_cron TEXT NOT NULL DEFAULT '0 23 * * *';
-ALTER TABLE app_services ADD COLUMN image_ref TEXT NOT NULL DEFAULT '';
