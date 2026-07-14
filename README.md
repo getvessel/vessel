@@ -31,82 +31,23 @@ Vessl is built to be simple but powerful, giving you everything you need to run 
 
 ## 💻 CLI
 
-Vessl ships two CLI tools.
+Vessl ships two CLI tools. See their individual READMEs for full command references.
 
-### `vessld` — Server Daemon CLI
+| Tool | Purpose | Docs |
+|---|---|---|
+| [`vessld`](./cmd/vessld/) | Server daemon — runs on your VPS, manages Docker & SQLite directly | [README](./cmd/vessld/README.md) |
+| [`vessl`](./cmd/vessl/) | Remote client — runs on your laptop, connects to `vessld` over HTTP | [README](./cmd/vessl/README.md) |
 
-Runs **on your VPS**. Manages the server process and all resources directly.
+**Quick example:**
 
-```bash
-# Server management
-vessld serve                  # Start the daemon (default)
-vessld setup                  # Run the initial admin configuration wizard
-vessld reset-password         # Reset the admin password
-vessld config                 # View or update server configuration
+```sh
+# On your server
+vessld serve
 
-# Deployments
-vessld deploy https://github.com/user/repo.git   # Deploy from Git
-vessld deploy --image nginx:latest --port 80     # Deploy a Docker image
-vessld deploy --compose docker-compose.yml       # Deploy a Compose stack
-
-# Resource management
-vessld project:list                              # List all projects
-vessld apps:list                                 # List all applications
-vessld apps:show <id>                            # Show app details
-vessld db:list                                   # List all databases
-vessld db:create my-db postgres --project <id>  # Provision a database
-vessld env:list --project <id>                  # List environment variables
-vessld env:set KEY=VALUE --project <id>         # Set an environment variable
-vessld deployment:list --service <id>           # List deployment history
-vessld deployment:logs <id>                     # View build logs
-vessld domain:list --project <id>              # List custom domains
-```
-
-### `vessl` — Remote CLI
-
-Runs **on your local machine**. Connects to your self-hosted `vessld` server over HTTP.
-
-**Installation:**
-
-```bash
-go install vessl.dev/vessl/cmd/vessl@latest
-```
-
-**Usage:**
-
-```bash
-# Authentication
-vessl login                           # Connect to your self-hosted server
-vessl logout                          # Clear saved credentials
-vessl me                              # Show current logged-in user
-
-# Projects & Environments
-vessl project list                    # List all projects
-vessl project create <name>           # Create a project
-vessl project destroy <id>            # Delete a project
-vessl env list                        # List environments
-vessl env create <name>               # Create an environment
-
-# Applications
-vessl apps list --environment <id>    # List apps
-vessl apps create                     # Create an app
-vessl apps destroy <id>               # Delete an app
-vessl apps secrets list --project <id>            # List env vars
-vessl apps secrets set KEY=VALUE --project <id>   # Set env var(s)
-vessl apps domains list --project <id>            # List custom domains
-vessl apps domains add <host> --project <id>      # Add a custom domain
-vessl apps deployments list --service <id>        # Deployment history
-vessl apps logs <deployment-id>                   # View build logs
-
-# Databases
-vessl db list --project <id>          # List databases
-vessl db create                       # Provision a database
-vessl db destroy <id>                 # Delete a database
-vessl db backups list --project <id>  # List backup configs
-vessl db backups trigger <id>         # Trigger a manual backup
-
-# Deployments
-vessl deploy <service-id>             # Trigger a remote deployment
+# On your local machine
+vessl login
+vessl project list
+vessl deploy <service-id>
 ```
 
 ## 🛠️ Local Development
