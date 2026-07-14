@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"database/sql"
-	"log"
+	"log/slog"
 	"runtime"
 	"time"
 
@@ -42,5 +42,5 @@ func pingTelemetry(db *sql.DB, version string) {
 		activeApps = len(apps)
 	}
 
-	log.Printf("Telemetry: instance=%s version=%s os=%s arch=%s apps=%d", settings.ID, version, runtime.GOOS, runtime.GOARCH, activeApps)
+	slog.Info("telemetry", "instance", settings.ID, "version", version, "os", runtime.GOOS, "arch", runtime.GOARCH, "apps", activeApps)
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/notifications"
@@ -31,7 +31,7 @@ func NewDispatcherService(notifRepo repositories.NotificationRepository, setting
 func (d *DispatcherService) Dispatch(event *models.NotificationEvent) {
 	go func() {
 		if err := d.Send(event); err != nil {
-			log.Printf("[Dispatcher] Failed to dispatch event '%s': %v", event.Title, err)
+			slog.Error("failed to dispatch event", "title", event.Title, "err", err)
 		}
 	}()
 }

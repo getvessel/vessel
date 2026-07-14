@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -70,7 +70,7 @@ func (s *PRPreviewService) DeployPRPreview(ctx context.Context, appID string, pr
 		clonedApp := *app
 		clonedApp.Branch = branch
 		if err := s.gitService.CloneOrPullAppRepository(bgCtx, &clonedApp, sourceDir, nil); err != nil {
-			log.Printf("[PRPreview] failed to clone PR branch %s: %v", branch, err)
+			slog.Warn("PR preview clone failed", "branch", branch, "err", err)
 			preview.Status = "FAILED"
 			_ = s.repo.Update(bgCtx, preview)
 			return
@@ -79,7 +79,7 @@ func (s *PRPreviewService) DeployPRPreview(ctx context.Context, appID string, pr
 		clonedApp.Name = fmt.Sprintf("%s-pr-%d", app.Name, prNumber)
 		containerID, deployErr := s.deployer.DeployAppService(bgCtx, &clonedApp, sourceDir, nil)
 		if deployErr != nil {
-			log.Printf("[PRPreview] failed to deploy: %v", deployErr)
+			slog.Warn("PR preview deploy failed", "err", deployErr)
 			preview.Status = "FAILED"
 			_ = s.repo.Update(bgCtx, preview)
 			return

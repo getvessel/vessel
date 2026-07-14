@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -51,12 +51,12 @@ func (cm *CronManager) Start() error {
 		if j.Status == "active" {
 			jobCopy := j
 			if err := cm.registerJobLocked(&jobCopy); err != nil {
-				log.Printf("⚠️ Failed to register cron job %s (%s): %v", jobCopy.Name, jobCopy.ID, err)
+				slog.Warn("failed to register cron job", "name", jobCopy.Name, "id", jobCopy.ID, "err", err)
 			}
 		}
 	}
 	cm.cronEngine.Start()
-	log.Println("⏰ CronManager started and executing background tasks")
+	slog.Info("cron manager started")
 	return nil
 }
 
@@ -180,16 +180,16 @@ func (cm *CronManager) ScheduleDockerCleanup(schedule string) error {
 		return fmt.Errorf("invalid docker cleanup schedule '%s': %w", schedule, err)
 	}
 	cm.entries["docker-cleanup"] = entryID
-	log.Printf("🐳 Docker cleanup scheduled: %s", schedule)
+	slog.Info("docker cleanup scheduled", "schedule", schedule)
 	return nil
 }
 
 func (cm *CronManager) DockerCleanup(ctx context.Context) {
 	if cm.dockerClient == nil {
-		log.Println("⚠️ Docker cleanup skipped: no Docker client")
+		slog.Warn("docker cleanup skipped", "reason", "no Docker client")
 		return
 	}
-	log.Println("🐳 Running Docker cleanup...")
+	slog.Info("running docker cleanup")
 
 	reclaimed := uint64(0)
 
@@ -209,9 +209,9 @@ func (cm *CronManager) DockerCleanup(ctx context.Context) {
 	}
 
 	if reclaimed > 0 {
-		log.Printf("🐳 Docker cleanup reclaimed %d bytes", reclaimed)
+		slog.Info("docker cleanup reclaimed space", "bytes", reclaimed)
 	} else {
-		log.Println("🐳 Docker cleanup: nothing to clean")
+		slog.Info("docker cleanup completed", "result", "nothing to clean")
 	}
 }
 
@@ -242,7 +242,7 @@ func (cm *CronManager) ScheduleDiskUsageCheck(schedule string, threshold int) er
 			return
 		}
 		if usage > threshold {
-			log.Printf("⚠️ Disk usage at %d%% (threshold: %d%%)", usage, threshold)
+			slog.Warn("disk usage above threshold", "usage_pct", usage, "threshold_pct", threshold)
 		}
 	})
 	if err != nil {

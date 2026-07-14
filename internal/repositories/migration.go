@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
-	"log"
+	"log/slog"
 	"sort"
 )
 
@@ -44,10 +44,10 @@ func RunMigrations(db *sql.DB) error {
 			return fmt.Errorf("failed to record migration %s: %w", file, err)
 		}
 
-		log.Printf("Applied migration: %s", file)
+		slog.Info("applied migration", "file", file)
 	}
 
-	log.Println(" Vessl SQLite schema migrations up to date")
+	slog.Info("schema migrations up to date")
 	return nil
 }
 
@@ -107,7 +107,7 @@ func ensureMigrationsTable(db *sql.DB) error {
 		}
 	}
 
-	log.Println(" Seeded schema_migrations for existing database")
+	slog.Info("seeded schema_migrations for existing database")
 	return nil
 }
 

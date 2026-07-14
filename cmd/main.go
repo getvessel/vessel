@@ -11,7 +11,7 @@ package main
 import (
 	"context"
 	"database/sql"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -65,45 +65,45 @@ func main() {
 }
 
 func initDataDir() (string, *sql.DB, *utils.Vault) {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
 	dataDir := os.Getenv("VESSL_DATA_DIR")
 	if dataDir == "" {
 		dataDir = "data"
 	}
 	if err := os.MkdirAll(dataDir, 0o755); err != nil {
-		log.Fatalf(" Failed to create data directory: %v", err)
+		slog.Error("failed to create data directory", "err", err)
+		os.Exit(1)
 	}
 	vlt, err := utils.NewVault(dataDir)
 	if err != nil {
-		log.Fatalf(" Failed to initialize secrets vault: %v", err)
+		slog.Error("failed to initialize secrets vault", "err", err)
+		os.Exit(1)
 	}
 	dbPath := filepath.Join(dataDir, "vessl.db")
 	db, err := sql.Open("sqlite", dbPath+"?_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=foreign_keys(ON)")
 	if err != nil {
-		log.Fatalf(" Failed to open SQLite database: %v", err)
+		slog.Error("failed to open SQLite database", "err", err)
+		os.Exit(1)
 	}
 	if err := repositories.RunMigrations(db); err != nil {
-		log.Fatalf("failed to run database migrations: %v", err)
+		slog.Error("failed to run database migrations", "err", err)
+		os.Exit(1)
 	}
 	return dataDir, db, vlt
 }
 
 func startServer() {
-	log.Printf(" Booting Vessl Daemon (`vessld`) v%s [%s/%s]...", vesslVersion, runtime.GOOS, runtime.GOARCH)
+	slog.Info("booting daemon", "version", vesslVersion, "os", runtime.GOOS, "arch", runtime.GOARCH)
 	_, db, vlt := initDataDir()
 	defer db.Close()
 
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		log.Printf(" Docker daemon connection warning: %v (container deployment features disabled)", err)
+		slog.Warn("Docker daemon connection warning", "err", err, "detail", "container deployment features disabled")
 	}
 
 	traefikMgr := engine.NewTraefikManager(dockerClient, os.Getenv("VESSL_TLS_EMAIL"))
 	if err := traefikMgr.EnsureTraefikRunning(context.Background()); err != nil {
-		log.Printf(" Warning: Failed to start Traefik proxy: %v", err)
+		slog.Warn("failed to start Traefik proxy", "err", err)
 	}
 
 	services.StartTelemetryReporter(db, vesslVersion)
@@ -118,17 +118,19 @@ func startServer() {
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
 	apiServer, err := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
 	if err != nil {
-		log.Fatalf(" Failed to initialize server: %v", err)
+		slog.Error("failed to initialize server", "err", err)
+		os.Exit(1)
 	}
 
-	log.Printf(" Vessl control plane listening on %s", addr)
+	slog.Info("control plane listening", "addr", addr)
 	if err := http.ListenAndServe(addr, apiServer.Handler()); err != nil {
-		log.Fatalf(" Server crashed: %v", err)
+		slog.Error("server crashed", "err", err)
+		os.Exit(1)
 	}
 }
 
 func runMCP() {
-	log.Printf("Starting MCP stdio server...")
+	slog.Info("starting MCP stdio server")
 	_, db, vlt := initDataDir()
 	defer db.Close()
 
@@ -137,10 +139,12 @@ func runMCP() {
 	traefikMgr := engine.NewTraefikManager(dockerClient, os.Getenv("VESSL_TLS_EMAIL"))
 	apiServer, err := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
 	if err != nil {
-		log.Fatalf(" Failed to initialize server: %v", err)
+		slog.Error("failed to initialize server", "err", err)
+		os.Exit(1)
 	}
 
 	if err := apiServer.StartMCPStdio(); err != nil {
-		log.Fatalf("MCP Server exited: %v", err)
+		slog.Error("MCP server exited", "err", err)
+		os.Exit(1)
 	}
 }

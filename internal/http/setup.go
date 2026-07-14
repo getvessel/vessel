@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -30,7 +30,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		LogURI:    true,
 		LogMethod: true,
 		LogValuesFunc: func(c echo.Context, v echomiddleware.RequestLoggerValues) error {
-			log.Printf("REQUEST: %s %s | status: %d", v.Method, v.URI, v.Status)
+			slog.Info("request", "method", v.Method, "uri", v.URI, "status", v.Status)
 			return nil
 		},
 	}))

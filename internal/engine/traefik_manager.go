@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"os"
 	"time"
 
@@ -50,7 +50,7 @@ func (m *TraefikManager) EnsureTraefikRunning(ctx context.Context) error {
 		return fmt.Errorf("failed to start traefik: %w", err)
 	}
 
-	log.Println("Traefik reverse proxy is running")
+	slog.Info("traefik reverse proxy is running")
 	return nil
 }
 
@@ -131,7 +131,7 @@ func (m *TraefikManager) createTraefikContainer(ctx context.Context) error {
 		return err
 	}
 
-	log.Printf("Created Traefik container ID: %s", resp.ID)
+	slog.Info("created traefik container", "containerID", resp.ID)
 	return nil
 }
 

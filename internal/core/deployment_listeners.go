@@ -2,7 +2,7 @@ package core
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 
 	"vessl.dev/vessl/internal/models"
 )
@@ -32,11 +32,11 @@ func (l *DeploymentListeners) SendNotification(e DeploymentCompleted) {
 }
 
 func (l *DeploymentListeners) UpdateAuditLog(e DeploymentCompleted) {
-	log.Printf("[Audit] Action: deployment.completed, ResourceID: %s, Status: %s", e.ServiceID, e.Status)
+	slog.Info("deployment completed", "serviceID", e.ServiceID, "status", e.Status)
 }
 
 func (l *DeploymentListeners) TriggerWebhook(e DeploymentCompleted) {
-	log.Printf("[Webhook] Triggering webhook for ProjectID: %s", e.ProjectID)
+	slog.Info("triggering webhook", "projectID", e.ProjectID)
 }
 
 func (l *DeploymentListeners) Register() {

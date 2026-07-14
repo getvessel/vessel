@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -56,11 +56,11 @@ func (bm *BackupManager) Start() error {
 	defer bm.mu.Unlock()
 	for _, cfg := range cfgs {
 		if err := bm.registerBackupLocked(cfg); err != nil {
-			log.Printf("⚠️ Failed to schedule automated backup %s (%s): %v", cfg.Name, cfg.ID, err)
+			slog.Warn("failed to schedule backup", "name", cfg.Name, "id", cfg.ID, "err", err)
 		}
 	}
 	bm.cronEngine.Start()
-	log.Println("⏰ BackupManager started and monitoring scheduled database/volume snapshots")
+	slog.Info("backup manager started")
 	return nil
 }
 
