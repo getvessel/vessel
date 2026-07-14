@@ -15,6 +15,7 @@ import { UserMenu } from './user-menu';
 
 const mainNav = [
   { title: 'Dashboard', url: '/', icon: LayoutDashboard, exact: true },
+  { title: 'Marketplace', url: '/marketplace', icon: Cloud },
   { title: 'Databases', url: '/databases', icon: Database },
   { title: 'S3 Storages', url: '/storages', icon: HardDrive },
   { title: 'Sources', url: '/sources', icon: Code },

@@ -16,6 +16,7 @@ import { Route as SplatRouteImport } from './routes/$'
 import { Route as ShellIndexRouteImport } from './routes/_shell/index'
 import { Route as ShellSettingsRouteImport } from './routes/_shell/settings'
 import { Route as ShellProjectsRouteImport } from './routes/_shell/projects'
+import { Route as ShellMarketplaceRouteImport } from './routes/_shell/marketplace'
 import { Route as ShellDatabasesRouteImport } from './routes/_shell/databases'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
@@ -56,6 +57,11 @@ const ShellSettingsRoute = ShellSettingsRouteImport.update({
 const ShellProjectsRoute = ShellProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellMarketplaceRoute = ShellMarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
   getParentRoute: () => ShellRoute,
 } as any)
 const ShellDatabasesRoute = ShellDatabasesRouteImport.update({
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/databases': typeof ShellDatabasesRoute
+  '/marketplace': typeof ShellMarketplaceRoute
   '/projects': typeof ShellProjectsRoute
   '/settings': typeof ShellSettingsRoute
   '/$projectId/deployments': typeof ProjectProjectIdDeploymentsRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/databases': typeof ShellDatabasesRoute
+  '/marketplace': typeof ShellMarketplaceRoute
   '/projects': typeof ShellProjectsRoute
   '/settings': typeof ShellSettingsRoute
   '/$projectId/deployments': typeof ProjectProjectIdDeploymentsRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_shell/databases': typeof ShellDatabasesRoute
+  '/_shell/marketplace': typeof ShellMarketplaceRoute
   '/_shell/projects': typeof ShellProjectsRoute
   '/_shell/settings': typeof ShellSettingsRoute
   '/_shell/': typeof ShellIndexRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/databases'
+    | '/marketplace'
     | '/projects'
     | '/settings'
     | '/$projectId/deployments'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/databases'
+    | '/marketplace'
     | '/projects'
     | '/settings'
     | '/$projectId/deployments'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/_auth/register'
     | '/_auth/reset-password'
     | '/_shell/databases'
+    | '/_shell/marketplace'
     | '/_shell/projects'
     | '/_shell/settings'
     | '/_shell/'
@@ -263,6 +275,13 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/projects'
       preLoaderRoute: typeof ShellProjectsRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/marketplace': {
+      id: '/_shell/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof ShellMarketplaceRouteImport
       parentRoute: typeof ShellRoute
     }
     '/_shell/databases': {
@@ -367,6 +386,7 @@ const ProjectRouteWithChildren =
 
 interface ShellRouteChildren {
   ShellDatabasesRoute: typeof ShellDatabasesRoute
+  ShellMarketplaceRoute: typeof ShellMarketplaceRoute
   ShellProjectsRoute: typeof ShellProjectsRoute
   ShellSettingsRoute: typeof ShellSettingsRoute
   ShellIndexRoute: typeof ShellIndexRoute
@@ -374,6 +394,7 @@ interface ShellRouteChildren {
 
 const ShellRouteChildren: ShellRouteChildren = {
   ShellDatabasesRoute: ShellDatabasesRoute,
+  ShellMarketplaceRoute: ShellMarketplaceRoute,
   ShellProjectsRoute: ShellProjectsRoute,
   ShellSettingsRoute: ShellSettingsRoute,
   ShellIndexRoute: ShellIndexRoute,

@@ -29,6 +29,7 @@ func runDeploy(args []string) {
 	archivePath := ""
 	projectID := ""
 	branch := "main"
+	rootDir := ""
 	port := 3000
 
 	for i := 0; i < len(args); i++ {
@@ -63,6 +64,19 @@ func runDeploy(args []string) {
 				branch = args[i+1]
 				i++
 			}
+		case "--dir", "-d":
+			if i+1 < len(args) {
+				rootDir = args[i+1]
+				i++
+			}
+		case "--template", "-t":
+			if i+1 < len(args) {
+				templateName := args[i+1]
+				gitURL = "https://github.com/vesslhq/vessl-examples.git"
+				branch = "main"
+				rootDir = templateName
+				i++
+			}
 		case "--port":
 			if i+1 < len(args) {
 				if p, err := parseUint(args[i+1]); err == nil {
@@ -80,7 +94,7 @@ func runDeploy(args []string) {
 	}
 
 	if gitURL == "" && imageRef == "" && composePath == "" && archivePath == "" {
-		exitError("Usage: vessld deploy <git-url> | --image <img> | --compose <file> | --archive <file>")
+		exitError("Usage: vessld deploy <git-url> | --template <t> | --image <img> | --compose <file> | --archive <file>")
 	}
 
 	count := 0
@@ -168,6 +182,9 @@ func runDeploy(args []string) {
 			ProjectID:     projectID,
 			EnvironmentID: envID,
 			Name:          appName,
+			RepositoryURL: gitURL,
+			Branch:        branch,
+			RootDirectory: rootDir,
 			InternalPort:  port,
 			Status:        "created",
 			CreatedAt:     time.Now(),
@@ -203,7 +220,11 @@ func runDeploy(args []string) {
 			exitError("Failed to load project: %v", err)
 		}
 		fmt.Println("🔨 Building and deploying...")
-		containerID, err := deployer.Deploy(context.Background(), project, cloneDir, os.Stdout)
+		srcDir := cloneDir
+		if svc.RootDirectory != "" {
+			srcDir = filepath.Join(cloneDir, svc.RootDirectory)
+		}
+		containerID, err := deployer.Deploy(context.Background(), project, srcDir, os.Stdout)
 		if err != nil {
 			exitError("Deployment failed: %v", err)
 		}
