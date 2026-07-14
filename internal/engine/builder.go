@@ -32,6 +32,7 @@ type BuildOptions struct {
 	LogWriter      io.Writer             `json:"-"`
 	ProjectConfig  *models.ProjectConfig `json:"projectConfig,omitempty"`
 	AppConfig      *models.AppService    `json:"appConfig,omitempty"`
+	EnvVars        map[string]string     `json:"envVars,omitempty"`
 }
 
 type Builder interface {

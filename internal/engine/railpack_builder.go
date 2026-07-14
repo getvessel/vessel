@@ -51,10 +51,14 @@ func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions, engineNa
 		if builderImage == "" {
 			builderImage = "paketobuildpacks/builder:base"
 		}
-		cmd := exec.CommandContext(ctx, "docker", "run", "--rm",
+		args := []string{"run", "--rm",
 			"-v", fmt.Sprintf("%s:/var/run/docker.sock", dockerSock),
 			"-v", fmt.Sprintf("%s:/app", absSourceDir),
-			packImage, "build", imageTag, "--path", "/app", "--builder", builderImage)
+			packImage, "build", imageTag, "--path", "/app", "--builder", builderImage}
+		for k, v := range opts.EnvVars {
+			args = append(args, "--env", fmt.Sprintf("%s=%s", k, v))
+		}
+		cmd := exec.CommandContext(ctx, "docker", args...)
 		cmd.Stdout = opts.LogWriter
 		cmd.Stderr = opts.LogWriter
 		if err := cmd.Run(); err == nil {
@@ -72,10 +76,14 @@ func (r *RailpackBuilder) Build(ctx context.Context, opts BuildOptions, engineNa
 		if nixpacksImage == "" {
 			nixpacksImage = "ghcr.io/railwayapp/nixpacks:latest"
 		}
-		cmd := exec.CommandContext(ctx, "docker", "run", "--rm",
+		args := []string{"run", "--rm",
 			"-v", fmt.Sprintf("%s:/var/run/docker.sock", dockerSock),
 			"-v", fmt.Sprintf("%s:/app", absSourceDir),
-			nixpacksImage, "build", "/app", "--name", imageTag)
+			nixpacksImage, "build", "/app", "--name", imageTag}
+		for k, v := range opts.EnvVars {
+			args = append(args, "--env", fmt.Sprintf("%s=%s", k, v))
+		}
+		cmd := exec.CommandContext(ctx, "docker", args...)
 		cmd.Stdout = opts.LogWriter
 		cmd.Stderr = opts.LogWriter
 		if err := cmd.Run(); err == nil {

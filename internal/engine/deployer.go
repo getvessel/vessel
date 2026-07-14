@@ -64,14 +64,19 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 		return "", err
 	}
 
-	imageTag, err := d.buildImage(ctx, app, sourceDir, logWriter)
+	envVarsMap, err := d.getEnvironmentVariables(app, logWriter)
 	if err != nil {
 		return "", err
 	}
 
-	envSlice, err := d.prepareEnvironmentVariables(app, logWriter)
+	imageTag, err := d.buildImage(ctx, app, sourceDir, envVarsMap, logWriter)
 	if err != nil {
 		return "", err
+	}
+
+	envSlice := make([]string, 0, len(envVarsMap))
+	for k, v := range envVarsMap {
+		envSlice = append(envSlice, fmt.Sprintf("%s=%s", k, v))
 	}
 
 	newContainerName := fmt.Sprintf("%s-%s", utils.NormalizeContainerName(app.ID), uuid.New().String()[:8])
@@ -133,13 +138,14 @@ func (d *Deployer) prepareServerlessCode(app *models.AppService, sourceDir strin
 	return nil
 }
 
-func (d *Deployer) buildImage(ctx context.Context, app *models.AppService, sourceDir string, logWriter io.Writer) (string, error) {
+func (d *Deployer) buildImage(ctx context.Context, app *models.AppService, sourceDir string, envVarsMap map[string]string, logWriter io.Writer) (string, error) {
 	buildOpts := BuildOptions{
 		ProjectID: app.ProjectID,
 		ServiceID: app.ID,
 		SourceDir: sourceDir,
 		LogWriter: logWriter,
 		AppConfig: app,
+		EnvVars:   envVarsMap,
 	}
 	imageTag, err := d.builder.Build(ctx, buildOpts)
 	if err != nil {
@@ -151,7 +157,7 @@ func (d *Deployer) buildImage(ctx context.Context, app *models.AppService, sourc
 	return imageTag, nil
 }
 
-func (d *Deployer) prepareEnvironmentVariables(app *models.AppService, logWriter io.Writer) ([]string, error) {
+func (d *Deployer) getEnvironmentVariables(app *models.AppService, logWriter io.Writer) (map[string]string, error) {
 	envVarsMap, err := d.store.GetEnvVars(app.ProjectID)
 	if err != nil && logWriter != nil {
 		fmt.Fprintf(logWriter, "⚠️ [Deployer] Warning: could not load shared project environment variables: %v\n", err)
@@ -178,11 +184,7 @@ func (d *Deployer) prepareEnvironmentVariables(app *models.AppService, logWriter
 		}
 	}
 
-	var envSlice []string
-	for k, v := range envVarsMap {
-		envSlice = append(envSlice, fmt.Sprintf("%s=%s", k, v))
-	}
-	return envSlice, nil
+	return envVarsMap, nil
 }
 
 func defaultAppPort() int {

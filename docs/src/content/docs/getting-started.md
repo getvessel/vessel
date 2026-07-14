@@ -72,7 +72,7 @@ vesslctl downgrade v0.1.0  # Downgrade to a specific version
 
 ### Configure a Domain (Recommended)
 
-Without a domain, Vessl assigns an `sslip.io` subdomain to every service. For production:
+Without a domain, Vessl assigns a magic DNS subdomain (like `sslip.io` or `traefik.me`) to every service. For production:
 
 1. Go to **Settings → Server Settings**.
 2. Set your wildcard domain (e.g. `*.vessl.example.com`).

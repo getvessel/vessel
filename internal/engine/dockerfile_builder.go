@@ -33,11 +33,18 @@ func (d *DockerfileBuilder) Build(ctx context.Context, opts BuildOptions) (strin
 	if dockerfilePath == "" {
 		dockerfilePath = "Dockerfile"
 	}
+	buildArgs := make(map[string]*string)
+	for k, v := range opts.EnvVars {
+		val := v
+		buildArgs[k] = &val
+	}
+
 	buildOptions := types.ImageBuildOptions{
 		Tags:       []string{imageTag},
 		Dockerfile: dockerfilePath,
 		Remove:     true,
 		CacheFrom:  []string{imageTag},
+		BuildArgs:  buildArgs,
 	}
 	resp, err := d.dockerClient.ImageBuild(ctx, tarContext, buildOptions)
 	if err != nil {

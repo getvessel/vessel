@@ -36,6 +36,7 @@ PORT=8080
 VESSL_DATA_DIR=data
 VESSL_STATIC_DIR=dashboard/dist
 VESSL_TLS_EMAIL=admin@example.com
+VESSL_MAGIC_DOMAIN=traefik.me # Magic DNS domain (options: sslip.io, traefik.me, nip.io)
 ```
 
 ## Notifications
@@ -44,15 +45,15 @@ Vessl sends deployment, backup, and system notifications through configurable ch
 
 ### Supported Channels
 
-| Channel | Configuration |
-|---|---|
-| **Discord** | Webhook URL |
-| **Slack** | Webhook URL |
-| **Telegram** | Bot token + Chat ID |
-| **Pushover** | User key + App token |
-| **Email (SMTP)** | SMTP server, credentials, from address |
-| **Resend** | Resend API key |
-| **Generic Webhook** | Custom URL + headers |
+| Channel             | Configuration                          |
+| ------------------- | -------------------------------------- |
+| **Discord**         | Webhook URL                            |
+| **Slack**           | Webhook URL                            |
+| **Telegram**        | Bot token + Chat ID                    |
+| **Pushover**        | User key + App token                   |
+| **Email (SMTP)**    | SMTP server, credentials, from address |
+| **Resend**          | Resend API key                         |
+| **Generic Webhook** | Custom URL + headers                   |
 
 ### Setting Up a Channel
 
@@ -89,6 +90,7 @@ Configure external authentication providers:
 4. Enable the provider for login.
 
 Supported providers:
+
 - GitHub
 - Google
 - GitLab
