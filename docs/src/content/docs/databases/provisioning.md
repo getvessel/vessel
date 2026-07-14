@@ -1,6 +1,6 @@
 ---
-title: Databases
-description: Managed database engines with one-click provisioning, automated backups, and connection string injection.
+title: Database Provisioning
+description: Managed database engines with one-click provisioning and connection string injection.
 ---
 
 Spin up managed databases directly from the Vessl dashboard. Each database runs in its own Docker container with persistent volumes, automatic health checks, and daily backups.
@@ -70,14 +70,6 @@ You can also find the connection details on the database's detail page in the da
 
 Databases can be started and stopped from the dashboard. Stopping a database frees resources while preserving the volume data.
 
-### SQL Studio
-
-Vessl includes an in-browser SQL query editor for PostgreSQL, MySQL, and MariaDB databases:
-
-1. Open the database detail page.
-2. Click **SQL Studio**.
-3. Write and execute queries directly in the browser.
-
 ### Configuration
 
 Each database has sensible defaults:
@@ -85,52 +77,3 @@ Each database has sensible defaults:
 - **Username**: `vessl`
 - **Database name**: `vessl`
 - **Data volume**: Persisted at `<data-dir>/databases/<id>/`
-
-## Backups
-
-### Automated Backups
-
-Backups run daily by default with configurable retention:
-
-1. Navigate to **Backups** in the sidebar.
-2. Click **New Backup Configuration**.
-3. Select the database and set the schedule.
-4. Configure retention (number of backups to keep).
-
-### Manual Backups
-
-Trigger a backup at any time from the database detail page or the Backups section.
-
-### S3 Destinations
-
-Backups can be uploaded to S3-compatible storage for offsite redundancy:
-
-1. Go to **Backups → S3 Destinations**.
-2. Add your S3-compatible endpoint (AWS S3, MinIO, Backblaze B2, etc.).
-3. Provide access key, secret key, and bucket name.
-4. Select the S3 destination when configuring a backup.
-
-### Supported Backup Commands
-
-| Engine | Backup Command |
-|---|---|
-| PostgreSQL | `pg_dump` |
-| MySQL / MariaDB | `mysqldump` |
-| MongoDB | `mongodump` |
-| Redis | `redis-cli SAVE` |
-
-### Restore
-
-To restore from a backup:
-
-1. Create a new database instance.
-2. Download the backup record from the dashboard.
-3. Restore using the engine's native restore command:
-
-```sh
-# PostgreSQL
-pg_restore -U vessl -d vessl < backup.sql
-
-# MySQL
-mysql -u vessl -p vessl < backup.sql
-```

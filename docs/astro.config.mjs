@@ -14,8 +14,9 @@ export default defineConfig({
           label: "Start here",
           items: [
             { label: 'Vessl Docs', slug: 'index' },
-            { label: 'Installation', slug: 'getting-started' },
+            { label: 'Installation', slug: 'getting-started/installation' },
             { label: 'Browser Onboarding', slug: 'getting-started/onboarding' },
+            { label: 'Quick Start', slug: 'getting-started/quick-start' },
             { label: 'Deploy Your First App', slug: 'tutorial' },
           ],
         },
@@ -23,16 +24,20 @@ export default defineConfig({
           label: "Core concepts",
           items: [
             { label: 'Architecture', slug: 'core-concepts/architecture' },
-            { label: 'Projects & Environments', slug: 'projects' },
+            { label: 'Projects Overview', slug: 'projects/overview' },
+            { label: 'Environments', slug: 'projects/environments' },
+            { label: 'Canvas View', slug: 'projects/canvas' },
+            { label: 'Project Settings', slug: 'projects/settings' },
           ],
         },
         {
           label: "Deployments",
           items: [
-            { label: 'Overview', slug: 'deployment' },
+            { label: 'Build Strategies', slug: 'deployments/build-strategies' },
+            { label: 'CI/CD & Git', slug: 'deployments/ci-cd' },
             { label: 'Source Services', slug: 'deployments/source-services' },
             { label: 'Docker Image Services', slug: 'deployments/docker-image-services' },
-            { label: 'Serverless Functions', slug: 'serverless' },
+            { label: 'Serverless Functions', slug: 'deployments/serverless-functions' },
             { label: 'Static Sites & Workers', slug: 'deployments/static-sites-and-workers' },
             { label: 'Environment Variables', slug: 'deployments/environment-variables' },
             { label: 'Deployment Lifecycle', slug: 'deployments/deployment-lifecycle' },
@@ -41,7 +46,8 @@ export default defineConfig({
         {
           label: "Databases",
           items: [
-            { label: 'Overview', slug: 'databases' },
+            { label: 'Database Provisioning', slug: 'databases/provisioning' },
+            { label: 'SQL Studio', slug: 'databases/sql-studio' },
             { label: 'Data Browser', slug: 'databases/data-browser' },
             { label: 'Data Imports', slug: 'databases/data-imports' },
             { label: 'Public Access & TLS', slug: 'databases/public-access-and-tls' },
@@ -50,7 +56,7 @@ export default defineConfig({
         {
           label: "Storage & Backups",
           items: [
-            { label: 'Storage (S3)', slug: 'storage' },
+            { label: 'Storage (MinIO)', slug: 'storage-and-backups/minio-storage' },
             { label: 'R2 Storage Integration', slug: 'storage-and-backups/r2-storage' },
             { label: 'Database Backups', slug: 'storage-and-backups/database-backups' },
             { label: 'Restore & Download', slug: 'storage-and-backups/restore-and-download' },
@@ -69,6 +75,7 @@ export default defineConfig({
             { label: 'Administration', slug: 'admin' },
             { label: 'Integrations', slug: 'integrations' },
             { label: 'Domains', slug: 'operations/domains' },
+            { label: 'DNS Providers', slug: 'operations/dns-providers' },
             { label: 'System Maintenance', slug: 'operations/system-maintenance' },
             { label: 'System Updates', slug: 'operations/system-updates' },
             { label: 'Backups & Updates', slug: 'operations/backups-and-updates' },
