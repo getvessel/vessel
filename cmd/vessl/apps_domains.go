@@ -1,0 +1,98 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"text/tabwriter"
+
+	"github.com/spf13/cobra"
+	"vessl.dev/vessl/internal/models"
+)
+
+var domainsCmd = &cobra.Command{
+	Use:   "domains",
+	Short: "Manage application domains",
+}
+
+var domainsListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List domains for a project",
+	Run: func(cmd *cobra.Command, args []string) {
+		projectID, _ := cmd.Flags().GetString("project")
+		if projectID == "" {
+			fmt.Println("Error: --project flag is required")
+			os.Exit(1)
+		}
+
+		client := getClient()
+		domains, err := client.ListDomains(projectID)
+		if err != nil {
+			fmt.Printf("Error listing domains: %v\n", err)
+			os.Exit(1)
+		}
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
+		fmt.Fprintln(w, "ID\tDOMAIN_NAME\tPATH_PREFIX\tSSL_STATUS\tREDIRECT_TO")
+		for _, domain := range domains {
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", domain.ID, domain.DomainName, domain.PathPrefix, domain.SSLCertStatus, domain.RedirectTo)
+		}
+		w.Flush()
+	},
+}
+
+var domainsAddCmd = &cobra.Command{
+	Use:   "add",
+	Short: "Add a domain to a project",
+	Run: func(cmd *cobra.Command, args []string) {
+		projectID, _ := cmd.Flags().GetString("project")
+		domainName, _ := cmd.Flags().GetString("domain")
+		if projectID == "" || domainName == "" {
+			fmt.Println("Error: --project and --domain flags are required")
+			os.Exit(1)
+		}
+
+		redirectTo, _ := cmd.Flags().GetString("redirect")
+		pathPrefix, _ := cmd.Flags().GetString("prefix")
+
+		client := getClient()
+		req := &models.DomainConfig{
+			DomainName: domainName,
+			ProjectID:  projectID,
+			RedirectTo: redirectTo,
+			PathPrefix: pathPrefix,
+		}
+
+		created, err := client.AddDomain(projectID, req)
+		if err != nil {
+			fmt.Printf("Error adding domain: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Domain %s added successfully with ID: %s\n", created.DomainName, created.ID)
+	},
+}
+
+var domainsRemoveCmd = &cobra.Command{
+	Use:   "remove [id]",
+	Short: "Remove a domain",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		client := getClient()
+		if err := client.RemoveDomain(args[0]); err != nil {
+			fmt.Printf("Error removing domain: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Domain %s removed successfully\n", args[0])
+	},
+}
+
+func init() {
+	domainsListCmd.Flags().StringP("project", "p", "", "Project ID (required)")
+
+	domainsAddCmd.Flags().StringP("project", "p", "", "Project ID (required)")
+	domainsAddCmd.Flags().StringP("domain", "d", "", "Domain name (required)")
+	domainsAddCmd.Flags().String("redirect", "", "Redirect To URL")
+	domainsAddCmd.Flags().String("prefix", "", "Path Prefix")
+
+	domainsCmd.AddCommand(domainsListCmd, domainsAddCmd, domainsRemoveCmd)
+	appsCmd.AddCommand(domainsCmd)
+}

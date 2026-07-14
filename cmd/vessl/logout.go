@@ -16,7 +16,7 @@ var logoutCmd = &cobra.Command{
 		cfg, err := config.Load()
 		if err == nil && cfg.Token != "" && cfg.ServerURL != "" {
 			client := getClient() // getClient calls os.Exit if not logged in, but we checked token
-			_ = client.Logout() // ignore error, we just want to clear local config
+			_ = client.Logout()   // ignore error, we just want to clear local config
 		}
 
 		// Clear local config
