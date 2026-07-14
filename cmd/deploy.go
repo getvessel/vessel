@@ -1,8 +1,11 @@
 package main
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"context"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"os/exec"
@@ -23,6 +26,7 @@ func runDeploy(args []string) {
 	gitURL := ""
 	imageRef := ""
 	composePath := ""
+	archivePath := ""
 	projectID := ""
 	branch := "main"
 	port := 3000
@@ -42,6 +46,11 @@ func runDeploy(args []string) {
 		case "--compose", "-c":
 			if i+1 < len(args) {
 				composePath = args[i+1]
+				i++
+			}
+		case "--archive", "-a":
+			if i+1 < len(args) {
+				archivePath = args[i+1]
 				i++
 			}
 		case "--project", "-p":
@@ -70,12 +79,18 @@ func runDeploy(args []string) {
 		}
 	}
 
-	if gitURL == "" && imageRef == "" && composePath == "" {
-		exitError("Usage: vessld deploy <git-url> or --image <image> or --compose <file>")
+	if gitURL == "" && imageRef == "" && composePath == "" && archivePath == "" {
+		exitError("Usage: vessld deploy <git-url> | --image <img> | --compose <file> | --archive <file>")
 	}
 
-	if (gitURL != "" && imageRef != "") || (gitURL != "" && composePath != "") || (imageRef != "" && composePath != "") {
-		exitError("Specify only one: Git URL, --image, or --compose")
+	count := 0
+	for _, v := range []bool{gitURL != "", imageRef != "", composePath != "", archivePath != ""} {
+		if v {
+			count++
+		}
+	}
+	if count > 1 {
+		exitError("Specify only one: Git URL, --image, --compose, or --archive")
 	}
 
 	dataDir, db, vlt := initDataDir()
@@ -169,7 +184,10 @@ func runDeploy(args []string) {
 		fmt.Printf("📦 Using existing app: %s (%s)\n", appName, svc.ID[:8])
 	}
 
-	if gitURL != "" {
+	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
+
+	switch {
+	case gitURL != "":
 		cloneDir := filepath.Join(dataDir, "builds", svc.ID)
 		_ = os.RemoveAll(cloneDir)
 		_ = os.MkdirAll(cloneDir, 0o755)
@@ -180,29 +198,27 @@ func runDeploy(args []string) {
 		if err := cloneCmd.Run(); err != nil {
 			exitError("Git clone failed: %v", err)
 		}
-
 		project, err := projectRepo.Get(context.Background(), projectID)
 		if err != nil {
 			exitError("Failed to load project: %v", err)
 		}
-
-		deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
 		fmt.Println("🔨 Building and deploying...")
 		containerID, err := deployer.Deploy(context.Background(), project, cloneDir, os.Stdout)
 		if err != nil {
 			exitError("Deployment failed: %v", err)
 		}
 		fmt.Printf("\n✅ Deployed! Container: %s\n", containerID)
-	} else if imageRef != "" {
+
+	case imageRef != "":
 		fmt.Printf("🐳 Deploying image %s...\n", imageRef)
-		deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
 		containerID, err := deployer.DeployImage(context.Background(), svc, os.Stdout)
 		if err != nil {
 			exitError("Image deploy failed: %v", err)
 		}
 		slog.Info("container started from image", "image", imageRef, "containerID", containerID)
 		fmt.Printf("\n✅ Deployed! Container: %s\n", containerID)
-	} else {
+
+	case composePath != "":
 		fmt.Printf("📦 Deploying compose file %s...\n", composePath)
 		composeDeployer := engine.NewComposeDeployer(dockerClient)
 		services, err := composeDeployer.Deploy(context.Background(), composePath, projectID)
@@ -213,6 +229,33 @@ func runDeploy(args []string) {
 		for _, s := range services {
 			fmt.Printf("   - %s (%s)\n", s.Name, s.ContainerID[:12])
 		}
+
+	case archivePath != "":
+		fmt.Printf("📦 Deploying archive %s...\n", archivePath)
+		archiveDir := filepath.Join(dataDir, "builds", svc.ID, "archive")
+		_ = os.RemoveAll(archiveDir)
+		_ = os.MkdirAll(archiveDir, 0o755)
+		f, err := os.Open(archivePath)
+		if err != nil {
+			exitError("Failed to open archive: %v", err)
+		}
+		if err := extractArchiveTo(archiveDir, f); err != nil {
+			f.Close()
+			exitError("Failed to extract archive: %v", err)
+		}
+		f.Close()
+
+		srcDir := findSourceDir(archiveDir)
+		project, err := projectRepo.Get(context.Background(), projectID)
+		if err != nil {
+			exitError("Failed to load project: %v", err)
+		}
+		fmt.Println("🔨 Building and deploying...")
+		containerID, err := deployer.Deploy(context.Background(), project, srcDir, os.Stdout)
+		if err != nil {
+			exitError("Deployment failed: %v", err)
+		}
+		fmt.Printf("\n✅ Deployed! Container: %s\n", containerID)
 	}
 
 	fmt.Printf("   App: %s (%s)\n", appName, svc.ID[:8])
@@ -243,6 +286,52 @@ func runDeploy(args []string) {
 		cleanIP := strings.ReplaceAll(hostIP, ".", "-")
 		fmt.Printf("   URL: http://%s.%s.sslip.io\n", cleanName, cleanIP)
 	}
+}
+
+func extractArchiveTo(dest string, src io.Reader) error {
+	gzr, err := gzip.NewReader(src)
+	if err != nil {
+		tr := tar.NewReader(src)
+		return untarTo(dest, tr)
+	}
+	defer gzr.Close()
+	return untarTo(dest, tar.NewReader(gzr))
+}
+
+func untarTo(dest string, tr *tar.Reader) error {
+	for {
+		hdr, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		path := filepath.Join(dest, filepath.Clean(hdr.Name))
+		if !strings.HasPrefix(path, filepath.Clean(dest)+string(os.PathSeparator)) {
+			continue
+		}
+		switch hdr.Typeflag {
+		case tar.TypeDir:
+			os.MkdirAll(path, 0o755)
+		case tar.TypeReg:
+			os.MkdirAll(filepath.Dir(path), 0o755)
+			f, _ := os.Create(path)
+			if f != nil {
+				_, _ = io.Copy(f, tr)
+				f.Close()
+			}
+		}
+	}
+	return nil
+}
+
+func findSourceDir(dir string) string {
+	entries, _ := os.ReadDir(dir)
+	if len(entries) == 1 && entries[0].IsDir() {
+		return filepath.Join(dir, entries[0].Name())
+	}
+	return dir
 }
 
 func extractRepoName(url string) string {

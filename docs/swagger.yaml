@@ -1122,6 +1122,36 @@ paths:
       summary: StopDatabase endpoint
       tags:
       - Databases
+  /deploy/archive:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a .tar.gz archive and deploy it as an application
+      parameters:
+      - description: Project ID
+        in: formData
+        name: projectId
+        type: string
+      - description: App name
+        in: formData
+        name: name
+        type: string
+      - description: Archive file (.tar.gz)
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Deploy from uploaded archive
+      tags:
+      - Archive
   /deployments/{id}/diagnostics:
     post:
       consumes:

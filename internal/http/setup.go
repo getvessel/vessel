@@ -171,6 +171,8 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	composeHandler := handlers.NewComposeHandler(composeDeployer, projectService, appService, environmentSQLiteRepository, appServiceSQLiteRepository)
 	oneClickService := services.NewOneClickService(tmplMgr, databaseDeployer, environmentSQLiteRepository, databaseSQLiteRepository)
 	oneClickHandler := handlers.NewOneClickHandler(oneClickService)
+	archiveService := services.NewArchiveService(appService, deploymentService)
+	archiveHandler := handlers.NewArchiveHandler(archiveService)
 	serverlessHandler := handlers.NewServerlessHandler(serverlessService)
 	systemService := services.NewSystemService()
 	systemHandler := handlers.NewSystemHandler(systemService)
@@ -221,6 +223,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		systemHandler:          systemHandler,
 		composeHandler:         composeHandler,
 		oneClickHandler:        oneClickHandler,
+		archiveHandler:         archiveHandler,
 	}
 
 	if srv.deployer != nil {
