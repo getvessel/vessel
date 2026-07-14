@@ -31,57 +31,67 @@ type TriggerDeploymentRequest struct {
 	Branch *string `json:"branch,omitempty"`
 }
 
+type RuntimeMode string
+
+const (
+	RuntimeModeWeb    RuntimeMode = "web"
+	RuntimeModeWorker RuntimeMode = "worker"
+)
+
 type AppService struct {
-	ID              string    `json:"id" db:"id"`
-	ProjectID       string    `json:"projectId" db:"project_id"`
-	EnvironmentID   string    `json:"environmentId" db:"environment_id"`
-	Name            string    `json:"name" db:"name"`
-	RepositoryURL   string    `json:"repositoryUrl" db:"repository_url"`
-	ImageRef        string    `json:"imageRef,omitempty" db:"image_ref"`
-	Branch          string    `json:"branch" db:"branch"`
-	RootDirectory   string    `json:"rootDirectory" db:"root_directory"`
-	BuildCommand    string    `json:"buildCommand" db:"build_command"`
-	StartCommand    string    `json:"startCommand" db:"start_command"`
-	DockerfilePath  string    `json:"dockerfilePath" db:"dockerfile_path"`
-	BuildEngine     string    `json:"buildEngine" db:"build_engine"`
-	InternalPort    int       `json:"internalPort" db:"internal_port"`
-	Domain          string    `json:"domain" db:"domain"`
-	HealthCheckPath string    `json:"healthCheckPath" db:"health_check_path"`
-	ContainerID     string    `json:"containerId" db:"container_id"`
-	Status          string    `json:"status" db:"status"`
-	CreatedAt       time.Time `json:"createdAt" db:"created_at"`
-	UpdatedAt       time.Time `json:"updatedAt" db:"updated_at"`
+	ID              string      `json:"id" db:"id"`
+	ProjectID       string      `json:"projectId" db:"project_id"`
+	EnvironmentID   string      `json:"environmentId" db:"environment_id"`
+	Name            string      `json:"name" db:"name"`
+	RepositoryURL   string      `json:"repositoryUrl" db:"repository_url"`
+	ImageRef        string      `json:"imageRef,omitempty" db:"image_ref"`
+	Branch          string      `json:"branch" db:"branch"`
+	RootDirectory   string      `json:"rootDirectory" db:"root_directory"`
+	RuntimeMode     RuntimeMode `json:"runtimeMode" db:"runtime_mode"`
+	BuildCommand    string      `json:"buildCommand" db:"build_command"`
+	StartCommand    string      `json:"startCommand" db:"start_command"`
+	DockerfilePath  string      `json:"dockerfilePath" db:"dockerfile_path"`
+	BuildEngine     string      `json:"buildEngine" db:"build_engine"`
+	InternalPort    int         `json:"internalPort" db:"internal_port"`
+	Domain          string      `json:"domain" db:"domain"`
+	HealthCheckPath string      `json:"healthCheckPath" db:"health_check_path"`
+	ContainerID     string      `json:"containerId" db:"container_id"`
+	Status          string      `json:"status" db:"status"`
+	CreatedAt       time.Time   `json:"createdAt" db:"created_at"`
+	UpdatedAt       time.Time   `json:"updatedAt" db:"updated_at"`
 }
 
 type CreateAppServiceRequest struct {
-	ProjectID       string `json:"projectId"`
-	Name            string `json:"name"`
-	RepositoryURL   string `json:"repositoryUrl"`
-	Branch          string `json:"branch"`
-	RootDirectory   string `json:"rootDirectory"`
-	BuildCommand    string `json:"buildCommand"`
-	StartCommand    string `json:"startCommand"`
-	DockerfilePath  string `json:"dockerfilePath"`
-	BuildEngine     string `json:"buildEngine"`
-	InternalPort    int    `json:"internalPort"`
-	Domain          string `json:"domain"`
-	HealthCheckPath string `json:"healthCheckPath"`
+	ProjectID       string      `json:"projectId"`
+	Name            string      `json:"name"`
+	RepositoryURL   string      `json:"repositoryUrl"`
+	Branch          string      `json:"branch"`
+	RootDirectory   string      `json:"rootDirectory"`
+	RuntimeMode     RuntimeMode `json:"runtimeMode"`
+	BuildCommand    string      `json:"buildCommand"`
+	StartCommand    string      `json:"startCommand"`
+	DockerfilePath  string      `json:"dockerfilePath"`
+	BuildEngine     string      `json:"buildEngine"`
+	InternalPort    int         `json:"internalPort"`
+	Domain          string      `json:"domain"`
+	HealthCheckPath string      `json:"healthCheckPath"`
 }
 
 type UpdateAppServiceRequest struct {
-	Name            string `json:"name"`
-	RepositoryURL   string `json:"repositoryUrl"`
-	Branch          string `json:"branch"`
-	RootDirectory   string `json:"rootDirectory"`
-	BuildCommand    string `json:"buildCommand"`
-	StartCommand    string `json:"startCommand"`
-	DockerfilePath  string `json:"dockerfilePath"`
-	BuildEngine     string `json:"buildEngine"`
-	InternalPort    int    `json:"internalPort"`
-	Domain          string `json:"domain"`
-	HealthCheckPath string `json:"healthCheckPath"`
-	ContainerID     string `json:"containerId"`
-	Status          string `json:"status"`
+	Name            string      `json:"name"`
+	RepositoryURL   string      `json:"repositoryUrl"`
+	Branch          string      `json:"branch"`
+	RootDirectory   string      `json:"rootDirectory"`
+	RuntimeMode     RuntimeMode `json:"runtimeMode"`
+	BuildCommand    string      `json:"buildCommand"`
+	StartCommand    string      `json:"startCommand"`
+	DockerfilePath  string      `json:"dockerfilePath"`
+	BuildEngine     string      `json:"buildEngine"`
+	InternalPort    int         `json:"internalPort"`
+	Domain          string      `json:"domain"`
+	HealthCheckPath string      `json:"healthCheckPath"`
+	ContainerID     string      `json:"containerId"`
+	Status          string      `json:"status"`
 }
 
 type Variable struct {

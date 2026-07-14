@@ -228,6 +228,7 @@ func (d *Deployer) startContainer(ctx context.Context, app *models.AppService, c
 		app.ID,
 		app.Domain,
 		port,
+		app.RuntimeMode,
 		envSlice,
 		memMB,
 		cpuReq,
@@ -240,6 +241,12 @@ func (d *Deployer) startContainer(ctx context.Context, app *models.AppService, c
 }
 
 func (d *Deployer) verifyHealthCheck(ctx context.Context, app *models.AppService, containerName string, logWriter io.Writer) error {
+	if app.RuntimeMode == models.RuntimeModeWorker {
+		if logWriter != nil {
+			fmt.Fprintf(logWriter, "✅ [Deployer] Worker mode detected. Skipping HTTP health check.\n")
+		}
+		return nil
+	}
 	healthy := d.waitForHealthyContainer(ctx, containerName, app.HealthCheckPath, app.InternalPort)
 	if !healthy {
 		_ = d.containerManager.StopAndRemove(ctx, containerName)
@@ -331,5 +338,5 @@ func (d *Deployer) DeployImage(ctx context.Context, app *models.AppService, logW
 	containerName := fmt.Sprintf("vessl-app-%s", utils.NormalizeContainerName(app.ID))
 	domain := app.Domain
 
-	return d.containerManager.CreateAndStart(ctx, containerName, app.ImageRef, app.ID, domain, port, nil, defaultMemoryMB(), defaultCPURequest(), app.HealthCheckPath)
+	return d.containerManager.CreateAndStart(ctx, containerName, app.ImageRef, app.ID, domain, port, app.RuntimeMode, nil, defaultMemoryMB(), defaultCPURequest(), app.HealthCheckPath)
 }

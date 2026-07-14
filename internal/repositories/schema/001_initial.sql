@@ -175,6 +175,7 @@ CREATE TABLE IF NOT EXISTS app_services (
 			private_networking_internal TEXT DEFAULT '',
 			enable_outbound_ipv6 BOOLEAN DEFAULT 0,
 			image_ref TEXT NOT NULL DEFAULT '',
+			runtime_mode TEXT DEFAULT 'web',
 			UNIQUE(environment_id, name)
 		);
 

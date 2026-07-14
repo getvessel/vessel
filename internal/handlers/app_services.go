@@ -53,6 +53,9 @@ func (h *AppHandler) Create(c echo.Context) error {
 	if req.InternalPort == 0 {
 		req.InternalPort = 3000
 	}
+	if req.RuntimeMode == "" {
+		req.RuntimeMode = models.RuntimeModeWeb
+	}
 	created, err := h.appService.CreateAppService(c.Request().Context(), &req)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
@@ -155,6 +158,7 @@ func (h *AppHandler) Update(c echo.Context) error {
 	existing.DockerfilePath = req.DockerfilePath
 	existing.BuildEngine = req.BuildEngine
 	existing.InternalPort = req.InternalPort
+	existing.RuntimeMode = req.RuntimeMode
 	existing.Domain = req.Domain
 	existing.HealthCheckPath = req.HealthCheckPath
 	existing.ContainerID = req.ContainerID

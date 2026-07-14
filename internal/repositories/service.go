@@ -50,10 +50,10 @@ func (r *AppServiceSQLiteRepository) Create(_ context.Context, svc *models.AppSe
 		svc.InternalPort = 3000
 	}
 	_, err := r.db.Exec(
-		`INSERT INTO app_services (id, project_id, environment_id, name, repository_url, image_ref, branch, root_directory, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		`INSERT INTO app_services (id, project_id, environment_id, name, repository_url, image_ref, branch, root_directory, runtime_mode, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		svc.ID, svc.ProjectID, svc.EnvironmentID, svc.Name, svc.RepositoryURL, svc.ImageRef, svc.Branch,
-		svc.RootDirectory, svc.BuildCommand, svc.StartCommand, svc.DockerfilePath, svc.BuildEngine,
+		svc.RootDirectory, svc.RuntimeMode, svc.BuildCommand, svc.StartCommand, svc.DockerfilePath, svc.BuildEngine,
 		svc.InternalPort, svc.Domain, svc.HealthCheckPath, svc.ContainerID, svc.Status, svc.CreatedAt, svc.UpdatedAt,
 	)
 	if err != nil {
@@ -67,7 +67,7 @@ func (r *AppServiceSQLiteRepository) GetByID(ctx context.Context, id string) (*m
 	defer r.mu.RUnlock()
 	var svc models.AppService
 	err := r.db.GetContext(ctx, &svc,
-		`SELECT id, project_id, environment_id, name, repository_url, COALESCE(image_ref,'') AS image_ref, branch, root_directory, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at
+		`SELECT id, project_id, environment_id, name, repository_url, COALESCE(image_ref,'') AS image_ref, branch, root_directory, runtime_mode, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at
 		FROM app_services WHERE id = ?`, id,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -84,7 +84,7 @@ func (r *AppServiceSQLiteRepository) ListByEnvironment(ctx context.Context, envi
 	defer r.mu.RUnlock()
 	var list []*models.AppService
 	err := r.db.SelectContext(ctx, &list,
-		`SELECT id, project_id, environment_id, name, repository_url, COALESCE(image_ref,'') AS image_ref, branch, root_directory, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at
+		`SELECT id, project_id, environment_id, name, repository_url, COALESCE(image_ref,'') AS image_ref, branch, root_directory, runtime_mode, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at
 		FROM app_services WHERE environment_id = ? ORDER BY created_at ASC`, environmentID,
 	)
 	if err != nil {
@@ -101,7 +101,7 @@ func (r *AppServiceSQLiteRepository) ListByProject(ctx context.Context, projectI
 	defer r.mu.RUnlock()
 	var list []*models.AppService
 	err := r.db.SelectContext(ctx, &list,
-		`SELECT id, project_id, environment_id, name, repository_url, COALESCE(image_ref,'') AS image_ref, branch, root_directory, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at
+		`SELECT id, project_id, environment_id, name, repository_url, COALESCE(image_ref,'') AS image_ref, branch, root_directory, runtime_mode, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at
 		FROM app_services WHERE project_id = ? ORDER BY created_at ASC`, projectID,
 	)
 	if err != nil {
@@ -118,7 +118,7 @@ func (r *AppServiceSQLiteRepository) ListAll(ctx context.Context) ([]*models.App
 	defer r.mu.RUnlock()
 	var list []*models.AppService
 	err := r.db.SelectContext(ctx, &list,
-		`SELECT id, project_id, environment_id, name, repository_url, COALESCE(image_ref,'') AS image_ref, branch, root_directory, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at
+		`SELECT id, project_id, environment_id, name, repository_url, COALESCE(image_ref,'') AS image_ref, branch, root_directory, runtime_mode, build_command, start_command, dockerfile_path, build_engine, internal_port, domain, health_check_path, container_id, status, created_at, updated_at
 		FROM app_services ORDER BY created_at ASC`,
 	)
 	if err != nil {
@@ -136,9 +136,9 @@ func (r *AppServiceSQLiteRepository) Update(_ context.Context, svc *models.AppSe
 	svc.UpdatedAt = time.Now().UTC()
 	_, err := r.db.Exec(
 		`UPDATE app_services SET
-			name = ?, repository_url = ?, image_ref = ?, branch = ?, root_directory = ?, build_command = ?, start_command = ?, dockerfile_path = ?, build_engine = ?, internal_port = ?, domain = ?, health_check_path = ?, container_id = ?, status = ?, updated_at = ?
+			name = ?, repository_url = ?, image_ref = ?, branch = ?, root_directory = ?, runtime_mode = ?, build_command = ?, start_command = ?, dockerfile_path = ?, build_engine = ?, internal_port = ?, domain = ?, health_check_path = ?, container_id = ?, status = ?, updated_at = ?
 		WHERE id = ?`,
-		svc.Name, svc.RepositoryURL, svc.ImageRef, svc.Branch, svc.RootDirectory, svc.BuildCommand, svc.StartCommand, svc.DockerfilePath, svc.BuildEngine, svc.InternalPort, svc.Domain, svc.HealthCheckPath,
+		svc.Name, svc.RepositoryURL, svc.ImageRef, svc.Branch, svc.RootDirectory, svc.RuntimeMode, svc.BuildCommand, svc.StartCommand, svc.DockerfilePath, svc.BuildEngine, svc.InternalPort, svc.Domain, svc.HealthCheckPath,
 		svc.ContainerID, svc.Status, svc.UpdatedAt, svc.ID,
 	)
 	if err != nil {

@@ -11,6 +11,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 
+	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/utils"
 )
 
@@ -23,13 +24,13 @@ func NewContainerManager(dockerClient *client.Client, st ContainerManagerStore) 
 	return &ContainerManager{dockerClient: dockerClient, store: st}
 }
 
-func (c *ContainerManager) CreateAndStart(ctx context.Context, name, imageTag, serviceID, domain string, internalPort int, envs []string, memoryLimitMB int, cpuRequest float64, healthCheckPath string) (string, error) {
+func (c *ContainerManager) CreateAndStart(ctx context.Context, name, imageTag, serviceID, domain string, internalPort int, runtimeMode models.RuntimeMode, envs []string, memoryLimitMB int, cpuRequest float64, healthCheckPath string) (string, error) {
 	containerPort, err := nat.NewPort("tcp", fmt.Sprintf("%d", internalPort))
 	if err != nil {
 		return "", fmt.Errorf("invalid port definition: %w", err)
 	}
 	labels := map[string]string{}
-	if serviceID != "" && domain != "" {
+	if serviceID != "" && domain != "" && runtimeMode != models.RuntimeModeWorker {
 		labels = map[string]string{
 			"traefik.enable": "true",
 			fmt.Sprintf("traefik.http.routers.%s.rule", serviceID):                      fmt.Sprintf("Host(`%s`)", domain),
@@ -43,10 +44,12 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, name, imageTag, s
 	}
 
 	config := &container.Config{
-		Image:        imageTag,
-		Env:          envs,
-		ExposedPorts: nat.PortSet{containerPort: struct{}{}},
-		Labels:       labels,
+		Image: imageTag,
+		Env:   envs,
+	}
+	if runtimeMode != models.RuntimeModeWorker {
+		config.ExposedPorts = nat.PortSet{containerPort: struct{}{}}
+		config.Labels = labels
 	}
 	hostConfig := &container.HostConfig{
 		RestartPolicy: container.RestartPolicy{Name: "always"},
