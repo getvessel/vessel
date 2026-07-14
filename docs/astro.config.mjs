@@ -8,6 +8,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Vessl Docs',
+      favicon: '/favicon.svg',
       customCss: ['./src/styles/theme.css'],
       sidebar: [
         {
@@ -37,11 +38,26 @@ export default defineConfig({
             { label: 'Templates & Examples', slug: 'deployments/templates' },
             { label: 'CI/CD & Git', slug: 'deployments/ci-cd' },
             { label: 'Source Services', slug: 'deployments/source-services' },
-            { label: 'Docker Image Services', slug: 'deployments/docker-image-services' },
-            { label: 'Serverless Functions', slug: 'deployments/serverless-functions' },
-            { label: 'Static Sites & Workers', slug: 'deployments/static-sites-and-workers' },
-            { label: 'Environment Variables', slug: 'deployments/environment-variables' },
-            { label: 'Deployment Lifecycle', slug: 'deployments/deployment-lifecycle' },
+            {
+              label: 'Docker Image Services',
+              slug: 'deployments/docker-image-services',
+            },
+            {
+              label: 'Serverless Functions',
+              slug: 'deployments/serverless-functions',
+            },
+            {
+              label: 'Static Sites & Workers',
+              slug: 'deployments/static-sites-and-workers',
+            },
+            {
+              label: 'Environment Variables',
+              slug: 'deployments/environment-variables',
+            },
+            {
+              label: 'Deployment Lifecycle',
+              slug: 'deployments/deployment-lifecycle',
+            },
           ],
         },
         {
@@ -51,16 +67,31 @@ export default defineConfig({
             { label: 'SQL Studio', slug: 'databases/sql-studio' },
             { label: 'Data Browser', slug: 'databases/data-browser' },
             { label: 'Data Imports', slug: 'databases/data-imports' },
-            { label: 'Public Access & TLS', slug: 'databases/public-access-and-tls' },
+            {
+              label: 'Public Access & TLS',
+              slug: 'databases/public-access-and-tls',
+            },
           ],
         },
         {
           label: 'Storage & Backups',
           items: [
-            { label: 'Storage (MinIO)', slug: 'storage-and-backups/minio-storage' },
-            { label: 'R2 Storage Integration', slug: 'storage-and-backups/r2-storage' },
-            { label: 'Database Backups', slug: 'storage-and-backups/database-backups' },
-            { label: 'Restore & Download', slug: 'storage-and-backups/restore-and-download' },
+            {
+              label: 'Storage (MinIO)',
+              slug: 'storage-and-backups/minio-storage',
+            },
+            {
+              label: 'R2 Storage Integration',
+              slug: 'storage-and-backups/r2-storage',
+            },
+            {
+              label: 'Database Backups',
+              slug: 'storage-and-backups/database-backups',
+            },
+            {
+              label: 'Restore & Download',
+              slug: 'storage-and-backups/restore-and-download',
+            },
           ],
         },
         {
@@ -78,9 +109,15 @@ export default defineConfig({
             { label: 'Integrations', slug: 'integrations' },
             { label: 'Domains', slug: 'operations/domains' },
             { label: 'DNS Providers', slug: 'operations/dns-providers' },
-            { label: 'System Maintenance', slug: 'operations/system-maintenance' },
+            {
+              label: 'System Maintenance',
+              slug: 'operations/system-maintenance',
+            },
             { label: 'System Updates', slug: 'operations/system-updates' },
-            { label: 'Backups & Updates', slug: 'operations/backups-and-updates' },
+            {
+              label: 'Backups & Updates',
+              slug: 'operations/backups-and-updates',
+            },
             { label: 'Troubleshooting', slug: 'operations/troubleshooting' },
           ],
         },
@@ -96,7 +133,10 @@ export default defineConfig({
             { label: 'API Services', slug: 'reference/api-services' },
             { label: 'API Deployments', slug: 'reference/api-deployments' },
             { label: 'API Databases', slug: 'reference/api-databases' },
-            { label: 'API Env & Domains', slug: 'reference/api-environment-and-domains' },
+            {
+              label: 'API Env & Domains',
+              slug: 'reference/api-environment-and-domains',
+            },
             { label: 'No Lock-In', slug: 'adopt' },
           ],
         },
@@ -105,6 +145,7 @@ export default defineConfig({
         SiteTitle: './src/components/docs-site-title.astro',
         ThemeSelect: './src/components/docs-theme-select.astro',
       },
+      social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/vesslhq/vessl' }],
     }),
   ],
 });

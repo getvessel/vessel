@@ -11,47 +11,27 @@ Vessl turns any bare-metal VPS into your own private Vercel & Railway in under 6
 
 <Tabs>
   <TabItem label="curl" icon="seti:shell">
-  ```sh
-  curl -fsSL https://get.vessl.dev | sh
-  ```
+```sh
+curl -fsSL https://get.vessl.dev | sh
+```
   </TabItem>
   <TabItem label="wget" icon="seti:shell">
-  ```sh
-  wget -qO- https://get.vessl.dev | sh
-  ```
+```sh
+wget -qO- https://get.vessl.dev | sh
+```
   </TabItem>
 </Tabs>
 
 This installs the `vessld` daemon, pulls the required Docker images, and starts the dashboard at `http://<your-ip>:8080`.
 
 <Aside type="tip" title="Prerequisites">
+
 - A Linux VPS (Ubuntu 22.04+, Debian 12+, or any modern distro with kernel 5.x+)
-- Docker Engine 24+ installed and running
+- Docker Engine 24+ (installed automatically if missing)
 - A domain pointing to your server (recommended for automatic SSL)
 - Ports 80 and 443 open (for Traefik reverse proxy)
+
 </Aside>
-
-### Docker Install
-
-If you don't have Docker yet:
-
-<Steps>
-
-1. Run the official Docker installer script:
-
-   ```sh
-   curl -fsSL https://get.docker.com | sh
-   ```
-
-2. Add your user to the `docker` group:
-
-   ```sh
-   sudo usermod -aG docker $USER
-   ```
-
-3. Log out and back in for the group change to take effect.
-
-</Steps>
 
 ## Post-Install
 
@@ -118,4 +98,3 @@ Without a domain, Vessl assigns a magic DNS subdomain (like `sslip.io` or `traef
 4. Traefik provisions Let's Encrypt SSL certificates automatically.
 
 </Steps>
-
