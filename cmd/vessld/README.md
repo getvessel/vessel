@@ -35,6 +35,9 @@ Deploy applications directly from the server terminal without using the dashboar
 # From a Git repository
 vessld deploy https://github.com/your/repo.git
 
+# From a template (e.g. go-fiber, nextjs)
+vessld deploy --template go-fiber
+
 # From a Docker image
 vessld deploy --image nginx:latest --port 80
 

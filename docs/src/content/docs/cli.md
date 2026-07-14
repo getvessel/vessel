@@ -84,6 +84,9 @@ Deploy an application directly from the server terminal.
 # From a Git repository
 vessld deploy https://github.com/your/repo.git
 
+# From a template (e.g. go-fiber, nextjs)
+vessld deploy --template nextjs
+
 # From a Docker image
 vessld deploy --image nginx:latest --port 80
 
@@ -155,6 +158,12 @@ vessld domain:remove <id>                  # Remove a custom domain
 The `vessl` binary runs on your **local machine** and communicates with your self-hosted `vessld` server over HTTP. This is what you install and use day-to-day from your laptop.
 
 ### Installation
+
+```sh
+curl -fsSL https://get.vessl.dev/cli | sh
+```
+
+Or if you have Go installed:
 
 ```sh
 go install vessl.dev/vessl/cmd/vessl@latest

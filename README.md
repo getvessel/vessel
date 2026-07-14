@@ -33,16 +33,18 @@ Vessl is built to be simple but powerful, giving you everything you need to run 
 
 Vessl ships two CLI tools. See their individual READMEs for full command references.
 
-| Tool | Purpose | Docs |
-|---|---|---|
-| [`vessld`](./cmd/vessld/) | Server daemon — runs on your VPS, manages Docker & SQLite directly | [README](./cmd/vessld/README.md) |
-| [`vessl`](./cmd/vessl/) | Remote client — runs on your laptop, connects to `vessld` over HTTP | [README](./cmd/vessl/README.md) |
+| Tool                      | Purpose                                                             | Docs                             |
+| ------------------------- | ------------------------------------------------------------------- | -------------------------------- |
+| [`vessld`](./cmd/vessld/) | Server daemon — runs on your VPS, manages Docker & SQLite directly  | [README](./cmd/vessld/README.md) |
+| [`vessl`](./cmd/vessl/)   | Remote client — runs on your laptop, connects to `vessld` over HTTP | [README](./cmd/vessl/README.md)  |
 
 **Quick example:**
 
 ```sh
 # On your server
 vessld serve
+vessld deploy --template nextjs
+vessld deploy https://github.com/user/repo.git
 
 # On your local machine
 vessl login
