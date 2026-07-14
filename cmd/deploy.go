@@ -168,7 +168,12 @@ func runDeploy(args []string) {
 
 	if wildcard != "" {
 		cleanName := sanitizeDomainName(appName)
-		fmt.Printf("   URL: http://%s.%s\n", cleanName, strings.TrimPrefix(wildcard, "*."))
+		base := strings.TrimPrefix(wildcard, "*.")
+		if strings.HasPrefix(base, "http") {
+			base = strings.TrimPrefix(base, "https://")
+			base = strings.TrimPrefix(base, "http://")
+		}
+		fmt.Printf("   URL: https://%s.%s\n", cleanName, base)
 	} else {
 		hostIP := os.Getenv("VESSL_HOST_IP")
 		if hostIP == "" {

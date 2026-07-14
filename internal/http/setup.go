@@ -81,6 +81,15 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	storageDeployer := engine.NewStorageDeployer(dockerClient, httpEngineAdapter)
 
 	cronManager := engine.NewCronManager(dockerClient, httpEngineAdapter)
+
+	settings, _ := settingsSQLiteRepository.GetServerSettings(context.Background())
+	if settings != nil && settings.DockerCleanupCron != "" {
+		_ = cronManager.ScheduleDockerCleanup(settings.DockerCleanupCron)
+	}
+	if settings != nil && settings.DiskUsageCron != "" {
+		_ = cronManager.ScheduleDiskUsageCheck(settings.DiskUsageCron, settings.DiskUsageThreshold)
+	}
+
 	_ = cronManager.Start()
 
 	backupManager := engine.NewBackupManager(dockerClient, httpEngineAdapter, "")

@@ -16,6 +16,7 @@ services:
       - PORT=8080
       - VESSL_DATA_DIR=/vessl/data
       - VESSL_DASHBOARD_URL=${VESSL_DASHBOARD_URL:-http://localhost:8080}
+      - TZ=${VESSL_TIMEZONE:-UTC}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dashboard.rule=Host(`${VESSL_DOMAIN:-vessl.local}`)"

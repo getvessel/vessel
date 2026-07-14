@@ -15,7 +15,6 @@ import { Route as ProjectRouteImport } from './routes/_project'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as WorkspaceIndexRouteImport } from './routes/_workspace/index'
-import { Route as WorkspaceSubscribeRouteImport } from './routes/_workspace/subscribe'
 import { Route as WorkspaceSettingsRouteImport } from './routes/_workspace/settings'
 import { Route as WorkspaceProjectsRouteImport } from './routes/_workspace/projects'
 import { Route as WorkspaceDatabasesRouteImport } from './routes/_workspace/databases'
@@ -53,11 +52,6 @@ const SplatRoute = SplatRouteImport.update({
 const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => WorkspaceRoute,
-} as any)
-const WorkspaceSubscribeRoute = WorkspaceSubscribeRouteImport.update({
-  id: '/subscribe',
-  path: '/subscribe',
   getParentRoute: () => WorkspaceRoute,
 } as any)
 const WorkspaceSettingsRoute = WorkspaceSettingsRouteImport.update({
@@ -130,7 +124,6 @@ export interface FileRoutesByFullPath {
   '/databases': typeof WorkspaceDatabasesRoute
   '/projects': typeof WorkspaceProjectsRoute
   '/settings': typeof WorkspaceSettingsRoute
-  '/subscribe': typeof WorkspaceSubscribeRoute
   '/$projectId/deployments': typeof ProjectProjectIdDeploymentsRoute
   '/$projectId/settings': typeof ProjectProjectIdSettingsRoute
   '/$projectId/': typeof ProjectProjectIdIndexRoute
@@ -147,7 +140,6 @@ export interface FileRoutesByTo {
   '/databases': typeof WorkspaceDatabasesRoute
   '/projects': typeof WorkspaceProjectsRoute
   '/settings': typeof WorkspaceSettingsRoute
-  '/subscribe': typeof WorkspaceSubscribeRoute
   '/$projectId/deployments': typeof ProjectProjectIdDeploymentsRoute
   '/$projectId/settings': typeof ProjectProjectIdSettingsRoute
   '/$projectId': typeof ProjectProjectIdIndexRoute
@@ -167,7 +159,6 @@ export interface FileRoutesById {
   '/_workspace/databases': typeof WorkspaceDatabasesRoute
   '/_workspace/projects': typeof WorkspaceProjectsRoute
   '/_workspace/settings': typeof WorkspaceSettingsRoute
-  '/_workspace/subscribe': typeof WorkspaceSubscribeRoute
   '/_workspace/': typeof WorkspaceIndexRoute
   '/_project/$projectId/deployments': typeof ProjectProjectIdDeploymentsRoute
   '/_project/$projectId/settings': typeof ProjectProjectIdSettingsRoute
@@ -187,7 +178,6 @@ export interface FileRouteTypes {
     | '/databases'
     | '/projects'
     | '/settings'
-    | '/subscribe'
     | '/$projectId/deployments'
     | '/$projectId/settings'
     | '/$projectId/'
@@ -204,7 +194,6 @@ export interface FileRouteTypes {
     | '/databases'
     | '/projects'
     | '/settings'
-    | '/subscribe'
     | '/$projectId/deployments'
     | '/$projectId/settings'
     | '/$projectId'
@@ -223,7 +212,6 @@ export interface FileRouteTypes {
     | '/_workspace/databases'
     | '/_workspace/projects'
     | '/_workspace/settings'
-    | '/_workspace/subscribe'
     | '/_workspace/'
     | '/_project/$projectId/deployments'
     | '/_project/$projectId/settings'
@@ -281,13 +269,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof WorkspaceIndexRouteImport
-      parentRoute: typeof WorkspaceRoute
-    }
-    '/_workspace/subscribe': {
-      id: '/_workspace/subscribe'
-      path: '/subscribe'
-      fullPath: '/subscribe'
-      preLoaderRoute: typeof WorkspaceSubscribeRouteImport
       parentRoute: typeof WorkspaceRoute
     }
     '/_workspace/settings': {
@@ -408,7 +389,6 @@ interface WorkspaceRouteChildren {
   WorkspaceDatabasesRoute: typeof WorkspaceDatabasesRoute
   WorkspaceProjectsRoute: typeof WorkspaceProjectsRoute
   WorkspaceSettingsRoute: typeof WorkspaceSettingsRoute
-  WorkspaceSubscribeRoute: typeof WorkspaceSubscribeRoute
   WorkspaceIndexRoute: typeof WorkspaceIndexRoute
 }
 
@@ -416,7 +396,6 @@ const WorkspaceRouteChildren: WorkspaceRouteChildren = {
   WorkspaceDatabasesRoute: WorkspaceDatabasesRoute,
   WorkspaceProjectsRoute: WorkspaceProjectsRoute,
   WorkspaceSettingsRoute: WorkspaceSettingsRoute,
-  WorkspaceSubscribeRoute: WorkspaceSubscribeRoute,
   WorkspaceIndexRoute: WorkspaceIndexRoute,
 }
 

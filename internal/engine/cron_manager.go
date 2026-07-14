@@ -7,11 +7,14 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	dockertypes "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/robfig/cron/v3"
@@ -152,4 +155,99 @@ func (cm *CronManager) ExecuteJob(ctx context.Context, jobID string) (string, er
 	now := time.Now()
 	_ = cm.store.UpdateJobStatusAndOutput(jobID, "active", &now, output)
 	return output, nil
+}
+
+func (cm *CronManager) ScheduleDockerCleanup(schedule string) error {
+	cm.mu.Lock()
+	defer cm.mu.Unlock()
+
+	cleanSchedule := strings.TrimSpace(schedule)
+	if len(strings.Fields(cleanSchedule)) == 5 && !strings.HasPrefix(cleanSchedule, "@") {
+		cleanSchedule = "0 " + cleanSchedule
+	}
+
+	if entryID, exists := cm.entries["docker-cleanup"]; exists {
+		cm.cronEngine.Remove(entryID)
+		delete(cm.entries, "docker-cleanup")
+	}
+
+	entryID, err := cm.cronEngine.AddFunc(cleanSchedule, func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		defer cancel()
+		cm.DockerCleanup(ctx)
+	})
+	if err != nil {
+		return fmt.Errorf("invalid docker cleanup schedule '%s': %w", schedule, err)
+	}
+	cm.entries["docker-cleanup"] = entryID
+	log.Printf("🐳 Docker cleanup scheduled: %s", schedule)
+	return nil
+}
+
+func (cm *CronManager) DockerCleanup(ctx context.Context) {
+	if cm.dockerClient == nil {
+		log.Println("⚠️ Docker cleanup skipped: no Docker client")
+		return
+	}
+	log.Println("🐳 Running Docker cleanup...")
+
+	reclaimed := uint64(0)
+
+	report, err := cm.dockerClient.ContainersPrune(ctx, filters.NewArgs(filters.Arg("until", "24h")))
+	if err == nil {
+		reclaimed += report.SpaceReclaimed
+	}
+
+	imgReport, err := cm.dockerClient.ImagesPrune(ctx, filters.NewArgs(filters.Arg("dangling", "true")))
+	if err == nil {
+		reclaimed += imgReport.SpaceReclaimed
+	}
+
+	volReport, err := cm.dockerClient.VolumesPrune(ctx, filters.NewArgs(filters.Arg("until", "24h")))
+	if err == nil {
+		reclaimed += volReport.SpaceReclaimed
+	}
+
+	if reclaimed > 0 {
+		log.Printf("🐳 Docker cleanup reclaimed %d bytes", reclaimed)
+	} else {
+		log.Println("🐳 Docker cleanup: nothing to clean")
+	}
+}
+
+func (cm *CronManager) ScheduleDiskUsageCheck(schedule string, threshold int) error {
+	cm.mu.Lock()
+	defer cm.mu.Unlock()
+
+	cleanSchedule := strings.TrimSpace(schedule)
+	if len(strings.Fields(cleanSchedule)) == 5 && !strings.HasPrefix(cleanSchedule, "@") {
+		cleanSchedule = "0 " + cleanSchedule
+	}
+
+	if entryID, exists := cm.entries["disk-usage"]; exists {
+		cm.cronEngine.Remove(entryID)
+		delete(cm.entries, "disk-usage")
+	}
+
+	entryID, err := cm.cronEngine.AddFunc(cleanSchedule, func() {
+		usageCmd := exec.Command("df", "--output=pcent", "/")
+		out, err := usageCmd.Output()
+		if err != nil {
+			return
+		}
+		pctStr := strings.TrimSpace(string(out))
+		pctStr = strings.TrimSuffix(strings.TrimSpace(strings.Split(pctStr, "\n")[1]), "%")
+		usage, err := strconv.Atoi(pctStr)
+		if err != nil {
+			return
+		}
+		if usage > threshold {
+			log.Printf("⚠️ Disk usage at %d%% (threshold: %d%%)", usage, threshold)
+		}
+	})
+	if err != nil {
+		return fmt.Errorf("invalid disk usage check schedule '%s': %w", schedule, err)
+	}
+	cm.entries["disk-usage"] = entryID
+	return nil
 }

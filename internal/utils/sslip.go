@@ -12,7 +12,11 @@ func GenerateSslipDomain(projectNameOrID string, hostIP string, wildcardDomain s
 	}
 	if wildcardDomain != "" {
 		cleanName := sanitizeDomainName(projectNameOrID)
-		return fmt.Sprintf("http://%s.%s", cleanName, strings.TrimPrefix(wildcardDomain, "*."))
+		base := strings.TrimPrefix(wildcardDomain, "*.")
+		if !strings.HasPrefix(base, "http") {
+			return fmt.Sprintf("https://%s.%s", cleanName, base)
+		}
+		return fmt.Sprintf("%s://%s.%s", parseScheme(base), cleanName, parseHost(base))
 	}
 
 	if hostIP == "" {
@@ -24,6 +28,19 @@ func GenerateSslipDomain(projectNameOrID string, hostIP string, wildcardDomain s
 	cleanIP := strings.ReplaceAll(strings.TrimSpace(hostIP), ".", "-")
 	cleanName := sanitizeDomainName(projectNameOrID)
 	return fmt.Sprintf("http://%s.%s.sslip.io", cleanName, cleanIP)
+}
+
+func parseScheme(url string) string {
+	if strings.HasPrefix(url, "https://") {
+		return "https"
+	}
+	return "http"
+}
+
+func parseHost(url string) string {
+	url = strings.TrimPrefix(url, "https://")
+	url = strings.TrimPrefix(url, "http://")
+	return url
 }
 
 func sanitizeDomainName(name string) string {

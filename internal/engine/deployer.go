@@ -274,7 +274,13 @@ func (d *Deployer) Remove(ctx context.Context, containerID string) error {
 }
 
 func (d *Deployer) waitForHealthyContainer(ctx context.Context, containerName string, healthCheckPath string, internalPort int) bool {
-	for i := 0; i < 30; i++ {
+	maxRetries := 30
+	if t := os.Getenv("VESSL_DEPLOYMENT_TIMEOUT"); t != "" {
+		if v, err := strconv.Atoi(t); err == nil && v > 0 {
+			maxRetries = v / 2
+		}
+	}
+	for i := 0; i < maxRetries; i++ {
 		time.Sleep(2 * time.Second)
 		inspect, err := d.containerManager.Inspect(ctx, containerName)
 		if err == nil {
