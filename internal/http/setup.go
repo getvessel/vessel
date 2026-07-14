@@ -23,7 +23,7 @@ import (
 	"vessl.dev/vessl/internal/utils"
 )
 
-func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikManager *engine.TraefikManager, dockerClient *client.Client) (*Server, error) {
+func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikManager *engine.TraefikManager, dockerClient *client.Client, dataDir string) (*Server, error) {
 
 	e := echo.New()
 	e.Use(echomiddleware.RequestLoggerWithConfig(echomiddleware.RequestLoggerConfig{
@@ -172,6 +172,8 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	serverlessHandler := handlers.NewServerlessHandler(serverlessService)
 	systemService := services.NewSystemService()
 	systemHandler := handlers.NewSystemHandler(systemService)
+	migrationService := services.NewMigrationService(databaseSQLiteRepository, dataDir)
+	migrationHandler := handlers.NewMigrationHandler(migrationService)
 
 	authLimiter := middleware.NewRateLimiter(10, time.Minute)
 
@@ -216,6 +218,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		composeHandler:         composeHandler,
 		oneClickHandler:        oneClickHandler,
 		archiveHandler:         archiveHandler,
+		migrationHandler:       migrationHandler,
 	}
 
 	if srv.deployer != nil {

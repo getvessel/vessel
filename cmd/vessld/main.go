@@ -96,7 +96,7 @@ func initDataDir() (string, *sql.DB, *utils.Vault) {
 
 func startServer() {
 	slog.Info("booting daemon", "version", vesslVersion, "os", runtime.GOOS, "arch", runtime.GOARCH)
-	_, db, vlt := initDataDir()
+	dataDir, db, vlt := initDataDir()
 	defer db.Close()
 
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
@@ -119,7 +119,7 @@ func startServer() {
 	addr := host + ":" + port
 
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
-	apiServer, err := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
+	apiServer, err := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient, dataDir)
 	if err != nil {
 		slog.Error("failed to initialize server", "err", err)
 		os.Exit(1)
@@ -159,7 +159,7 @@ func runMCP() {
 	dockerClient, _ := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
 	traefikMgr := engine.NewTraefikManager(dockerClient, os.Getenv("VESSL_TLS_EMAIL"))
-	apiServer, err := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
+	apiServer, err := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient, "")
 	if err != nil {
 		slog.Error("failed to initialize server", "err", err)
 		os.Exit(1)
