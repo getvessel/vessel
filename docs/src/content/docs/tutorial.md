@@ -10,7 +10,7 @@ This tutorial walks you through deploying a real application on Vessl. You'll de
 ## Prerequisites
 
 - A running Vessl instance ([install guide](/getting-started/))
-- An admin account (create via dashboard or `vesslctl setup`)
+- An admin account (create via dashboard or `vessld setup`)
 
 ## Step 1: Create a Project
 
@@ -107,7 +107,7 @@ To remove everything:
 
 ```sh
 # Via CLI
-vesslctl backup   # Backup your database first
+vessld backup   # Backup your database first
 
 # In dashboard: Delete the project
 ```

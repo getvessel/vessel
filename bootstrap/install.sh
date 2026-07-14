@@ -7,7 +7,7 @@ RELEASE=${VESSL_VERSION:-latest}
 VESSL_DIR=/vessl
 REPO_URL="https://raw.githubusercontent.com/vesslhq/vessl/main"
 COMPOSE_URL="$REPO_URL/docker-compose.yml"
-CTL_URL="$REPO_URL/bootstrap/vesslctl"
+CTL_URL="$REPO_URL/bootstrap/vessld"
 BOLD="\033[1m"
 DIM="\033[2m"
 GREEN="\033[0;32m"
@@ -84,11 +84,11 @@ mkdir -p "$VESSL_DIR"/data/{backups,traefik,builds,storage}
 # --- Pull files ---
 echo -e "${BOLD}⬇️  Fetching configuration files...${NC}"
 curl -fsSL "$COMPOSE_URL" -o "$VESSL_DIR/docker-compose.yml"
-curl -fsSL "$CTL_URL" -o "$VESSL_DIR/vesslctl"
-chmod +x "$VESSL_DIR/vesslctl"
+curl -fsSL "$CTL_URL" -o "$VESSL_DIR/vessld"
+chmod +x "$VESSL_DIR/vessld"
 
-# Install vesslctl to PATH (shell wrapper that proxies commands into the container)
-ln -sf "$VESSL_DIR/vesslctl" /usr/local/bin/vesslctl
+# Install vessld to PATH (shell wrapper that proxies commands into the container)
+ln -sf "$VESSL_DIR/vessld" /usr/local/bin/vessld
 
 # --- .env generation ---
 if [ ! -f "$VESSL_DIR/.env" ]; then
@@ -188,7 +188,7 @@ for i in $(seq 1 30); do
     break
   fi
   if [ "$i" -eq 30 ]; then
-    echo -e "${YELLOW}⚠️  Vessl is starting but not yet responding. Run 'vesslctl logs -f' to check.${NC}"
+    echo -e "${YELLOW}⚠️  Vessl is starting but not yet responding. Run 'vessld logs -f' to check.${NC}"
   fi
   sleep 2
 done
@@ -223,7 +223,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo -e "  ${BOLD}📍 Dashboard:${NC}  http://${SERVER_IP}:8080"
 echo -e "  ${BOLD}📖 Docs:${NC}       https://docs.vessl.dev"
-echo -e "  ${BOLD}🛠️  Server CLI:${NC}  vesslctl --help (runs commands inside the container)"
+echo -e "  ${BOLD}🛠️  Server CLI:${NC}  vessld --help (runs commands inside the container)"
 echo -e "  ${DIM}Install the remote CLI on your laptop: curl -fsSL https://get.vessl.dev/cli | sh${NC}"
 echo ""
 
@@ -247,10 +247,10 @@ echo -e "  ${DIM}📊 System:     ${TOTAL_RAM_MB}MB RAM, $(nproc) CPU cores${NC}
 echo ""
 echo -e "  ${BOLD}Next steps:${NC}"
 echo -e "  1. Open the dashboard and create your admin account."
-echo -e "  2. Or run: ${BOLD}vesslctl setup${NC} to create an admin from the terminal."
+echo -e "  2. Or run: ${BOLD}vessld setup${NC} to create an admin from the terminal."
 echo ""
-echo -e "  ${DIM}Run 'vesslctl status' to check daemon health.${NC}"
-echo -e "  ${DIM}Run 'vesslctl logs -f' to follow daemon logs.${NC}"
+echo -e "  ${DIM}Run 'vessld status' to check daemon health.${NC}"
+echo -e "  ${DIM}Run 'vessld logs -f' to follow daemon logs.${NC}"
 echo ""
 
 # --- Offer to run setup ---
@@ -258,7 +258,7 @@ echo -e "📋 Would you like to create an admin account now? (y/N)"
 read -r -p "   " RUN_SETUP </dev/tty
 if [ "$RUN_SETUP" = "y" ] || [ "$RUN_SETUP" = "Y" ]; then
   echo ""
-  vesslctl setup
+  vessld setup
   echo ""
   echo -e "${GREEN}✅ Admin account created. You can now log in at http://${SERVER_IP}:8080${NC}"
   echo ""

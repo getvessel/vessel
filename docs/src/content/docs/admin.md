@@ -9,36 +9,36 @@ Vessl administration covers instance-wide configuration available to instance ad
 
 Vessl provides three CLI tools for different environments and use cases:
 
-### Server CLI (`vesslctl`)
+### Server CLI (`vessld`)
 
-After installation, `vesslctl` is available at `/usr/local/bin/vesslctl`. This is a shell wrapper that manages the Vessl daemon by executing commands **inside the Docker container**. Use it for day-to-day server administration:
+After installation, `vessld` is available at `/usr/local/bin/vessld`. This is a shell wrapper that manages the Vessl daemon by executing commands **inside the Docker container**. Use it for day-to-day server administration:
 
 ```sh
-vesslctl status           # Show daemon health + running containers
-vesslctl setup            # Interactive admin account wizard
-vesslctl reset-password   # Reset admin password
-vesslctl config           # View current configuration
-vesslctl config <key>=<value>  # Update a setting (site-name, registration, telemetry)
-vesslctl logs -f          # Tail daemon logs
-vesslctl update           # Upgrade to the latest version
-vesslctl downgrade <ver>  # Downgrade to a specific version (with backup + confirmation)
-vesslctl backup           # Create a manual database backup
-vesslctl restart          # Restart the Vessl daemon
+vessld status           # Show daemon health + running containers
+vessld setup            # Interactive admin account wizard
+vessld reset-password   # Reset admin password
+vessld config           # View current configuration
+vessld config <key>=<value>  # Update a setting (site-name, registration, telemetry)
+vessld logs -f          # Tail daemon logs
+vessld update           # Upgrade to the latest version
+vessld downgrade <ver>  # Downgrade to a specific version (with backup + confirmation)
+vessld backup           # Create a manual database backup
+vessld restart          # Restart the Vessl daemon
 
 # App management
-vesslctl deploy <git-url>           # Deploy an app from a Git URL
-vesslctl deploy --template nextjs   # Deploy a template from vesslhq/vessl-examples
-vesslctl deploy --image nginx:latest --port 80  # Deploy from a Docker image
-vesslctl apps:list                  # List all apps
-vesslctl apps:show <id>             # Show app details
-vesslctl apps:create <name>         # Create an app
-vesslctl apps:destroy <id>         # Delete an app
+vessld deploy <git-url>           # Deploy an app from a Git URL
+vessld deploy --template nextjs   # Deploy a template from vesslhq/vessl-examples
+vessld deploy --image nginx:latest --port 80  # Deploy from a Docker image
+vessld apps:list                  # List all apps
+vessld apps:show <id>             # Show app details
+vessld apps:create <name>         # Create an app
+vessld apps:destroy <id>         # Delete an app
 
 # Database management
-vesslctl db:list                    # List all databases
-vesslctl db:show <id>              # Show database details
-vesslctl db:create <name> <engine> # Create a database (postgres, mysql, redis, etc.)
-vesslctl db:destroy <id>           # Delete a database
+vessld db:list                    # List all databases
+vessld db:show <id>              # Show database details
+vessld db:create <name> <engine> # Create a database (postgres, mysql, redis, etc.)
+vessld db:destroy <id>           # Delete a database
 ```
 
 ### Daemon CLI (`vessld`)
@@ -67,14 +67,14 @@ vessl login    # Connect to your server
 
 For a full list of remote commands, see the [CLI Reference](/cli/).
 
-### Update with `vesslctl update`
+### Update with `vessld update`
 
 1. Shows current and latest available version.
 2. Creates a pre-upgrade database backup automatically.
 3. Pulls the new Docker image and recreates the container.
 4. Your apps and databases experience zero downtime.
 
-### Downgrade with `vesslctl downgrade`
+### Downgrade with `vessld downgrade`
 
 1. Requires you to type `downgrade` to confirm (safety gate).
 2. Creates a pre-downgrade database backup automatically.
@@ -129,7 +129,7 @@ curl -X POST /api/settings/updates/check \
 ### Rollback
 
 ```sh
-sudo vesslctl rollback
+sudo vessld rollback
 ```
 
 Restores the previous binary and a database backup taken before the upgrade.

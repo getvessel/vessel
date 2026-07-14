@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Vessl Control - CLI admin tool for Docker-based installations
-# Usage: vesslctl <command> [args]
+# Usage: vessld <command> [args]
 set -eo pipefail
 
 VESSL_DIR=${VESSL_DIR:-/vessl}

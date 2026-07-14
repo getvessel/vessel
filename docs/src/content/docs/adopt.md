@@ -14,13 +14,13 @@ Vessl is designed so you never lose access to your applications. Every app and d
 ## Uninstall Vessl Without Losing Apps
 
 ```sh
-vesslctl uninstall
+vessld uninstall
 ```
 
 This command:
 1. Stops the Vessl daemon container.
 2. Removes the systemd service.
-3. Removes `vesslctl` from PATH.
+3. Removes `vessld` from PATH.
 4. **Leaves all your app and database containers running.**
 
 After uninstall, your apps continue serving traffic if you set up your own reverse proxy. The Traefik routing will stop, but your containers are still running on the Vessl Docker network with their assigned ports.
@@ -81,7 +81,7 @@ docker run -d \
 Before any major operation:
 
 ```sh
-vesslctl backup
+vessld backup
 ```
 
 This creates a timestamped copy of the Vessl database at `/vessl/data/backups/`.

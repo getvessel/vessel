@@ -60,7 +60,7 @@ After the install script completes, you'll see:
 ```text
 ✅ Vessl vlatest installed successfully!
   📍 Dashboard:    http://203.0.113.42:8080
-  🛠️  Server CLI:  vesslctl --help
+  🛠️  Server CLI:  vessld --help
   💻 Remote CLI:   curl -fsSL https://get.vessl.dev/cli | sh
 ```
 
@@ -75,24 +75,24 @@ You have two ways to create the admin account:
   <TabItem label="Via Terminal" icon="terminal">
   Run the setup wizard directly from your server (no browser needed):
   ```sh
-  vesslctl setup
+  vessld setup
   ```
   </TabItem>
 </Tabs>
 
-### Server CLI (`vesslctl`)
+### Server CLI (`vessld`)
 
-The install script places `vesslctl` at `/usr/local/bin/vesslctl`. This is a shell wrapper that runs commands **inside the Docker container** on your server:
+The install script places `vessld` at `/usr/local/bin/vessld`. This is a shell wrapper that runs commands **inside the Docker container** on your server:
 
 ```sh
-vesslctl status            # Show daemon health and running containers
-vesslctl logs -f           # Tail daemon logs
-vesslctl reset-password    # Reset admin password
-vesslctl config            # View server configuration
-vesslctl config site-name=MyVessl  # Update a setting
-vesslctl backup            # Create a manual database backup
-vesslctl update            # Upgrade to the latest version
-vesslctl downgrade v0.1.0  # Downgrade to a specific version
+vessld status            # Show daemon health and running containers
+vessld logs -f           # Tail daemon logs
+vessld reset-password    # Reset admin password
+vessld config            # View server configuration
+vessld config site-name=MyVessl  # Update a setting
+vessld backup            # Create a manual database backup
+vessld update            # Upgrade to the latest version
+vessld downgrade v0.1.0  # Downgrade to a specific version
 ```
 
 ### Remote CLI (`vessl`)
@@ -153,10 +153,10 @@ Without a domain, Vessl assigns a magic DNS subdomain (like `sslip.io` or `traef
 Deploy a ready-made starter from the [vessl-examples](https://github.com/vesslhq/vessl-examples) repository:
 
 ```sh
-vesslctl deploy --template go-fiber
-vesslctl deploy --template node-express
-vesslctl deploy --template python-fastapi
-vesslctl deploy --template nextjs
+vessld deploy --template go-fiber
+vessld deploy --template node-express
+vessld deploy --template python-fastapi
+vessld deploy --template nextjs
 ```
 
 This clones the template, builds it, and deploys it in one step. Browse all available templates at **[github.com/vesslhq/vessl-examples](https://github.com/vesslhq/vessl-examples)**.
