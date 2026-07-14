@@ -6,7 +6,6 @@ import {
   LogOut,
   Moon,
   MoreVertical,
-  Settings,
   Sun,
   UserCircle,
 } from 'lucide-react';
@@ -56,14 +55,6 @@ export function UserMenu() {
             >
               <UserCircle className="h-4 w-4 text-muted-foreground" />
               Account Settings
-            </Link>
-            <Link
-              to={'/settings' as never}
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] hover:bg-accent transition-colors"
-            >
-              <Settings className="h-4 w-4 text-muted-foreground" />
-              Workspace Settings
             </Link>
             <Link
               to={'/settings' as never}
@@ -137,9 +128,6 @@ export function UserMenu() {
         <div className="min-w-0 text-left flex-1">
           <p className="truncate text-[12px] font-semibold text-sidebar-foreground leading-none">
             {user?.name ?? 'User'}
-          </p>
-          <p className="truncate text-[10px] text-sidebar-foreground/50 mt-0.5 leading-none">
-            Workspace Owner
           </p>
         </div>
         <MoreVertical className="h-4 w-4 text-sidebar-foreground/50 shrink-0" />

@@ -12,18 +12,16 @@ import (
 )
 
 type OAuthService struct {
-	oauthRepo        repositories.OAuthRepository
-	userRepo         repositories.UserRepository
-	tokenService     *TokenService
-	workspaceService *WorkspaceService
+	oauthRepo    repositories.OAuthRepository
+	userRepo     repositories.UserRepository
+	tokenService *TokenService
 }
 
-func NewOAuthService(or repositories.OAuthRepository, ur repositories.UserRepository, ts *TokenService, ws *WorkspaceService) *OAuthService {
+func NewOAuthService(or repositories.OAuthRepository, ur repositories.UserRepository, ts *TokenService) *OAuthService {
 	return &OAuthService{
-		oauthRepo:        or,
-		userRepo:         ur,
-		tokenService:     ts,
-		workspaceService: ws,
+		oauthRepo:    or,
+		userRepo:     ur,
+		tokenService: ts,
 	}
 }
 
@@ -109,11 +107,6 @@ func (s *OAuthService) HandleCallback(ctx context.Context, providerName, code st
 			return "", nil, errors.New("failed to create user account from oauth: " + err.Error())
 		}
 
-		// Create default workspace for the oauth user
-		_, err = s.workspaceService.CreateWorkspace(ctx, "Personal Workspace", u.ID)
-		if err != nil {
-			// Log the error but don't fail oauth sign-in
-		}
 	}
 	token, err := s.tokenService.GenerateToken(u)
 	if err != nil {

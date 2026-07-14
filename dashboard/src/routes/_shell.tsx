@@ -1,19 +1,17 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { Shell } from '#/components/layout/shell';
-import { useListWorkspaces } from '#/hooks/useWorkspaces';
 import { authStore } from '#/stores/authStore';
 
-export const Route = createFileRoute('/_workspace')({
+export const Route = createFileRoute('/_shell')({
   beforeLoad: () => {
     if (!authStore.state.isAuthenticated) {
       throw redirect({ to: '/login' });
     }
   },
-  component: WorkspaceLayout,
+  component: ShellLayout,
 });
 
-function WorkspaceLayout() {
-  useListWorkspaces();
+function ShellLayout() {
   return (
     <Shell>
       <Outlet />

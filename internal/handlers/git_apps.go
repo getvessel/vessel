@@ -8,7 +8,6 @@ import (
 
 	"vessl.dev/vessl/internal/utils"
 
-	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/services"
 )
 
@@ -21,22 +20,17 @@ func NewGitAppsHandler(gs *services.GitAppsService) *GitAppsHandler {
 }
 
 type getFunc[T any] func(ctx context.Context, id string) (*T, error)
-type listFunc[T any] func(ctx context.Context, workspaceID string) ([]T, error)
+type listFunc[T any] func(ctx context.Context) ([]T, error)
 type saveFunc[T any] func(ctx context.Context, app *T) error
 type deleteFunc func(ctx context.Context, id string) error
 
 type GitAppsManifestRequest struct {
-	Code        string `json:"code"`
-	WorkspaceID string `json:"workspaceId"`
+	Code string `json:"code"`
 }
 
 func listAppsHandler[T any](list listFunc[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		workspaceID := c.QueryParam("workspaceId")
-		if workspaceID == "" {
-			workspaceID = "default"
-		}
-		apps, err := list(c.Request().Context(), workspaceID)
+		apps, err := list(c.Request().Context())
 		if err != nil {
 			return utils.Error(c, http.StatusInternalServerError, err.Error())
 		}
@@ -61,13 +55,12 @@ func getAppHandler[T any](get getFunc[T]) echo.HandlerFunc {
 	}
 }
 
-func saveAppHandler[T any](save saveFunc[T], setWorkspaceID func(*T, string)) echo.HandlerFunc {
+func saveAppHandler[T any](save saveFunc[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var app T
 		if err := c.Bind(&app); err != nil {
 			return utils.Error(c, http.StatusBadRequest, "invalid payload")
 		}
-		setWorkspaceID(&app, "default")
 		if err := save(c.Request().Context(), &app); err != nil {
 			return utils.Error(c, http.StatusInternalServerError, err.Error())
 		}
@@ -103,7 +96,7 @@ func (h *GitAppsHandler) ExchangeGithubManifestCode(c echo.Context) error {
 		return utils.Error(c, http.StatusBadRequest, "code is required")
 	}
 
-	app, err := h.gitAppsService.ExchangeGithubManifestCode(c.Request().Context(), payload.Code, payload.WorkspaceID)
+	app, err := h.gitAppsService.ExchangeGithubManifestCode(c.Request().Context(), payload.Code)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
@@ -136,11 +129,7 @@ func (h *GitAppsHandler) GetGithubApp(c echo.Context) error {
 // @Accept json
 // @Produce json
 func (h *GitAppsHandler) SaveGithubApp(c echo.Context) error {
-	return saveAppHandler(h.gitAppsService.SaveGithubApp, func(a *models.GithubApp, t string) {
-		if a.WorkspaceID == "" {
-			a.WorkspaceID = t
-		}
-	})(c)
+	return saveAppHandler(h.gitAppsService.SaveGithubApp)(c)
 }
 
 // @Summary DeleteGithubApp endpoint
@@ -178,11 +167,7 @@ func (h *GitAppsHandler) GetGitlabApp(c echo.Context) error {
 // @Accept json
 // @Produce json
 func (h *GitAppsHandler) SaveGitlabApp(c echo.Context) error {
-	return saveAppHandler(h.gitAppsService.SaveGitlabApp, func(a *models.GitlabApp, t string) {
-		if a.WorkspaceID == "" {
-			a.WorkspaceID = t
-		}
-	})(c)
+	return saveAppHandler(h.gitAppsService.SaveGitlabApp)(c)
 }
 
 // @Summary DeleteGitlabApp endpoint
@@ -220,11 +205,7 @@ func (h *GitAppsHandler) GetBitbucketApp(c echo.Context) error {
 // @Accept json
 // @Produce json
 func (h *GitAppsHandler) SaveBitbucketApp(c echo.Context) error {
-	return saveAppHandler(h.gitAppsService.SaveBitbucketApp, func(a *models.BitbucketApp, t string) {
-		if a.WorkspaceID == "" {
-			a.WorkspaceID = t
-		}
-	})(c)
+	return saveAppHandler(h.gitAppsService.SaveBitbucketApp)(c)
 }
 
 // @Summary DeleteBitbucketApp endpoint

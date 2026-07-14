@@ -22,16 +22,9 @@ func NewDatabaseHandler(s *services.DatabaseService, ps *services.ProjectService
 }
 
 func (h *DatabaseHandler) verifyProjectOwnership(c echo.Context, projectID string) error {
-	user := middleware.GetUserClaimsFromContext(c.Request().Context())
-	if user == nil || user.Role == "admin" {
-		return nil
-	}
-	p, err := h.projectService.GetProject(c.Request().Context(), projectID)
+	_, err := h.projectService.GetProject(c.Request().Context(), projectID)
 	if err != nil {
 		return utils.Error(c, http.StatusNotFound, "project not found")
-	}
-	if p.WorkspaceID != user.UserID {
-		return utils.Error(c, http.StatusForbidden, "access denied")
 	}
 	return nil
 }
@@ -54,8 +47,8 @@ func (h *DatabaseHandler) ListDatabases(c echo.Context) error {
 	if user != nil && user.Role != "admin" {
 		var filtered []*models.Database
 		for _, db := range databases {
-			p, err := h.projectService.GetProject(c.Request().Context(), db.ProjectID)
-			if err == nil && p.WorkspaceID == user.UserID {
+			_, err := h.projectService.GetProject(c.Request().Context(), db.ProjectID)
+			if err == nil {
 				filtered = append(filtered, db)
 			}
 		}

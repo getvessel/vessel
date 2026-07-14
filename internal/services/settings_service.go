@@ -10,14 +10,12 @@ import (
 )
 
 type SettingsService struct {
-	settingsRepo     repositories.SettingsRepository
-	notificationRepo repositories.NotificationRepository
+	settingsRepo repositories.SettingsRepository
 }
 
-func NewSettingsService(sr repositories.SettingsRepository, nr repositories.NotificationRepository) *SettingsService {
+func NewSettingsService(sr repositories.SettingsRepository) *SettingsService {
 	return &SettingsService{
-		settingsRepo:     sr,
-		notificationRepo: nr,
+		settingsRepo: sr,
 	}
 }
 
@@ -30,34 +28,6 @@ func (s *SettingsService) UpdateSettings(ctx context.Context, cfg *models.Server
 		return errors.New("server settings cannot be nil")
 	}
 	return s.settingsRepo.UpdateServerSettings(ctx, cfg)
-}
-
-func (s *SettingsService) ListWorkspaceNotificationChannels(ctx context.Context, workspaceID string) ([]models.WorkspaceNotificationChannel, error) {
-	if workspaceID == "" {
-		return nil, errors.New("team id is required")
-	}
-	return s.notificationRepo.ListChannelsByTeam(ctx, workspaceID)
-}
-
-func (s *SettingsService) SaveWorkspaceNotificationChannel(ctx context.Context, c *models.WorkspaceNotificationChannel) error {
-	if c == nil || c.WorkspaceID == "" {
-		return errors.New("valid team notification channel is required")
-	}
-	return s.notificationRepo.SaveChannel(ctx, c)
-}
-
-func (s *SettingsService) GetWorkspaceNotificationChannel(ctx context.Context, id string) (*models.WorkspaceNotificationChannel, error) {
-	if id == "" {
-		return nil, errors.New("channel id is required")
-	}
-	return s.notificationRepo.GetChannel(ctx, id)
-}
-
-func (s *SettingsService) DeleteWorkspaceNotificationChannel(ctx context.Context, id string) error {
-	if id == "" {
-		return errors.New("channel id is required")
-	}
-	return s.notificationRepo.DeleteChannel(ctx, id)
 }
 
 func (s *SettingsService) CheckMCPEnabled(ctx context.Context) error {

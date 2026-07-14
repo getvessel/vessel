@@ -12,7 +12,7 @@ import (
 )
 
 type ProjectRepository interface {
-	List(ctx context.Context, workspaceID string, limit, offset int) ([]models.ProjectConfig, int, error)
+	List(ctx context.Context, limit, offset int) ([]models.ProjectConfig, int, error)
 	Get(ctx context.Context, id string) (*models.ProjectConfig, error)
 	Create(ctx context.Context, p *models.ProjectConfig) error
 	Delete(ctx context.Context, id string) error
@@ -32,22 +32,15 @@ func NewProjectSQLiteRepository(db *sql.DB, envRepo EnvironmentRepository) *Proj
 	return &ProjectSQLiteRepository{db: sqlx.NewDb(db, "sqlite"), environments: envRepo}
 }
 
-func (r *ProjectSQLiteRepository) List(_ context.Context, workspaceID string, limit, offset int) ([]models.ProjectConfig, int, error) {
+func (r *ProjectSQLiteRepository) List(_ context.Context, limit, offset int) ([]models.ProjectConfig, int, error) {
 	var total int
 	var err error
 	var projects []models.ProjectConfig
 
-	if workspaceID != "" {
-		if err = r.db.Get(&total, `SELECT COUNT(*) FROM projects WHERE workspace_id = ?`, workspaceID); err != nil {
-			return nil, 0, err
-		}
-		err = r.db.Select(&projects, `SELECT id, COALESCE(workspace_id, '') AS workspace_id, name, COALESCE(description,'') AS description, created_at, updated_at FROM projects WHERE workspace_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`, workspaceID, limit, offset)
-	} else {
-		if err = r.db.Get(&total, `SELECT COUNT(*) FROM projects`); err != nil {
-			return nil, 0, err
-		}
-		err = r.db.Select(&projects, `SELECT id, COALESCE(workspace_id, '') AS workspace_id, name, COALESCE(description,'') AS description, created_at, updated_at FROM projects ORDER BY created_at DESC LIMIT ? OFFSET ?`, limit, offset)
+	if err = r.db.Get(&total, `SELECT COUNT(*) FROM projects`); err != nil {
+		return nil, 0, err
 	}
+	err = r.db.Select(&projects, `SELECT id, name, COALESCE(description,'') AS description, created_at, updated_at FROM projects ORDER BY created_at DESC LIMIT ? OFFSET ?`, limit, offset)
 
 	if err != nil {
 		return nil, 0, err
@@ -60,7 +53,7 @@ func (r *ProjectSQLiteRepository) List(_ context.Context, workspaceID string, li
 
 func (r *ProjectSQLiteRepository) Get(_ context.Context, id string) (*models.ProjectConfig, error) {
 	var p models.ProjectConfig
-	err := r.db.Get(&p, `SELECT id, COALESCE(workspace_id, '') AS workspace_id, name, COALESCE(description,'') AS description, created_at, updated_at FROM projects WHERE id = ?`, id)
+	err := r.db.Get(&p, `SELECT id, name, COALESCE(description,'') AS description, created_at, updated_at FROM projects WHERE id = ?`, id)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -78,8 +71,8 @@ func (r *ProjectSQLiteRepository) Create(ctx context.Context, p *models.ProjectC
 	p.CreatedAt = now
 	p.UpdatedAt = now
 	_, err := r.db.Exec(
-		`INSERT INTO projects (id, workspace_id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`,
-		p.ID, p.WorkspaceID, p.Name, p.Description, p.CreatedAt, p.UpdatedAt,
+		`INSERT INTO projects (id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`,
+		p.ID, p.Name, p.Description, p.CreatedAt, p.UpdatedAt,
 	)
 	if err != nil {
 		return err

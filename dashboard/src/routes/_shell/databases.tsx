@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/_workspace/databases')({
+export const Route = createFileRoute('/_shell/databases')({
   component: DatabasesPage,
 });
 

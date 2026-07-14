@@ -14,27 +14,27 @@ The layout utilizes a contextual **Sidebar** and a global **Topbar**.
 
 ### Topbar
 
-- **Workspace Context Switcher:** Allows users to switch between Personal Account, and various Workspaces.
+- **Instance Context Switcher:** Allows users to switch between Personal Account, and various Instances.
 - **Global Command Menu (Cmd+K):** Deep-link search across all projects, environments, databases, and settings.
 - **Notification Center:** Real-time updates via SSE for deployments, backup completions, or team invites.
 - **Profile / Theme:** Dark/Light mode, link to Personal Settings.
 
 ### Contextual Sidebar States
 
-#### A. Global / Workspace Sidebar
+#### A. Global / Instance Sidebar
 
 _Applies when no specific project is selected._
 
 - **Overview:** Aggregated stats (running containers, total deployments, active jobs).
 - **Projects:** Grid/List of projects.
-- **Databases:** Global view of all DBs (Postgres, MySQL, Redis, etc.) across the workspace.
+- **Databases:** Global view of all DBs (Postgres, MySQL, Redis, etc.) across the instance.
 - **Storage:** S3-compatible MinIO instances.
 - **Backups & S3 Destinations:** Global backup policies and connected S3 buckets.
-- **Workspaces:**
+- **Instances:**
   - Members & Roles
   - Trusted Domains (SSO config)
   - SSH Keys
-  - Audit Logs (`/workspaces/:workspaceId/audit-logs`)
+  - Audit Logs (`/instances/:instanceId/audit-logs`)
 - **Git Integrations:** GitHub/GitLab/Bitbucket app connections.
 - **AI & Notifications:**
   - AI Settings (OpenAI/Anthropic keys for the team)
@@ -124,7 +124,7 @@ src/
 │   ├── databases/             # DB instances, SQL Studio, Backups
 │   ├── storage/               # Object storage buckets
 │   ├── jobs/                  # Background Cron Tasks
-│   ├── workspaces/            # Workspace settings, Members, Integrations
+│   ├── instances/            # Instance settings, Members, Integrations
 │   └── instance/              # Super Admin Vessl settings, Updates
 │
 ├── routes/                    # TanStack file-based routing
@@ -132,7 +132,7 @@ src/
 │   ├── _auth/                 # Auth layout (no sidebar)
 │   │   ├── login.tsx
 │   │   └── register.tsx
-│   ├── _workspace/            # Global Workspace layout (Sidebar: Global Context)
+│   ├── _instance/            # Global Instance layout (Sidebar: Global Context)
 │   │   ├── index.tsx          # Dashboard overview
 │   │   ├── projects.tsx
 │   │   ├── databases.tsx
@@ -169,14 +169,14 @@ src/
 
 ### Phase 2: Core Layouts
 
-- [ ] Build the Topbar component (Workspace switcher, User profile).
+- [ ] Build the Topbar component (Instance switcher, User profile).
 - [ ] Build the dynamic Sidebar component.
-- [ ] Create `_workspace` layout routing.
+- [ ] Create `_instance` layout routing.
 - [ ] Create `_project` layout routing (Sidebar items change based on `$projectId`).
 
-### Phase 3: Workspace & Project Views
+### Phase 3: Instance & Project Views
 
-- [ ] Implement Workspace Dashboard (`/projects`, `/databases`).
+- [ ] Implement Instance Dashboard (`/projects`, `/databases`).
 - [ ] Implement Project Summary page (`/projects/$projectId`).
 - [ ] Implement the **Interactive Canvas** using React Flow (`features/canvas`).
   - _Must allow dragging DB nodes to App nodes to link them._
@@ -191,7 +191,7 @@ src/
 
 ### Phase 5: Admin & Enterprise Polish
 
-- [ ] Workspace management, RBAC, and Invites UI.
+- [ ] Instance management, RBAC, and Invites UI.
 - [ ] Git webhook and repository connection flow.
 - [ ] "Super Admin" settings panel for self-hosted Vessl instance updates.
 - [ ] Dark Mode refinements and responsive design checks.

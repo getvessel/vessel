@@ -2,9 +2,9 @@ package core
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log/slog"
+	"strings"
 
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/notifications"
@@ -12,20 +12,19 @@ import (
 )
 
 type DispatcherService struct {
-	notifRepo    repositories.NotificationRepository
 	settingsRepo repositories.SettingsRepository
 	userRepo     repositories.UserRepository
 	mailer       interface {
-		SendTeamEmail(ctx context.Context, workspaceID, templateName string, toAddress string, subject string, data any) error
+		SendSystemEmail(ctx context.Context, templateName string, toAddress string, subject string, data any) error
 	}
 }
 
 type Mailer interface {
-	SendTeamEmail(ctx context.Context, workspaceID, templateName string, toAddress string, subject string, data any) error
+	SendSystemEmail(ctx context.Context, templateName string, toAddress string, subject string, data any) error
 }
 
-func NewDispatcherService(notifRepo repositories.NotificationRepository, settingsRepo repositories.SettingsRepository, userRepo repositories.UserRepository, mailer Mailer) *DispatcherService {
-	return &DispatcherService{notifRepo: notifRepo, settingsRepo: settingsRepo, userRepo: userRepo, mailer: mailer}
+func NewDispatcherService(settingsRepo repositories.SettingsRepository, userRepo repositories.UserRepository, mailer Mailer) *DispatcherService {
+	return &DispatcherService{settingsRepo: settingsRepo, userRepo: userRepo, mailer: mailer}
 }
 
 func (d *DispatcherService) Dispatch(event *models.NotificationEvent) {
@@ -37,97 +36,8 @@ func (d *DispatcherService) Dispatch(event *models.NotificationEvent) {
 }
 
 func (d *DispatcherService) Send(event *models.NotificationEvent) error {
-	if event.WorkspaceID == "" {
-		return fmt.Errorf("WorkspaceID is required for dispatch")
-	}
-
-	if event.WorkspaceID == "global_test" {
+	if strings.HasPrefix(event.EventType, "test_global_") {
 		return d.sendGlobalTest(event)
-	}
-
-	channels, err := d.notifRepo.ListChannelsByTeam(context.Background(), event.WorkspaceID)
-	if err != nil {
-		return fmt.Errorf("failed to list channels for team %s: %w", event.WorkspaceID, err)
-	}
-
-	for _, c := range channels {
-		if !c.IsEnabled {
-			continue
-		}
-
-		var events []string
-		if len(c.Events) > 0 {
-			if err := json.Unmarshal(c.Events, &events); err == nil {
-				matches := false
-				for _, e := range events {
-					if e == event.EventType || e == "*" {
-						matches = true
-						break
-					}
-				}
-				if !matches && len(events) > 0 {
-					continue
-				}
-			}
-		}
-
-		switch c.Provider {
-		case "slack":
-			var cfg struct {
-				WebhookURL string `json:"webhookUrl"`
-			}
-			if json.Unmarshal(c.Config, &cfg) == nil && cfg.WebhookURL != "" {
-				_ = notifications.SendSlackNotification(cfg.WebhookURL, event)
-			}
-		case "discord":
-			var cfg struct {
-				WebhookURL string `json:"webhookUrl"`
-			}
-			if json.Unmarshal(c.Config, &cfg) == nil && cfg.WebhookURL != "" {
-				_ = notifications.SendDiscordNotification(cfg.WebhookURL, event)
-			}
-		case "telegram":
-			var cfg struct {
-				BotToken string `json:"botToken"`
-				ChatID   string `json:"chatId"`
-			}
-			if json.Unmarshal(c.Config, &cfg) == nil && cfg.BotToken != "" && cfg.ChatID != "" {
-				_ = notifications.SendTelegramNotification(cfg.BotToken, cfg.ChatID, event)
-			}
-		case "pushover":
-			var cfg struct {
-				AppToken string `json:"appToken"`
-				UserKey  string `json:"userKey"`
-			}
-			if json.Unmarshal(c.Config, &cfg) == nil && cfg.AppToken != "" && cfg.UserKey != "" {
-				_ = notifications.SendPushoverNotification(cfg.AppToken, cfg.UserKey, event)
-			}
-		case "generic":
-			var cfg struct {
-				WebhookURL string `json:"webhookUrl"`
-			}
-			if json.Unmarshal(c.Config, &cfg) == nil && cfg.WebhookURL != "" {
-				_ = notifications.SendGenericWebhook(cfg.WebhookURL, event)
-			}
-		case "smtp":
-			var cfg struct {
-				ToEmail string `json:"toEmail"`
-			}
-			if json.Unmarshal(c.Config, &cfg) == nil && cfg.ToEmail != "" && d.mailer != nil {
-				name := ""
-				if d.userRepo != nil {
-					u, err := d.userRepo.GetUserByEmail(context.Background(), cfg.ToEmail)
-					if err == nil && u != nil && u.Name != "" {
-						name = u.Name
-					}
-				}
-				_ = d.mailer.SendTeamEmail(context.Background(), event.WorkspaceID, "notification", cfg.ToEmail, event.Title, map[string]string{
-					"Message": event.Message,
-					"URL":     event.URL,
-					"Name":    name,
-				})
-			}
-		}
 	}
 	return nil
 }

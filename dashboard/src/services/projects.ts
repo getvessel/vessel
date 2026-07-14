@@ -9,9 +9,9 @@ import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
 
 export const projectsService = {
-  listProjects: async (workspaceId?: string): Promise<ListProjectsResponse> => {
+  listProjects: async (): Promise<ListProjectsResponse> => {
     try {
-      const url = workspaceId ? `/projects?workspaceId=${workspaceId}` : '/projects';
+      const url = '/projects';
       return await apiClient.get<ListProjectsResponse>(url);
     } catch (error) {
       throw handleApiError(error);

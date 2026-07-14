@@ -1,1 +1,0 @@
-ALTER TABLE app_services ADD COLUMN image_ref TEXT NOT NULL DEFAULT '';

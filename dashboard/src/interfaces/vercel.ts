@@ -2,7 +2,6 @@ export interface UserVercelAccount {
   id: string;
   userId: string;
   accessToken?: string;
-  workspaceId?: string;
   accountName: string;
   createdAt: string;
   updatedAt: string;

@@ -175,4 +175,4 @@ If a deployment fails, use **AI Diagnose** to analyze the build logs:
 2. Click **AI Diagnose**.
 3. Vessl sends the logs to your configured AI provider and suggests a fix.
 
-Configure your AI provider in **Workspace Settings → AI**.
+Configure your AI provider in **Server Settings → AI**.

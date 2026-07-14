@@ -72,11 +72,11 @@ Channels can be configured for specific events:
 - System update available
 - Backup retention cleanup
 
-### Per-Workspace Email
+### Email Configuration
 
-Each workspace can configure its own SMTP or Resend settings for transactional emails (invites, password resets):
+You can configure SMTP or Resend settings for transactional emails (invites, password resets):
 
-1. Go to **Workspace Settings → Email**.
+1. Go to **Server Settings → Email**.
 2. Configure SMTP server or Resend API key.
 3. Verify the configuration with a test email.
 
@@ -110,7 +110,7 @@ Enable 2FA on your account for additional security:
 
 Configure an AI provider for deployment diagnostics:
 
-1. Go to **Workspace Settings → AI**.
+1. Go to **Server Settings → AI**.
 2. Select a provider (OpenAI or Anthropic).
 3. Enter your API key.
 4. When a deployment fails, click **AI Diagnose** to analyze logs and get fix suggestions.

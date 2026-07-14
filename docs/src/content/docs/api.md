@@ -131,18 +131,7 @@ curl -H "Authorization: Bearer vpt_xxx" \
 | POST   | `/api/projects/:id/domains` | Add a domain    |
 | DELETE | `/api/domains/:id`          | Remove a domain |
 
-### Workspaces
 
-| Method | Path                                  | Description      |
-| ------ | ------------------------------------- | ---------------- |
-| GET    | `/api/workspaces`                     | List workspaces  |
-| POST   | `/api/workspaces`                     | Create workspace |
-| GET    | `/api/workspaces/:id`                 | Get workspace    |
-| PUT    | `/api/workspaces/:id`                 | Update workspace |
-| DELETE | `/api/workspaces/:id`                 | Delete workspace |
-| GET    | `/api/workspaces/:id/members`         | List members     |
-| POST   | `/api/workspaces/:id/invite`          | Invite member    |
-| DELETE | `/api/workspaces/:id/members/:userId` | Remove member    |
 
 ### Backups
 

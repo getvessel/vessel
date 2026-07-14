@@ -15,17 +15,17 @@ import (
 )
 
 type GitAppRepository interface {
-	ListGithubApps(ctx context.Context, workspaceID string) ([]models.GithubApp, error)
+	ListGithubApps(ctx context.Context) ([]models.GithubApp, error)
 	GetGithubApp(ctx context.Context, id string) (*models.GithubApp, error)
 	SaveGithubApp(ctx context.Context, app *models.GithubApp) error
 	DeleteGithubApp(ctx context.Context, id string) error
 
-	ListGitlabApps(ctx context.Context, workspaceID string) ([]models.GitlabApp, error)
+	ListGitlabApps(ctx context.Context) ([]models.GitlabApp, error)
 	GetGitlabApp(ctx context.Context, id string) (*models.GitlabApp, error)
 	SaveGitlabApp(ctx context.Context, app *models.GitlabApp) error
 	DeleteGitlabApp(ctx context.Context, id string) error
 
-	ListBitbucketApps(ctx context.Context, workspaceID string) ([]models.BitbucketApp, error)
+	ListBitbucketApps(ctx context.Context) ([]models.BitbucketApp, error)
 	GetBitbucketApp(ctx context.Context, id string) (*models.BitbucketApp, error)
 	SaveBitbucketApp(ctx context.Context, app *models.BitbucketApp) error
 	DeleteBitbucketApp(ctx context.Context, id string) error
@@ -45,7 +45,7 @@ func saveApp(ctx context.Context, db *sqlx.DB, tableName string, columns []strin
 	updates := make([]string, len(columns))
 	for i, col := range columns {
 		placeholders[i] = "?"
-		if col != "id" && col != "workspace_id" && col != "created_at" {
+		if col != "id" && col != "created_at" {
 			updates[i] = fmt.Sprintf("%s=excluded.%s", col, col)
 		}
 	}
@@ -74,10 +74,10 @@ func deleteApp(ctx context.Context, db *sqlx.DB, tableName, id string) error {
 	return err
 }
 
-func (r *GitAppSQLiteRepository) ListGithubApps(ctx context.Context, workspaceID string) ([]models.GithubApp, error) {
-	query := `SELECT id, workspace_id, name, app_id, installation_id, client_id, is_public, created_at, updated_at FROM github_apps WHERE workspace_id = ?`
+func (r *GitAppSQLiteRepository) ListGithubApps(ctx context.Context) ([]models.GithubApp, error) {
+	query := `SELECT id, name, app_id, installation_id, client_id, is_public, created_at, updated_at FROM github_apps`
 	var apps []models.GithubApp
-	if err := r.db.SelectContext(ctx, &apps, query, workspaceID); err != nil {
+	if err := r.db.SelectContext(ctx, &apps, query); err != nil {
 		return nil, err
 	}
 	if apps == nil {
@@ -87,7 +87,7 @@ func (r *GitAppSQLiteRepository) ListGithubApps(ctx context.Context, workspaceID
 }
 
 func (r *GitAppSQLiteRepository) GetGithubApp(ctx context.Context, id string) (*models.GithubApp, error) {
-	query := `SELECT id, workspace_id, name, app_id, installation_id, client_id, client_secret, webhook_secret, private_key, is_public, created_at, updated_at FROM github_apps WHERE id = ?`
+	query := `SELECT id, name, app_id, installation_id, client_id, client_secret, webhook_secret, private_key, is_public, created_at, updated_at FROM github_apps WHERE id = ?`
 	var a models.GithubApp
 	if err := r.db.GetContext(ctx, &a, query, id); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -116,8 +116,8 @@ func (r *GitAppSQLiteRepository) SaveGithubApp(ctx context.Context, app *models.
 	}
 	app.UpdatedAt = time.Now()
 
-	cols := []string{"id", "workspace_id", "name", "app_id", "installation_id", "client_id", "client_secret", "webhook_secret", "private_key", "is_public", "created_at", "updated_at"}
-	vals := []any{app.ID, app.WorkspaceID, app.Name, app.AppID, app.InstallationID, app.ClientID, cs, ws, pk, app.IsPublic, app.CreatedAt, app.UpdatedAt}
+	cols := []string{"id", "name", "app_id", "installation_id", "client_id", "client_secret", "webhook_secret", "private_key", "is_public", "created_at", "updated_at"}
+	vals := []any{app.ID, app.Name, app.AppID, app.InstallationID, app.ClientID, cs, ws, pk, app.IsPublic, app.CreatedAt, app.UpdatedAt}
 	return saveApp(ctx, r.db, "github_apps", cols, vals)
 }
 
@@ -125,10 +125,10 @@ func (r *GitAppSQLiteRepository) DeleteGithubApp(ctx context.Context, id string)
 	return deleteApp(ctx, r.db, "github_apps", id)
 }
 
-func (r *GitAppSQLiteRepository) ListGitlabApps(ctx context.Context, workspaceID string) ([]models.GitlabApp, error) {
-	query := `SELECT id, workspace_id, name, app_id, api_url, is_public, created_at, updated_at FROM gitlab_apps WHERE workspace_id = ?`
+func (r *GitAppSQLiteRepository) ListGitlabApps(ctx context.Context) ([]models.GitlabApp, error) {
+	query := `SELECT id, name, app_id, api_url, is_public, created_at, updated_at FROM gitlab_apps`
 	var apps []models.GitlabApp
-	if err := r.db.SelectContext(ctx, &apps, query, workspaceID); err != nil {
+	if err := r.db.SelectContext(ctx, &apps, query); err != nil {
 		return nil, err
 	}
 	if apps == nil {
@@ -138,7 +138,7 @@ func (r *GitAppSQLiteRepository) ListGitlabApps(ctx context.Context, workspaceID
 }
 
 func (r *GitAppSQLiteRepository) GetGitlabApp(ctx context.Context, id string) (*models.GitlabApp, error) {
-	query := `SELECT id, workspace_id, name, app_id, app_secret, webhook_secret, api_url, is_public, created_at, updated_at FROM gitlab_apps WHERE id = ?`
+	query := `SELECT id, name, app_id, app_secret, webhook_secret, api_url, is_public, created_at, updated_at FROM gitlab_apps WHERE id = ?`
 	var a models.GitlabApp
 	if err := r.db.GetContext(ctx, &a, query, id); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -163,8 +163,8 @@ func (r *GitAppSQLiteRepository) SaveGitlabApp(ctx context.Context, app *models.
 	}
 	app.UpdatedAt = time.Now()
 
-	cols := []string{"id", "workspace_id", "name", "app_id", "app_secret", "webhook_secret", "api_url", "is_public", "created_at", "updated_at"}
-	vals := []any{app.ID, app.WorkspaceID, app.Name, app.AppID, as, ws, app.APIURL, app.IsPublic, app.CreatedAt, app.UpdatedAt}
+	cols := []string{"id", "name", "app_id", "app_secret", "webhook_secret", "api_url", "is_public", "created_at", "updated_at"}
+	vals := []any{app.ID, app.Name, app.AppID, as, ws, app.APIURL, app.IsPublic, app.CreatedAt, app.UpdatedAt}
 	return saveApp(ctx, r.db, "gitlab_apps", cols, vals)
 }
 
@@ -172,10 +172,10 @@ func (r *GitAppSQLiteRepository) DeleteGitlabApp(ctx context.Context, id string)
 	return deleteApp(ctx, r.db, "gitlab_apps", id)
 }
 
-func (r *GitAppSQLiteRepository) ListBitbucketApps(ctx context.Context, workspaceID string) ([]models.BitbucketApp, error) {
-	query := `SELECT id, workspace_id, name, workspace, client_id, is_public, created_at, updated_at FROM bitbucket_apps WHERE workspace_id = ?`
+func (r *GitAppSQLiteRepository) ListBitbucketApps(ctx context.Context) ([]models.BitbucketApp, error) {
+	query := `SELECT id, name, owner, client_id, is_public, created_at, updated_at FROM bitbucket_apps`
 	var apps []models.BitbucketApp
-	if err := r.db.SelectContext(ctx, &apps, query, workspaceID); err != nil {
+	if err := r.db.SelectContext(ctx, &apps, query); err != nil {
 		return nil, err
 	}
 	if apps == nil {
@@ -185,7 +185,7 @@ func (r *GitAppSQLiteRepository) ListBitbucketApps(ctx context.Context, workspac
 }
 
 func (r *GitAppSQLiteRepository) GetBitbucketApp(ctx context.Context, id string) (*models.BitbucketApp, error) {
-	query := `SELECT id, workspace_id, name, workspace, client_id, client_secret, webhook_secret, is_public, created_at, updated_at FROM bitbucket_apps WHERE id = ?`
+	query := `SELECT id, name, owner, client_id, client_secret, webhook_secret, is_public, created_at, updated_at FROM bitbucket_apps WHERE id = ?`
 	var a models.BitbucketApp
 	if err := r.db.GetContext(ctx, &a, query, id); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -210,8 +210,8 @@ func (r *GitAppSQLiteRepository) SaveBitbucketApp(ctx context.Context, app *mode
 	}
 	app.UpdatedAt = time.Now()
 
-	cols := []string{"id", "workspace_id", "name", "workspace", "client_id", "client_secret", "webhook_secret", "is_public", "created_at", "updated_at"}
-	vals := []any{app.ID, app.WorkspaceID, app.Name, app.Workspace, app.ClientID, cs, ws, app.IsPublic, app.CreatedAt, app.UpdatedAt}
+	cols := []string{"id", "name", "owner", "client_id", "client_secret", "webhook_secret", "is_public", "created_at", "updated_at"}
+	vals := []any{app.ID, app.Name, app.Owner, app.ClientID, cs, ws, app.IsPublic, app.CreatedAt, app.UpdatedAt}
 	return saveApp(ctx, r.db, "bitbucket_apps", cols, vals)
 }
 

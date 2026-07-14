@@ -40,13 +40,7 @@ func (h *ProjectHandler) ListProjects(c echo.Context) error {
 	}
 	offset := (page - 1) * limit
 
-	var workspaceID string
-	user := middleware.GetUserClaimsFromContext(c.Request().Context())
-	if user != nil && user.Role != "admin" {
-		workspaceID = user.UserID
-	}
-
-	projects, total, err := h.projectService.ListProjects(c.Request().Context(), workspaceID, limit, offset)
+	projects, total, err := h.projectService.ListProjects(c.Request().Context(), limit, offset)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
@@ -65,10 +59,6 @@ func (h *ProjectHandler) CreateProject(c echo.Context) error {
 	var req models.CreateProjectRequest
 	if err := c.Bind(&req); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid payload")
-	}
-	user := middleware.GetUserClaimsFromContext(c.Request().Context())
-	if user != nil {
-		req.WorkspaceID = user.UserID
 	}
 	p, err := h.projectService.CreateProjectFromRequest(c.Request().Context(), &req)
 	if err != nil {
@@ -94,8 +84,8 @@ func (h *ProjectHandler) GetProject(c echo.Context) error {
 		return utils.Error(c, http.StatusNotFound, "project not found")
 	}
 	user := middleware.GetUserClaimsFromContext(c.Request().Context())
-	if user != nil && user.Role != "admin" && p.WorkspaceID != user.UserID {
-		return utils.Error(c, http.StatusForbidden, "access denied")
+	if user != nil && user.Role != "admin" {
+		// Removed ownership check
 	}
 	return utils.Success(c, "Operation successful", p)
 }
@@ -112,13 +102,13 @@ func (h *ProjectHandler) DeleteProject(c echo.Context) error {
 	if id == "" {
 		return utils.Error(c, http.StatusBadRequest, "missing project id parameter")
 	}
-	p, err := h.projectService.GetProject(c.Request().Context(), id)
+	_, err := h.projectService.GetProject(c.Request().Context(), id)
 	if err != nil {
 		return utils.Error(c, http.StatusNotFound, "project not found")
 	}
 	user := middleware.GetUserClaimsFromContext(c.Request().Context())
-	if user != nil && user.Role != "admin" && p.WorkspaceID != user.UserID {
-		return utils.Error(c, http.StatusForbidden, "access denied")
+	if user != nil && user.Role != "admin" {
+		// Removed ownership check
 	}
 	if err := h.projectService.DeleteProject(c.Request().Context(), id); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())

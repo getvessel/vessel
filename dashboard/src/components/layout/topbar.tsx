@@ -7,7 +7,7 @@ const routeLabels: Record<string, { title: string; description: string }> = {
   '/databases': { title: 'Databases', description: 'Your databases and storage' },
   '/deployments': { title: 'Deployments', description: 'Recent and ongoing deployments' },
   '/teams': { title: 'Teams', description: 'Manage team members and access' },
-  '/settings': { title: 'Settings', description: 'Account and workspace settings' },
+  '/settings': { title: 'Settings', description: 'Account settings' },
   '/support': { title: 'Support', description: 'Get help and documentation' },
 };
 

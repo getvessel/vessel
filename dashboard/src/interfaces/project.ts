@@ -4,7 +4,6 @@ import type { AppService } from './deployment';
 
 export interface ProjectConfig {
   id: string;
-  workspaceId?: string;
   name: string;
   description?: string;
   createdAt: string;
@@ -42,7 +41,6 @@ export interface ServerlessFunctionCode {
 
 export interface CanvasSummary {
   id: string;
-  workspaceId?: string;
   name: string;
   description?: string;
   environmentsCount: number;
@@ -65,7 +63,6 @@ export interface EnvironmentCanvas {
 }
 
 export interface CreateProjectRequest {
-  workspaceId?: string;
   name: string;
   description?: string;
   repositoryUrl?: string;

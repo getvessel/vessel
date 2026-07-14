@@ -22,16 +22,9 @@ func NewAppHandler(s *services.AppService, ps *services.ProjectService) *AppHand
 }
 
 func (h *AppHandler) verifyProjectOwnership(c echo.Context, projectID string) error {
-	user := middleware.GetUserClaimsFromContext(c.Request().Context())
-	if user == nil || user.Role == "admin" {
-		return nil
-	}
-	p, err := h.projectService.GetProject(c.Request().Context(), projectID)
+	_, err := h.projectService.GetProject(c.Request().Context(), projectID)
 	if err != nil {
 		return utils.Error(c, http.StatusNotFound, "project not found")
-	}
-	if p.WorkspaceID != user.UserID {
-		return utils.Error(c, http.StatusForbidden, "access denied")
 	}
 	return nil
 }
@@ -84,8 +77,8 @@ func (h *AppHandler) ListByEnvironment(c echo.Context) error {
 	if user != nil && user.Role != "admin" {
 		var filtered []*models.AppService
 		for _, app := range apps {
-			p, err := h.projectService.GetProject(c.Request().Context(), app.ProjectID)
-			if err == nil && p.WorkspaceID == user.UserID {
+			_, err := h.projectService.GetProject(c.Request().Context(), app.ProjectID)
+			if err == nil {
 				filtered = append(filtered, app)
 			}
 		}

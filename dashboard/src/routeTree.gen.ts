@@ -9,15 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as WorkspaceRouteImport } from './routes/_workspace'
+import { Route as ShellRouteImport } from './routes/_shell'
 import { Route as ProjectRouteImport } from './routes/_project'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as SplatRouteImport } from './routes/$'
-import { Route as WorkspaceIndexRouteImport } from './routes/_workspace/index'
-import { Route as WorkspaceSettingsRouteImport } from './routes/_workspace/settings'
-import { Route as WorkspaceProjectsRouteImport } from './routes/_workspace/projects'
-import { Route as WorkspaceDatabasesRouteImport } from './routes/_workspace/databases'
+import { Route as ShellIndexRouteImport } from './routes/_shell/index'
+import { Route as ShellSettingsRouteImport } from './routes/_shell/settings'
+import { Route as ShellProjectsRouteImport } from './routes/_shell/projects'
+import { Route as ShellDatabasesRouteImport } from './routes/_shell/databases'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
@@ -27,13 +26,8 @@ import { Route as ProjectProjectIdSettingsRouteImport } from './routes/_project/
 import { Route as ProjectProjectIdDeploymentsRouteImport } from './routes/_project/$projectId/deployments'
 import { Route as ProjectProjectIdServicesServiceIdRouteImport } from './routes/_project/$projectId/services/$serviceId'
 
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WorkspaceRoute = WorkspaceRouteImport.update({
-  id: '/_workspace',
+const ShellRoute = ShellRouteImport.update({
+  id: '/_shell',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectRoute = ProjectRouteImport.update({
@@ -49,25 +43,25 @@ const SplatRoute = SplatRouteImport.update({
   path: '/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
+const ShellIndexRoute = ShellIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => WorkspaceRoute,
+  getParentRoute: () => ShellRoute,
 } as any)
-const WorkspaceSettingsRoute = WorkspaceSettingsRouteImport.update({
+const ShellSettingsRoute = ShellSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => WorkspaceRoute,
+  getParentRoute: () => ShellRoute,
 } as any)
-const WorkspaceProjectsRoute = WorkspaceProjectsRouteImport.update({
+const ShellProjectsRoute = ShellProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
-  getParentRoute: () => WorkspaceRoute,
+  getParentRoute: () => ShellRoute,
 } as any)
-const WorkspaceDatabasesRoute = WorkspaceDatabasesRouteImport.update({
+const ShellDatabasesRoute = ShellDatabasesRouteImport.update({
   id: '/databases',
   path: '/databases',
-  getParentRoute: () => WorkspaceRoute,
+  getParentRoute: () => ShellRoute,
 } as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -115,15 +109,14 @@ const ProjectProjectIdServicesServiceIdRoute =
 
 export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
-  '/': typeof WorkspaceIndexRoute
-  '/onboarding': typeof OnboardingRoute
+  '/': typeof ShellIndexRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
-  '/databases': typeof WorkspaceDatabasesRoute
-  '/projects': typeof WorkspaceProjectsRoute
-  '/settings': typeof WorkspaceSettingsRoute
+  '/databases': typeof ShellDatabasesRoute
+  '/projects': typeof ShellProjectsRoute
+  '/settings': typeof ShellSettingsRoute
   '/$projectId/deployments': typeof ProjectProjectIdDeploymentsRoute
   '/$projectId/settings': typeof ProjectProjectIdSettingsRoute
   '/$projectId/': typeof ProjectProjectIdIndexRoute
@@ -131,15 +124,14 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/$': typeof SplatRoute
-  '/': typeof WorkspaceIndexRoute
-  '/onboarding': typeof OnboardingRoute
+  '/': typeof ShellIndexRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
-  '/databases': typeof WorkspaceDatabasesRoute
-  '/projects': typeof WorkspaceProjectsRoute
-  '/settings': typeof WorkspaceSettingsRoute
+  '/databases': typeof ShellDatabasesRoute
+  '/projects': typeof ShellProjectsRoute
+  '/settings': typeof ShellSettingsRoute
   '/$projectId/deployments': typeof ProjectProjectIdDeploymentsRoute
   '/$projectId/settings': typeof ProjectProjectIdSettingsRoute
   '/$projectId': typeof ProjectProjectIdIndexRoute
@@ -150,16 +142,15 @@ export interface FileRoutesById {
   '/$': typeof SplatRoute
   '/_auth': typeof AuthRouteWithChildren
   '/_project': typeof ProjectRouteWithChildren
-  '/_workspace': typeof WorkspaceRouteWithChildren
-  '/onboarding': typeof OnboardingRoute
+  '/_shell': typeof ShellRouteWithChildren
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
-  '/_workspace/databases': typeof WorkspaceDatabasesRoute
-  '/_workspace/projects': typeof WorkspaceProjectsRoute
-  '/_workspace/settings': typeof WorkspaceSettingsRoute
-  '/_workspace/': typeof WorkspaceIndexRoute
+  '/_shell/databases': typeof ShellDatabasesRoute
+  '/_shell/projects': typeof ShellProjectsRoute
+  '/_shell/settings': typeof ShellSettingsRoute
+  '/_shell/': typeof ShellIndexRoute
   '/_project/$projectId/deployments': typeof ProjectProjectIdDeploymentsRoute
   '/_project/$projectId/settings': typeof ProjectProjectIdSettingsRoute
   '/_project/$projectId/': typeof ProjectProjectIdIndexRoute
@@ -170,7 +161,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/$'
     | '/'
-    | '/onboarding'
     | '/forgot-password'
     | '/login'
     | '/register'
@@ -186,7 +176,6 @@ export interface FileRouteTypes {
   to:
     | '/$'
     | '/'
-    | '/onboarding'
     | '/forgot-password'
     | '/login'
     | '/register'
@@ -203,16 +192,15 @@ export interface FileRouteTypes {
     | '/$'
     | '/_auth'
     | '/_project'
-    | '/_workspace'
-    | '/onboarding'
+    | '/_shell'
     | '/_auth/forgot-password'
     | '/_auth/login'
     | '/_auth/register'
     | '/_auth/reset-password'
-    | '/_workspace/databases'
-    | '/_workspace/projects'
-    | '/_workspace/settings'
-    | '/_workspace/'
+    | '/_shell/databases'
+    | '/_shell/projects'
+    | '/_shell/settings'
+    | '/_shell/'
     | '/_project/$projectId/deployments'
     | '/_project/$projectId/settings'
     | '/_project/$projectId/'
@@ -223,24 +211,16 @@ export interface RootRouteChildren {
   SplatRoute: typeof SplatRoute
   AuthRoute: typeof AuthRouteWithChildren
   ProjectRoute: typeof ProjectRouteWithChildren
-  WorkspaceRoute: typeof WorkspaceRouteWithChildren
-  OnboardingRoute: typeof OnboardingRoute
+  ShellRoute: typeof ShellRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_workspace': {
-      id: '/_workspace'
+    '/_shell': {
+      id: '/_shell'
       path: ''
       fullPath: '/'
-      preLoaderRoute: typeof WorkspaceRouteImport
+      preLoaderRoute: typeof ShellRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_project': {
@@ -264,33 +244,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_workspace/': {
-      id: '/_workspace/'
+    '/_shell/': {
+      id: '/_shell/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof WorkspaceIndexRouteImport
-      parentRoute: typeof WorkspaceRoute
+      preLoaderRoute: typeof ShellIndexRouteImport
+      parentRoute: typeof ShellRoute
     }
-    '/_workspace/settings': {
-      id: '/_workspace/settings'
+    '/_shell/settings': {
+      id: '/_shell/settings'
       path: '/settings'
       fullPath: '/settings'
-      preLoaderRoute: typeof WorkspaceSettingsRouteImport
-      parentRoute: typeof WorkspaceRoute
+      preLoaderRoute: typeof ShellSettingsRouteImport
+      parentRoute: typeof ShellRoute
     }
-    '/_workspace/projects': {
-      id: '/_workspace/projects'
+    '/_shell/projects': {
+      id: '/_shell/projects'
       path: '/projects'
       fullPath: '/projects'
-      preLoaderRoute: typeof WorkspaceProjectsRouteImport
-      parentRoute: typeof WorkspaceRoute
+      preLoaderRoute: typeof ShellProjectsRouteImport
+      parentRoute: typeof ShellRoute
     }
-    '/_workspace/databases': {
-      id: '/_workspace/databases'
+    '/_shell/databases': {
+      id: '/_shell/databases'
       path: '/databases'
       fullPath: '/databases'
-      preLoaderRoute: typeof WorkspaceDatabasesRouteImport
-      parentRoute: typeof WorkspaceRoute
+      preLoaderRoute: typeof ShellDatabasesRouteImport
+      parentRoute: typeof ShellRoute
     }
     '/_auth/reset-password': {
       id: '/_auth/reset-password'
@@ -385,40 +365,28 @@ const ProjectRouteChildren: ProjectRouteChildren = {
 const ProjectRouteWithChildren =
   ProjectRoute._addFileChildren(ProjectRouteChildren)
 
-interface WorkspaceRouteChildren {
-  WorkspaceDatabasesRoute: typeof WorkspaceDatabasesRoute
-  WorkspaceProjectsRoute: typeof WorkspaceProjectsRoute
-  WorkspaceSettingsRoute: typeof WorkspaceSettingsRoute
-  WorkspaceIndexRoute: typeof WorkspaceIndexRoute
+interface ShellRouteChildren {
+  ShellDatabasesRoute: typeof ShellDatabasesRoute
+  ShellProjectsRoute: typeof ShellProjectsRoute
+  ShellSettingsRoute: typeof ShellSettingsRoute
+  ShellIndexRoute: typeof ShellIndexRoute
 }
 
-const WorkspaceRouteChildren: WorkspaceRouteChildren = {
-  WorkspaceDatabasesRoute: WorkspaceDatabasesRoute,
-  WorkspaceProjectsRoute: WorkspaceProjectsRoute,
-  WorkspaceSettingsRoute: WorkspaceSettingsRoute,
-  WorkspaceIndexRoute: WorkspaceIndexRoute,
+const ShellRouteChildren: ShellRouteChildren = {
+  ShellDatabasesRoute: ShellDatabasesRoute,
+  ShellProjectsRoute: ShellProjectsRoute,
+  ShellSettingsRoute: ShellSettingsRoute,
+  ShellIndexRoute: ShellIndexRoute,
 }
 
-const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(
-  WorkspaceRouteChildren,
-)
+const ShellRouteWithChildren = ShellRoute._addFileChildren(ShellRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
   AuthRoute: AuthRouteWithChildren,
   ProjectRoute: ProjectRouteWithChildren,
-  WorkspaceRoute: WorkspaceRouteWithChildren,
-  OnboardingRoute: OnboardingRoute,
+  ShellRoute: ShellRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

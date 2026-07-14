@@ -1,6 +1,5 @@
 export interface TeamAISettings {
   id: string;
-  workspaceId: string;
   provider: string;
   apiKey?: string;
   createdAt: string;
@@ -9,7 +8,6 @@ export interface TeamAISettings {
 
 export interface TeamEmailSettings {
   id: string;
-  workspaceId: string;
   smtpHost?: string;
   smtpPort?: number;
   smtpUser?: string;

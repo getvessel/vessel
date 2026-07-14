@@ -43,7 +43,6 @@ func (r *CanvasSQLiteRepository) GetEnvironmentCanvas(ctx context.Context, envir
 
 type projectRow struct {
 	ID          string    `db:"id"`
-	WorkspaceID string    `db:"workspace_id"`
 	Name        string    `db:"name"`
 	Description string    `db:"description"`
 	CreatedAt   time.Time `db:"created_at"`
@@ -52,7 +51,7 @@ type projectRow struct {
 
 func (r *CanvasSQLiteRepository) listAllProjects() ([]projectRow, error) {
 	var projects []projectRow
-	err := r.db.Select(&projects, `SELECT id, COALESCE(workspace_id, '') as workspace_id, name, COALESCE(description,'') as description, created_at, updated_at FROM projects ORDER BY created_at DESC`)
+	err := r.db.Select(&projects, `SELECT id, name, COALESCE(description,'') as description, created_at, updated_at FROM projects ORDER BY created_at DESC`)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +63,7 @@ func (r *CanvasSQLiteRepository) listAllProjects() ([]projectRow, error) {
 
 func (r *CanvasSQLiteRepository) getProject(id string) (*projectRow, error) {
 	var p projectRow
-	err := r.db.Get(&p, `SELECT id, COALESCE(workspace_id, '') as workspace_id, name, COALESCE(description,'') as description, created_at, updated_at FROM projects WHERE id = ?`, id)
+	err := r.db.Get(&p, `SELECT id, name, COALESCE(description,'') as description, created_at, updated_at FROM projects WHERE id = ?`, id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, utils.NewNotFoundError("CanvasEnvironment", id)
 	}

@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS projects (
 			id TEXT PRIMARY KEY,
-			workspace_id TEXT DEFAULT '',
 			name TEXT UNIQUE NOT NULL,
 			description TEXT DEFAULT '',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -57,7 +56,6 @@ CREATE TABLE IF NOT EXISTS env_vars (
 
 CREATE TABLE IF NOT EXISTS databases (
 			id TEXT PRIMARY KEY,
-			project_id TEXT DEFAULT '',
 			name TEXT UNIQUE NOT NULL,
 			engine TEXT NOT NULL,
 			version TEXT NOT NULL,
@@ -78,7 +76,6 @@ CREATE TABLE IF NOT EXISTS databases (
 
 CREATE TABLE IF NOT EXISTS storage (
 			id TEXT PRIMARY KEY,
-			project_id TEXT DEFAULT '',
 			name TEXT UNIQUE NOT NULL,
 			type TEXT DEFAULT 'minio',
 			api_port INTEGER DEFAULT 9000,
@@ -125,11 +122,11 @@ CREATE TABLE IF NOT EXISTS user_vercel_accounts (
 			id TEXT PRIMARY KEY,
 			user_id TEXT NOT NULL,
 			encrypted_access_token TEXT NOT NULL,
-			workspace_id TEXT, -- Vercel team ID if they authenticated a team, or NULL for personal account
+			vercel_team_id TEXT, -- Vercel team ID if they authenticated a team, or NULL for personal account
 			account_name TEXT NOT NULL,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			UNIQUE(user_id, workspace_id)
+			UNIQUE(user_id, vercel_team_id)
 		);;
 
 CREATE TABLE IF NOT EXISTS environments (
@@ -311,61 +308,7 @@ CREATE TABLE IF NOT EXISTS s3_destinations (
 
 
 
-CREATE TABLE IF NOT EXISTS workspace_members (
-			id TEXT PRIMARY KEY,
-			workspace_id TEXT NOT NULL,
-			user_id TEXT NOT NULL,
-			user_email TEXT,
-			role TEXT NOT NULL,
-			joined_at TEXT
-		);;
 
-CREATE TABLE IF NOT EXISTS workspace_invites (
-			id TEXT PRIMARY KEY,
-			workspace_id TEXT NOT NULL,
-			email TEXT NOT NULL,
-			role TEXT NOT NULL,
-			token TEXT UNIQUE NOT NULL,
-			invited_by TEXT NOT NULL,
-			expires_at TEXT,
-			created_at TEXT
-		);;
-
-CREATE TABLE IF NOT EXISTS workspaces (
-			id TEXT PRIMARY KEY,
-			name TEXT NOT NULL,
-			avatar_url TEXT DEFAULT '',
-			preferred_region TEXT DEFAULT 'local',
-			owner_id TEXT NOT NULL,
-			created_at TEXT,
-			updated_at TEXT
-		);;
-
-CREATE TABLE IF NOT EXISTS workspace_trusted_domains (
-			id TEXT PRIMARY KEY,
-			workspace_id TEXT NOT NULL,
-			domain TEXT NOT NULL,
-			role TEXT DEFAULT 'developer',
-			created_at TEXT
-		);;
-
-CREATE TABLE IF NOT EXISTS workspace_ssh_keys (
-			id TEXT PRIMARY KEY,
-			workspace_id TEXT NOT NULL,
-			name TEXT NOT NULL,
-			public_key TEXT NOT NULL,
-			created_at TEXT
-		);;
-
-CREATE TABLE IF NOT EXISTS workspace_audit_logs (
-			id TEXT PRIMARY KEY,
-			workspace_id TEXT NOT NULL,
-			project_id TEXT,
-			environment_id TEXT,
-			action TEXT NOT NULL,
-			actor TEXT NOT NULL,
-			created_at TEXT
-		);;
 
 CREATE TABLE IF NOT EXISTS server_settings (
 			id TEXT PRIMARY KEY,
@@ -419,20 +362,10 @@ CREATE TABLE IF NOT EXISTS personal_access_tokens (
 			created_at TEXT
 		);;
 
-CREATE TABLE IF NOT EXISTS workspace_notification_channels (
-			id TEXT PRIMARY KEY,
-			workspace_id TEXT NOT NULL,
-			provider TEXT NOT NULL,
-			config JSON NOT NULL,
-			events JSON NOT NULL,
-			is_enabled BOOLEAN DEFAULT TRUE,
-			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);;
+
 
 CREATE TABLE IF NOT EXISTS github_apps (
 			id TEXT PRIMARY KEY,
-			workspace_id TEXT NOT NULL,
 			name TEXT NOT NULL,
 			app_id TEXT NOT NULL,
 			installation_id TEXT,
@@ -447,7 +380,6 @@ CREATE TABLE IF NOT EXISTS github_apps (
 
 CREATE TABLE IF NOT EXISTS gitlab_apps (
 			id TEXT PRIMARY KEY,
-			workspace_id TEXT NOT NULL,
 			name TEXT NOT NULL,
 			app_id TEXT NOT NULL,
 			app_secret TEXT NOT NULL,
@@ -460,9 +392,8 @@ CREATE TABLE IF NOT EXISTS gitlab_apps (
 
 CREATE TABLE IF NOT EXISTS bitbucket_apps (
 			id TEXT PRIMARY KEY,
-			workspace_id TEXT NOT NULL,
 			name TEXT NOT NULL,
-			workspace TEXT NOT NULL,
+			owner TEXT NOT NULL,
 			client_id TEXT NOT NULL,
 			client_secret TEXT NOT NULL,
 			webhook_secret TEXT NOT NULL,
@@ -484,28 +415,31 @@ CREATE TABLE IF NOT EXISTS oauth_providers (
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);;
 
-CREATE TABLE IF NOT EXISTS workspace_ai_settings (
-			id TEXT PRIMARY KEY,
-			workspace_id TEXT UNIQUE NOT NULL,
-			provider TEXT NOT NULL,
-			encrypted_api_key TEXT NOT NULL,
-			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);;
+ALTER TABLE server_settings RENAME COLUMN caddy_wildcard_ip TO traefik_wildcard_ip;
+-- Add missing notification_alerts column to server_settings
+ALTER TABLE server_settings ADD COLUMN notification_alerts TEXT DEFAULT '';
 
+-- Fix project_webhooks: add missing columns used by the repository
+ALTER TABLE project_webhooks ADD COLUMN url TEXT DEFAULT '';
+ALTER TABLE project_webhooks ADD COLUMN event_types TEXT DEFAULT '';
+ALTER TABLE project_webhooks ADD COLUMN include_pr_environments BOOLEAN DEFAULT FALSE;
 
-CREATE TABLE IF NOT EXISTS workspace_email_settings (
-	id TEXT PRIMARY KEY,
-	workspace_id TEXT UNIQUE NOT NULL,
-	smtp_host TEXT DEFAULT '',
-	smtp_port INTEGER DEFAULT 587,
-	smtp_user TEXT DEFAULT '',
-	encrypted_smtp_password TEXT DEFAULT '',
-	smtp_from_name TEXT DEFAULT '',
-	smtp_from_address TEXT DEFAULT '',
-	encrypted_resend_api_key TEXT DEFAULT '',
-	use_resend BOOLEAN DEFAULT FALSE,
-	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-	updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);;
-
+-- Fix project_members: add missing columns used by the repository
+ALTER TABLE project_members ADD COLUMN email TEXT DEFAULT '';
+ALTER TABLE project_members ADD COLUMN permission TEXT DEFAULT 'Can Edit';
+ALTER TABLE project_members ADD COLUMN status TEXT DEFAULT 'pending';
+ALTER TABLE project_members ADD COLUMN invited_at TEXT;
+ALTER TABLE project_members ADD COLUMN accepted_at TEXT;
+ALTER TABLE server_settings ADD COLUMN site_name TEXT DEFAULT '';
+ALTER TABLE server_settings ADD COLUMN public_ipv4 TEXT DEFAULT '';
+ALTER TABLE server_settings ADD COLUMN public_ipv6 TEXT DEFAULT '';
+ALTER TABLE server_settings ADD COLUMN show_sponsorship_popup BOOLEAN DEFAULT 1;
+ALTER TABLE server_settings ADD COLUMN disable_two_step_confirmation BOOLEAN DEFAULT 0;
+ALTER TABLE server_settings ADD COLUMN panel_domain TEXT NOT NULL DEFAULT '';
+ALTER TABLE server_settings ADD COLUMN concurrent_builds INTEGER NOT NULL DEFAULT 2;
+ALTER TABLE server_settings ADD COLUMN deployment_timeout INTEGER NOT NULL DEFAULT 3600;
+ALTER TABLE server_settings ADD COLUMN server_timezone TEXT NOT NULL DEFAULT 'UTC';
+ALTER TABLE server_settings ADD COLUMN docker_cleanup_cron TEXT NOT NULL DEFAULT '0 0 * * *';
+ALTER TABLE server_settings ADD COLUMN disk_usage_threshold INTEGER NOT NULL DEFAULT 80;
+ALTER TABLE server_settings ADD COLUMN disk_usage_cron TEXT NOT NULL DEFAULT '0 23 * * *';
+ALTER TABLE app_services ADD COLUMN image_ref TEXT NOT NULL DEFAULT '';

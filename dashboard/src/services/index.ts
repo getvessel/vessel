@@ -17,5 +17,3 @@ export { serviceVarsService } from './services';
 export { settingsService } from './settings';
 export { storageService } from './storage';
 export { vercelService } from './vercel';
-export { workspaceSettingsService } from './workspace-settings';
-export { workspacesService } from './workspaces';

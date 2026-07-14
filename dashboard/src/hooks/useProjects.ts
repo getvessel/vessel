@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { projectsService } from '#/services/projects';
 
-export const useListProjects = (workspaceId: string) => {
+export const useListProjects = () => {
   return useQuery({
-    queryKey: ['projects', 'listProjects', workspaceId].filter(Boolean),
-    queryFn: () => projectsService.listProjects(workspaceId),
+    queryKey: ['projects', 'listProjects'],
+    queryFn: () => projectsService.listProjects(),
   });
 };
 

@@ -31,7 +31,7 @@ Vessl is a self-hosted PaaS that runs on any Linux VPS — deploy apps with zero
 |---|---|
 | [Projects](/projects/) | Organize services into environments with an interactive canvas view |
 | [Storage](/storage/) | S3-compatible object storage with auto-injected credentials |
-| [Workspaces](/workspaces/) | Multi-tenant teams with RBAC, audit logs, and SSH keys |
+
 | [Serverless](/serverless/) | Write Node.js, Python, or Go functions in the browser |
 | [Integrations](/integrations/) | Git providers, OAuth, Vercel import, and outgoing webhooks |
 

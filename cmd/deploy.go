@@ -116,7 +116,7 @@ func runDeploy(args []string) {
 	}
 
 	if projectID == "" {
-		projects, _, _ := projectRepo.List(context.Background(), "", 100, 0)
+		projects, _, _ := projectRepo.List(context.Background(), 1000, 0)
 		if len(projects) > 0 {
 			projectID = projects[0].ID
 			fmt.Printf("📁 Using project: %s (%s)\n", projects[0].Name, projectID[:8])

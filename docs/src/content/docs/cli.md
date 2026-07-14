@@ -17,7 +17,7 @@ vesslctl serve
 
 ### `setup`
 
-Runs the interactive setup wizard to initialize the database, create the first workspace, and provision the master admin account.
+Runs the interactive setup wizard to initialize the database, create the initial setup, and provision the master admin account.
 
 ```sh
 vesslctl setup

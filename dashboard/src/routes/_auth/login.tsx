@@ -15,7 +15,7 @@ function LoginPage() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col space-y-2 text-center mb-8">
         <h1 className="text-3xl font-semibold tracking-tight text-foreground">Welcome back</h1>
-        <p className="text-sm text-muted-foreground">Sign in to your Vessl workspace.</p>
+        <p className="text-sm text-muted-foreground">Sign in to your Vessl instance.</p>
       </div>
 
       <OAuthButtons />

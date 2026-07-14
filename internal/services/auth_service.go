@@ -18,20 +18,18 @@ type Mailer interface {
 }
 
 type AuthService struct {
-	userRepo         repositories.UserRepository
-	settingsRepo     repositories.SettingsRepository
-	tokenService     *TokenService
-	workspaceService *WorkspaceService
-	mailer           Mailer
+	userRepo     repositories.UserRepository
+	settingsRepo repositories.SettingsRepository
+	tokenService *TokenService
+	mailer       Mailer
 }
 
-func NewAuthService(ur repositories.UserRepository, sr repositories.SettingsRepository, ts *TokenService, ws *WorkspaceService, m Mailer) *AuthService {
+func NewAuthService(ur repositories.UserRepository, sr repositories.SettingsRepository, ts *TokenService, m Mailer) *AuthService {
 	return &AuthService{
-		userRepo:         ur,
-		settingsRepo:     sr,
-		tokenService:     ts,
-		workspaceService: ws,
-		mailer:           m,
+		userRepo:     ur,
+		settingsRepo: sr,
+		tokenService: ts,
+		mailer:       m,
 	}
 }
 
@@ -81,13 +79,6 @@ func (a *AuthService) Register(ctx context.Context, name, email, password string
 	}
 	if err := a.userRepo.CreateUser(ctx, u); err != nil {
 		return nil, "", err
-	}
-
-	// Create default workspace for the user
-	_, err = a.workspaceService.CreateWorkspace(ctx, "Personal Workspace", u.ID)
-	if err != nil {
-		// Log the error but don't fail registration
-		// We could potentially retry or let the user create one manually if this fails
 	}
 
 	token, err := a.tokenService.GenerateToken(u)

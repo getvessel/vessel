@@ -16,7 +16,7 @@ Dashboard at `http://your-server-ip:8080`.
 - **Auto connection strings** — `DATABASE_URL`, `REDIS_URL`, etc. injected automatically
 - **Custom domains** — Let's Encrypt SSL via Traefik v3
 - **Git auto-deploy** — Connect GitHub/GitLab, push to deploy, PR previews
-- **Workspaces & teams** — RBAC, audit logs, SSH keys, trusted domain SSO
+- **Self-hosted & Multi-tenant** — RBAC, audit logs, SSH keys, trusted domain SSO
 - **Serverless functions** — Node.js, Python, Go in-browser editor
 - **Cron jobs** — Scheduled tasks inside containers
 - **Notifications** — Discord, Slack, Telegram, Pushover, SMTP, Resend, webhooks

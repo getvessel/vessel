@@ -9,15 +9,12 @@ import {
   LayoutDashboard,
   MessageSquare,
   Settings,
-  Users,
 } from 'lucide-react';
 import { NavItem } from './nav-item';
 import { UserMenu } from './user-menu';
-import { WorkspaceSwitcher } from './workspace-switcher';
 
 const mainNav = [
   { title: 'Dashboard', url: '/', icon: LayoutDashboard, exact: true },
-  { title: 'Workspaces', url: '/workspaces', icon: Users },
   { title: 'Databases', url: '/databases', icon: Database },
   { title: 'S3 Storages', url: '/storages', icon: HardDrive },
   { title: 'Sources', url: '/sources', icon: Code },
@@ -63,10 +60,6 @@ export function AppSidebar() {
         <span className="ml-auto text-[10px] font-medium text-muted-foreground bg-sidebar-accent px-1.5 py-0.5 rounded">
           v0.1
         </span>
-      </div>
-
-      <div className="shrink-0 pt-4">
-        <WorkspaceSwitcher />
       </div>
 
       <nav className="flex flex-1 flex-col overflow-y-auto px-3 py-2 gap-1">

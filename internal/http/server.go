@@ -38,7 +38,6 @@ type Server struct {
 	serviceVarHandler      *handlers.ServiceVarHandler
 	projectSettingsHandler *handlers.ProjectSettingsHandler
 	backupHandler          *handlers.BackupHandler
-	workspaceHandler       *handlers.WorkspaceHandler
 	settingsHandler        *handlers.SettingsHandler
 	updaterHandler         *handlers.UpdaterHandler
 	userHandler            *handlers.UserHandler
@@ -52,9 +51,6 @@ type Server struct {
 	projectEnvHandler      *handlers.ProjectEnvHandler
 	notificationHandler    *handlers.NotificationHandler
 	gitAppsHandler         *handlers.GitAppsHandler
-	aiSettingsHandler      *handlers.AISettingsHandler
-	emailSettingsHandler   *handlers.EmailSettingsHandler
-	aiDiagnosticsHandler   *handlers.AIDiagnosticsHandler
 	vercelHandler          *handlers.VercelHandler
 	serverlessHandler      *handlers.ServerlessHandler
 	systemHandler          *handlers.SystemHandler

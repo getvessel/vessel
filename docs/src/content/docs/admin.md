@@ -70,7 +70,7 @@ Access from **Settings** in the dashboard. Only the first registered user (insta
 
 ### Global Configuration
 
-- **Wildcard Domain**: Set the base domain for all services across all workspaces.
+- **Wildcard Domain**: Set the base domain for all services across all projects.
 - **SMTP Configuration**: Instance-wide SMTP settings for transactional emails.
 - **DNS Resolvers**: Custom DNS resolvers for container networking.
 - **Port Ranges**: Configure the port pool for service allocation.
@@ -132,7 +132,7 @@ The license is validated against the licensing server and applied immediately.
 Plans may include:
 
 - Seat limits (number of users)
-- Workspace limits
+- Instance limits
 - Premium features (audit logs, SSO, advanced RBAC)
 
 ## Telemetry

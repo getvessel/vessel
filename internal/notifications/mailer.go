@@ -10,68 +10,16 @@ import (
 )
 
 type MailerService struct {
-	workspaceEmailService *services.EmailSettingsService
 	globalSettingsService *services.SettingsService
 }
 
-func NewMailerService(workspaceEmail *services.EmailSettingsService, globalSettings *services.SettingsService) (*MailerService, error) {
+func NewMailerService(globalSettings *services.SettingsService) (*MailerService, error) {
 	if err := LoadTemplates(); err != nil {
 		return nil, fmt.Errorf("failed to load email templates: %w", err)
 	}
 	return &MailerService{
-		workspaceEmailService: workspaceEmail,
 		globalSettingsService: globalSettings,
 	}, nil
-}
-
-func (s *MailerService) SendTeamEmail(ctx context.Context, workspaceID, templateName string, toAddress string, subject string, data any) error {
-
-	settings, err := s.workspaceEmailService.GetWorkspaceEmailSettings(ctx, workspaceID)
-	if err != nil {
-		return fmt.Errorf("fetching team email settings: %w", err)
-	}
-
-	host := ""
-	port := ""
-	user := ""
-	pass := ""
-	from := ""
-
-	if settings != nil {
-		if settings.SMTPHost != "" {
-			host = settings.SMTPHost
-			port = fmt.Sprintf("%d", settings.SMTPPort)
-			user = settings.SMTPUser
-			pass = settings.SMTPPassword
-			from = settings.SMTPFromAddress
-		}
-	}
-
-	if host == "" || from == "" {
-		return fmt.Errorf("SMTP configuration missing for team %s and global env", workspaceID)
-	}
-
-	// Render template
-	var buf bytes.Buffer
-	if err := HTMLTemplates.ExecuteTemplate(&buf, templateName, data); err != nil {
-		return fmt.Errorf("executing template %s: %w", templateName, err)
-	}
-
-	msg := fmt.Appendf(nil, "To: %s\r\n"+
-		"From: %s\r\n"+
-		"Subject: %s\r\n"+
-		"Content-Type: text/html; charset=UTF-8\r\n\r\n"+
-		"%s", toAddress, from, subject, buf.String())
-
-	auth := smtp.PlainAuth("", user, pass, host)
-	addr := fmt.Sprintf("%s:%s", host, port)
-
-	err = smtp.SendMail(addr, auth, from, []string{toAddress}, msg)
-	if err != nil {
-		return fmt.Errorf("smtp.SendMail: %w", err)
-	}
-
-	return nil
 }
 
 func (s *MailerService) SendSystemEmail(ctx context.Context, templateName string, toAddress string, subject string, data any) error {

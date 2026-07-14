@@ -22,23 +22,6 @@ definitions:
       name:
         type: string
     type: object
-  handlers.CreateSSHKeyRequest:
-    properties:
-      name:
-        type: string
-      publicKey:
-        type: string
-    type: object
-  handlers.CreateTrustedDomainRequest:
-    properties:
-      domain:
-        type: string
-    type: object
-  handlers.CreateWorkspaceRequest:
-    properties:
-      name:
-        type: string
-    type: object
   handlers.ForgotPasswordRequest:
     properties:
       email:
@@ -47,8 +30,6 @@ definitions:
   handlers.GitAppsManifestRequest:
     properties:
       code:
-        type: string
-      workspaceId:
         type: string
     type: object
   handlers.GithubWebhookPayload:
@@ -86,11 +67,7 @@ definitions:
     type: object
   handlers.TestNotificationRequest:
     properties:
-      channelId:
-        type: string
       provider:
-        type: string
-      workspaceId:
         type: string
     type: object
   handlers.UpdateProfileRequest:
@@ -231,8 +208,6 @@ definitions:
       repository_url:
         type: string
       repositoryUrl:
-        type: string
-      workspaceId:
         type: string
     type: object
   models.CreateTokenRequest:
@@ -608,67 +583,6 @@ definitions:
         type: string
       url:
         type: string
-    type: object
-  models.Workspace:
-    properties:
-      avatarUrl:
-        type: string
-      createdAt:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      ownerId:
-        type: string
-      preferredRegion:
-        type: string
-      updatedAt:
-        type: string
-    type: object
-  models.WorkspaceAISettings:
-    properties:
-      apiKey:
-        type: string
-      createdAt:
-        type: string
-      id:
-        type: string
-      provider:
-        type: string
-      updatedAt:
-        type: string
-      workspaceId:
-        type: string
-    type: object
-  models.WorkspaceEmailSettings:
-    properties:
-      createdAt:
-        type: string
-      id:
-        type: string
-      resendApiKey:
-        type: string
-      smtpFromAddress:
-        type: string
-      smtpFromName:
-        type: string
-      smtpHost:
-        type: string
-      smtpPassword:
-        type: string
-      smtpPort:
-        type: integer
-      smtpUser:
-        type: string
-      updatedAt:
-        type: string
-      useResend:
-        type: boolean
-      workspaceId:
-        type: string
-    type: object
-  models.WorkspaceNotificationChannel:
     type: object
 host: localhost:8080
 info:
@@ -1152,23 +1066,6 @@ paths:
       summary: Deploy from uploaded archive
       tags:
       - Archive
-  /deployments/{id}/diagnostics:
-    post:
-      consumes:
-      - application/json
-      description: Analyze endpoint
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: Analyze endpoint
-      tags:
-      - Deployments
   /deployments/{id}/logs:
     get:
       consumes:
@@ -2253,67 +2150,6 @@ paths:
       summary: ExchangeGithubManifestCode endpoint
       tags:
       - Settings
-  /settings/notifications:
-    get:
-      consumes:
-      - application/json
-      description: ListChannels endpoint
-      produces:
-      - application/json
-      responses: {}
-      summary: ListChannels endpoint
-      tags:
-      - Settings
-    put:
-      consumes:
-      - application/json
-      description: SaveChannel endpoint
-      parameters:
-      - description: Payload
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/models.WorkspaceNotificationChannel'
-      produces:
-      - application/json
-      responses: {}
-      summary: SaveChannel endpoint
-      tags:
-      - Settings
-  /settings/notifications/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: DeleteChannel endpoint
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: DeleteChannel endpoint
-      tags:
-      - Settings
-    get:
-      consumes:
-      - application/json
-      description: GetWorkspaceNotificationChannel endpoint
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: GetWorkspaceNotificationChannel endpoint
-      tags:
-      - Settings
   /settings/notifications/test:
     post:
       consumes:
@@ -2584,252 +2420,6 @@ paths:
       summary: HandleGitHubWebhook endpoint
       tags:
       - Webhooks
-  /workspaces:
-    post:
-      consumes:
-      - application/json
-      description: Create endpoint
-      parameters:
-      - description: Payload
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.CreateWorkspaceRequest'
-      produces:
-      - application/json
-      responses: {}
-      summary: Create endpoint
-      tags:
-      - Workspaces
-  /workspaces/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete endpoint
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: Delete endpoint
-      tags:
-      - Workspaces
-    get:
-      consumes:
-      - application/json
-      description: Get endpoint
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: Get endpoint
-      tags:
-      - Workspaces
-    put:
-      consumes:
-      - application/json
-      description: Update endpoint
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Payload
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/models.Workspace'
-      produces:
-      - application/json
-      responses: {}
-      summary: Update endpoint
-      tags:
-      - Workspaces
-  /workspaces/{workspaceId}/ai_settings:
-    get:
-      consumes:
-      - application/json
-      description: Get endpoint
-      parameters:
-      - description: workspaceId
-        in: path
-        name: workspaceId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: Get endpoint
-      tags:
-      - Workspaces
-    put:
-      consumes:
-      - application/json
-      description: Save endpoint
-      parameters:
-      - description: workspaceId
-        in: path
-        name: workspaceId
-        required: true
-        type: string
-      - description: Payload
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/models.WorkspaceAISettings'
-      produces:
-      - application/json
-      responses: {}
-      summary: Save endpoint
-      tags:
-      - Workspaces
-  /workspaces/{workspaceId}/audit-logs:
-    get:
-      consumes:
-      - application/json
-      description: ListAuditLogs endpoint
-      parameters:
-      - description: workspaceId
-        in: path
-        name: workspaceId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: ListAuditLogs endpoint
-      tags:
-      - Workspaces
-  /workspaces/{workspaceId}/email_settings:
-    get:
-      consumes:
-      - application/json
-      description: Get Team Email Settings
-      parameters:
-      - description: Team ID
-        in: path
-        name: workspaceId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: Get Team Email Settings
-      tags:
-      - Settings
-    put:
-      consumes:
-      - application/json
-      description: Save Team Email Settings
-      parameters:
-      - description: Team ID
-        in: path
-        name: workspaceId
-        required: true
-        type: string
-      - description: Payload
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/models.WorkspaceEmailSettings'
-      produces:
-      - application/json
-      responses: {}
-      summary: Save Team Email Settings
-      tags:
-      - Settings
-  /workspaces/{workspaceId}/ssh-keys:
-    get:
-      consumes:
-      - application/json
-      description: ListSSHKeys endpoint
-      parameters:
-      - description: workspaceId
-        in: path
-        name: workspaceId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: ListSSHKeys endpoint
-      tags:
-      - Workspaces
-    post:
-      consumes:
-      - application/json
-      description: CreateSSHKey endpoint
-      parameters:
-      - description: workspaceId
-        in: path
-        name: workspaceId
-        required: true
-        type: string
-      - description: Payload
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.CreateSSHKeyRequest'
-      produces:
-      - application/json
-      responses: {}
-      summary: CreateSSHKey endpoint
-      tags:
-      - Workspaces
-  /workspaces/{workspaceId}/trusted-domains:
-    get:
-      consumes:
-      - application/json
-      description: ListTrustedDomains endpoint
-      parameters:
-      - description: workspaceId
-        in: path
-        name: workspaceId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: ListTrustedDomains endpoint
-      tags:
-      - Workspaces
-    post:
-      consumes:
-      - application/json
-      description: CreateTrustedDomain endpoint
-      parameters:
-      - description: workspaceId
-        in: path
-        name: workspaceId
-        required: true
-        type: string
-      - description: Payload
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.CreateTrustedDomainRequest'
-      produces:
-      - application/json
-      responses: {}
-      summary: CreateTrustedDomain endpoint
-      tags:
-      - Workspaces
   /ws/services/{id}/terminal:
     get:
       description: Upgrade connection to WebSocket and attach to container terminal
