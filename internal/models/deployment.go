@@ -54,6 +54,7 @@ type AppService struct {
 	BuildEngine     string      `json:"buildEngine" db:"build_engine"`
 	InternalPort    int         `json:"internalPort" db:"internal_port"`
 	Domain          string      `json:"domain" db:"domain"`
+	StaticOutput    string      `json:"staticOutput" db:"static_output"`
 	HealthCheckPath string      `json:"healthCheckPath" db:"health_check_path"`
 	ContainerID     string      `json:"containerId" db:"container_id"`
 	Status          string      `json:"status" db:"status"`
@@ -74,6 +75,7 @@ type CreateAppServiceRequest struct {
 	BuildEngine     string      `json:"buildEngine"`
 	InternalPort    int         `json:"internalPort"`
 	Domain          string      `json:"domain"`
+	StaticOutput    string      `json:"staticOutput"`
 	HealthCheckPath string      `json:"healthCheckPath"`
 }
 
@@ -89,6 +91,7 @@ type UpdateAppServiceRequest struct {
 	BuildEngine     string      `json:"buildEngine"`
 	InternalPort    int         `json:"internalPort"`
 	Domain          string      `json:"domain"`
+	StaticOutput    string      `json:"staticOutput"`
 	HealthCheckPath string      `json:"healthCheckPath"`
 	ContainerID     string      `json:"containerId"`
 	Status          string      `json:"status"`

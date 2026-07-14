@@ -160,6 +160,7 @@ func (h *AppHandler) Update(c echo.Context) error {
 	existing.InternalPort = req.InternalPort
 	existing.RuntimeMode = req.RuntimeMode
 	existing.Domain = req.Domain
+	existing.StaticOutput = req.StaticOutput
 	existing.HealthCheckPath = req.HealthCheckPath
 	existing.ContainerID = req.ContainerID
 	existing.Status = req.Status

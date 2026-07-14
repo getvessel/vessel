@@ -80,13 +80,19 @@ func (b *EngineBuilder) Build(ctx context.Context, opts BuildOptions) (string, e
 		if err != nil {
 			return "", fmt.Errorf("dockerfile build failed: %w", err)
 		}
-		return imageTag, nil
+		if opts.AppConfig != nil && opts.AppConfig.StaticOutput != "" {
+			imageTag, err = b.wrapStaticOutput(ctx, imageTag, opts.AppConfig.StaticOutput, opts.LogWriter)
+		}
+		return imageTag, err
 	case StrategyRailpack, StrategyNixpacks, StrategyBuildpacks:
 		imageTag, err := b.railpackBuilder.Build(ctx, opts, string(strategy))
 		if err != nil {
 			return "", fmt.Errorf("%s build failed: %w", strategy, err)
 		}
-		return imageTag, nil
+		if opts.AppConfig != nil && opts.AppConfig.StaticOutput != "" {
+			imageTag, err = b.wrapStaticOutput(ctx, imageTag, opts.AppConfig.StaticOutput, opts.LogWriter)
+		}
+		return imageTag, err
 	default:
 		return "", fmt.Errorf("unsupported build strategy: %s", strategy)
 	}
@@ -111,4 +117,41 @@ func (b *EngineBuilder) DetectStrategy(sourceDir, dockerfilePath string, app *mo
 	}
 
 	return StrategyRailpack
+}
+
+func (b *EngineBuilder) wrapStaticOutput(ctx context.Context, baseImageTag string, staticOutputDir string, logWriter io.Writer) (string, error) {
+	if logWriter != nil {
+		fmt.Fprintf(logWriter, "📦 [StaticOutput] Extracting %s and wrapping in NGINX alpine...\n", staticOutputDir)
+	}
+
+	tmpDir, err := os.MkdirTemp("", "vessl-static-*")
+	if err != nil {
+		return "", err
+	}
+	defer os.RemoveAll(tmpDir)
+
+	sourcePath := staticOutputDir
+	if !filepath.IsAbs(sourcePath) {
+		sourcePath = filepath.Join("/app", sourcePath)
+	}
+
+	dockerfileContent := fmt.Sprintf(`
+FROM %s AS builder
+FROM nginx:alpine
+COPY --from=builder %s /usr/share/nginx/html
+EXPOSE 80
+`, baseImageTag, sourcePath)
+
+	if err := os.WriteFile(filepath.Join(tmpDir, "Dockerfile"), []byte(dockerfileContent), 0644); err != nil {
+		return "", err
+	}
+
+	opts := BuildOptions{
+		ProjectID:      baseImageTag + "-static",
+		SourceDir:      tmpDir,
+		DockerfilePath: "Dockerfile",
+		LogWriter:      logWriter,
+	}
+
+	return b.dockerfileBuilder.Build(ctx, opts)
 }

@@ -219,6 +219,9 @@ func (d *Deployer) startContainer(ctx context.Context, app *models.AppService, c
 	if port <= 0 {
 		port = defaultAppPort()
 	}
+	if app.StaticOutput != "" {
+		port = 80 // NGINX alpine default port
+	}
 	memMB := defaultMemoryMB()
 	cpuReq := defaultCPURequest()
 	_, err := d.containerManager.CreateAndStart(
