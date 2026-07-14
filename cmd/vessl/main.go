@@ -3,9 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/spf13/cobra"
 )
+
+var version = "dev"
 
 var rootCmd = &cobra.Command{
 	Use:   "vessl",
@@ -16,7 +19,16 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Print the vessl CLI version",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf("vessl %s %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
+	},
+}
+
 func main() {
+	rootCmd.AddCommand(versionCmd)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

@@ -87,7 +87,7 @@ curl -fsSL "$COMPOSE_URL" -o "$VESSL_DIR/docker-compose.yml"
 curl -fsSL "$CTL_URL" -o "$VESSL_DIR/vesslctl"
 chmod +x "$VESSL_DIR/vesslctl"
 
-# Install vesslctl to PATH
+# Install vesslctl to PATH (shell wrapper that proxies commands into the container)
 ln -sf "$VESSL_DIR/vesslctl" /usr/local/bin/vesslctl
 
 # --- .env generation ---
@@ -223,7 +223,8 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo -e "  ${BOLD}📍 Dashboard:${NC}  http://${SERVER_IP}:8080"
 echo -e "  ${BOLD}📖 Docs:${NC}       https://docs.vessl.dev"
-echo -e "  ${BOLD}🛠️  CLI:${NC}        vesslctl --help"
+echo -e "  ${BOLD}🛠️  Server CLI:${NC}  vesslctl --help (runs commands inside the container)"
+echo -e "  ${DIM}Install the remote CLI on your laptop: curl -fsSL https://get.vessl.dev/cli | sh${NC}"
 echo ""
 
 echo -e "  ${BOLD}📍 Dashboard:${NC}  ${DASHBOARD_URL:-http://${SERVER_IP}:8080}"
@@ -260,6 +261,9 @@ if [ "$RUN_SETUP" = "y" ] || [ "$RUN_SETUP" = "Y" ]; then
   vesslctl setup
   echo ""
   echo -e "${GREEN}✅ Admin account created. You can now log in at http://${SERVER_IP}:8080${NC}"
+  echo ""
+  echo -e "  ${DIM}Install the remote CLI on your laptop to manage this server remotely:${NC}"
+  echo -e "  ${DIM}  curl -fsSL https://get.vessl.dev/cli | sh${NC}"
 fi
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

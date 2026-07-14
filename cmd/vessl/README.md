@@ -5,10 +5,14 @@ The `vessl` binary is the remote client for your self-hosted Vessl server. It ru
 ## Installation
 
 ```sh
-go install vessl.dev/vessl/cmd/vessl@latest
+curl -fsSL https://get.vessl.dev/cli | sh
 ```
 
-Or download a pre-built binary from the [releases page](https://github.com/vesslhq/vessl/releases).
+Or if you have Go installed:
+
+```sh
+go install vessl.dev/vessl/cmd/vessl@latest
+```
 
 After installing, authenticate against your server:
 

@@ -59,8 +59,9 @@ After the install script completes, you'll see:
 
 ```text
 ✅ Vessl vlatest installed successfully!
-  📍 Dashboard:  http://203.0.113.42:8080
-  🛠️  CLI:        vesslctl --help
+  📍 Dashboard:    http://203.0.113.42:8080
+  🛠️  Server CLI:  vesslctl --help
+  💻 Remote CLI:   curl -fsSL https://get.vessl.dev/cli | sh
 ```
 
 ### Create Your Account
@@ -79,9 +80,9 @@ You have two ways to create the admin account:
   </TabItem>
 </Tabs>
 
-### CLI Admin Tool
+### Server CLI (`vesslctl`)
 
-The install script places `vesslctl` at `/usr/local/bin/vesslctl`. Use it for day-to-day admin tasks:
+The install script places `vesslctl` at `/usr/local/bin/vesslctl`. This is a shell wrapper that runs commands **inside the Docker container** on your server:
 
 ```sh
 vesslctl status            # Show daemon health and running containers
@@ -92,6 +93,17 @@ vesslctl config site-name=MyVessl  # Update a setting
 vesslctl backup            # Create a manual database backup
 vesslctl update            # Upgrade to the latest version
 vesslctl downgrade v0.1.0  # Downgrade to a specific version
+```
+
+### Remote CLI (`vessl`)
+
+Install on your **local machine** to manage your server from anywhere:
+
+```sh
+curl -fsSL https://get.vessl.dev/cli | sh
+vessl login    # Connect to your server
+vessl project list
+vessl deploy <service-id>
 ```
 
 ### Configure a Domain (Recommended)
@@ -136,6 +148,19 @@ Without a domain, Vessl assigns a magic DNS subdomain (like `sslip.io` or `traef
 
 <Aside>Vessl provisions the container with persistent volumes and injects the connection string into your apps automatically.</Aside>
 
+### From a Template
+
+Deploy a ready-made starter from the [vessl-examples](https://github.com/vesslhq/vessl-examples) repository:
+
+```sh
+vesslctl deploy --template go-fiber
+vesslctl deploy --template node-express
+vesslctl deploy --template python-fastapi
+vesslctl deploy --template nextjs
+```
+
+This clones the template, builds it, and deploys it in one step. Browse all available templates at **[github.com/vesslhq/vessl-examples](https://github.com/vesslhq/vessl-examples)**.
+
 ## What's Next
 
 - [Follow the tutorial → Deploy your first app in 5 minutes](/tutorial/)
@@ -143,4 +168,4 @@ Without a domain, Vessl assigns a magic DNS subdomain (like `sslip.io` or `traef
 - [Add a database](/databases/)
 - [Configure environment variables](/configuration/)
 - [Set up notifications](/configuration/#notifications)
-- [Manage Vessl via CLI](/admin/#cli-admin-tool)
+- [CLI reference](/cli/)

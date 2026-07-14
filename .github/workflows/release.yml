@@ -48,7 +48,7 @@ jobs:
           for GOARCH in amd64 arm64; do
             echo "Building vessld for linux/$GOARCH..."
             GOOS=linux GOARCH=$GOARCH go build -ldflags="-s -w -X main.vesslVersion=$VERSION" -o dist/vessld_linux_$GOARCH ./cmd/vessld
-            
+
             # Compress
             tar -czf dist/vessld_linux_$GOARCH.tar.gz -C dist vessld_linux_$GOARCH
             rm dist/vessld_linux_$GOARCH

@@ -5,9 +5,13 @@ description: Instance management, system updates, license management, and global
 
 Vessl administration covers instance-wide configuration available to instance admins.
 
-## CLI Admin Tool
+## CLI Administration
 
-After installation, `vesslctl` is available at `/usr/local/bin/vesslctl` for managing Vessl from the terminal.
+Vessl provides three CLI tools for different environments and use cases:
+
+### Server CLI (`vesslctl`)
+
+After installation, `vesslctl` is available at `/usr/local/bin/vesslctl`. This is a shell wrapper that manages the Vessl daemon by executing commands **inside the Docker container**. Use it for day-to-day server administration:
 
 ```sh
 vesslctl status           # Show daemon health + running containers
@@ -23,6 +27,7 @@ vesslctl restart          # Restart the Vessl daemon
 
 # App management
 vesslctl deploy <git-url>           # Deploy an app from a Git URL
+vesslctl deploy --template nextjs   # Deploy a template from vesslhq/vessl-examples
 vesslctl deploy --image nginx:latest --port 80  # Deploy from a Docker image
 vesslctl apps:list                  # List all apps
 vesslctl apps:show <id>             # Show app details
@@ -36,7 +41,7 @@ vesslctl db:create <name> <engine> # Create a database (postgres, mysql, redis, 
 vesslctl db:destroy <id>           # Delete a database
 ```
 
-For development or standalone (non-Docker) mode, the `vessld` binary supports the same subcommands:
+### Daemon CLI (`vessld`)
 
 ```sh
 vessld serve              # Start the daemon (default)
@@ -44,11 +49,23 @@ vessld setup              # Setup wizard
 vessld reset-password     # Reset admin password
 vessld config             # View/update configuration
 vessld deploy <url>       # Deploy from Git URL
+vessld deploy --template  # Deploy a template
 vessld apps:list          # List apps
 vessld db:list            # List databases
 vessld mcp                # Run MCP stdio server
 vessld version            # Show version
 ```
+
+### Remote CLI (`vessl`)
+
+For remote management from your local machine, install the `vessl` client:
+
+```sh
+curl -fsSL https://get.vessl.dev/cli | sh
+vessl login    # Connect to your server
+```
+
+For a full list of remote commands, see the [CLI Reference](/cli/).
 
 ### Update with `vesslctl update`
 
