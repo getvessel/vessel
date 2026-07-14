@@ -155,6 +155,7 @@ func (h *AppHandler) Update(c echo.Context) error {
 	existing.RootDirectory = req.RootDirectory
 	existing.BuildCommand = req.BuildCommand
 	existing.StartCommand = req.StartCommand
+	existing.InstallCommand = req.InstallCommand
 	existing.DockerfilePath = req.DockerfilePath
 	existing.BuildEngine = req.BuildEngine
 	existing.InternalPort = req.InternalPort

@@ -48,6 +48,7 @@ type AppService struct {
 	Branch          string      `json:"branch" db:"branch"`
 	RootDirectory   string      `json:"rootDirectory" db:"root_directory"`
 	RuntimeMode     RuntimeMode `json:"runtimeMode" db:"runtime_mode"`
+	InstallCommand  string      `json:"installCommand" db:"install_command"`
 	BuildCommand    string      `json:"buildCommand" db:"build_command"`
 	StartCommand    string      `json:"startCommand" db:"start_command"`
 	DockerfilePath  string      `json:"dockerfilePath" db:"dockerfile_path"`
@@ -69,6 +70,7 @@ type CreateAppServiceRequest struct {
 	Branch          string      `json:"branch"`
 	RootDirectory   string      `json:"rootDirectory"`
 	RuntimeMode     RuntimeMode `json:"runtimeMode"`
+	InstallCommand  string      `json:"installCommand"`
 	BuildCommand    string      `json:"buildCommand"`
 	StartCommand    string      `json:"startCommand"`
 	DockerfilePath  string      `json:"dockerfilePath"`
@@ -85,6 +87,7 @@ type UpdateAppServiceRequest struct {
 	Branch          string      `json:"branch"`
 	RootDirectory   string      `json:"rootDirectory"`
 	RuntimeMode     RuntimeMode `json:"runtimeMode"`
+	InstallCommand  string      `json:"installCommand"`
 	BuildCommand    string      `json:"buildCommand"`
 	StartCommand    string      `json:"startCommand"`
 	DockerfilePath  string      `json:"dockerfilePath"`
