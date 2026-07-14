@@ -3,6 +3,8 @@ title: Railway Import
 description: Import Railway projects into Vessl, including services, variables, databases, custom domains, and optional data imports.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+
 Railway import translates a Railway project into Vessl projects and services. It is for moving workloads from Railway into your own server.
 
 ## What You Need
@@ -18,10 +20,12 @@ Railway internal hosts ending in `.railway.internal` are only reachable inside R
 
 The import modal walks through four steps:
 
+<Steps>
 1. Enter Railway API token.
 2. Select a Railway project.
 3. Choose environment and migration options.
 4. Run the import.
+</Steps>
 
 Vessl reads Railway environments, service instances, service variables, source metadata, repo triggers, command overrides, root directory, custom domains, and detected service images when Railway exposes them.
 

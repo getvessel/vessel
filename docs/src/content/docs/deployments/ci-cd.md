@@ -5,10 +5,10 @@ description: Set up automatic deployments on push.
 
 ## Git Providers
 
-Connect GitHub or GitLab to enable automatic deployments:
+Connect GitHub, GitLab, or Bitbucket to enable automatic deployments:
 
 1. Go to **Settings → Git Apps**.
-2. Install the Vessl GitHub App or configure a GitLab App.
+2. Install the Vessl GitHub App, or configure a GitLab / Bitbucket App.
 3. Grant repository access to the repos you want to deploy.
 
 ## Automatic Deployments

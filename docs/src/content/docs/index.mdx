@@ -21,22 +21,27 @@ import { Card, CardGrid, LinkCard, Icon } from '@astrojs/starlight/components';
 
 ## Getting Started
 
-<CardGrid stagger>
- <Card title="Installation" icon="rocket">
-  Deploy Vessl on any Linux VPS in under 60 seconds.
-    <br/>
-    <LinkCard title="Read Guide" href="/getting-started/installation/" />
- </Card>
- <Card title="Deploy an App" icon="laptop">
-  Docker, Railpack, Nixpacks, or Buildpacks — pick your strategy.
-    <br/>
-    <LinkCard title="Read Guide" href="/deployments/build-strategies/" />
- </Card>
- <Card title="Create a Database" icon="seti:db">
-  15 managed engines — PostgreSQL, MySQL, Redis, Kafka, and more.
-    <br/>
-    <LinkCard title="Read Guide" href="/databases/provisioning/" />
- </Card>
+<CardGrid>
+  <LinkCard
+    title="Installation"
+    description="Deploy Vessl on any Linux VPS in under 60 seconds."
+    href="/getting-started/installation/"
+  />
+  <LinkCard
+    title="Browser Onboarding"
+    description="Securely initialize your server and create an admin account."
+    href="/getting-started/onboarding/"
+  />
+  <LinkCard
+    title="Quick Start"
+    description="Take a quick tour of the Vessl dashboard and core features."
+    href="/getting-started/quick-start/"
+  />
+  <LinkCard
+    title="Deploy Your First App"
+    description="Learn how to deploy a basic app from GitHub or a template."
+    href="/tutorial/"
+  />
 </CardGrid>
 
 ## Platform Features
@@ -48,19 +53,19 @@ import { Card, CardGrid, LinkCard, Icon } from '@astrojs/starlight/components';
     href="/projects/overview/"
   />
   <LinkCard
+    title="Service Types"
+    description="Deploy Docker images, Compose stacks, source code, and functions."
+    href="/deployments/service-types/"
+  />
+  <LinkCard
+    title="Databases"
+    description="15 managed engines with automated backups and 1-click restore."
+    href="/databases/provisioning/"
+  />
+  <LinkCard
     title="Storage & Backups"
     description="MinIO object storage, R2 integration, and database backups."
     href="/storage-and-backups/minio-storage/"
-  />
-  <LinkCard
-    title="Templates"
-    description="Deploy 1-click apps or use starter kits from the Examples repo."
-    href="/deployments/templates/"
-  />
-  <LinkCard
-    title="Integrations"
-    description="Git providers, OAuth, Vercel import, and outgoing webhooks."
-    href="/integrations/"
   />
 </CardGrid>
 
@@ -76,6 +81,11 @@ import { Card, CardGrid, LinkCard, Icon } from '@astrojs/starlight/components';
     title="Teams"
     description="Invite members to collaborate on projects with role-based access."
     href="/operations/teams/"
+  />
+  <LinkCard
+    title="Maintenance & Updates"
+    description="Automated garbage collection, disk alerts, and seamless auto-updates."
+    href="/operations/maintenance-and-updates/"
   />
   <LinkCard
     title="API Reference"

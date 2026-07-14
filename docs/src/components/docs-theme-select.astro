@@ -4,8 +4,8 @@ import { Icon } from '@astrojs/starlight/components';
 
 <vessl-theme-toggle>
   <button aria-label="Toggle theme" title="Toggle theme">
-    <Icon name="sun" class="sun-icon" />
-    <Icon name="moon" class="moon-icon" />
+    <span class="sun-icon"><Icon name="sun" /></span>
+    <span class="moon-icon"><Icon name="moon" /></span>
   </button>
 </vessl-theme-toggle>
 
@@ -25,18 +25,18 @@ import { Icon } from '@astrojs/starlight/components';
     color: var(--sl-color-white);
     background: rgba(255, 255, 255, 0.05);
   }
-  :global([data-theme='light']) .sun-icon {
-    display: none;
-  }
-  :global([data-theme='dark']) .moon-icon {
-    display: none;
-  }
-  :global(:not([data-theme='light']):not([data-theme='dark'])) {
-    @media (prefers-color-scheme: light) {
-      .sun-icon { display: none; }
+  
+  :global([data-theme='light']) .sun-icon { display: none; }
+  :global([data-theme='dark']) .moon-icon { display: none; }
+  
+  @media (prefers-color-scheme: light) {
+    :global(:not([data-theme='light']):not([data-theme='dark'])) .sun-icon {
+      display: none;
     }
-    @media (prefers-color-scheme: dark) {
-      .moon-icon { display: none; }
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:not([data-theme='light']):not([data-theme='dark'])) .moon-icon {
+      display: none;
     }
   }
 </style>

@@ -3,6 +3,8 @@ title: Teams & Collaboration
 description: Invite members to your Vessl projects to collaborate.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+
 Vessl provides project-based team collaboration. While the system operates with global user accounts, permissions and access are scoped to individual projects.
 
 ## Project Members
@@ -11,11 +13,13 @@ You can invite other users to collaborate on your Vessl projects. Members have a
 
 ### Inviting Members
 
+<Steps>
 1. Navigate to your project in the Vessl dashboard.
 2. Go to **Settings → Members**.
 3. Enter the email address of the user you want to invite.
 4. Select their **Permission level**.
 5. Click **Invite**.
+</Steps>
 
 The invited user will receive an email containing a secure invitation link.
 
@@ -36,8 +40,10 @@ Once a user accepts the invitation, they will be listed as an active team member
 
 Project administrators can remove members at any time:
 
+<Steps>
 1. Go to **Settings → Members**.
 2. Find the active member.
 3. Click the action menu and select **Remove**.
+</Steps>
 
 The member will immediately lose access to the project's dashboard, logs, and services.

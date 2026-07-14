@@ -26,8 +26,6 @@ export default defineConfig({
           items: [
             { label: 'Architecture', slug: 'core-concepts/architecture' },
             { label: 'Projects Overview', slug: 'projects/overview' },
-            { label: 'Environments', slug: 'projects/environments' },
-            { label: 'Canvas View', slug: 'projects/canvas' },
             { label: 'Project Settings', slug: 'projects/settings' },
           ],
         },
@@ -37,19 +35,8 @@ export default defineConfig({
             { label: 'Build Strategies', slug: 'deployments/build-strategies' },
             { label: 'Templates & Examples', slug: 'deployments/templates' },
             { label: 'CI/CD & Git', slug: 'deployments/ci-cd' },
-            { label: 'Source Services', slug: 'deployments/source-services' },
-            {
-              label: 'Docker Image Services',
-              slug: 'deployments/docker-image-services',
-            },
-            {
-              label: 'Serverless Functions',
-              slug: 'deployments/serverless-functions',
-            },
-            {
-              label: 'Static Sites & Workers',
-              slug: 'deployments/static-sites-and-workers',
-            },
+            { label: 'Service Types', slug: 'deployments/service-types' },
+            { label: 'Cron Jobs', slug: 'deployments/jobs' },
             {
               label: 'Environment Variables',
               slug: 'deployments/environment-variables',
@@ -99,6 +86,7 @@ export default defineConfig({
           items: [
             { label: 'Vessl Bundles', slug: 'migration/vessl-bundles' },
             { label: 'Railway Import', slug: 'migration/railway-import' },
+            { label: 'Vercel Import', slug: 'migration/vercel-import' },
           ],
         },
         {
@@ -109,14 +97,10 @@ export default defineConfig({
             { label: 'Integrations', slug: 'integrations' },
             { label: 'Domains', slug: 'operations/domains' },
             { label: 'DNS Providers', slug: 'operations/dns-providers' },
+            { label: 'Account Security', slug: 'operations/account-security' },
             {
-              label: 'System Maintenance',
-              slug: 'operations/system-maintenance',
-            },
-            { label: 'System Updates', slug: 'operations/system-updates' },
-            {
-              label: 'Backups & Updates',
-              slug: 'operations/backups-and-updates',
+              label: 'Maintenance & Updates',
+              slug: 'operations/maintenance-and-updates',
             },
             { label: 'Troubleshooting', slug: 'operations/troubleshooting' },
           ],
