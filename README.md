@@ -29,26 +29,84 @@ Vessl is built to be simple but powerful, giving you everything you need to run 
 - **Marketplace Templates:** Instantly deploy popular frameworks (Node.js, Go, Python, Ruby, PHP) from our built-in marketplace.
 - **No Lock-in:** Vessl orchestrates standard Docker containers. If you ever remove Vessl, your apps keep running.
 
-## 💻 CLI Operations
+## 💻 CLI
 
-Manage your entire infrastructure directly from the terminal.
+Vessl ships two CLI tools.
+
+### `vessld` — Server Daemon CLI
+
+Runs **on your VPS**. Manages the server process and all resources directly.
 
 ```bash
-# General Management
-vessld status                # View cluster health and running containers
-vessld setup                 # Run the initial admin configuration wizard
-vessld reset-password        # Reset the dashboard admin password
-vessld logs -f               # Tail global system logs
+# Server management
+vessld serve                  # Start the daemon (default)
+vessld setup                  # Run the initial admin configuration wizard
+vessld reset-password         # Reset the admin password
+vessld config                 # View or update server configuration
 
 # Deployments
-vessld deploy --template node-express            # Deploy an official starter template
-vessld deploy https://github.com/user/repo.git   # Deploy any Git repository
-vessld deploy --image nginx:latest               # Deploy a pre-built Docker image
-vessld deploy --compose docker-compose.yml       # Deploy a full Docker Compose stack
+vessld deploy https://github.com/user/repo.git   # Deploy from Git
+vessld deploy --image nginx:latest --port 80     # Deploy a Docker image
+vessld deploy --compose docker-compose.yml       # Deploy a Compose stack
 
-# App & Resource Management
-vessld apps:list                                 # List all running applications
-vessld db:create my-db postgres --project <id>   # Provision a managed database
+# Resource management
+vessld project:list                              # List all projects
+vessld apps:list                                 # List all applications
+vessld apps:show <id>                            # Show app details
+vessld db:list                                   # List all databases
+vessld db:create my-db postgres --project <id>  # Provision a database
+vessld env:list --project <id>                  # List environment variables
+vessld env:set KEY=VALUE --project <id>         # Set an environment variable
+vessld deployment:list --service <id>           # List deployment history
+vessld deployment:logs <id>                     # View build logs
+vessld domain:list --project <id>              # List custom domains
+```
+
+### `vessl` — Remote CLI
+
+Runs **on your local machine**. Connects to your self-hosted `vessld` server over HTTP.
+
+**Installation:**
+
+```bash
+go install vessl.dev/vessl/cmd/vessl@latest
+```
+
+**Usage:**
+
+```bash
+# Authentication
+vessl login                           # Connect to your self-hosted server
+vessl logout                          # Clear saved credentials
+vessl me                              # Show current logged-in user
+
+# Projects & Environments
+vessl project list                    # List all projects
+vessl project create <name>           # Create a project
+vessl project destroy <id>            # Delete a project
+vessl env list                        # List environments
+vessl env create <name>               # Create an environment
+
+# Applications
+vessl apps list --environment <id>    # List apps
+vessl apps create                     # Create an app
+vessl apps destroy <id>               # Delete an app
+vessl apps secrets list --project <id>            # List env vars
+vessl apps secrets set KEY=VALUE --project <id>   # Set env var(s)
+vessl apps domains list --project <id>            # List custom domains
+vessl apps domains add <host> --project <id>      # Add a custom domain
+vessl apps deployments list --service <id>        # Deployment history
+vessl apps logs <deployment-id>                   # View build logs
+
+# Databases
+vessl db list --project <id>          # List databases
+vessl db create                       # Provision a database
+vessl db destroy <id>                 # Delete a database
+vessl db backups list --project <id>  # List backup configs
+vessl db backups trigger <id>         # Trigger a manual backup
+
+# Deployments
+vessl deploy <service-id>             # Trigger a remote deployment
 ```
 
 ## 🛠️ Local Development
@@ -63,11 +121,11 @@ cd vessl
 # 2. Setup your environment
 cp .env.example .env
 
-# 3. Run the Go daemon locally (Starts on port :8080)
-go run ./cmd
+# 3. Run the Go daemon locally (starts on :8080)
+go run ./cmd/vessld
 ```
 
-**Requirements:** Go 1.25+, Node.js 22+, and Docker.
+**Requirements:** Go 1.22+, Node.js 22+, and Docker.
 
 ## 📚 Documentation
 
