@@ -1,0 +1,17 @@
+x-vessl:
+  is_one_click: true
+  name: Nextcloud
+  description: Self-hosted cloud storage & collaboration
+services:
+  nextcloud:
+    image: nextcloud
+    restart: always
+    ports:
+      - "80"
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+      POSTGRES_PASSWORD: nextcloud

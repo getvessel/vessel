@@ -1,6 +1,10 @@
-version: '3'
+x-vessl:
+  is_one_click: true
+  name: NocoDB
+  description: Open-source Airtable alternative
 services:
   nocodb:
-    image: nocodb/nocodb:latest
-    environment:
-      NC_DB: "mysql://db:3306?u=root&p=password&d=nocodb"
+    image: nocodb/nocodb
+    restart: always
+    ports:
+      - "8080"

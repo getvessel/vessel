@@ -1,0 +1,10 @@
+x-vessl:
+  is_one_click: true
+  name: n8n
+  description: Open-source workflow automation
+services:
+  n8n:
+    image: n8nio/n8n
+    restart: always
+    ports:
+      - "5678"

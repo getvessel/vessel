@@ -1,10 +1,10 @@
-version: '3'
+x-vessl:
+  is_one_click: true
+  name: Gitea
+  description: Self-hosted Git service
 services:
   gitea:
-    image: gitea/gitea:latest
-    environment:
-      - USER_UID=1000
-      - USER_GID=1000
+    image: gitea/gitea
     restart: always
-    volumes:
-      - ./gitea:/data
+    ports:
+      - "3000"

@@ -1,0 +1,10 @@
+x-vessl:
+  is_one_click: true
+  name: Vaultwarden
+  description: Lightweight Bitwarden-compatible password manager
+services:
+  vaultwarden:
+    image: vaultwarden/server
+    restart: always
+    ports:
+      - "80"

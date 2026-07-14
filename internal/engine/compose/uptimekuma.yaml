@@ -1,0 +1,10 @@
+x-vessl:
+  is_one_click: true
+  name: Uptime Kuma
+  description: Self-hosted uptime monitoring
+services:
+  uptimekuma:
+    image: louislam/uptime-kuma
+    restart: always
+    ports:
+      - "3001"

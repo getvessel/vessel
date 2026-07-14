@@ -1,7 +1,15 @@
-version: '3'
+x-vessl:
+  is_one_click: true
+  name: Plausible
+  description: Privacy-friendly web analytics
 services:
   plausible:
-    image: plausible/analytics:latest
+    image: plausible/analytics
+    restart: always
+    ports:
+      - "8000"
+  db:
+    image: postgres:16-alpine
+    restart: always
     environment:
-      - BASE_URL=https://analytics.example.com
-      - SECRET_KEY_BASE=random_secret
+      POSTGRES_DB: plausible

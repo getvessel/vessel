@@ -59,6 +59,7 @@ type Server struct {
 	serverlessHandler      *handlers.ServerlessHandler
 	systemHandler          *handlers.SystemHandler
 	composeHandler         *handlers.ComposeHandler
+	oneClickHandler        *handlers.OneClickHandler
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
