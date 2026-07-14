@@ -23,6 +23,7 @@ type Deployer struct {
 	containerManager *ContainerManager
 	store            DeployerStore
 	EnvProvider      func(projectID string) (map[string]string, error)
+	EnvInterpolator  func(projectID string) (map[string]map[string]string, error)
 }
 
 func NewDeployer(dockerClient *client.Client, s DeployerStore) *Deployer {
@@ -180,6 +181,15 @@ func (d *Deployer) getEnvironmentVariables(app *models.AppService, logWriter io.
 			}
 			if logWriter != nil && len(linkedEnvs) > 0 {
 				fmt.Fprintf(logWriter, "🔗 [Deployer] Automatically linked %d service connection strings (DATABASE_URL, REDIS_URL, etc.)\n", len(linkedEnvs))
+			}
+		}
+	}
+
+	if d.EnvInterpolator != nil {
+		if registry, err := d.EnvInterpolator(app.ProjectID); err == nil && len(registry) > 0 {
+			envVarsMap = InterpolateEnvVars(envVarsMap, registry)
+			if logWriter != nil {
+				fmt.Fprintf(logWriter, "🔀 [Deployer] Interpolated dynamic variable references (${service.VAR_KEY} syntax).\n")
 			}
 		}
 	}

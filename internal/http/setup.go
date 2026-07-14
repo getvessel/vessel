@@ -222,6 +222,9 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		srv.deployer.EnvProvider = func(projectID string) (map[string]string, error) {
 			return srv.serviceLinker.GetLinkedEnvironmentVariables(context.Background(), projectID)
 		}
+		srv.deployer.EnvInterpolator = func(projectID string) (map[string]map[string]string, error) {
+			return srv.serviceLinker.GetNamespacedVariables(context.Background(), projectID)
+		}
 	}
 
 	srv.registerRoutes()
