@@ -45,6 +45,7 @@ show_help() {
   echo "  update [version]         Upgrade to latest or specific version"
   echo "  downgrade <version>      Downgrade to a specific version"
   echo "  backup                   Create a manual database backup"
+  echo "  uninstall                Remove Vessl daemon (apps keep running)"
   echo "  version                  Show Vessl version"
   echo "  help                     Show this help message"
   echo ""
@@ -258,6 +259,40 @@ case "${1:-help}" in
     echo "   cp $VESSL_DIR/data/backups/vessl-pre-downgrade-*.db $VESSL_DIR/data/vessl.db"
     echo "   vesslctl restart"
     ;;
+  uninstall)
+    echo -e "${RED}⚠️  WARNING: This removes Vessl but keeps your apps running.${NC}"
+    echo -e "${YELLOW}   Your Docker containers, databases, and volumes will NOT be touched.${NC}"
+    echo -e "${YELLOW}   See https://docs.vessl.dev/adopt/ to learn how to take over.${NC}"
+    echo ""
+    echo -n "Type '${BOLD}uninstall${NC}' to confirm: "
+    read -r CONFIRM
+    if [ "$CONFIRM" != "uninstall" ]; then
+      echo "Cancelled."
+      exit 0
+    fi
+    echo ""
+    echo -e "${BOLD}🛑 Stopping Vessl daemon...${NC}"
+    docker compose -f "$VESSL_DIR/docker-compose.yml" stop "$CONTAINER_NAME" 2>/dev/null || true
+    if command -v systemctl &>/dev/null; then
+      systemctl stop vessl.service 2>/dev/null || true
+      systemctl disable vessl.service 2>/dev/null || true
+      rm -f /etc/systemd/system/vessl.service
+      systemctl daemon-reload
+    fi
+    rm -f /usr/local/bin/vesslctl
+    echo ""
+    echo -e "${GREEN}✅ Vessl daemon removed.${NC}"
+    echo -e "${YELLOW}   Your apps, databases, and data are still running:${NC}"
+    echo "   $(docker ps --filter network=vessl-network --format '{{.Names}}' 2>/dev/null | wc -l) containers active"
+    echo ""
+    echo "   To adopt your containers manually:"
+    echo "     docker ps --filter network=vessl-network"
+    echo ""
+    echo "   To fully remove all data (apps, databases, volumes):"
+    echo "     docker compose -f $VESSL_DIR/docker-compose.yml down -v"
+    echo "     rm -rf $VESSL_DIR"
+    ;;
+
   backup)
     BACKUP_FILE="$VESSL_DIR/data/backups/vessl-manual-$(date +%Y%m%d%H%M%S).db"
     mkdir -p "$VESSL_DIR/data/backups"

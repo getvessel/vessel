@@ -61,6 +61,7 @@ func runDeploy(args []string) {
 	envRepo := repositories.NewEnvironmentSQLiteRepository(db)
 	appRepo := repositories.NewAppServiceSQLiteRepository(db)
 	projectRepo := repositories.NewProjectSQLiteRepository(db, envRepo)
+	settingsRepo := repositories.NewSettingsSQLiteRepository(db)
 
 	if projectID == "" {
 		projects, _, _ := projectRepo.List(context.Background(), "", 100, 0)
@@ -155,11 +156,36 @@ func runDeploy(args []string) {
 
 	fmt.Printf("\n✅ Deployed! Container: %s\n", containerID)
 	fmt.Printf("   App: %s (%s)\n", appName, svc.ID[:8])
-	if hostIP := os.Getenv("VESSL_HOST_IP"); hostIP != "" {
-		cleanName := strings.ToLower(strings.ReplaceAll(appName, " ", "-"))
+
+	wildcard := ""
+	settings, err := settingsRepo.GetServerSettings(context.Background())
+	if err == nil {
+		wildcard = settings.DefaultWildcardDomain
+	}
+	if wildcard == "" {
+		wildcard = os.Getenv("VESSL_DOMAIN")
+	}
+
+	if wildcard != "" {
+		cleanName := sanitizeDomainName(appName)
+		fmt.Printf("   URL: http://%s.%s\n", cleanName, strings.TrimPrefix(wildcard, "*."))
+	} else {
+		hostIP := os.Getenv("VESSL_HOST_IP")
+		if hostIP == "" {
+			hostIP = "127.0.0.1"
+		}
+		cleanName := sanitizeDomainName(appName)
 		cleanIP := strings.ReplaceAll(hostIP, ".", "-")
 		fmt.Printf("   URL: http://%s.%s.sslip.io\n", cleanName, cleanIP)
 	}
+}
+
+func sanitizeDomainName(name string) string {
+	clean := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(name), " ", "-"))
+	if len(clean) > 32 {
+		clean = clean[:32]
+	}
+	return strings.Trim(clean, "-")
 }
 
 func extractRepoName(url string) string {

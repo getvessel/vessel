@@ -18,14 +18,16 @@ func runConfig() {
 
 	if len(os.Args) < 3 {
 		fmt.Println("Current configuration:")
-		fmt.Printf("  site-name:       %s\n", settings.SiteName)
-		fmt.Printf("  registration:    %v\n", settings.RegistrationEnabled)
-		fmt.Printf("  telemetry:       %v\n", settings.TelemetryEnabled)
-		fmt.Printf("  smtp-enabled:    %v\n", settings.SMTPEnabled)
-		fmt.Printf("  resend-enabled:  %v\n", settings.ResendEnabled)
+		fmt.Printf("  site-name:         %s\n", settings.SiteName)
+		fmt.Printf("  registration:      %v\n", settings.RegistrationEnabled)
+		fmt.Printf("  telemetry:         %v\n", settings.TelemetryEnabled)
+		fmt.Printf("  domain:            %s\n", os.Getenv("VESSL_DOMAIN"))
+		fmt.Printf("  smtp-enabled:      %v\n", settings.SMTPEnabled)
+		fmt.Printf("  resend-enabled:    %v\n", settings.ResendEnabled)
 		fmt.Println("\nUsage: vessld config <key>=<value>")
 		fmt.Println("  e.g.  vessld config site-name=MyVessl")
 		fmt.Println("        vessld config registration=true")
+		fmt.Println("  Note: panel-domain and wildcard-domain are set via .env, not here.")
 		return
 	}
 

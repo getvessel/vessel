@@ -18,14 +18,16 @@ type ProjectService struct {
 	envRepo        repositories.EnvironmentRepository
 	appServiceRepo repositories.AppServiceRepository
 	serviceVarRepo repositories.ServiceVarRepository
+	settingsRepo   repositories.SettingsRepository
 }
 
-func NewProjectService(pr repositories.ProjectRepository, er repositories.EnvironmentRepository, ar repositories.AppServiceRepository, svr repositories.ServiceVarRepository) *ProjectService {
+func NewProjectService(pr repositories.ProjectRepository, er repositories.EnvironmentRepository, ar repositories.AppServiceRepository, svr repositories.ServiceVarRepository, sr repositories.SettingsRepository) *ProjectService {
 	return &ProjectService{
 		projectRepo:    pr,
 		envRepo:        er,
 		appServiceRepo: ar,
 		serviceVarRepo: svr,
+		settingsRepo:   sr,
 	}
 }
 
@@ -79,7 +81,14 @@ func (s *ProjectService) CreateProjectFromRequest(ctx context.Context, req *mode
 	}
 	domain := req.Domain
 	if domain == "" {
-		domain = utils.GenerateSslipDomain(req.Name, "")
+		wildcard := ""
+		if s.settingsRepo != nil {
+			settings, err := s.settingsRepo.GetServerSettings(ctx)
+			if err == nil {
+				wildcard = settings.DefaultWildcardDomain
+			}
+		}
+		domain = utils.GenerateSslipDomain(req.Name, "", wildcard)
 	}
 	branch := req.Branch
 	if branch == "" {

@@ -86,7 +86,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	backupManager := engine.NewBackupManager(dockerClient, httpEngineAdapter, "")
 	_ = backupManager.Start()
 
-	projectService := services.NewProjectService(projectSQLiteRepository, environmentSQLiteRepository, appServiceSQLiteRepository, serviceVarSQLiteRepository)
+	projectService := services.NewProjectService(projectSQLiteRepository, environmentSQLiteRepository, appServiceSQLiteRepository, serviceVarSQLiteRepository, settingsSQLiteRepository)
 	appService := services.NewAppService(appServiceSQLiteRepository, serviceVarSQLiteRepository)
 	databaseService := services.NewDatabaseService(databaseSQLiteRepository, databaseDeployer)
 	tokenService, err := services.NewTokenService()
@@ -154,6 +154,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	aiDiagnosticsHandler := handlers.NewAIDiagnosticsHandler(aiSettingsService, deploymentService, projectService)
 	vercelHandler := handlers.NewVercelHandler(vercelService)
 	serverlessHandler := handlers.NewServerlessHandler(serverlessService)
+	systemHandler := handlers.NewSystemHandler()
 
 	authLimiter := middleware.NewRateLimiter(10, time.Minute)
 
@@ -198,6 +199,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		aiDiagnosticsHandler:   aiDiagnosticsHandler,
 		vercelHandler:          vercelHandler,
 		serverlessHandler:      serverlessHandler,
+		systemHandler:          systemHandler,
 	}
 
 	if srv.deployer != nil {

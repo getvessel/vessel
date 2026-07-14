@@ -7,15 +7,21 @@ services:
     container_name: vessl-control-plane
     restart: unless-stopped
     ports:
-      - "8080:8080" # API and Dashboard GUI
-      - "80:80"     # Automatic reverse proxy HTTP
-      - "443:443"   # Automatic reverse proxy HTTPS / TLS
+      - "8080:8080"
+      - "80:80"
+      - "443:443"
     env_file:
       - .env
     environment:
       - PORT=8080
       - VESSL_DATA_DIR=/vessl/data
       - VESSL_DASHBOARD_URL=${VESSL_DASHBOARD_URL:-http://localhost:8080}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`${VESSL_DOMAIN:-vessl.local}`)"
+      - "traefik.http.routers.dashboard.tls=${VESSL_DOMAIN:+true}"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
     volumes:
       - vessl_data:/vessl/data
       - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro

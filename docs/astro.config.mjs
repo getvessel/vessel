@@ -27,6 +27,7 @@ export default defineConfig({
         { label: 'Integrations', slug: 'integrations' },
         { label: 'Configuration', slug: 'configuration' },
         { label: 'Administration', slug: 'admin' },
+        { label: 'No Lock-In', slug: 'adopt' },
         { label: 'API Reference', slug: 'api' },
       ],
     }),

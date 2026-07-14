@@ -25,6 +25,7 @@ func (s *Server) registerRoutes() {
 	apiGroup.POST("/auth/forgot-password", s.authHandler.ForgotPassword, s.authRateLimiter.Middleware)
 	apiGroup.POST("/auth/reset-password", s.authHandler.ResetPassword, s.authRateLimiter.Middleware)
 	apiGroup.GET("/system/public", s.settingsHandler.GetPublicSettings)
+	apiGroup.POST("/system/restart", s.systemHandler.Restart, s.authGuard.RequireRole("admin"))
 	authGroup.GET("/auth/me", s.userHandler.GetProfile)
 	apiGroup.POST("/auth/logout", s.authHandler.Logout)
 	authGroup.GET("/projects", s.projectHandler.ListProjects)

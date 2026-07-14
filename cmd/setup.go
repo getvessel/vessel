@@ -59,15 +59,24 @@ func runSetup() {
 	fmt.Printf("\n✅ Admin account created for %s (%s)\n", name, email)
 	fmt.Println("You can now log in at the Vessl dashboard.")
 
+	domain := promptOptional("Domain for apps (e.g. vessl.example.com, or press Enter to skip): ")
 	tlsEmail := promptOptional("Let's Encrypt email (optional, for SSL): ")
-	if tlsEmail != "" {
+	if domain != "" || tlsEmail != "" {
 		envPath := filepath.Join(filepath.Dir(os.Getenv("VESSL_DATA_DIR")), ".env")
-		if f, err := os.OpenFile(envPath, os.O_APPEND|os.O_WRONLY, 0o644); err == nil {
-			fmt.Fprintf(f, "\nVESSL_TLS_EMAIL=%s\n", tlsEmail)
+		f, err := os.OpenFile(envPath, os.O_APPEND|os.O_WRONLY, 0o644)
+		if err == nil {
+			if domain != "" {
+				fmt.Fprintf(f, "\nVESSL_DOMAIN=%s\n", domain)
+				fmt.Printf("✅ Domain set to %s. Restart Vessl to apply.\n", domain)
+				fmt.Printf("   DNS: *.%s  A  <your-server-ip>\n", domain)
+			}
+			if tlsEmail != "" {
+				fmt.Fprintf(f, "\nVESSL_TLS_EMAIL=%s\n", tlsEmail)
+				fmt.Println("✅ TLS email saved. Restart Vessl for SSL to take effect.")
+			}
 			f.Close()
-			fmt.Println("✅ TLS email saved. Restart Vessl for SSL to take effect.")
 		} else {
-			fmt.Printf("⚠️  Could not update .env. Set VESSL_TLS_EMAIL=%s manually and restart.\n", tlsEmail)
+			fmt.Printf("⚠️  Could not update .env. Edit it manually: VESSL_DOMAIN=%s VESSL_TLS_EMAIL=%s\n", domain, tlsEmail)
 		}
 	}
 

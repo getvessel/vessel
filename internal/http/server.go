@@ -57,6 +57,7 @@ type Server struct {
 	aiDiagnosticsHandler   *handlers.AIDiagnosticsHandler
 	vercelHandler          *handlers.VercelHandler
 	serverlessHandler      *handlers.ServerlessHandler
+	systemHandler          *handlers.SystemHandler
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

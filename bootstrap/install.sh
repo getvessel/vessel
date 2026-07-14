@@ -100,10 +100,37 @@ if [ ! -f "$VESSL_DIR/.env" ]; then
   TLS_EMAIL=""
   echo ""
   echo -e "📧 ${BOLD}Optional:${NC} Enter your email for automatic Let's Encrypt SSL."
-  echo "   (Press Enter to skip — configure later via Settings or 'vesslctl config')"
+  echo "   (Press Enter to skip)"
   read -r -p "   Email: " TLS_EMAIL_INPUT </dev/tty
   if [ -n "$TLS_EMAIL_INPUT" ]; then
     TLS_EMAIL="$TLS_EMAIL_INPUT"
+  fi
+
+  # Prompt for wildcard domain (app subdomains)
+  WILDCARD_DOMAIN=""
+  echo ""
+  echo -e "${BOLD}🌐 Domain setup (optional)${NC}"
+  echo ""
+  echo "   Enter your domain so apps get subdomains like myapp.yourdomain.com."
+  echo "   Press Enter to skip — apps get myapp.${SERVER_IP}.sslip.io (no DNS)."
+  echo ""
+  read -r -p "   Domain for apps (e.g. example.com): " DOMAIN_INPUT </dev/tty
+  if [ -n "$DOMAIN_INPUT" ]; then
+    WILDCARD_DOMAIN="$DOMAIN_INPUT"
+    echo ""
+    echo -e "  ${YELLOW}⚠️  DNS: *.${WILDCARD_DOMAIN}  A  ${SERVER_IP}${NC}"
+  fi
+
+  # Prompt for dashboard URL
+  DASHBOARD_URL=""
+  echo ""
+  echo -e "   Enter the full URL where the dashboard is accessed (for notifications/redirects)."
+  echo "   If using a domain, include the protocol: https://dashboard.yourdomain.com"
+  echo "   Press Enter to use http://${SERVER_IP}:8080."
+  echo ""
+  read -r -p "   Dashboard URL (e.g. https://dashboard.example.com): " URL_INPUT </dev/tty
+  if [ -n "$URL_INPUT" ]; then
+    DASHBOARD_URL="$URL_INPUT"
   fi
 
   cat > "$VESSL_DIR/.env" <<ENV
@@ -114,20 +141,23 @@ if [ ! -f "$VESSL_DIR/.env" ]; then
 PORT=8080
 HOST=0.0.0.0
 VESSL_DATA_DIR=/vessl/data
-VESSL_HOST_IP=
+VESSL_HOST_IP=${SERVER_IP}
 
 # Security (required - change this in production!)
 VESSL_JWT_SECRET=${JWT_SECRET}
 
 # Let's Encrypt SSL (for automatic HTTPS on custom domains)
-# Leave empty if you don't have a domain or want to configure later
 VESSL_TLS_EMAIL=${TLS_EMAIL}
+
+# Wildcard domain — apps get https://myapp.yourdomain.com
+# Leave empty — apps get myapp.IP.sslip.io (no DNS needed)
+VESSL_WILDCARD_DOMAIN=${WILDCARD_DOMAIN}
 
 # Docker
 DOCKER_SOCKET_PATH=/var/run/docker.sock
 
-# Dashboard (required for notifications)
-VESSL_DASHBOARD_URL=http://${SERVER_IP}:8080
+# Dashboard URL — used in notification links and redirects
+VESSL_DASHBOARD_URL=${DASHBOARD_URL:-http://${SERVER_IP}:8080}
 
 # Docker Deployments
 VESSL_RUNTIME_NETWORK=vessl-network
@@ -135,7 +165,7 @@ DEPLOY_HOST_PORT_START=4100
 DEPLOY_HOST_PORT_END=4999
 DEPLOY_DRY_RUN=false
 
-# Updates (change to your fork if forked)
+# Updates
 VESSL_UPDATE_URL=https://api.github.com/repos/vesslhq/vessl/releases/latest
 VESSL_DOWNLOAD_URL=https://github.com/vesslhq/vessl/releases
 ENV
@@ -172,9 +202,8 @@ Requires=docker.service
 Restart=always
 RestartSec=10
 WorkingDirectory=/vessl
-ExecStartPre=-/usr/bin/docker compose -f /vessl/docker-compose.yml down
-ExecStart=/usr/bin/docker compose -f /vessl/docker-compose.yml up
-ExecStop=/usr/bin/docker compose -f /vessl/docker-compose.yml down
+ExecStart=/usr/bin/docker compose -f /vessl/docker-compose.yml up vessl
+ExecStop=/usr/bin/docker compose -f /vessl/docker-compose.yml stop vessl
 
 [Install]
 WantedBy=multi-user.target
@@ -194,10 +223,19 @@ echo -e "  ${BOLD}📖 Docs:${NC}       https://docs.vessl.dev"
 echo -e "  ${BOLD}🛠️  CLI:${NC}        vesslctl --help"
 echo ""
 
+echo -e "  ${BOLD}📍 Dashboard:${NC}  ${DASHBOARD_URL:-http://${SERVER_IP}:8080}"
+if [ -n "$WILDCARD_DOMAIN" ]; then
+  echo -e "  ${BOLD}🌐 Apps:${NC}       https://myapp.${WILDCARD_DOMAIN}"
+  echo ""
+  echo -e "  ${YELLOW}⚠️  DNS: *.${WILDCARD_DOMAIN}  A  ${SERVER_IP}${NC}"
+else
+  echo -e "  ${BOLD}🌐 Apps:${NC}       myapp.${SERVER_IP}.sslip.io (no DNS needed)"
+fi
+
 if [ -n "$TLS_EMAIL" ]; then
   echo -e "  ${GREEN}🔒 SSL:       Enabled for ${TLS_EMAIL}${NC}"
 else
-  echo -e "  ${YELLOW}🔒 SSL:       Not configured${NC} (set up later in Settings or .env)"
+  echo -e "  ${YELLOW}🔒 SSL:       Not configured${NC} (add VESSL_TLS_EMAIL in .env later)"
 fi
 
 TOTAL_RAM_MB=$(free -m | awk '/^Mem:/{print $2}')

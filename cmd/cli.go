@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"runtime"
 	"strings"
 )
@@ -24,6 +25,8 @@ func mainCLI() {
 		runConfig()
 	case "deploy":
 		runDeploy(os.Args[2:])
+	case "restart":
+		runRestart()
 	case "mcp":
 		runMCP()
 	case "version", "--version", "-v":
@@ -80,6 +83,21 @@ func promptOptional(msg string) string {
 	var input string
 	fmt.Scanln(&input)
 	return input
+}
+
+func runRestart() {
+	fmt.Println("🔄 Restarting Vessl daemon...")
+	if _, err := os.Stat("/vessl/docker-compose.yml"); err == nil {
+		cmd := exec.Command("docker", "compose", "-f", "/vessl/docker-compose.yml", "restart", "vessl-control-plane")
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			exitError("Restart failed: %v", err)
+		}
+	} else {
+		fmt.Println("   Standalone mode — exiting. Use systemd/supervisor to restart.")
+		os.Exit(0)
+	}
 }
 
 func parseUint(s string) (int, error) {
