@@ -14,11 +14,14 @@ type MailerService struct {
 	globalSettingsService *services.SettingsService
 }
 
-func NewMailerService(workspaceEmail *services.EmailSettingsService, globalSettings *services.SettingsService) *MailerService {
+func NewMailerService(workspaceEmail *services.EmailSettingsService, globalSettings *services.SettingsService) (*MailerService, error) {
+	if err := LoadTemplates(); err != nil {
+		return nil, fmt.Errorf("failed to load email templates: %w", err)
+	}
 	return &MailerService{
 		workspaceEmailService: workspaceEmail,
 		globalSettingsService: globalSettings,
-	}
+	}, nil
 }
 
 func (s *MailerService) SendTeamEmail(ctx context.Context, workspaceID, templateName string, toAddress string, subject string, data any) error {

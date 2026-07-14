@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"vessl.dev/vessl/internal/http/middleware"
 	"vessl.dev/vessl/internal/utils"
 
 	"vessl.dev/vessl/internal/services"
@@ -30,7 +31,7 @@ func (h *VercelHandler) Callback(c echo.Context) error {
 		return utils.Error(c, http.StatusBadRequest, "authorization code required")
 	}
 
-	user := GetUserClaimsFromContext(c.Request().Context())
+	user := middleware.GetUserClaimsFromContext(c.Request().Context())
 	if user == nil {
 		return utils.Error(c, http.StatusUnauthorized, "unauthorized")
 	}
@@ -52,7 +53,7 @@ func (h *VercelHandler) Callback(c echo.Context) error {
 // @Produce json
 // @Router /vercel/projects [get]
 func (h *VercelHandler) ListProjects(c echo.Context) error {
-	user := GetUserClaimsFromContext(c.Request().Context())
+	user := middleware.GetUserClaimsFromContext(c.Request().Context())
 	if user == nil {
 		return utils.Error(c, http.StatusUnauthorized, "unauthorized")
 	}
@@ -81,7 +82,7 @@ func (h *VercelHandler) ListProjects(c echo.Context) error {
 // @Param id path string true "id"
 // @Router /vercel/projects/{id}/env [get]
 func (h *VercelHandler) GetProjectEnv(c echo.Context) error {
-	user := GetUserClaimsFromContext(c.Request().Context())
+	user := middleware.GetUserClaimsFromContext(c.Request().Context())
 	if user == nil {
 		return utils.Error(c, http.StatusUnauthorized, "unauthorized")
 	}

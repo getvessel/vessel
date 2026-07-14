@@ -116,7 +116,10 @@ func startServer() {
 	addr := host + ":" + port
 
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
-	apiServer := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
+	apiServer, err := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
+	if err != nil {
+		log.Fatalf(" Failed to initialize server: %v", err)
+	}
 
 	log.Printf(" Vessl control plane listening on %s", addr)
 	if err := http.ListenAndServe(addr, apiServer.Handler()); err != nil {
@@ -132,7 +135,10 @@ func runMCP() {
 	dockerClient, _ := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	deployer := engine.NewDeployer(dockerClient, &dbDeployerStore{db: db, vault: vlt})
 	traefikMgr := engine.NewTraefikManager(dockerClient, os.Getenv("VESSL_TLS_EMAIL"))
-	apiServer := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
+	apiServer, err := vesslhttp.NewServer(db, vlt, deployer, traefikMgr, dockerClient)
+	if err != nil {
+		log.Fatalf(" Failed to initialize server: %v", err)
+	}
 
 	if err := apiServer.StartMCPStdio(); err != nil {
 		log.Fatalf("MCP Server exited: %v", err)

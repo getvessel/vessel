@@ -103,10 +103,10 @@ func (s *StorageService) CreateStorageWithDefaults(ctx context.Context, st *mode
 		st.ConsolePort = 9001
 	}
 	if st.AccessKey == "" {
-		st.AccessKey = "vessladmin"
+		st.AccessKey = uuid.New().String()[:16]
 	}
 	if st.SecretKey == "" {
-		st.SecretKey = "vesslsecretkey123"
+		st.SecretKey = uuid.New().String()[:24]
 	}
 	if st.BucketName == "" {
 		st.BucketName = "vessl-backups"

@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -21,7 +22,7 @@ import (
 	"vessl.dev/vessl/internal/utils"
 )
 
-func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikManager *engine.TraefikManager, dockerClient *client.Client) *Server {
+func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikManager *engine.TraefikManager, dockerClient *client.Client) (*Server, error) {
 
 	e := echo.New()
 	e.Use(echomiddleware.RequestLoggerWithConfig(echomiddleware.RequestLoggerConfig{
@@ -100,13 +101,16 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	databaseService := services.NewDatabaseService(databaseSQLiteRepository, databaseDeployer)
 	tokenService, err := services.NewTokenService()
 	if err != nil {
-		log.Fatalf(" Failed to initialize token service: %v", err)
+		return nil, fmt.Errorf("token service: %w", err)
 	}
 	settingsService := services.NewSettingsService(settingsSQLiteRepository, notificationSQLiteRepository)
 	projectSettingsService := services.NewProjectSettingsService(projectSettingsSQLiteRepository, userSQLiteRepository)
 	serviceLinker := services.NewServiceLinker(databaseSQLiteRepository, storageSQLiteRepository)
 	emailSettingsService := services.NewEmailSettingsService(teamEmailSettingsSQLiteRepository)
-	mailerService := notifications.NewMailerService(emailSettingsService, settingsService)
+	mailerService, err := notifications.NewMailerService(emailSettingsService, settingsService)
+	if err != nil {
+		return nil, fmt.Errorf("mailer service: %w", err)
+	}
 	dispatcherService := core.NewDispatcherService(notificationSQLiteRepository, settingsSQLiteRepository, userSQLiteRepository, mailerService)
 	storageService := services.NewStorageService(storageSQLiteRepository, storageDeployer)
 	jobService := services.NewJobService(jobSQLiteRepository, cronManager)
@@ -218,5 +222,5 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	}
 
 	srv.registerRoutes()
-	return srv
+	return srv, nil
 }

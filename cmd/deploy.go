@@ -15,6 +15,7 @@ import (
 	"vessl.dev/vessl/internal/engine"
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/repositories"
+	"vessl.dev/vessl/internal/utils"
 )
 
 func runDeploy(args []string) {
@@ -167,7 +168,7 @@ func runDeploy(args []string) {
 	}
 
 	if wildcard != "" {
-		cleanName := sanitizeDomainName(appName)
+		cleanName := utils.SanitizeDomainName(appName)
 		base := strings.TrimPrefix(wildcard, "*.")
 		if strings.HasPrefix(base, "http") {
 			base = strings.TrimPrefix(base, "https://")
@@ -179,18 +180,10 @@ func runDeploy(args []string) {
 		if hostIP == "" {
 			hostIP = "127.0.0.1"
 		}
-		cleanName := sanitizeDomainName(appName)
+		cleanName := utils.SanitizeDomainName(appName)
 		cleanIP := strings.ReplaceAll(hostIP, ".", "-")
 		fmt.Printf("   URL: http://%s.%s.sslip.io\n", cleanName, cleanIP)
 	}
-}
-
-func sanitizeDomainName(name string) string {
-	clean := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(name), " ", "-"))
-	if len(clean) > 32 {
-		clean = clean[:32]
-	}
-	return strings.Trim(clean, "-")
 }
 
 func extractRepoName(url string) string {

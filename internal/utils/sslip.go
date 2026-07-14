@@ -11,7 +11,7 @@ func GenerateSslipDomain(projectNameOrID string, hostIP string, wildcardDomain s
 		wildcardDomain = os.Getenv("VESSL_WILDCARD_DOMAIN")
 	}
 	if wildcardDomain != "" {
-		cleanName := sanitizeDomainName(projectNameOrID)
+		cleanName := SanitizeDomainName(projectNameOrID)
 		base := strings.TrimPrefix(wildcardDomain, "*.")
 		if !strings.HasPrefix(base, "http") {
 			return fmt.Sprintf("https://%s.%s", cleanName, base)
@@ -26,7 +26,7 @@ func GenerateSslipDomain(projectNameOrID string, hostIP string, wildcardDomain s
 		hostIP = "127.0.0.1"
 	}
 	cleanIP := strings.ReplaceAll(strings.TrimSpace(hostIP), ".", "-")
-	cleanName := sanitizeDomainName(projectNameOrID)
+	cleanName := SanitizeDomainName(projectNameOrID)
 	return fmt.Sprintf("http://%s.%s.sslip.io", cleanName, cleanIP)
 }
 
@@ -43,7 +43,7 @@ func parseHost(url string) string {
 	return url
 }
 
-func sanitizeDomainName(name string) string {
+func SanitizeDomainName(name string) string {
 	clean := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(name), " ", "-"))
 	if len(clean) > 32 {
 		clean = clean[:32]

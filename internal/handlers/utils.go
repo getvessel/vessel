@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -44,8 +43,4 @@ func ExtractUserID(c echo.Context) string {
 		return claims.UserID
 	}
 	return ""
-}
-
-func GetUserClaimsFromContext(ctx context.Context) *models.UserClaims {
-	return nil
 }

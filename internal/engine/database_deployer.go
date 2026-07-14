@@ -167,10 +167,3 @@ func (d *DatabaseDeployer) Stop(ctx context.Context, dbID string) error {
 	_ = d.dockerClient.ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true})
 	return d.store.UpdateDatabaseStatus(dbID, "stopped", "")
 }
-
-func getVersionOrDefault(version, defaultVersion string) string {
-	if version == "" {
-		return defaultVersion
-	}
-	return version
-}

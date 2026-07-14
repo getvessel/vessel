@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -71,7 +72,7 @@ func traefikImage() string {
 	if img := os.Getenv("VESSL_TRAEFIK_IMAGE"); img != "" {
 		return img
 	}
-	return "traefik:v3.0"
+	return "traefik:v3.6"
 }
 
 func dockerSocketPath() string {
@@ -96,6 +97,7 @@ func (m *TraefikManager) createTraefikContainer(ctx context.Context) error {
 		RestartPolicy: container.RestartPolicy{
 			Name: "unless-stopped",
 		},
+		ExtraHosts: []string{"host.docker.internal:host-gateway"},
 	}
 
 	resp, err := m.dockerClient.ContainerCreate(ctx, &container.Config{
@@ -104,7 +106,20 @@ func (m *TraefikManager) createTraefikContainer(ctx context.Context) error {
 		ExposedPorts: nat.PortSet{
 			"80/tcp":   struct{}{},
 			"443/tcp":  struct{}{},
+			"443/udp":  struct{}{},
 			"8080/tcp": struct{}{},
+		},
+		Labels: map[string]string{
+			"traefik.enable": "true",
+			"traefik.http.routers.traefik.entrypoints":               "http",
+			"traefik.http.routers.traefik.service":                   "api@internal",
+			"traefik.http.services.traefik.loadbalancer.server.port": "8080",
+		},
+		Healthcheck: &container.HealthConfig{
+			Test:     []string{"CMD", "wget", "-qO-", "http://localhost:80/ping"},
+			Interval: 4 * time.Second,
+			Timeout:  2 * time.Second,
+			Retries:  5,
 		},
 	}, hostConfig, &network.NetworkingConfig{
 		EndpointsConfig: map[string]*network.EndpointSettings{
@@ -122,12 +137,15 @@ func (m *TraefikManager) createTraefikContainer(ctx context.Context) error {
 
 func (m *TraefikManager) buildTraefikCmdArgs() []string {
 	cmdArgs := []string{
+		"--ping=true",
+		"--ping.entrypoint=http",
 		"--api.insecure=true",
 		"--providers.docker=true",
 		"--providers.docker.exposedbydefault=false",
 		"--providers.docker.network=" + VesslNetworkName,
 		"--entrypoints.web.address=:80",
 		"--entrypoints.websecure.address=:443",
+		"--entrypoints.https.http3=true",
 		"--entrypoints.web.http.redirections.entryPoint.to=websecure",
 		"--entrypoints.web.http.redirections.entryPoint.scheme=https",
 	}
@@ -177,6 +195,7 @@ func (m *TraefikManager) buildPortBindings() nat.PortMap {
 	return nat.PortMap{
 		"80/tcp":   []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: httpPort}},
 		"443/tcp":  []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: httpsPort}},
+		"443/udp":  []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: httpsPort}},
 		"8080/tcp": []nat.PortBinding{{HostIP: "127.0.0.1", HostPort: apiPort}},
 	}
 }
