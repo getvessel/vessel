@@ -11,7 +11,7 @@
   --vessl-text: #fafafa;
   --vessl-accent: #7c3aed;
   --vessl-accent-strong: #8b5cf6;
-  
+
   --sl-color-white: var(--vessl-text);
   --sl-color-gray-1: #e7e8ee;
   --sl-color-gray-2: var(--vessl-muted);
@@ -35,9 +35,10 @@
   --sl-color-hairline: rgba(39, 39, 42, 0.65);
   --sl-color-hairline-shade: rgba(39, 39, 42, 0.5);
   --sl-color-backdrop-overlay: rgba(10, 10, 15, 0.78);
-  
+
   --sl-font: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --sl-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --sl-font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   --sl-content-width: 52rem;
   --sl-sidebar-width: 17.5rem;
   --sl-nav-height: 4.25rem;
@@ -58,7 +59,11 @@ body {
     linear-gradient(90deg, rgba(255, 255, 255, 0.032) 1px, transparent 1px),
     linear-gradient(135deg, rgba(124, 58, 237, 0.1), transparent 34%),
     linear-gradient(315deg, rgba(139, 92, 246, 0.07), transparent 32%);
-  background-size: 72px 72px, 72px 72px, auto, auto;
+  background-size:
+    72px 72px,
+    72px 72px,
+    auto,
+    auto;
 }
 
 .header {

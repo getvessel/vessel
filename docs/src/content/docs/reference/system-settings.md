@@ -3,79 +3,61 @@ title: System Settings
 description: Reference for Vessl system-wide settings and what they affect.
 ---
 
-System Settings controls server-wide behavior. Service settings control one service.
+System Settings control server-wide behavior across your entire Vessl instance. You can access these by clicking on **Settings** in the bottom left of the Vessl dashboard.
 
-## Domains
+## General Settings
 
-`Control plane hostname` serves the Vessl dashboard through Traefik.
+- **Site Name**: The global name of your Vessl instance (e.g., used in emails).
+- **Public IPs**: Explicitly define the IPv4 and IPv6 addresses for your server.
+- **Server Timezone**: Sets the timezone for cron jobs, metrics, and logs.
+- **Deployment Timeout**: Maximum time (in seconds) a deployment can run before being forcibly timed out (default: 3600).
+- **Concurrent Builds**: Controls how many builds can happen at the exact same time (default: 2).
 
-`Root domain` enables generated service hostnames and generated database public hostnames.
+## Registrations
 
-Both can be set during onboarding or later from System Settings.
+- **Allow Registrations**: Toggles whether new users can create an account on your Vessl instance.
+- **Domain Allowlist**: A comma-separated list of allowed email domains (e.g., `@example.com`). If set, only users with matching emails can register.
 
-## DNS
+## External Notifications
 
-DNS provider settings store credentials for Cloudflare, Namecheap, and Spaceship. Connected providers appear as actions on service custom domains.
+Vessl supports deep integration with external platforms to notify you of deployment statuses, database backups, and system events.
 
-Provider automation writes IPv4 `A` records only.
+- **Discord**: Provide a webhook URL. You can optionally enable @ping notifications.
+- **Slack**: Provide a Slack webhook URL.
+- **Telegram**: Provide a Bot Token and Chat ID.
+- **Pushover**: Provide your User Key and API Token for mobile push notifications.
+- **Generic Webhooks**: Send POST requests to any custom URL with a JSON payload of the event.
 
-## GitHub
+## Email Providers
 
-GitHub settings support either:
+Vessl can send transactional emails (e.g., invites, password resets) using one of two methods:
 
-- GitHub App credentials.
-- Host-level `GITHUB_ACCESS_TOKEN`.
+- **SMTP**: Configure standard SMTP host, port, user, password, and from-address.
+- **Resend**: Provide a Resend API key for zero-configuration email delivery.
 
-The GitHub App path enables repository discovery and push webhooks.
+## Maintenance & Cleanup
 
-## API Access
+Vessl has built-in garbage collection to prevent your server from filling up with old images and logs.
 
-API Access creates scoped API keys for programmatic requests to Vessl.
+- **Docker Cleanup Cron**: A cron expression (default: `0 0 * * *`) that dictates when to run `docker system prune` to clear unused images, stopped containers, and dangling build caches.
+- **Disk Usage Alerts**: A cron expression to check disk space.
+- **Disk Usage Threshold**: A percentage (e.g., 80%). If disk usage exceeds this, Vessl will alert you via your configured notification channels.
 
-Keys can be read-only or read/write, scoped to all projects or selected projects, and configured to expire after `7`, `30`, or `90` days, or never expire.
+## AI Integrations
 
-API keys use bearer authentication against the same `/api/*` endpoints as the dashboard. See [API Access](/docs/reference/api-access/) for examples and endpoint behavior.
+You can provide global API keys for Vessl's AI features (if enabled):
 
-## Storage
+- **OpenAI API Key**: Used as the default model provider.
+- **Anthropic API Key**: Alternative model provider.
 
-R2 settings store Cloudflare account ID, bucket, endpoint, access key suffix, encrypted secret access key, and timestamps.
+## Updates & Telemetry
 
-R2 must be connected before database services can select `r2` or `disk+r2` backup destinations.
+- **Update Check Cron**: How frequently Vessl checks for a new version of itself.
+- **Auto Update Enabled**: If true, Vessl will automatically pull and deploy the latest version when detected.
+- **Telemetry**: Opt-in/opt-out of anonymous usage data collection.
 
-## Migration
+## Advanced Settings
 
-Migration settings export encrypted `.vessl` bundles. The export requires a passphrase with at least 8 characters.
-
-Bundle import is available during onboarding.
-
-## Maintenance
-
-Maintenance settings show disk, Docker, Vessl data paths, build artifacts, database backup storage, APT cache, system logs, cleanup actions, and recent history.
-
-Safe cleanup avoids Docker volumes. Volume cleanup is separate and destructive for detached volumes.
-
-## Deployments
-
-`Concurrent deployments` controls the global number of deployment jobs that can run at once.
-
-Allowed values:
-
-```txt
-1 through 10
-```
-
-Default:
-
-```txt
-3
-```
-
-Vessl also enforces one active deployment per service.
-
-## Updates
-
-Updates settings compare the running install against the configured repository and branch.
-
-Git installs can fast-forward, install dependencies, build, prune, and queue a restart.
-
-Image installs can compare commit metadata and run an image update command when configured.
+- **Custom DNS Resolvers**: Override the DNS resolvers used by Vessl's internal checks.
+- **MCP Server Enabled**: Toggles whether the Model Context Protocol (MCP) server is enabled on your instance.
+- **IP Allowlist**: A global allowlist of IPs that are allowed to access the Vessl dashboard.

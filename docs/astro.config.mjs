@@ -11,7 +11,7 @@ export default defineConfig({
       customCss: ['./src/styles/theme.css'],
       sidebar: [
         {
-          label: "Start here",
+          label: 'Start here',
           items: [
             { label: 'Vessl Docs', slug: 'index' },
             { label: 'Installation', slug: 'getting-started/installation' },
@@ -21,7 +21,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "Core concepts",
+          label: 'Core concepts',
           items: [
             { label: 'Architecture', slug: 'core-concepts/architecture' },
             { label: 'Projects Overview', slug: 'projects/overview' },
@@ -31,9 +31,10 @@ export default defineConfig({
           ],
         },
         {
-          label: "Deployments",
+          label: 'Deployments',
           items: [
             { label: 'Build Strategies', slug: 'deployments/build-strategies' },
+            { label: 'Templates & Examples', slug: 'deployments/templates' },
             { label: 'CI/CD & Git', slug: 'deployments/ci-cd' },
             { label: 'Source Services', slug: 'deployments/source-services' },
             { label: 'Docker Image Services', slug: 'deployments/docker-image-services' },
@@ -44,7 +45,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "Databases",
+          label: 'Databases',
           items: [
             { label: 'Database Provisioning', slug: 'databases/provisioning' },
             { label: 'SQL Studio', slug: 'databases/sql-studio' },
@@ -54,7 +55,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "Storage & Backups",
+          label: 'Storage & Backups',
           items: [
             { label: 'Storage (MinIO)', slug: 'storage-and-backups/minio-storage' },
             { label: 'R2 Storage Integration', slug: 'storage-and-backups/r2-storage' },
@@ -63,15 +64,16 @@ export default defineConfig({
           ],
         },
         {
-          label: "Migration",
+          label: 'Migration',
           items: [
             { label: 'Vessl Bundles', slug: 'migration/vessl-bundles' },
             { label: 'Railway Import', slug: 'migration/railway-import' },
           ],
         },
         {
-          label: "Operations",
+          label: 'Operations',
           items: [
+            { label: 'Teams & Collaboration', slug: 'operations/teams' },
             { label: 'Administration', slug: 'admin' },
             { label: 'Integrations', slug: 'integrations' },
             { label: 'Domains', slug: 'operations/domains' },
@@ -83,7 +85,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "Reference",
+          label: 'Reference',
           items: [
             { label: 'Configuration', slug: 'configuration' },
             { label: 'CLI Reference', slug: 'cli' },
@@ -100,8 +102,8 @@ export default defineConfig({
         },
       ],
       components: {
-        SiteTitle: "./src/components/docs-site-title.astro",
-        ThemeSelect: "./src/components/docs-theme-select.astro",
+        SiteTitle: './src/components/docs-site-title.astro',
+        ThemeSelect: './src/components/docs-theme-select.astro',
       },
     }),
   ],
