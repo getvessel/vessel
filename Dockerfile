@@ -31,8 +31,11 @@ COPY . .
 # Copy built dashboard static assets to be embedded
 COPY --from=dashboard-builder /app/dashboard/dist ./dashboard/dist
 
-# Build self-contained binary with CGO disabled
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags="-w -s" -o /vessld ./cmd
+# Accept version via build arguments (defaults to dev)
+ARG VERSION=dev
+
+# Build self-contained binary with CGO disabled and inject the version
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags="-w -s -X main.vesslVersion=${VERSION}" -o /vessld ./cmd/vessld
 
 # Stage 3: Minimal Production Runtime
 FROM alpine:3.21 AS production
