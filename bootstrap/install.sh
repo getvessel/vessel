@@ -141,23 +141,23 @@ if [ ! -f "$VESSL_DIR/.env" ]; then
 PORT=8080
 HOST=0.0.0.0
 VESSL_DATA_DIR=/vessl/data
-VESSL_HOST_IP=${SERVER_IP}
+VESSL_HOST_IP="${SERVER_IP}"
 
 # Security (required - change this in production!)
-VESSL_JWT_SECRET=${JWT_SECRET}
+VESSL_JWT_SECRET="${JWT_SECRET}"
 
 # Let's Encrypt SSL (for automatic HTTPS on custom domains)
-VESSL_TLS_EMAIL=${TLS_EMAIL}
+VESSL_TLS_EMAIL="${TLS_EMAIL}"
 
 # Wildcard domain — apps get https://myapp.yourdomain.com
 # Leave empty — apps get myapp.IP.sslip.io (no DNS needed)
-VESSL_WILDCARD_DOMAIN=${WILDCARD_DOMAIN}
+VESSL_WILDCARD_DOMAIN="${WILDCARD_DOMAIN}"
 
 # Docker
 DOCKER_SOCKET_PATH=/var/run/docker.sock
 
 # Dashboard URL — used in notification links and redirects
-VESSL_DASHBOARD_URL=${DASHBOARD_URL:-http://${SERVER_IP}:8080}
+VESSL_DASHBOARD_URL="${DASHBOARD_URL:-http://${SERVER_IP}:8080}"
 
 # Docker Deployments
 VESSL_RUNTIME_NETWORK=vessl-network

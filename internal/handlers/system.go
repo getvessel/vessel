@@ -3,6 +3,7 @@ package handlers
 import (
 	"os"
 	"os/exec"
+	"syscall"
 
 	"github.com/labstack/echo/v4"
 
@@ -43,7 +44,9 @@ func (h *SystemHandler) Restart(c echo.Context) error {
 		if _, err := exec.LookPath("docker"); err == nil {
 			exec.Command("docker", "compose", "-f", "/vessl/docker-compose.yml", "restart", "vessl-control-plane").Start()
 		} else {
-			os.Exit(0)
+			if p, err := os.FindProcess(os.Getpid()); err == nil {
+				_ = p.Signal(syscall.SIGTERM)
+			}
 		}
 	}()
 	return utils.Success(c, "Restart initiated", map[string]string{"status": "restarting"})

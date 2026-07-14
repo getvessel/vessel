@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/docker/docker/client"
@@ -35,8 +36,14 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		},
 	}))
 	e.Use(echomiddleware.Recover())
+
+	allowOrigins := []string{"http://localhost:3000", "http://localhost:8080"}
+	if dashboardURL := os.Getenv("VESSL_DASHBOARD_URL"); dashboardURL != "" {
+		allowOrigins = append(allowOrigins, dashboardURL)
+	}
+
 	e.Use(echomiddleware.CORSWithConfig(echomiddleware.CORSConfig{
-		AllowOrigins:     []string{"*"},
+		AllowOrigins:     allowOrigins,
 		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 		AllowHeaders:     []string{"Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposeHeaders:    []string{"Content-Length"},

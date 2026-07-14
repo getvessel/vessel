@@ -14,8 +14,11 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"runtime"
+	"syscall"
+	"time"
 
 	"github.com/docker/docker/client"
 	"github.com/joho/godotenv"
@@ -122,11 +125,30 @@ func startServer() {
 		os.Exit(1)
 	}
 
-	slog.Info("control plane listening", "addr", addr)
-	if err := http.ListenAndServe(addr, apiServer.Handler()); err != nil {
-		slog.Error("server crashed", "err", err)
-		os.Exit(1)
+	srv := &http.Server{
+		Addr:    addr,
+		Handler: apiServer.Handler(),
 	}
+
+	go func() {
+		slog.Info("control plane listening", "addr", addr)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			slog.Error("server crashed", "err", err)
+			os.Exit(1)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	slog.Info("shutting down server gracefully...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		slog.Error("server forced to shutdown", "err", err)
+	}
+	slog.Info("server exited")
 }
 
 func runMCP() {

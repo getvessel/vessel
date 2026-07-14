@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/lib/pq"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/redis/go-redis/v9"
 
 	"vessl.dev/vessl/internal/models"
@@ -34,7 +34,7 @@ func (s *DatabaseService) QueryDatabase(ctx context.Context, id string, query st
 	case "postgresql", "postgres":
 		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 			host, db.Port, db.Username, db.Password, db.DatabaseName)
-		return s.querySQL("postgres", dsn, query)
+		return s.querySQL("pgx", dsn, query)
 	case "mysql", "mariadb":
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s",
 			db.Username, db.Password, host, db.Port, db.DatabaseName)

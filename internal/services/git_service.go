@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -247,6 +248,10 @@ func (s *GitService) CloneOrPullAppRepository(ctx context.Context, app *models.A
 	branch := strings.TrimSpace(app.Branch)
 	if branch == "" {
 		branch = "main"
+	}
+	validBranch := regexp.MustCompile(`^[a-zA-Z0-9._/-]+$`)
+	if !validBranch.MatchString(branch) {
+		return errors.New("invalid branch name")
 	}
 	authURL := s.injectAuthTokenIfAvailable(ctx, repoURL)
 	if logWriter != nil {
