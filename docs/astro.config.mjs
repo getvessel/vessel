@@ -23,7 +23,7 @@ export default defineConfig({
         },
         { label: 'Databases', slug: 'databases' },
         { label: 'Storage', slug: 'storage' },
-                { label: 'Integrations', slug: 'integrations' },
+        { label: 'Integrations', slug: 'integrations' },
         { label: 'Configuration', slug: 'configuration' },
         { label: 'Administration', slug: 'admin' },
         { label: 'CLI Reference', slug: 'cli' },

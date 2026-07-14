@@ -3,6 +3,8 @@ title: Deploy Your First App
 description: Step-by-step tutorial — deploy a sample Node.js app on Vessl in under 5 minutes.
 ---
 
+import { Steps, Aside } from '@astrojs/starlight/components';
+
 This tutorial walks you through deploying a real application on Vessl. You'll deploy a ready-to-run Node.js app, connect it to a database, and see it live.
 
 ## Prerequisites
@@ -12,16 +14,22 @@ This tutorial walks you through deploying a real application on Vessl. You'll de
 
 ## Step 1: Create a Project
 
+<Steps>
+
 1. Log in to your Vessl dashboard at `http://your-server-ip:8080`.
 2. Click **New Project** in the sidebar.
 3. Enter `my-first-app` as the project name.
 4. Click **Create**.
 
-Vessl creates the project with a default **production** environment.
+</Steps>
+
+<Aside>Vessl creates the project with a default **production** environment.</Aside>
 
 ## Step 2: Deploy a Sample App
 
 Since you don't have a Git repository connected yet, you'll deploy from a public Git URL.
+
+<Steps>
 
 1. In your project, click **New Service**.
 2. Select **Deploy from Git URL**.
@@ -32,7 +40,9 @@ Since you don't have a Git repository connected yet, you'll deploy from a public
 4. Vessl auto-detects the build strategy — it finds the `package.json` and uses Railpack.
 5. Click **Deploy**.
 
-Vessl clones the repository, detects Node.js, builds the image, and runs health checks.
+</Steps>
+
+<Aside>Vessl clones the repository, detects Node.js, builds the image, and runs health checks.</Aside>
 
 **Check progress:** Click on the service to view live deployment logs.
 
@@ -40,35 +50,47 @@ Once the status shows **running**, your app is live at the URL shown in the serv
 
 ## Step 3: Add a Database
 
+<Steps>
+
 1. Navigate to **Databases** in the sidebar.
 2. Click **New Database**.
 3. Select **PostgreSQL 16**.
 4. Click **Create**.
 
+</Steps>
+
 Vessl provisions a PostgreSQL container with persistent storage.
 
 After creation, Vessl automatically injects the connection string into your app:
 
-```
+```env
 DATABASE_URL=postgresql://vessl:<password>@<container-name>:5432/vessl
 ```
 
 ## Step 4: Set Environment Variables
+
+<Steps>
 
 1. Go to your service's **Variables** tab.
 2. Click **Add Variable**.
 3. Set `NODE_ENV` to `production`.
 4. Save.
 
-The service restarts automatically with the new environment.
+</Steps>
+
+<Aside>The service restarts automatically with the new environment.</Aside>
 
 ## Step 5: Attach a Custom Domain (Optional)
+
+<Steps>
 
 1. Go to **Project → Domains**.
 2. Click **Add Domain**.
 3. Enter your domain (e.g. `app.example.com`).
 4. Add the `A` record at your DNS provider.
 5. SSL is provisioned automatically via Let's Encrypt.
+
+</Steps>
 
 ## Step 6: Monitor
 
