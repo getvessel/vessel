@@ -65,6 +65,12 @@ export interface ServerSettings {
   updateCheckCron: string;
   autoUpdateEnabled: boolean;
   telemetryEnabled: boolean;
+  concurrentBuilds: number;
+  deploymentTimeout: number;
+  serverTimezone: string;
+  dockerCleanupCron: string;
+  diskUsageThreshold: number;
+  diskUsageCron: string;
   currentVersion: string;
   latestVersion: string;
   lastUpdateCheck: string;

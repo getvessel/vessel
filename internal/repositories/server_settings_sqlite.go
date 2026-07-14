@@ -26,7 +26,7 @@ func NewSettingsSQLiteRepository(db *sql.DB) *SettingsSQLiteRepository {
 	return &SettingsSQLiteRepository{db: db}
 }
 
-const serverSettingsColumns = `id, traefik_wildcard_ip, discord_webhook_url, discord_ping_enabled, discord_enabled, slack_webhook_url, slack_enabled, telegram_bot_token, telegram_chat_id, telegram_enabled, smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name, smtp_from_address, smtp_enabled, resend_api_key, resend_enabled, pushover_user_key, pushover_api_token, pushover_enabled, generic_webhook_url, generic_webhook_enabled, notification_alerts, registration_enabled, registration_domain_allowlist, custom_dns_resolvers, dns_validation_enabled, ip_allowlist, mcp_server_enabled, default_wildcard_domain, site_name, public_ipv4, public_ipv6, show_sponsorship_popup, disable_two_step_confirmation, default_openai_key, default_anthropic_key, update_check_cron, auto_update_enabled, current_version, latest_version, last_update_check, updated_at`
+const serverSettingsColumns = `id, traefik_wildcard_ip, discord_webhook_url, discord_ping_enabled, discord_enabled, slack_webhook_url, slack_enabled, telegram_bot_token, telegram_chat_id, telegram_enabled, smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name, smtp_from_address, smtp_enabled, resend_api_key, resend_enabled, pushover_user_key, pushover_api_token, pushover_enabled, generic_webhook_url, generic_webhook_enabled, notification_alerts, registration_enabled, registration_domain_allowlist, custom_dns_resolvers, dns_validation_enabled, ip_allowlist, mcp_server_enabled, default_wildcard_domain, site_name, public_ipv4, public_ipv6, show_sponsorship_popup, disable_two_step_confirmation, default_openai_key, default_anthropic_key, update_check_cron, auto_update_enabled, concurrent_builds, deployment_timeout, server_timezone, docker_cleanup_cron, disk_usage_threshold, disk_usage_cron, current_version, latest_version, last_update_check, updated_at`
 
 func scanServerSettings(scanner interface{ Scan(dest ...any) error }, cfg *models.ServerSettings) error {
 	return scanner.Scan(
@@ -37,7 +37,9 @@ func scanServerSettings(scanner interface{ Scan(dest ...any) error }, cfg *model
 		&cfg.RegistrationEnabled, &cfg.RegistrationDomainAllowlist, &cfg.CustomDNSResolvers, &cfg.DNSValidationEnabled, &cfg.IPAllowlist, &cfg.MCPServerEnabled, &cfg.DefaultWildcardDomain,
 		&cfg.SiteName, &cfg.PublicIPv4, &cfg.PublicIPv6, &cfg.ShowSponsorshipPopup, &cfg.DisableTwoStepConfirmation,
 		&cfg.DefaultOpenAIKey, &cfg.DefaultAnthropicKey,
-		&cfg.UpdateCheckCron, &cfg.AutoUpdateEnabled, &cfg.CurrentVersion, &cfg.LatestVersion, &cfg.LastUpdateCheck, &cfg.UpdatedAt,
+		&cfg.UpdateCheckCron, &cfg.AutoUpdateEnabled,
+		&cfg.ConcurrentBuilds, &cfg.DeploymentTimeout, &cfg.ServerTimezone, &cfg.DockerCleanupCron, &cfg.DiskUsageThreshold, &cfg.DiskUsageCron,
+		&cfg.CurrentVersion, &cfg.LatestVersion, &cfg.LastUpdateCheck, &cfg.UpdatedAt,
 	)
 }
 
@@ -134,6 +136,12 @@ func (r *SettingsSQLiteRepository) UpdateServerSettings(ctx context.Context, cfg
 	          default_anthropic_key = excluded.default_anthropic_key,
 	          update_check_cron = excluded.update_check_cron,
 	          auto_update_enabled = excluded.auto_update_enabled,
+	          concurrent_builds = excluded.concurrent_builds,
+	          deployment_timeout = excluded.deployment_timeout,
+	          server_timezone = excluded.server_timezone,
+	          docker_cleanup_cron = excluded.docker_cleanup_cron,
+	          disk_usage_threshold = excluded.disk_usage_threshold,
+	          disk_usage_cron = excluded.disk_usage_cron,
 	          current_version = excluded.current_version,
 	          latest_version = excluded.latest_version,
 	          last_update_check = excluded.last_update_check,

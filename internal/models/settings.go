@@ -69,6 +69,12 @@ type ServerSettings struct {
 	UpdateCheckCron             string `json:"updateCheckCron"`
 	AutoUpdateEnabled           bool   `json:"autoUpdateEnabled"`
 	TelemetryEnabled            bool   `json:"telemetryEnabled"`
+	ConcurrentBuilds            int    `json:"concurrentBuilds"`
+	DeploymentTimeout           int    `json:"deploymentTimeout"`
+	ServerTimezone              string `json:"serverTimezone"`
+	DockerCleanupCron           string `json:"dockerCleanupCron"`
+	DiskUsageThreshold          int    `json:"diskUsageThreshold"`
+	DiskUsageCron               string `json:"diskUsageCron"`
 	CurrentVersion              string `json:"currentVersion"`
 	LatestVersion               string `json:"latestVersion"`
 	LastUpdateCheck             string `json:"lastUpdateCheck"`

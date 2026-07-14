@@ -6,8 +6,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/docker/docker/client"
+	"golang.org/x/sync/semaphore"
 
 	"vessl.dev/vessl/internal/models"
 )
@@ -40,6 +42,16 @@ type EngineBuilder struct {
 	dockerClient      *client.Client
 	dockerfileBuilder *DockerfileBuilder
 	railpackBuilder   *RailpackBuilder
+	sem               *semaphore.Weighted
+}
+
+func defaultConcurrentBuilds() int64 {
+	if s := os.Getenv("VESSL_MAX_CONCURRENT_BUILDS"); s != "" {
+		if v, err := strconv.ParseInt(s, 10, 64); err == nil && v > 0 {
+			return v
+		}
+	}
+	return 2
 }
 
 func NewBuilder(dockerClient *client.Client) *EngineBuilder {
@@ -47,10 +59,16 @@ func NewBuilder(dockerClient *client.Client) *EngineBuilder {
 		dockerClient:      dockerClient,
 		dockerfileBuilder: NewDockerfileBuilder(dockerClient),
 		railpackBuilder:   NewRailpackBuilder(dockerClient),
+		sem:               semaphore.NewWeighted(defaultConcurrentBuilds()),
 	}
 }
 
 func (b *EngineBuilder) Build(ctx context.Context, opts BuildOptions) (string, error) {
+	if err := b.sem.Acquire(ctx, 1); err != nil {
+		return "", fmt.Errorf("failed to acquire build slot: %w", err)
+	}
+	defer b.sem.Release(1)
+
 	strategy := b.DetectStrategy(opts.SourceDir, opts.DockerfilePath, opts.AppConfig)
 	if opts.LogWriter != nil {
 		fmt.Fprintf(opts.LogWriter, "🚀 [Builder] Detected build strategy: %s\n", strategy)
