@@ -5,10 +5,30 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"vessl.dev/vessl/internal/utils"
 )
+
+type dockerStats struct {
+	CPUStats    cpuStats    `json:"cpu_stats"`
+	PreCPUStats cpuStats    `json:"precpu_stats"`
+	MemoryStats memoryStats `json:"memory_stats"`
+}
+
+type cpuStats struct {
+	CPUUsage struct {
+		TotalUsage  float64   `json:"total_usage"`
+		PercpuUsage []float64 `json:"percpu_usage"`
+	} `json:"cpu_usage"`
+	SystemUsage float64 `json:"system_cpu_usage"`
+	OnlineCPUs  float64 `json:"online_cpus"`
+}
+
+type memoryStats struct {
+	Usage float64            `json:"usage"`
+	Limit float64            `json:"limit"`
+	Stats map[string]float64 `json:"stats"`
+}
 
 type ContainerHealth struct {
 	Status             string  `json:"status"`
@@ -39,7 +59,7 @@ func (s *StatsMonitor) GetHealth(ctx context.Context, containerIDOrName string) 
 		return nil, utils.NewEngineError("ContainerStatsOneShot", err)
 	}
 	defer statsResp.Body.Close()
-	var stats types.StatsJSON
+	var stats dockerStats
 	if err := json.NewDecoder(statsResp.Body).Decode(&stats); err != nil {
 		return nil, utils.NewEngineError("DecodeStats", err)
 	}
@@ -62,7 +82,7 @@ func (s *StatsMonitor) GetHealth(ctx context.Context, containerIDOrName string) 
 	}, nil
 }
 
-func CalculateCPUPercentage(stats *types.StatsJSON) float64 {
+func CalculateCPUPercentage(stats *dockerStats) float64 {
 	cpuDelta := float64(stats.CPUStats.CPUUsage.TotalUsage) - float64(stats.PreCPUStats.CPUUsage.TotalUsage)
 	systemDelta := float64(stats.CPUStats.SystemUsage) - float64(stats.PreCPUStats.SystemUsage)
 	if systemDelta > 0.0 && cpuDelta > 0.0 {

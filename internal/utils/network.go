@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 )
 
@@ -31,7 +31,7 @@ func EnsureVesslNetwork(ctx context.Context, cli *client.Client) error {
 
 	netName := GetRuntimeNetwork()
 
-	networks, err := cli.NetworkList(ctx, types.NetworkListOptions{})
+	networks, err := cli.NetworkList(ctx, network.ListOptions{})
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func EnsureVesslNetwork(ctx context.Context, cli *client.Client) error {
 			return nil
 		}
 	}
-	_, err = cli.NetworkCreate(ctx, netName, types.NetworkCreate{
+	_, err = cli.NetworkCreate(ctx, netName, network.CreateOptions{
 		Driver: "bridge",
 	})
 	return err

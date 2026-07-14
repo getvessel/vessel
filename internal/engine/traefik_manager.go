@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
@@ -55,10 +55,10 @@ func (m *TraefikManager) EnsureTraefikRunning(ctx context.Context) error {
 }
 
 func (m *TraefikManager) ensureNetwork(ctx context.Context) error {
-	_, err := m.dockerClient.NetworkInspect(ctx, VesslNetworkName, types.NetworkInspectOptions{})
+	_, err := m.dockerClient.NetworkInspect(ctx, VesslNetworkName, network.InspectOptions{})
 	if err != nil {
 		if client.IsErrNotFound(err) {
-			_, err = m.dockerClient.NetworkCreate(ctx, VesslNetworkName, types.NetworkCreate{
+			_, err = m.dockerClient.NetworkCreate(ctx, VesslNetworkName, network.CreateOptions{
 				Driver: "bridge",
 			})
 			return err
@@ -84,7 +84,7 @@ func dockerSocketPath() string {
 
 func (m *TraefikManager) createTraefikContainer(ctx context.Context) error {
 	imageRef := traefikImage()
-	out, err := m.dockerClient.ImagePull(ctx, imageRef, types.ImagePullOptions{})
+	out, err := m.dockerClient.ImagePull(ctx, imageRef, image.PullOptions{})
 	if err == nil {
 		defer out.Close()
 		io.Copy(io.Discard, out)

@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	dockertypes "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/robfig/cron/v3"
@@ -218,18 +218,18 @@ func (bm *BackupManager) executeDump(ctx context.Context, containerName string, 
 		return nil, "", fmt.Errorf("cannot backup: container %s is stopped or not running", containerName)
 	}
 
-	execConfig := dockertypes.ExecConfig{
+	execConfig := container.ExecOptions{
 		AttachStdout: true,
 		AttachStderr: true,
 		Cmd:          dumpCmd,
 	}
 
-	execIDResp, err := bm.dockerClient.ContainerExecCreate(ctx, inspectResp.ID, execConfig)
+	execCreateResp, err := bm.dockerClient.ContainerExecCreate(ctx, inspectResp.ID, execConfig)
 	if err != nil {
 		return nil, "", fmt.Errorf("docker exec create failed: %v", err)
 	}
 
-	attachResp, err := bm.dockerClient.ContainerExecAttach(ctx, execIDResp.ID, dockertypes.ExecStartCheck{})
+	attachResp, err := bm.dockerClient.ContainerExecAttach(ctx, execCreateResp.ID, container.ExecAttachOptions{})
 	if err != nil {
 		return nil, "", fmt.Errorf("docker exec attach failed: %v", err)
 	}

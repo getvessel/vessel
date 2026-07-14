@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	dockertypes "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
@@ -123,18 +123,18 @@ func (cm *CronManager) ExecuteJob(ctx context.Context, jobID string) (string, er
 		_ = cm.store.UpdateJobStatusAndOutput(jobID, "error", &now, errMsg)
 		return errMsg, errors.New(errMsg)
 	}
-	execConfig := dockertypes.ExecConfig{
+	execConfig := container.ExecOptions{
 		AttachStdout: true,
 		AttachStderr: true,
 		Cmd:          []string{"sh", "-c", j.Command},
 	}
-	execIDResp, err := cm.dockerClient.ContainerExecCreate(ctx, inspectResp.ID, execConfig)
+	execCreateResp, err := cm.dockerClient.ContainerExecCreate(ctx, inspectResp.ID, execConfig)
 	if err != nil {
 		now := time.Now()
 		_ = cm.store.UpdateJobStatusAndOutput(jobID, "error", &now, err.Error())
 		return "", fmt.Errorf("failed to create container exec for job %s: %w", j.Name, err)
 	}
-	attachResp, err := cm.dockerClient.ContainerExecAttach(ctx, execIDResp.ID, dockertypes.ExecStartCheck{})
+	attachResp, err := cm.dockerClient.ContainerExecAttach(ctx, execCreateResp.ID, container.ExecAttachOptions{})
 	if err != nil {
 		now := time.Now()
 		_ = cm.store.UpdateJobStatusAndOutput(jobID, "error", &now, err.Error())

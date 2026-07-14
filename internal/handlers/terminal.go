@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -74,7 +74,7 @@ func (h *TerminalHandler) HandleWebSocket(c echo.Context) error {
 			}
 		}
 	}
-	execConfig := types.ExecConfig{
+	execConfig := container.ExecOptions{
 		Cmd:          []string{"/bin/sh"},
 		Tty:          true,
 		AttachStdin:  true,
@@ -88,7 +88,7 @@ func (h *TerminalHandler) HandleWebSocket(c echo.Context) error {
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, "failed to create exec instance: "+err.Error())
 	}
-	hijackedResp, err := h.dockerClient.ContainerExecAttach(context.Background(), resp.ID, types.ExecStartCheck{Tty: true})
+	hijackedResp, err := h.dockerClient.ContainerExecAttach(context.Background(), resp.ID, container.ExecAttachOptions{Tty: true})
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, "failed to attach to exec instance: "+err.Error())
 	}

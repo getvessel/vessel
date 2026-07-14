@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
@@ -48,7 +48,7 @@ func (d *StorageDeployer) SpinUp(ctx context.Context, sc *models.Storage) (strin
 		"MINIO_ROOT_PASSWORD=" + sc.SecretKey,
 	}
 	cmd := []string{"server", "/data", "--console-address", fmt.Sprintf(":%d", sc.ConsolePort)}
-	pullResp, err := d.dockerClient.ImagePull(ctx, imageName, dockertypes.ImagePullOptions{})
+	pullResp, err := d.dockerClient.ImagePull(ctx, imageName, image.PullOptions{})
 	if err == nil {
 		_, _ = io.Copy(io.Discard, pullResp)
 		_ = pullResp.Close()
