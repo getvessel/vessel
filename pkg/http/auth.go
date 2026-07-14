@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	nethttp "net/http"
-
-	"vessl.dev/vessl/internal/models"
 )
 
 // AuthResponse holds the response from the authentication endpoint.
