@@ -63,7 +63,7 @@ Vessl provisions a PostgreSQL container with persistent storage.
 
 After creation, Vessl automatically injects the connection string into your app:
 
-```env
+```text
 DATABASE_URL=postgresql://vessl:<password>@<container-name>:5432/vessl
 ```
 
