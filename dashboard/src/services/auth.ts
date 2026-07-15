@@ -31,6 +31,15 @@ export const authService = {
     }
   },
 
+  setup: async (details: RegisterCredentials): Promise<AuthResponse> => {
+    try {
+      const response = await apiClient.post<BaseResponse<AuthResponse>>('/system/setup', details);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   logout: async (): Promise<void> => {
     try {
       await apiClient.post('/auth/logout');

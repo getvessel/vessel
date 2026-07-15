@@ -56,6 +56,30 @@ export const useRegister = () => {
   });
 };
 
+export const useSetup = () => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: (details: Parameters<typeof authService.setup>[0]) => authService.setup(details),
+    onSuccess: async (data) => {
+      if (!data?.token || !data?.user) {
+        toast.error('Setup failed: invalid response from server');
+        return;
+      }
+
+      authActions.setAuth(data.token, data.user);
+      queryClient.clear();
+      await router.navigate({ to: '/' });
+
+      toast.success('Setup completed! Welcome to Vessl.');
+    },
+    onError: (error: Error) => {
+      toast.error(error?.message || 'Setup failed. Please try again.');
+    },
+  });
+};
+
 export const useForgotPassword = () => {
   return useMutation({
     mutationFn: (email: string) => authService.forgotPassword(email),

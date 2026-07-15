@@ -1,14 +1,19 @@
 import { createFileRoute, Link, Navigate } from '@tanstack/react-router';
 import { OAuthButtons, RegisterForm } from '#/features/auth';
-import { useGetPublicSettings } from '#/hooks/useSettings';
+import { useGetPublicSettings, useGetSetupStatus } from '#/hooks/useSettings';
 
 export const Route = createFileRoute('/_auth/register')({
   component: RegisterPage,
 });
 
 function RegisterPage() {
-  const { data: publicSettings, isLoading } = useGetPublicSettings();
+  const { data: publicSettings } = useGetPublicSettings();
+  const { data: setupStatus, isLoading } = useGetSetupStatus();
   const registrationEnabled = publicSettings?.data?.registrationEnabled ?? true;
+
+  if (!isLoading && setupStatus?.data?.setupRequired) {
+    return <Navigate to="/setup" replace />;
+  }
 
   if (!isLoading && !registrationEnabled) {
     return <Navigate to="/login" replace />;

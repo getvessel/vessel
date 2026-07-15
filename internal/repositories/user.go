@@ -20,6 +20,7 @@ type UserRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 	GetUserByID(ctx context.Context, id string) (*models.User, error)
 	ListUsers(ctx context.Context, limit, offset int) ([]models.User, int, error)
+	CountUsers(ctx context.Context) (int, error)
 	UpdateUser(ctx context.Context, u *models.User) error
 	CreatePAT(ctx context.Context, pat *models.PersonalAccessToken) error
 	ListPATs(ctx context.Context, userID string) ([]*models.PersonalAccessToken, error)
@@ -33,6 +34,12 @@ type UserSQLiteRepository struct {
 
 func NewUserSQLiteRepository(db *sql.DB) *UserSQLiteRepository {
 	return &UserSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+}
+
+func (r *UserSQLiteRepository) CountUsers(ctx context.Context) (int, error) {
+	var count int
+	err := r.db.GetContext(ctx, &count, "SELECT COUNT(*) FROM users")
+	return count, err
 }
 
 func (r *UserSQLiteRepository) CreateUser(ctx context.Context, u *models.User) error {

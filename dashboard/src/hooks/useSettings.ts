@@ -15,6 +15,13 @@ export const useGetPublicSettings = () => {
   });
 };
 
+export const useGetSetupStatus = () => {
+  return useQuery({
+    queryKey: ['settings', 'getSetupStatus'],
+    queryFn: () => settingsService.getSetupStatus(),
+  });
+};
+
 export const useUpdateSettings = () => {
   const queryClient = useQueryClient();
   return useMutation({

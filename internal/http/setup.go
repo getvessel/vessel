@@ -175,6 +175,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	systemHandler := handlers.NewSystemHandler(systemService)
 	migrationService := services.NewMigrationService(databaseSQLiteRepository, dataDir)
 	migrationHandler := handlers.NewMigrationHandler(migrationService)
+	onboardingHandler := handlers.NewOnboardingHandler(userService, authService, settingsService)
 
 	authLimiter := middleware.NewRateLimiter(10, time.Minute)
 
@@ -220,6 +221,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		oneClickHandler:        oneClickHandler,
 		archiveHandler:         archiveHandler,
 		migrationHandler:       migrationHandler,
+		onboardingHandler:      onboardingHandler,
 	}
 
 	if srv.deployer != nil {

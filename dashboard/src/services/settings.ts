@@ -12,6 +12,14 @@ export const settingsService = {
     }
   },
 
+  getSetupStatus: async (): Promise<BaseResponse<{ setupRequired: boolean }>> => {
+    try {
+      return await apiClient.get<BaseResponse<{ setupRequired: boolean }>>('/system/setup-status');
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   getPublicSettings: async (): Promise<
     BaseResponse<{
       registrationEnabled: boolean;

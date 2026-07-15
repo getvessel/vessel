@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, Navigate } from '@tanstack/react-router';
 import { LoginForm, OAuthButtons } from '#/features/auth';
 
-import { useGetPublicSettings } from '#/hooks/useSettings';
+import { useGetPublicSettings, useGetSetupStatus } from '#/hooks/useSettings';
 
 export const Route = createFileRoute('/_auth/login')({
   component: LoginPage,
@@ -9,7 +9,12 @@ export const Route = createFileRoute('/_auth/login')({
 
 function LoginPage() {
   const { data: publicSettings } = useGetPublicSettings();
+  const { data: setupStatus, isLoading } = useGetSetupStatus();
   const registrationEnabled = publicSettings?.data?.registrationEnabled ?? true;
+
+  if (!isLoading && setupStatus?.data?.setupRequired) {
+    return <Navigate to="/setup" replace />;
+  }
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">

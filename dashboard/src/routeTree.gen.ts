@@ -18,6 +18,7 @@ import { Route as ShellSettingsRouteImport } from './routes/_shell/settings'
 import { Route as ShellProjectsRouteImport } from './routes/_shell/projects'
 import { Route as ShellMarketplaceRouteImport } from './routes/_shell/marketplace'
 import { Route as ShellDatabasesRouteImport } from './routes/_shell/databases'
+import { Route as AuthSetupRouteImport } from './routes/_auth/setup'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
@@ -68,6 +69,11 @@ const ShellDatabasesRoute = ShellDatabasesRouteImport.update({
   id: '/databases',
   path: '/databases',
   getParentRoute: () => ShellRoute,
+} as any)
+const AuthSetupRoute = AuthSetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/setup': typeof AuthSetupRoute
   '/databases': typeof ShellDatabasesRoute
   '/marketplace': typeof ShellMarketplaceRoute
   '/projects': typeof ShellProjectsRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/setup': typeof AuthSetupRoute
   '/databases': typeof ShellDatabasesRoute
   '/marketplace': typeof ShellMarketplaceRoute
   '/projects': typeof ShellProjectsRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
+  '/_auth/setup': typeof AuthSetupRoute
   '/_shell/databases': typeof ShellDatabasesRoute
   '/_shell/marketplace': typeof ShellMarketplaceRoute
   '/_shell/projects': typeof ShellProjectsRoute
@@ -174,6 +183,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/setup'
     | '/databases'
     | '/marketplace'
     | '/projects'
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/setup'
     | '/databases'
     | '/marketplace'
     | '/projects'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/register'
     | '/_auth/reset-password'
+    | '/_auth/setup'
     | '/_shell/databases'
     | '/_shell/marketplace'
     | '/_shell/projects'
@@ -291,6 +303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellDatabasesRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_auth/setup': {
+      id: '/_auth/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof AuthSetupRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/reset-password': {
       id: '/_auth/reset-password'
       path: '/reset-password'
@@ -355,6 +374,7 @@ interface AuthRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AuthSetupRoute: typeof AuthSetupRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
@@ -362,6 +382,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AuthSetupRoute: AuthSetupRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

@@ -25,6 +25,10 @@ func NewUserService(ur repositories.UserRepository) *UserService {
 	}
 }
 
+func (s *UserService) CountUsers(ctx context.Context) (int, error) {
+	return s.userRepo.CountUsers(ctx)
+}
+
 func (s *UserService) CreateUser(ctx context.Context, u *models.User) error {
 	if u.Email == "" {
 		return errors.New("user email is required")

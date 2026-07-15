@@ -58,6 +58,7 @@ type Server struct {
 	oneClickHandler        *handlers.OneClickHandler
 	archiveHandler         *handlers.ArchiveHandler
 	migrationHandler       *handlers.MigrationHandler
+	onboardingHandler      *handlers.OnboardingHandler
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
