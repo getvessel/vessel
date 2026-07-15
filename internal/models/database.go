@@ -67,3 +67,15 @@ type DatabaseQueryResponse struct {
 	Rows    []map[string]any `json:"rows,omitempty"`
 	Result  any              `json:"result,omitempty"`
 }
+
+type TableSchema struct {
+	Name    string         `json:"name"`
+	Columns []ColumnSchema `json:"columns"`
+}
+
+type ColumnSchema struct {
+	Name       string `json:"name"`
+	Type       string `json:"type"`
+	IsNullable bool   `json:"isNullable"`
+	IsPrimary  bool   `json:"isPrimary"`
+}
