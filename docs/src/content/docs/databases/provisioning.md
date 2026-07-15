@@ -9,38 +9,39 @@ Spin up managed databases directly from the Vessl dashboard. Each database runs 
 
 ### Relational
 
-| Engine | Version | Default Port |
-|---|---|---|
-| PostgreSQL | 16-alpine | 5432 |
-| MySQL | 8.0 | 3306 |
-| MariaDB | 11 | 3306 |
-| ClickHouse | latest | 9000 |
+| Engine      | Version   | Default Port |
+| ----------- | --------- | ------------ |
+| PostgreSQL  | 16-alpine | 5432         |
+| TimescaleDB | latest    | 5432         |
+| MySQL       | 8.0       | 3306         |
+| MariaDB     | 11        | 3306         |
+| ClickHouse  | latest    | 9000         |
 
 ### NoSQL
 
-| Engine | Version | Default Port |
-|---|---|---|
-| MongoDB | 7.0 | 27017 |
-| Redis | 7-alpine | 6379 |
-| Dragonfly | latest | 6379 |
-| KeyDB | latest | 6379 |
+| Engine    | Version  | Default Port |
+| --------- | -------- | ------------ |
+| MongoDB   | 7.0      | 27017        |
+| Redis     | 7-alpine | 6379         |
+| Dragonfly | latest   | 6379         |
+| KeyDB     | latest   | 6379         |
 
 ### Message Brokers
 
-| Engine | Version | Default Port |
-|---|---|---|
-| Kafka | latest | 9092 |
-| RabbitMQ | 4-alpine | 5672 |
-| NATS | 2-alpine | 4222 |
+| Engine   | Version  | Default Port |
+| -------- | -------- | ------------ |
+| Kafka    | latest   | 9092         |
+| RabbitMQ | 4-alpine | 5672         |
+| NATS     | 2-alpine | 4222         |
 
 ### One-Click Deployers
 
-| Service | Purpose | Port |
-|---|---|---|
-| NocoDB | Open-source Airtable alternative | 8080 |
-| Plausible | Web analytics | 8000 |
-| WordPress | CMS | 80 |
-| Gitea | Self-hosted Git service | 3000 |
+| Service   | Purpose                          | Port |
+| --------- | -------------------------------- | ---- |
+| NocoDB    | Open-source Airtable alternative | 8080 |
+| Plausible | Web analytics                    | 8000 |
+| WordPress | CMS                              | 80   |
+| Gitea     | Self-hosted Git service          | 3000 |
 
 ## Creating a Database
 
@@ -58,6 +59,7 @@ Once created, the connection string is automatically injected into every service
 
 ```
 DATABASE_URL=postgresql://vessl:<password>@<service-name>:5432/vessl
+TIMESCALE_URL=postgresql://vessl:<password>@<service-name>:5432/vessl
 REDIS_URL=redis://<service-name>:6379
 MONGO_URL=mongodb://vessl:<password>@<service-name>:27017/vessl
 ```
@@ -73,6 +75,7 @@ Databases can be started and stopped from the dashboard. Stopping a database fre
 ### Configuration
 
 Each database has sensible defaults:
+
 - **Port**: Assigned from the engine's default port range
 - **Username**: `vessl`
 - **Database name**: `vessl`

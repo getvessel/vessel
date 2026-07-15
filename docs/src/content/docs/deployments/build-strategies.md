@@ -41,3 +41,13 @@ Railpack generates an optimal Dockerfile for your project without you writing on
 ### Buildpacks
 
 Cloud Native Buildpacks support is available for OCI-compliant builds. Select **Buildpacks** in the deployment settings.
+
+### Build Overrides
+
+When using auto-detection builders like Railpack or Nixpacks, you can customize the pipeline without maintaining a Dockerfile by providing overrides in your service settings:
+
+- **Install Command**: Override package dependency installation (`npm ci`, `pip install -r requirements.txt`, `go mod download`).
+- **Build Command**: Override compilation and asset generation (`npm run build`, `go build -o app ./cmd`).
+- **Start Command**: Override the container execution command (`npm start`, `./app`).
+
+Vessl injects these flags directly into the builder CLI (`--install-cmd`, `--build-cmd`, `--start-cmd`) or synthesizes the corresponding `RUN` and `CMD` instructions inside fallback build containers automatically.
