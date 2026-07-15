@@ -15,13 +15,15 @@ type EnvironmentService struct {
 	envRepo    repositories.EnvironmentRepository
 	domainRepo repositories.DomainRepository
 	varRepo    repositories.EnvRepository
+	dnsService *DNSProviderService
 }
 
-func NewEnvironmentService(er repositories.EnvironmentRepository, dr repositories.DomainRepository, vr repositories.EnvRepository) *EnvironmentService {
+func NewEnvironmentService(er repositories.EnvironmentRepository, dr repositories.DomainRepository, vr repositories.EnvRepository, dnsService *DNSProviderService) *EnvironmentService {
 	return &EnvironmentService{
 		envRepo:    er,
 		domainRepo: dr,
 		varRepo:    vr,
+		dnsService: dnsService,
 	}
 }
 
@@ -77,6 +79,15 @@ func (s *EnvironmentService) CreateDomain(ctx context.Context, d *models.DomainC
 	if err := s.domainRepo.Create(ctx, d); err != nil {
 		return nil, err
 	}
+
+	// Best-effort DNS provisioning
+	if s.dnsService != nil {
+		// Run in background so we don't block the API response unnecessarily, or we can run synchronously
+		go func() {
+			_ = s.dnsService.ProvisionARecord(context.Background(), d.DomainName)
+		}()
+	}
+
 	return d, nil
 }
 

@@ -51,3 +51,16 @@ func (h *SystemHandler) Restart(c echo.Context) error {
 	}()
 	return utils.Success(c, "Restart initiated", map[string]string{"status": "restarting"})
 }
+
+// @Summary Run system cleanup
+// @Description Prunes unused docker images, containers, volumes, and networks
+// @Tags System
+// @Produce json
+// @Success 200 {object} map[string]any
+// @Router /system/maintenance/cleanup [post]
+func (h *SystemHandler) Cleanup(c echo.Context) error {
+	if err := h.service.Cleanup(); err != nil {
+		return utils.Error(c, 500, "Cleanup failed")
+	}
+	return utils.Success(c, "System cleanup completed successfully", nil)
+}

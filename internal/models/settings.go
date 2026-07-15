@@ -40,6 +40,11 @@ type ServerSettings struct {
 	DisableTwoStepConfirmation  bool   `json:"disableTwoStepConfirmation"`
 	DefaultOpenAIKey            string `json:"defaultOpenAIKey,omitempty"`
 	DefaultAnthropicKey         string `json:"defaultAnthropicKey,omitempty"`
+	CloudflareAPIToken          string `json:"cloudflareApiToken,omitempty"`
+	NamecheapAPIUser            string `json:"namecheapApiUser,omitempty"`
+	NamecheapAPIKey             string `json:"namecheapApiKey,omitempty"`
+	NamecheapClientIP           string `json:"namecheapClientIp,omitempty"`
+	SpaceshipAPIKey             string `json:"spaceshipApiKey,omitempty"`
 	UpdateCheckCron             string `json:"updateCheckCron"`
 	AutoUpdateEnabled           bool   `json:"autoUpdateEnabled"`
 	TelemetryEnabled            bool   `json:"telemetryEnabled"`

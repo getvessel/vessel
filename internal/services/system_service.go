@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
@@ -21,6 +22,14 @@ type SystemService struct {
 
 func NewSystemService() *SystemService {
 	return &SystemService{}
+}
+
+func (s *SystemService) Cleanup() error {
+	cmd := exec.Command("docker", "system", "prune", "-af", "--volumes")
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("docker prune failed: %w", err)
+	}
+	return nil
 }
 
 func (s *SystemService) GetStats() (*models.SystemStats, error) {
