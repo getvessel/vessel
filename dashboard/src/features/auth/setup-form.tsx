@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Lock, Mail, User } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '#/components/ui/button';
@@ -17,6 +18,7 @@ type SetupSchema = z.infer<typeof setupSchema>;
 
 export const SetupForm = () => {
   const { mutateAsync: setupUser, isPending } = useSetup();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -87,10 +89,18 @@ export const SetupForm = () => {
           </div>
           <Input
             id="password"
-            type="password"
-            className="h-12 bg-background pl-10 text-base"
+            type={showPassword ? 'text' : 'password'}
+            className="h-12 bg-background pr-10 pl-10 text-base"
             {...register('password')}
           />
+          <button
+            type="button"
+            className="absolute top-3.5 right-3 text-muted-foreground hover:text-foreground focus:outline-none"
+            onClick={() => setShowPassword(!showPassword)}
+            tabIndex={-1}
+          >
+            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
         </div>
         {errors.password && (
           <p className="text-[13px] text-destructive">{errors.password.message}</p>

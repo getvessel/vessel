@@ -8,6 +8,13 @@ import { authActions, authStore } from '#/stores/authStore';
 
 const API_BASE_URL = env.VITE_API_URL;
 
+function getCookie(name: string) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift();
+  return null;
+}
+
 export class ApiError extends Error {
   public status: number;
   public data: unknown;
@@ -34,6 +41,11 @@ export const apiClient = {
       headers.set('Authorization', `Bearer ${token}`);
     }
 
+    const csrfToken = getCookie('csrf_token');
+    if (csrfToken) {
+      headers.set('X-CSRF-Token', csrfToken);
+    }
+
     const response = await fetch(url, {
       ...options,
       headers,
@@ -53,7 +65,8 @@ export const apiClient = {
     const data = isJson ? await response.json() : await response.text();
 
     if (!response.ok) {
-      const errorMessage = data?.error || response.statusText || 'An error occurred';
+      const errorMessage =
+        data?.message || data?.error || response.statusText || 'An error occurred';
       import('sonner').then(({ toast }) => toast.error(errorMessage));
       throw new ApiError(response.status, errorMessage, data);
     }
@@ -72,6 +85,10 @@ export const apiClient = {
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
+    const csrfToken = getCookie('csrf_token');
+    if (csrfToken) {
+      headers.set('X-CSRF-Token', csrfToken);
+    }
     const response = await fetch(url, { ...options, method: 'GET', headers });
 
     if (response.status === 401) {
@@ -83,7 +100,8 @@ export const apiClient = {
     if (!response.ok) {
       const isJson = response.headers.get('content-type')?.includes('application/json');
       const data = isJson ? await response.json() : await response.text();
-      const errorMessage = data?.error || response.statusText || 'An error occurred';
+      const errorMessage =
+        data?.message || data?.error || response.statusText || 'An error occurred';
       import('sonner').then(({ toast }) => toast.error(errorMessage));
       throw new ApiError(response.status, errorMessage, data);
     }

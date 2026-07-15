@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/labstack/echo/v4"
 
 	"vessl.dev/vessl/internal/services"
@@ -63,6 +65,7 @@ func (h *OnboardingHandler) Setup(c echo.Context) error {
 
 	var req SetupRequest
 	if err := c.Bind(&req); err != nil {
+		fmt.Printf("Setup Error: Failed to bind request: %v\n", err)
 		return utils.Error(c, 400, "invalid request")
 	}
 
