@@ -1,5 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { Shell } from '#/components/layout/shell';
 
 export const Route = createFileRoute('/_dashboard')({
-  component: () => <div>Route Component</div>,
+  component: DashboardLayout,
 });
+
+function DashboardLayout() {
+  return (
+    <Shell>
+      <Outlet />
+    </Shell>
+  );
+}
