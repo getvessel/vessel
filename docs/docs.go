@@ -433,6 +433,31 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/backups/{id}/restore": {
+            "post": {
+                "description": "Restore endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backups"
+                ],
+                "summary": "Restore endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/backups/{id}/trigger": {
             "post": {
                 "description": "Trigger endpoint",
@@ -562,6 +587,38 @@ const docTemplate = `{
                 ],
                 "responses": {}
             },
+            "put": {
+                "description": "UpdateDatabase endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Databases"
+                ],
+                "summary": "UpdateDatabase endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateDatabaseRequest"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
             "delete": {
                 "description": "DeleteDatabase endpoint",
                 "consumes": [
@@ -581,6 +638,204 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/databases/{id}/data/{table}": {
+            "get": {
+                "description": "GetTableData endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Databases"
+                ],
+                "summary": "GetTableData endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "table",
+                        "name": "table",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            },
+            "put": {
+                "description": "UpdateTableRow endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Databases"
+                ],
+                "summary": "UpdateTableRow endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "table",
+                        "name": "table",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "description": "InsertTableRow endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Databases"
+                ],
+                "summary": "InsertTableRow endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "table",
+                        "name": "table",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "description": "DeleteTableRow endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Databases"
+                ],
+                "summary": "DeleteTableRow endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "table",
+                        "name": "table",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Payload with keys",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/databases/{id}/import": {
+            "post": {
+                "description": "ImportData endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Databases"
+                ],
+                "summary": "ImportData endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ImportDatabaseRequest"
+                        }
                     }
                 ],
                 "responses": {}
@@ -615,6 +870,31 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.DatabaseQueryRequest"
                         }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/databases/{id}/schemas": {
+            "get": {
+                "description": "GetSchemas endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Databases"
+                ],
+                "summary": "GetSchemas endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {}
@@ -1644,7 +1924,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Project Settings"
                 ],
                 "summary": "ListMembers endpoint",
                 "parameters": [
@@ -1703,7 +1983,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces",
+                    "Project Settings",
                     "Projects"
                 ],
                 "summary": "Remove Project Member",
@@ -2487,6 +2767,189 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/system/export": {
+            "get": {
+                "description": "Exports the full server state (SQLite database + all DB container dumps) into an AES-256-GCM encrypted .vessl bundle. Admin only.",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Export server bundle",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Passphrase used to encrypt the bundle",
+                        "name": "passphrase",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Encrypted .vessl bundle file",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "Missing passphrase",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Export failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/system/import": {
+            "post": {
+                "description": "Imports an encrypted .vessl bundle, restoring the SQLite database and all DB container data. Admin only. Triggers a server restart after restore.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Import server bundle",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Passphrase used to decrypt the bundle",
+                        "name": "passphrase",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "The .vessl bundle file to import",
+                        "name": "bundle",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Import completed with manifest details",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Missing passphrase or bundle file",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Decryption or restore failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/system/maintenance/cleanup": {
+            "post": {
+                "description": "Prunes unused docker images, containers, volumes, and networks",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Run system cleanup",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/system/migration/railway/import": {
+            "post": {
+                "description": "Imports a project from Railway",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Import Railway Project",
+                "parameters": [
+                    {
+                        "description": "Import request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RailwayImportRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/system/migration/railway/projects": {
+            "get": {
+                "description": "Fetches projects from Railway API",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "List Railway Projects",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Railway Personal API Token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/system/public": {
             "get": {
                 "description": "Get public settings for the frontend (e.g., if registration is enabled)",
@@ -2513,6 +2976,62 @@ const docTemplate = `{
                     "System"
                 ],
                 "summary": "Restart the Vessl daemon",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/system/setup": {
+            "post": {
+                "description": "Creates the first user and optionally configures initial settings",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Complete onboarding setup",
+                "parameters": [
+                    {
+                        "description": "Setup details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SetupRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/system/setup-status": {
+            "get": {
+                "description": "Returns true if no users exist in the system, indicating setup is needed",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Check if onboarding is required",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2841,6 +3360,20 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.SetupRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "handlers.TestNotificationRequest": {
             "type": "object",
             "properties": {
@@ -2918,6 +3451,9 @@ const docTemplate = `{
                 "imageRef": {
                     "type": "string"
                 },
+                "installCommand": {
+                    "type": "string"
+                },
                 "internalPort": {
                     "type": "integer"
                 },
@@ -2933,7 +3469,13 @@ const docTemplate = `{
                 "rootDirectory": {
                     "type": "string"
                 },
+                "runtimeMode": {
+                    "$ref": "#/definitions/models.RuntimeMode"
+                },
                 "startCommand": {
+                    "type": "string"
+                },
+                "staticOutput": {
                     "type": "string"
                 },
                 "status": {
@@ -3007,6 +3549,9 @@ const docTemplate = `{
                 },
                 "environmentId": {
                     "type": "string"
+                },
+                "logicalReplication": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
@@ -3180,6 +3725,14 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ImportDatabaseRequest": {
+            "type": "object",
+            "properties": {
+                "sourceUrl": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Job": {
             "type": "object",
             "properties": {
@@ -3296,6 +3849,37 @@ const docTemplate = `{
                 }
             }
         },
+        "models.RailwayImportRequest": {
+            "type": "object",
+            "properties": {
+                "excludeRailwayVars": {
+                    "type": "boolean"
+                },
+                "importData": {
+                    "type": "boolean"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "recreateDatabases": {
+                    "type": "boolean"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.RuntimeMode": {
+            "type": "string",
+            "enum": [
+                "web",
+                "worker"
+            ],
+            "x-enum-varnames": [
+                "RuntimeModeWeb",
+                "RuntimeModeWorker"
+            ]
+        },
         "models.S3Destination": {
             "type": "object",
             "properties": {
@@ -3333,6 +3917,9 @@ const docTemplate = `{
             "properties": {
                 "autoUpdateEnabled": {
                     "type": "boolean"
+                },
+                "cloudflareApiToken": {
+                    "type": "string"
                 },
                 "concurrentBuilds": {
                     "type": "integer"
@@ -3400,6 +3987,15 @@ const docTemplate = `{
                 "mcpServerEnabled": {
                     "type": "boolean"
                 },
+                "namecheapApiKey": {
+                    "type": "string"
+                },
+                "namecheapApiUser": {
+                    "type": "string"
+                },
+                "namecheapClientIp": {
+                    "type": "string"
+                },
                 "notificationAlerts": {
                     "type": "boolean"
                 },
@@ -3464,6 +4060,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "smtpUser": {
+                    "type": "string"
+                },
+                "spaceshipApiKey": {
                     "type": "string"
                 },
                 "telegramBotToken": {
@@ -3568,6 +4167,20 @@ const docTemplate = `{
                 },
                 "uptimeSeconds": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.UpdateDatabaseRequest": {
+            "type": "object",
+            "properties": {
+                "customArgs": {
+                    "type": "string"
+                },
+                "externalDns": {
+                    "type": "string"
+                },
+                "logicalReplication": {
+                    "type": "boolean"
                 }
             }
         },

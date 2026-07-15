@@ -62,35 +62,19 @@ func (s *RailwayService) doGraphQL(ctx context.Context, token, query string, var
 	return io.ReadAll(resp.Body)
 }
 
-type RailwayProjectNode struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
-type RailwayProjectsResponse struct {
-	Data struct {
-		Projects struct {
-			Edges []struct {
-				Node RailwayProjectNode `json:"node"`
-			} `json:"edges"`
-		} `json:"projects"`
-	} `json:"data"`
-}
-
-func (s *RailwayService) ListProjects(ctx context.Context, token string) ([]RailwayProjectNode, error) {
+func (s *RailwayService) ListProjects(ctx context.Context, token string) ([]models.RailwayProject, error) {
 	query := `query { projects { edges { node { id name description } } } }`
 	body, err := s.doGraphQL(ctx, token, query, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	var res RailwayProjectsResponse
+	var res models.RailwayProjectsResponse
 	if err := json.Unmarshal(body, &res); err != nil {
 		return nil, err
 	}
 
-	var projects []RailwayProjectNode
+	var projects []models.RailwayProject
 	for _, edge := range res.Data.Projects.Edges {
 		projects = append(projects, edge.Node)
 	}
@@ -98,45 +82,7 @@ func (s *RailwayService) ListProjects(ctx context.Context, token string) ([]Rail
 	return projects, nil
 }
 
-type RailwayEnvironmentNode struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
-type RailwayServiceSource struct {
-	Image string `json:"image"`
-	Repo  string `json:"repo"`
-}
-
-type RailwayServiceNode struct {
-	ID     string               `json:"id"`
-	Name   string               `json:"name"`
-	Source RailwayServiceSource `json:"source"`
-}
-
-type RailwayProjectDetails struct {
-	ID           string `json:"id"`
-	Name         string `json:"name"`
-	Description  string `json:"description"`
-	Environments struct {
-		Edges []struct {
-			Node RailwayEnvironmentNode `json:"node"`
-		} `json:"edges"`
-	} `json:"environments"`
-	Services struct {
-		Edges []struct {
-			Node RailwayServiceNode `json:"node"`
-		} `json:"edges"`
-	} `json:"services"`
-}
-
-type RailwayProjectDetailsResponse struct {
-	Data struct {
-		Project RailwayProjectDetails `json:"project"`
-	} `json:"data"`
-}
-
-func (s *RailwayService) GetProjectDetails(ctx context.Context, token, projectID string) (*RailwayProjectDetails, error) {
+func (s *RailwayService) GetProjectDetails(ctx context.Context, token, projectID string) (*models.RailwayProject, error) {
 	query := `query($id: String!) {
 		project(id: $id) {
 			id
@@ -170,7 +116,7 @@ func (s *RailwayService) GetProjectDetails(ctx context.Context, token, projectID
 		return nil, err
 	}
 
-	var res RailwayProjectDetailsResponse
+	var res models.RailwayProjectDetailsResponse
 	if err := json.Unmarshal(body, &res); err != nil {
 		return nil, err
 	}
@@ -189,55 +135,63 @@ func (s *RailwayService) ImportProject(ctx context.Context, token, projectID str
 		return err
 	}
 
-	// Create environments
 	for _, envEdge := range details.Environments.Edges {
-		env, err := s.projectService.CreateEnvironment(ctx, proj.ID, envEdge.Node.Name)
-		if err != nil {
+		if err := s.importEnvironment(ctx, proj.ID, envEdge.Node.Name, details.Services.Edges); err != nil {
 			return err
-		}
-
-		// Create services in each environment
-		for _, svcEdge := range details.Services.Edges {
-			svcNode := svcEdge.Node
-
-			isDB := false
-			engine := ""
-			image := strings.ToLower(svcNode.Source.Image)
-			if strings.Contains(image, "postgres") {
-				isDB = true
-				engine = "postgres"
-			} else if strings.Contains(image, "redis") {
-				isDB = true
-				engine = "redis"
-			} else if strings.Contains(image, "mysql") {
-				isDB = true
-				engine = "mysql"
-			}
-
-			if isDB {
-				db := &models.Database{
-					ProjectID:     proj.ID,
-					EnvironmentID: env.ID,
-					Name:          svcNode.Name,
-					Engine:        engine,
-					Version:       "latest",
-				}
-				if _, err := s.dbService.CreateDatabase(ctx, db); err != nil {
-					return err
-				}
-			} else {
-				app := &models.AppService{
-					ProjectID:     proj.ID,
-					EnvironmentID: env.ID,
-					Name:          svcNode.Name,
-					RepositoryURL: svcNode.Source.Repo,
-				}
-				if _, err := s.appService.CreateAppService(ctx, app); err != nil {
-					return err
-				}
-			}
 		}
 	}
 
 	return nil
+}
+
+func (s *RailwayService) importEnvironment(ctx context.Context, projectID, envName string, services []models.RailwayServiceEdge) error {
+	env, err := s.projectService.CreateEnvironment(ctx, projectID, envName)
+	if err != nil {
+		return err
+	}
+
+	for _, svcEdge := range services {
+		if err := s.importService(ctx, projectID, env.ID, svcEdge.Node); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *RailwayService) importService(ctx context.Context, projectID, envID string, svcNode models.RailwayService) error {
+	isDB := false
+	engine := ""
+	image := strings.ToLower(svcNode.Source.Image)
+
+	if strings.Contains(image, "postgres") {
+		isDB = true
+		engine = "postgres"
+	} else if strings.Contains(image, "redis") {
+		isDB = true
+		engine = "redis"
+	} else if strings.Contains(image, "mysql") {
+		isDB = true
+		engine = "mysql"
+	}
+
+	if isDB {
+		db := &models.Database{
+			ProjectID:     projectID,
+			EnvironmentID: envID,
+			Name:          svcNode.Name,
+			Engine:        engine,
+			Version:       "latest",
+		}
+		_, err := s.dbService.CreateDatabase(ctx, db)
+		return err
+	}
+
+	app := &models.AppService{
+		ProjectID:     projectID,
+		EnvironmentID: envID,
+		Name:          svcNode.Name,
+		RepositoryURL: svcNode.Source.Repo,
+	}
+	_, err := s.appService.CreateAppService(ctx, app)
+	return err
 }

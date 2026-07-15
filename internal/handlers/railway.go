@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/services"
 	"vessl.dev/vessl/internal/utils"
 )
@@ -38,24 +39,16 @@ func (h *RailwayHandler) GetProjects(c echo.Context) error {
 	return utils.Success(c, "fetched projects", projects)
 }
 
-type railwayImportRequest struct {
-	Token              string `json:"token"`
-	ProjectID          string `json:"projectId"`
-	ExcludeRailwayVars bool   `json:"excludeRailwayVars"`
-	RecreateDatabases  bool   `json:"recreateDatabases"`
-	ImportData         bool   `json:"importData"`
-}
-
 // @Summary Import Railway Project
 // @Description Imports a project from Railway
 // @Tags System
 // @Accept json
 // @Produce json
-// @Param req body railwayImportRequest true "Import request"
+// @Param req body models.RailwayImportRequest true "Import request"
 // @Success 200 {object} map[string]any
 // @Router /system/migration/railway/import [post]
 func (h *RailwayHandler) ImportProject(c echo.Context) error {
-	var req railwayImportRequest
+	var req models.RailwayImportRequest
 	if err := c.Bind(&req); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid request")
 	}

@@ -65,6 +65,15 @@ definitions:
       token:
         type: string
     type: object
+  handlers.SetupRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
   handlers.TestNotificationRequest:
     properties:
       provider:
@@ -115,6 +124,8 @@ definitions:
         type: string
       imageRef:
         type: string
+      installCommand:
+        type: string
       internalPort:
         type: integer
       name:
@@ -125,7 +136,11 @@ definitions:
         type: string
       rootDirectory:
         type: string
+      runtimeMode:
+        $ref: '#/definitions/models.RuntimeMode'
       startCommand:
+        type: string
+      staticOutput:
         type: string
       status:
         type: string
@@ -174,6 +189,8 @@ definitions:
         type: string
       environmentId:
         type: string
+      logicalReplication:
+        type: boolean
       name:
         type: string
       password:
@@ -286,6 +303,11 @@ definitions:
       provider:
         type: string
     type: object
+  models.ImportDatabaseRequest:
+    properties:
+      sourceUrl:
+        type: string
+    type: object
   models.Job:
     properties:
       command:
@@ -362,6 +384,27 @@ definitions:
       userId:
         type: string
     type: object
+  models.RailwayImportRequest:
+    properties:
+      excludeRailwayVars:
+        type: boolean
+      importData:
+        type: boolean
+      projectId:
+        type: string
+      recreateDatabases:
+        type: boolean
+      token:
+        type: string
+    type: object
+  models.RuntimeMode:
+    enum:
+    - web
+    - worker
+    type: string
+    x-enum-varnames:
+    - RuntimeModeWeb
+    - RuntimeModeWorker
   models.S3Destination:
     properties:
       accessKeyId:
@@ -387,6 +430,8 @@ definitions:
     properties:
       autoUpdateEnabled:
         type: boolean
+      cloudflareApiToken:
+        type: string
       concurrentBuilds:
         type: integer
       currentVersion:
@@ -431,6 +476,12 @@ definitions:
         type: string
       mcpServerEnabled:
         type: boolean
+      namecheapApiKey:
+        type: string
+      namecheapApiUser:
+        type: string
+      namecheapClientIp:
+        type: string
       notificationAlerts:
         type: boolean
       publicIpv4:
@@ -474,6 +525,8 @@ definitions:
       smtpPort:
         type: integer
       smtpUser:
+        type: string
+      spaceshipApiKey:
         type: string
       telegramBotToken:
         type: string
@@ -543,6 +596,15 @@ definitions:
         type: integer
       uptimeSeconds:
         type: integer
+    type: object
+  models.UpdateDatabaseRequest:
+    properties:
+      customArgs:
+        type: string
+      externalDns:
+        type: string
+      logicalReplication:
+        type: boolean
     type: object
   models.Variable:
     properties:
@@ -875,6 +937,23 @@ paths:
       summary: Get Backup
       tags:
       - Backups
+  /backups/{id}/restore:
+    post:
+      consumes:
+      - application/json
+      description: Restore endpoint
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Restore endpoint
+      tags:
+      - Backups
   /backups/{id}/trigger:
     post:
       consumes:
@@ -979,6 +1058,165 @@ paths:
       summary: GetDatabase endpoint
       tags:
       - Databases
+    put:
+      consumes:
+      - application/json
+      description: UpdateDatabase endpoint
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateDatabaseRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: UpdateDatabase endpoint
+      tags:
+      - Databases
+  /databases/{id}/data/{table}:
+    delete:
+      consumes:
+      - application/json
+      description: DeleteTableRow endpoint
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: table
+        in: path
+        name: table
+        required: true
+        type: string
+      - description: Payload with keys
+        in: body
+        name: request
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses: {}
+      summary: DeleteTableRow endpoint
+      tags:
+      - Databases
+    get:
+      consumes:
+      - application/json
+      description: GetTableData endpoint
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: table
+        in: path
+        name: table
+        required: true
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: GetTableData endpoint
+      tags:
+      - Databases
+    post:
+      consumes:
+      - application/json
+      description: InsertTableRow endpoint
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: table
+        in: path
+        name: table
+        required: true
+        type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses: {}
+      summary: InsertTableRow endpoint
+      tags:
+      - Databases
+    put:
+      consumes:
+      - application/json
+      description: UpdateTableRow endpoint
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: table
+        in: path
+        name: table
+        required: true
+        type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses: {}
+      summary: UpdateTableRow endpoint
+      tags:
+      - Databases
+  /databases/{id}/import:
+    post:
+      consumes:
+      - application/json
+      description: ImportData endpoint
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ImportDatabaseRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: ImportData endpoint
+      tags:
+      - Databases
   /databases/{id}/query:
     post:
       consumes:
@@ -1000,6 +1238,23 @@ paths:
       - application/json
       responses: {}
       summary: QueryDatabase endpoint
+      tags:
+      - Databases
+  /databases/{id}/schemas:
+    get:
+      consumes:
+      - application/json
+      description: GetSchemas endpoint
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: GetSchemas endpoint
       tags:
       - Databases
   /databases/{id}/start:
@@ -1707,7 +1962,7 @@ paths:
       responses: {}
       summary: ListMembers endpoint
       tags:
-      - Workspaces
+      - Project Settings
     post:
       consumes:
       - application/json
@@ -1765,7 +2020,7 @@ paths:
       responses: {}
       summary: Remove Project Member
       tags:
-      - Workspaces
+      - Project Settings
       - Projects
   /projects/{projectId}/tokens:
     get:
@@ -2276,6 +2531,131 @@ paths:
       summary: StopStorage endpoint
       tags:
       - Storage
+  /system/export:
+    get:
+      description: Exports the full server state (SQLite database + all DB container
+        dumps) into an AES-256-GCM encrypted .vessl bundle. Admin only.
+      parameters:
+      - description: Passphrase used to encrypt the bundle
+        in: query
+        name: passphrase
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: Encrypted .vessl bundle file
+          schema:
+            type: file
+        "400":
+          description: Missing passphrase
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Export failed
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Export server bundle
+      tags:
+      - System
+  /system/import:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Imports an encrypted .vessl bundle, restoring the SQLite database
+        and all DB container data. Admin only. Triggers a server restart after restore.
+      parameters:
+      - description: Passphrase used to decrypt the bundle
+        in: query
+        name: passphrase
+        required: true
+        type: string
+      - description: The .vessl bundle file to import
+        in: formData
+        name: bundle
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Import completed with manifest details
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Missing passphrase or bundle file
+          schema:
+            additionalProperties: true
+            type: object
+        "422":
+          description: Decryption or restore failed
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Import server bundle
+      tags:
+      - System
+  /system/maintenance/cleanup:
+    post:
+      description: Prunes unused docker images, containers, volumes, and networks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Run system cleanup
+      tags:
+      - System
+  /system/migration/railway/import:
+    post:
+      consumes:
+      - application/json
+      description: Imports a project from Railway
+      parameters:
+      - description: Import request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/models.RailwayImportRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Import Railway Project
+      tags:
+      - System
+  /system/migration/railway/projects:
+    get:
+      description: Fetches projects from Railway API
+      parameters:
+      - description: Railway Personal API Token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List Railway Projects
+      tags:
+      - System
   /system/public:
     get:
       consumes:
@@ -2300,6 +2680,44 @@ paths:
             additionalProperties: true
             type: object
       summary: Restart the Vessl daemon
+      tags:
+      - System
+  /system/setup:
+    post:
+      consumes:
+      - application/json
+      description: Creates the first user and optionally configures initial settings
+      parameters:
+      - description: Setup details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SetupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Complete onboarding setup
+      tags:
+      - System
+  /system/setup-status:
+    get:
+      description: Returns true if no users exist in the system, indicating setup
+        is needed
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Check if onboarding is required
       tags:
       - System
   /system/stats:
