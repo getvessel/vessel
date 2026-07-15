@@ -46,6 +46,16 @@ export const useTrigger = () => {
   });
 };
 
+export const useRestore = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { id: string }) => backupsService.restore(payload.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['backups'] });
+    },
+  });
+};
+
 export const useListRecords = (id: string) => {
   return useQuery({
     queryKey: ['backups', 'listRecords', id].filter(Boolean),

@@ -1,21 +1,25 @@
 import type {
   AuthCredentials,
   AuthResponse,
+  Disable2FAResponse,
+  ForgotPasswordResponse,
+  LoginResponse,
   RegisterCredentials,
+  RegisterResponse,
+  ResetPasswordResponse,
   Setup2FAResponse,
+  Setup2FAResponseType,
+  SetupResponse,
   Verify2FARequest,
+  Verify2FAResponse,
 } from '#/interfaces/auth';
-import type { BaseResponse } from '#/interfaces/base';
 import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
 
 export const authService = {
   login: async (credentials: AuthCredentials): Promise<AuthResponse> => {
     try {
-      const response = await apiClient.post<BaseResponse<AuthResponse>>(
-        '/auth/signin',
-        credentials
-      );
+      const response = await apiClient.post<LoginResponse>('/auth/signin', credentials);
       return response.data;
     } catch (error) {
       throw handleApiError(error);
@@ -24,7 +28,7 @@ export const authService = {
 
   register: async (details: RegisterCredentials): Promise<AuthResponse> => {
     try {
-      const response = await apiClient.post<BaseResponse<AuthResponse>>('/auth/signup', details);
+      const response = await apiClient.post<RegisterResponse>('/auth/signup', details);
       return response.data;
     } catch (error) {
       throw handleApiError(error);
@@ -33,7 +37,7 @@ export const authService = {
 
   setup: async (details: RegisterCredentials): Promise<AuthResponse> => {
     try {
-      const response = await apiClient.post<BaseResponse<AuthResponse>>('/system/setup', details);
+      const response = await apiClient.post<SetupResponse>('/system/setup', details);
       return response.data;
     } catch (error) {
       throw handleApiError(error);
@@ -48,17 +52,17 @@ export const authService = {
     }
   },
 
-  forgotPassword: async (email: string): Promise<BaseResponse<void>> => {
+  forgotPassword: async (email: string): Promise<ForgotPasswordResponse> => {
     try {
-      return await apiClient.post<BaseResponse<void>>('/auth/forgot-password', { email });
+      return await apiClient.post<ForgotPasswordResponse>('/auth/forgot-password', { email });
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  resetPassword: async (token: string, newPassword: string): Promise<BaseResponse<void>> => {
+  resetPassword: async (token: string, newPassword: string): Promise<ResetPasswordResponse> => {
     try {
-      return await apiClient.post<BaseResponse<void>>('/auth/reset-password', {
+      return await apiClient.post<ResetPasswordResponse>('/auth/reset-password', {
         token,
         newPassword,
       });
@@ -67,25 +71,25 @@ export const authService = {
     }
   },
 
-  setup2FA: async (): Promise<BaseResponse<Setup2FAResponse>> => {
+  setup2FA: async (): Promise<Setup2FAResponseType> => {
     try {
-      return await apiClient.post<BaseResponse<Setup2FAResponse>>('/auth/2fa/setup');
+      return await apiClient.post<Setup2FAResponseType>('/auth/2fa/setup');
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  verify2FA: async (payload: Verify2FARequest): Promise<BaseResponse<void>> => {
+  verify2FA: async (payload: Verify2FARequest): Promise<Verify2FAResponse> => {
     try {
-      return await apiClient.post<BaseResponse<void>>('/auth/2fa/verify', payload);
+      return await apiClient.post<Verify2FAResponse>('/auth/2fa/verify', payload);
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  disable2FA: async (payload: Verify2FARequest): Promise<BaseResponse<void>> => {
+  disable2FA: async (payload: Verify2FARequest): Promise<Disable2FAResponse> => {
     try {
-      return await apiClient.post<BaseResponse<void>>('/auth/2fa/disable', payload);
+      return await apiClient.post<Disable2FAResponse>('/auth/2fa/disable', payload);
     } catch (error) {
       throw handleApiError(error);
     }

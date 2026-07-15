@@ -1,3 +1,5 @@
+import type { BaseResponse } from './base';
+
 export interface TeamAISettings {
   id: string;
   provider: string;
@@ -72,10 +74,15 @@ export interface ServerSettings {
   currentVersion: string;
   latestVersion: string;
   lastUpdateCheck: string;
+  cloudflareApiToken?: string;
+  namecheapApiUser?: string;
+  namecheapApiKey?: string;
+  namecheapClientIp?: string;
+  spaceshipApiKey?: string;
   updatedAt: string;
 }
 
-export type UpdateSettingsRequest = Record<string, unknown>;
+export type UpdateSettingsRequest = Partial<ServerSettings>;
 
 export interface PruneResponse {
   status: string;
@@ -97,3 +104,75 @@ export interface MCPError {
   code: number;
   message: string;
 }
+
+export interface TestNotificationRequest {
+  provider: string;
+}
+
+export interface GithubApp {
+  id: string;
+  name: string;
+  appId: string;
+  installationId: string;
+  clientId: string;
+  clientSecret: string;
+  webhookSecret: string;
+  privateKey: string;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GitlabApp {
+  id: string;
+  name: string;
+  appId: string;
+  appSecret: string;
+  webhookSecret: string;
+  apiUrl: string;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BitbucketApp {
+  id: string;
+  name: string;
+  owner: string;
+  clientId: string;
+  clientSecret: string;
+  webhookSecret: string;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateInfo {
+  currentVersion: string;
+  latestVersion: string;
+  hasUpdate: boolean;
+  releaseNotes: string;
+  downloadUrl: string;
+  lastChecked: string;
+  autoUpdate: boolean;
+  updateCheckCron: string;
+}
+
+export interface GitAppsManifestRequest {
+  code: string;
+}
+
+export type GetServerSettingsResponse = BaseResponse<ServerSettings>;
+export type UpdateServerSettingsResponse = BaseResponse<ServerSettings>;
+export type TestNotificationResponseType = BaseResponse<void>;
+export type GetGithubAppsResponse = BaseResponse<GithubApp[]>;
+export type SaveGithubAppResponse = BaseResponse<GithubApp>;
+export type GetGitlabAppsResponse = BaseResponse<GitlabApp[]>;
+export type SaveGitlabAppResponse = BaseResponse<GitlabApp>;
+export type GetBitbucketAppsResponse = BaseResponse<BitbucketApp[]>;
+export type SaveBitbucketAppResponse = BaseResponse<BitbucketApp>;
+export type ExchangeGithubManifestResponse = BaseResponse<GithubApp>;
+export type GetUpdateStatusResponse = BaseResponse<UpdateInfo>;
+export type CheckUpdateResponse = BaseResponse<UpdateInfo>;
+export type DeployUpdateResponse = BaseResponse<void>;
+export type SystemPruneResponse = BaseResponse<PruneResponse>;

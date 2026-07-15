@@ -1,3 +1,5 @@
+import type { BaseResponse } from './base';
+
 export interface Database {
   id: string;
   projectId: string;
@@ -62,3 +64,29 @@ export interface DatabaseQueryResponse {
   rows?: Record<string, unknown>[];
   result?: unknown;
 }
+
+export interface TableSchema {
+  name: string;
+  columns: ColumnSchema[];
+}
+
+export interface ColumnSchema {
+  name: string;
+  type: string;
+  isNullable: boolean;
+  isPrimary: boolean;
+}
+
+export interface ImportDatabaseRequest {
+  sourceUrl: string;
+}
+
+export type TableRowPayload = Record<string, unknown>;
+
+export type GetDatabasesResponse = BaseResponse<Database[]>;
+export type GetDatabaseResponse = BaseResponse<Database>;
+export type CreateDatabaseResponse = BaseResponse<Database>;
+export type DatabaseQueryResponseType = BaseResponse<DatabaseQueryResponse>;
+export type ListTablesResponse = BaseResponse<TableSchema[]>;
+export type ImportDatabaseResponse = BaseResponse<void>;
+export type DeleteDatabaseResponse = BaseResponse<void>;

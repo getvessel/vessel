@@ -1,4 +1,4 @@
-import type { BaseResponse } from './base';
+import type { BaseResponse, PaginatedData } from './base';
 
 export interface AppService {
   id: string;
@@ -120,8 +120,10 @@ export interface UpdateAppServiceRequest {
 }
 
 export interface TriggerDeploymentRequest {
-  branch?: string;
+  commitId?: string;
 }
+
+export type DiagnosticsResponse = Record<string, Record<string, unknown>>;
 
 export interface CreateServiceVarRequest {
   key: string;
@@ -153,3 +155,10 @@ export type ListAppsResponse = BaseResponse<AppService[]>;
 export type GetAppResponse = BaseResponse<AppService>;
 export type CreateAppResponse = BaseResponse<AppService>;
 export type UpdateAppResponse = BaseResponse<AppService>;
+
+export type ListDeploymentsResponse = BaseResponse<PaginatedData<Deployment>>;
+export type TriggerDeploymentResponse = BaseResponse<Deployment>;
+export type RollbackDeploymentResponse = BaseResponse<Deployment>;
+export type GetDeploymentLogsResponse = BaseResponse<string>;
+export type GetServiceMetricsResponse = BaseResponse<ServiceMetric>;
+export type GetDiagnosticsResponse = BaseResponse<DiagnosticsResponse>;

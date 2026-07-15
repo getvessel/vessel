@@ -1,14 +1,23 @@
 import type { BaseResponse, PaginatedData } from '#/interfaces/base';
-import type { Deployment, ServiceMetric, TriggerDeploymentRequest } from '#/interfaces/deployment';
+import type {
+  Deployment,
+  DiagnosticsResponse,
+  GetDeploymentLogsResponse,
+  GetDiagnosticsResponse,
+  GetServiceMetricsResponse,
+  ListDeploymentsResponse,
+  RollbackDeploymentResponse,
+  ServiceMetric,
+  TriggerDeploymentRequest,
+  TriggerDeploymentResponse,
+} from '#/interfaces/deployment';
 import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
 
 export const deploymentsService = {
-  listByService: async (serviceId: string): Promise<BaseResponse<PaginatedData<Deployment>>> => {
+  listByService: async (serviceId: string): Promise<ListDeploymentsResponse> => {
     try {
-      return await apiClient.get<BaseResponse<PaginatedData<Deployment>>>(
-        `/services/${serviceId}/deployments`
-      );
+      return await apiClient.get<ListDeploymentsResponse>(`/services/${serviceId}/deployments`);
     } catch (error) {
       throw handleApiError(error);
     }
@@ -17,9 +26,9 @@ export const deploymentsService = {
   trigger: async (
     serviceId: string,
     payload?: TriggerDeploymentRequest
-  ): Promise<BaseResponse<Deployment>> => {
+  ): Promise<TriggerDeploymentResponse> => {
     try {
-      return await apiClient.post<BaseResponse<Deployment>>(
+      return await apiClient.post<TriggerDeploymentResponse>(
         `/services/${serviceId}/deploy`,
         payload
       );
@@ -28,9 +37,9 @@ export const deploymentsService = {
     }
   },
 
-  rollback: async (deploymentId: string): Promise<BaseResponse<Deployment>> => {
+  rollback: async (deploymentId: string): Promise<RollbackDeploymentResponse> => {
     try {
-      return await apiClient.post<BaseResponse<Deployment>>(
+      return await apiClient.post<RollbackDeploymentResponse>(
         `/deployments/${deploymentId}/rollback`
       );
     } catch (error) {
@@ -38,25 +47,25 @@ export const deploymentsService = {
     }
   },
 
-  getLogs: async (deploymentId: string): Promise<BaseResponse<string>> => {
+  getLogs: async (deploymentId: string): Promise<GetDeploymentLogsResponse> => {
     try {
-      return await apiClient.get<BaseResponse<string>>(`/deployments/${deploymentId}/logs`);
+      return await apiClient.get<GetDeploymentLogsResponse>(`/deployments/${deploymentId}/logs`);
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  getMetrics: async (serviceId: string): Promise<BaseResponse<ServiceMetric>> => {
+  getMetrics: async (serviceId: string): Promise<GetServiceMetricsResponse> => {
     try {
-      return await apiClient.get<BaseResponse<ServiceMetric>>(`/services/${serviceId}/metrics`);
+      return await apiClient.get<GetServiceMetricsResponse>(`/services/${serviceId}/metrics`);
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  diagnostics: async (deploymentId: string): Promise<BaseResponse<unknown>> => {
+  diagnostics: async (deploymentId: string): Promise<GetDiagnosticsResponse> => {
     try {
-      return await apiClient.post<BaseResponse<unknown>>(
+      return await apiClient.post<GetDiagnosticsResponse>(
         `/deployments/${deploymentId}/diagnostics`
       );
     } catch (error) {

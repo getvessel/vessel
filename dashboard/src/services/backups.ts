@@ -52,6 +52,14 @@ export const backupsService = {
     }
   },
 
+  restore: async (id: string): Promise<void> => {
+    try {
+      await apiClient.post(`/backups/${id}/restore`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   listRecords: async (id: string): Promise<ListBackupRecordsResponse> => {
     try {
       return await apiClient.get<ListBackupRecordsResponse>(`/backups/${id}/records`);

@@ -357,6 +357,25 @@
         "responses": {}
       }
     },
+    "/backups/{id}/records": {
+      "get": {
+        "description": "ListBackupRecords endpoint",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Backups"],
+        "summary": "ListBackupRecords endpoint",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
     "/compose/deploy": {
       "post": {
         "description": "Parses and deploys all services defined in a docker-compose.yml",
@@ -2039,6 +2058,26 @@
             }
           }
         ],
+        "responses": {}
+      }
+    },
+    "/settings/updates/check": {
+      "post": {
+        "description": "CheckUpdate endpoint",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Settings"],
+        "summary": "CheckUpdate endpoint",
+        "responses": {}
+      }
+    },
+    "/settings/updates/status": {
+      "get": {
+        "description": "GetUpdateStatus endpoint",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Settings"],
+        "summary": "GetUpdateStatus endpoint",
         "responses": {}
       }
     },

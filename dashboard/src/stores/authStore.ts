@@ -1,4 +1,4 @@
-import { useSelector } from '@tanstack/react-store';
+import { useStore } from '@tanstack/react-store';
 import { Store } from '@tanstack/store';
 import type { User } from '#/interfaces';
 
@@ -73,5 +73,5 @@ export const authActions = {
 };
 
 export const useAuthState = () => {
-  return useSelector(authStore, (state) => state);
+  return useStore(authStore, (state) => state);
 };

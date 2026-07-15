@@ -61,6 +61,26 @@ export const apiClient = {
     return this.fetch<T>(endpoint, { ...options, method: 'GET' });
   },
 
+  async getBlob(endpoint: string, options?: RequestInit): Promise<Blob> {
+    const url = `${API_BASE_URL}${endpoint}`;
+    const headers = new Headers(options?.headers || {});
+    const token = authStore.state.token;
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    const response = await fetch(url, { ...options, method: 'GET', headers });
+    if (!response.ok) {
+      const isJson = response.headers.get('content-type')?.includes('application/json');
+      const data = isJson ? await response.json() : await response.text();
+      throw new ApiError(
+        response.status,
+        data?.error || response.statusText || 'An error occurred',
+        data
+      );
+    }
+    return response.blob();
+  },
+
   post<T>(endpoint: string, body?: unknown, options?: RequestInit) {
     return this.fetch<T>(endpoint, {
       ...options,

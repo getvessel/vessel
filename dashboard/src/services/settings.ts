@@ -1,12 +1,34 @@
 import type { BaseResponse } from '#/interfaces/base';
-import type { ServerSettings, UpdateSettingsRequest } from '#/interfaces/settings';
+import type {
+  BitbucketApp,
+  CheckUpdateResponse,
+  DeployUpdateResponse,
+  ExchangeGithubManifestResponse,
+  GetBitbucketAppsResponse,
+  GetGithubAppsResponse,
+  GetGitlabAppsResponse,
+  GetServerSettingsResponse,
+  GetUpdateStatusResponse,
+  GitAppsManifestRequest,
+  GithubApp,
+  GitlabApp,
+  SaveBitbucketAppResponse,
+  SaveGithubAppResponse,
+  SaveGitlabAppResponse,
+  ServerSettings,
+  TestNotificationRequest,
+  TestNotificationResponseType,
+  UpdateInfo,
+  UpdateServerSettingsResponse,
+  UpdateSettingsRequest,
+} from '#/interfaces/settings';
 import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
 
 export const settingsService = {
-  getSettings: async (): Promise<BaseResponse<ServerSettings>> => {
+  getSettings: async (): Promise<GetServerSettingsResponse> => {
     try {
-      return await apiClient.get<BaseResponse<ServerSettings>>('/settings');
+      return await apiClient.get<GetServerSettingsResponse>('/settings');
     } catch (error) {
       throw handleApiError(error);
     }
@@ -40,73 +62,104 @@ export const settingsService = {
     }
   },
 
-  updateSettings: async (payload: UpdateSettingsRequest): Promise<BaseResponse<ServerSettings>> => {
+  updateSettings: async (payload: UpdateSettingsRequest): Promise<UpdateServerSettingsResponse> => {
     try {
-      return await apiClient.put<BaseResponse<ServerSettings>>('/settings', payload);
+      return await apiClient.put<UpdateServerSettingsResponse>('/settings', payload);
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  getNotifications: async (): Promise<BaseResponse<unknown>> => {
+  testNotification: async (
+    payload: TestNotificationRequest
+  ): Promise<TestNotificationResponseType> => {
     try {
-      return await apiClient.get<BaseResponse<unknown>>('/settings/notifications');
+      return await apiClient.post<TestNotificationResponseType>(
+        '/settings/notifications/test',
+        payload
+      );
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  saveNotificationChannel: async (payload: unknown): Promise<BaseResponse<unknown>> => {
+  getGithubApps: async (): Promise<GetGithubAppsResponse> => {
     try {
-      return await apiClient.put<BaseResponse<unknown>>('/settings/notifications', payload);
+      return await apiClient.get<GetGithubAppsResponse>('/settings/git_apps/github');
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  testNotification: async (payload: unknown): Promise<BaseResponse<unknown>> => {
+  saveGithubApp: async (payload: GithubApp): Promise<SaveGithubAppResponse> => {
     try {
-      return await apiClient.post<BaseResponse<unknown>>('/settings/notifications/test', payload);
+      return await apiClient.put<SaveGithubAppResponse>('/settings/git_apps/github', payload);
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  deleteNotificationChannel: async (id: string): Promise<void> => {
+  deleteGithubApp: async (id: string): Promise<void> => {
     try {
-      await apiClient.delete(`/settings/notifications/${id}`);
+      await apiClient.delete(`/settings/git_apps/github/${id}`);
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  getGitApps: async (provider: string): Promise<BaseResponse<unknown>> => {
+  getGitlabApps: async (): Promise<GetGitlabAppsResponse> => {
     try {
-      return await apiClient.get<BaseResponse<unknown>>(`/settings/git_apps/${provider}`);
+      return await apiClient.get<GetGitlabAppsResponse>('/settings/git_apps/gitlab');
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  saveGitApp: async (provider: string, payload: unknown): Promise<BaseResponse<unknown>> => {
+  saveGitlabApp: async (payload: GitlabApp): Promise<SaveGitlabAppResponse> => {
     try {
-      return await apiClient.put<BaseResponse<unknown>>(`/settings/git_apps/${provider}`, payload);
+      return await apiClient.put<SaveGitlabAppResponse>('/settings/git_apps/gitlab', payload);
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  deleteGitApp: async (provider: string, id: string): Promise<void> => {
+  deleteGitlabApp: async (id: string): Promise<void> => {
     try {
-      await apiClient.delete(`/settings/git_apps/${provider}/${id}`);
+      await apiClient.delete(`/settings/git_apps/gitlab/${id}`);
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  exchangeGithubManifest: async (payload: unknown): Promise<BaseResponse<unknown>> => {
+  getBitbucketApps: async (): Promise<GetBitbucketAppsResponse> => {
     try {
-      return await apiClient.post<BaseResponse<unknown>>(
+      return await apiClient.get<GetBitbucketAppsResponse>('/settings/git_apps/bitbucket');
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  saveBitbucketApp: async (payload: BitbucketApp): Promise<SaveBitbucketAppResponse> => {
+    try {
+      return await apiClient.put<SaveBitbucketAppResponse>('/settings/git_apps/bitbucket', payload);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  deleteBitbucketApp: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/settings/git_apps/bitbucket/${id}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  exchangeGithubManifest: async (
+    payload: GitAppsManifestRequest
+  ): Promise<ExchangeGithubManifestResponse> => {
+    try {
+      return await apiClient.post<ExchangeGithubManifestResponse>(
         '/settings/git_apps/github/manifest-callback',
         payload
       );
@@ -115,17 +168,25 @@ export const settingsService = {
     }
   },
 
-  checkUpdate: async (): Promise<BaseResponse<unknown>> => {
+  getUpdateStatus: async (): Promise<GetUpdateStatusResponse> => {
     try {
-      return await apiClient.post<BaseResponse<unknown>>('/settings/updates/check');
+      return await apiClient.get<GetUpdateStatusResponse>('/settings/updates/status');
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  deployUpdate: async (): Promise<BaseResponse<unknown>> => {
+  checkUpdate: async (): Promise<CheckUpdateResponse> => {
     try {
-      return await apiClient.post<BaseResponse<unknown>>('/settings/updates/deploy');
+      return await apiClient.post<CheckUpdateResponse>('/settings/updates/check');
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  deployUpdate: async (): Promise<DeployUpdateResponse> => {
+    try {
+      return await apiClient.post<DeployUpdateResponse>('/settings/updates/deploy');
     } catch (error) {
       throw handleApiError(error);
     }

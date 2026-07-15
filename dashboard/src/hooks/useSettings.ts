@@ -50,7 +50,7 @@ export const useGetGitApps = (provider: string) => {
 export const useSaveGitApp = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ provider, payload }: { provider: string; payload: unknown }) =>
+    mutationFn: ({ provider, payload }: { provider: string; payload: Record<string, unknown> }) =>
       settingsService.saveGitApp(provider, payload),
     onSuccess: (_, { provider }) => {
       queryClient.invalidateQueries({ queryKey: ['settings', 'getGitApps', provider] });
@@ -71,7 +71,15 @@ export const useDeleteGitApp = () => {
 
 export const useExchangeGithubManifest = () => {
   return useMutation({
-    mutationFn: (payload: unknown) => settingsService.exchangeGithubManifest(payload),
+    mutationFn: (payload: Record<string, unknown>) =>
+      settingsService.exchangeGithubManifest(payload),
+  });
+};
+
+export const useGetUpdateStatus = () => {
+  return useQuery({
+    queryKey: ['settings', 'getUpdateStatus'].filter(Boolean),
+    queryFn: () => settingsService.getUpdateStatus(),
   });
 };
 
@@ -90,7 +98,8 @@ export const useDeployUpdate = () => {
 export const useSaveNotificationChannel = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: unknown) => settingsService.saveNotificationChannel(payload),
+    mutationFn: (payload: Record<string, unknown>) =>
+      settingsService.saveNotificationChannel(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings', 'getNotifications'] });
     },
@@ -99,7 +108,7 @@ export const useSaveNotificationChannel = () => {
 
 export const useTestNotification = () => {
   return useMutation({
-    mutationFn: (payload: unknown) => settingsService.testNotification(payload),
+    mutationFn: (payload: Record<string, unknown>) => settingsService.testNotification(payload),
   });
 };
 

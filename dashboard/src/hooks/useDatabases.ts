@@ -68,3 +68,83 @@ export const useQueryDatabase = () => {
     },
   });
 };
+
+export const useGetSchemas = (id: string) => {
+  return useQuery({
+    queryKey: ['databases', 'getSchemas', id].filter(Boolean),
+    queryFn: () => databasesService.getSchemas(id),
+  });
+};
+
+export const useGetTableData = (
+  id: string,
+  table: string,
+  params?: { limit?: number; offset?: number }
+) => {
+  return useQuery({
+    queryKey: ['databases', 'getTableData', id, table, params].filter(Boolean),
+    queryFn: () => databasesService.getTableData(id, table, params),
+  });
+};
+
+export const useInsertTableRow = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: {
+      id: string;
+      table: string;
+      payload: Parameters<typeof databasesService.insertTableRow>[2];
+    }) => databasesService.insertTableRow(payload.id, payload.table, payload.payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['databases', 'getTableData', variables.id, variables.table],
+      });
+    },
+  });
+};
+
+export const useUpdateTableRow = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: {
+      id: string;
+      table: string;
+      payload: Parameters<typeof databasesService.updateTableRow>[2];
+    }) => databasesService.updateTableRow(payload.id, payload.table, payload.payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['databases', 'getTableData', variables.id, variables.table],
+      });
+    },
+  });
+};
+
+export const useDeleteTableRow = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: {
+      id: string;
+      table: string;
+      payload?: Parameters<typeof databasesService.deleteTableRow>[2];
+    }) => databasesService.deleteTableRow(payload.id, payload.table, payload.payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['databases', 'getTableData', variables.id, variables.table],
+      });
+    },
+  });
+};
+
+export const useImportDatabase = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: {
+      id: string;
+      payload: Parameters<typeof databasesService.importDatabase>[1];
+    }) => databasesService.importDatabase(payload.id, payload.payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['databases', 'getSchemas', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['databases', 'getTableData', variables.id] });
+    },
+  });
+};
