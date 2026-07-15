@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_shell/projects')({
 function ProjectsPage() {
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Projects</h1>
+      <h1 className="mb-4 font-semibold text-2xl">Projects</h1>
       <p className="text-muted-foreground">Projects content goes here.</p>
     </div>
   );

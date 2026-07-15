@@ -39,19 +39,19 @@ export function UserMenu() {
   }, []);
 
   return (
-    <div ref={ref} className="relative border-t border-sidebar-border p-3">
+    <div ref={ref} className="relative border-sidebar-border border-t p-3">
       {open && (
-        <div className="absolute bottom-full left-3 right-3 mb-2 rounded-lg border border-border bg-popover shadow-xl overflow-hidden py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
-          <div className="px-3 py-2 border-b border-border mb-1">
-            <p className="text-[13px] font-semibold text-foreground">{user?.name}</p>
+        <div className="fade-in zoom-in-95 absolute right-3 bottom-full left-3 z-50 mb-2 animate-in overflow-hidden rounded-lg border border-border bg-popover py-1 shadow-xl duration-100">
+          <div className="mb-1 border-border border-b px-3 py-2">
+            <p className="font-semibold text-[13px] text-foreground">{user?.name}</p>
             <p className="text-[11px] text-muted-foreground">{user?.email}</p>
           </div>
 
-          <div className="px-1 py-1 space-y-0.5">
+          <div className="space-y-0.5 px-1 py-1">
             <Link
               to={'/settings' as never}
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] hover:bg-accent transition-colors"
+              className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] transition-colors hover:bg-accent"
             >
               <UserCircle className="h-4 w-4 text-muted-foreground" />
               Account Settings
@@ -59,7 +59,7 @@ export function UserMenu() {
             <Link
               to={'/settings' as never}
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] hover:bg-accent transition-colors"
+              className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] transition-colors hover:bg-accent"
             >
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
               Project Usage
@@ -68,11 +68,11 @@ export function UserMenu() {
 
           <div className="my-1 h-px bg-border" />
 
-          <div className="px-1 py-1 space-y-0.5">
+          <div className="space-y-0.5 px-1 py-1">
             <Link
               to={'/docs' as never}
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] hover:bg-accent transition-colors"
+              className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] transition-colors hover:bg-accent"
             >
               <FileText className="h-4 w-4 text-muted-foreground" />
               Documentation
@@ -80,7 +80,7 @@ export function UserMenu() {
             <Link
               to={'/support' as never}
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] hover:bg-accent transition-colors"
+              className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] transition-colors hover:bg-accent"
             >
               <HelpCircle className="h-4 w-4 text-muted-foreground" />
               Support
@@ -89,14 +89,14 @@ export function UserMenu() {
 
           <div className="my-1 h-px bg-border" />
 
-          <div className="px-1 py-1 space-y-0.5">
+          <div className="space-y-0.5 px-1 py-1">
             <button
               type="button"
               onClick={() => {
                 setTheme(theme === 'dark' ? 'light' : 'dark');
                 setOpen(false);
               }}
-              className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] hover:bg-accent transition-colors"
+              className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] transition-colors hover:bg-accent"
             >
               {theme === 'dark' ? (
                 <Sun className="h-4 w-4 text-muted-foreground" />
@@ -108,7 +108,7 @@ export function UserMenu() {
             <button
               type="button"
               onClick={() => logout()}
-              className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] text-destructive hover:bg-destructive/10 transition-colors"
+              className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] text-destructive transition-colors hover:bg-destructive/10"
             >
               <LogOut className="h-4 w-4" />
               Log out
@@ -120,17 +120,17 @@ export function UserMenu() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center gap-2.5 rounded-lg hover:bg-sidebar-accent/50 p-1.5 transition-colors"
+        className="flex w-full items-center gap-2.5 rounded-lg p-1.5 transition-colors hover:bg-sidebar-accent/50"
       >
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20 text-[11px] font-bold text-primary">
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20 font-bold text-[11px] text-primary">
           {initials}
         </div>
-        <div className="min-w-0 text-left flex-1">
-          <p className="truncate text-[12px] font-semibold text-sidebar-foreground leading-none">
+        <div className="min-w-0 flex-1 text-left">
+          <p className="truncate font-semibold text-[12px] text-sidebar-foreground leading-none">
             {user?.name ?? 'User'}
           </p>
         </div>
-        <MoreVertical className="h-4 w-4 text-sidebar-foreground/50 shrink-0" />
+        <MoreVertical className="h-4 w-4 shrink-0 text-sidebar-foreground/50" />
       </button>
     </div>
   );

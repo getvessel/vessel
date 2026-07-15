@@ -1,11 +1,17 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.3/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.4/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
   },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -18,18 +24,25 @@
     "rules": {
       "preset": "recommended",
       "style": {
-        "noDefaultExport": "off"
+        "noDefaultExport": "off",
+        "useImportType": "warn"
       },
       "a11y": {
         "noSvgWithoutTitle": "off"
       },
       "correctness": {
-        "noUnusedImports": "off",
+        "noUnusedImports": "warn",
         "noInvalidPositionAtImportRule": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "off",
         "noShorthandPropertyOverrides": "off"
+      },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "warn",
+          "fix": "safe"
+        }
       }
     }
   },
@@ -37,12 +50,16 @@
     "formatter": {
       "semicolons": "always",
       "quoteStyle": "single",
-      "trailingCommas": "es5"
+      "trailingCommas": "es5",
+      "arrowParentheses": "always",
+      "bracketSameLine": false,
+      "bracketSpacing": true
     }
   },
   "css": {
     "formatter": {
-      "enabled": true
+      "enabled": true,
+      "quoteStyle": "single"
     },
     "parser": {
       "tailwindDirectives": true

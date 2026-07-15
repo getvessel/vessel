@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_shell/')({
 function DashboardPage() {
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Dashboard</h1>
+      <h1 className="mb-4 font-semibold text-2xl">Dashboard</h1>
       <p className="text-muted-foreground">Dashboard content goes here.</p>
     </div>
   );

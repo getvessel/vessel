@@ -36,8 +36,8 @@ export function NavItem({ item, exact = false }: { item: NavItemProps; exact?: b
     return (
       <a href={item.url} target="_blank" rel="noopener noreferrer" className={className}>
         {IconComponent}
-        <span className="truncate flex-1">{item.title}</span>
-        <ExternalLink className="h-3.5 w-3.5 opacity-50 shrink-0" />
+        <span className="flex-1 truncate">{item.title}</span>
+        <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-50" />
       </a>
     );
   }

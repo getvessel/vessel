@@ -1,13 +1,9 @@
-import type { BaseResponse, PaginatedData } from '#/interfaces/base';
 import type {
-  Deployment,
-  DiagnosticsResponse,
   GetDeploymentLogsResponse,
   GetDiagnosticsResponse,
   GetServiceMetricsResponse,
   ListDeploymentsResponse,
   RollbackDeploymentResponse,
-  ServiceMetric,
   TriggerDeploymentRequest,
   TriggerDeploymentResponse,
 } from '#/interfaces/deployment';

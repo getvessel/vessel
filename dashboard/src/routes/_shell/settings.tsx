@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_shell/settings')({
 function SettingsPage() {
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Settings</h1>
+      <h1 className="mb-4 font-semibold text-2xl">Settings</h1>
       <p className="text-muted-foreground">Settings content goes here.</p>
     </div>
   );

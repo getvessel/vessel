@@ -33,18 +33,18 @@ export const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="new-password" className="text-sm font-medium">
+          <Label htmlFor="new-password" className="font-medium text-sm">
             New Password
           </Label>
           <div className="relative">
-            <div className="absolute left-3 top-3.5 text-muted-foreground">
+            <div className="absolute top-3.5 left-3 text-muted-foreground">
               <Lock className="h-5 w-5" />
             </div>
             <Input
               id="new-password"
               type="password"
               placeholder="Enter new password"
-              className="h-12 pl-10 bg-background text-base"
+              className="h-12 bg-background pl-10 text-base"
               value={newPassword}
               onChange={(e) => {
                 setNewPassword(e.target.value);
@@ -57,18 +57,18 @@ export const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="confirm-password" className="text-sm font-medium">
+          <Label htmlFor="confirm-password" className="font-medium text-sm">
             Confirm Password
           </Label>
           <div className="relative">
-            <div className="absolute left-3 top-3.5 text-muted-foreground">
+            <div className="absolute top-3.5 left-3 text-muted-foreground">
               <Lock className="h-5 w-5" />
             </div>
             <Input
               id="confirm-password"
               type="password"
               placeholder="Confirm new password"
-              className="h-12 pl-10 bg-background text-base"
+              className="h-12 bg-background pl-10 text-base"
               value={confirmPassword}
               onChange={(e) => {
                 setConfirmPassword(e.target.value);
@@ -80,12 +80,12 @@ export const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
           </div>
         </div>
 
-        {error && <p className="text-sm font-medium text-destructive">{error}</p>}
+        {error && <p className="font-medium text-destructive text-sm">{error}</p>}
       </div>
 
       <Button
         type="submit"
-        className="h-12 w-full text-base font-medium mt-2"
+        className="mt-2 h-12 w-full font-medium text-base"
         disabled={isPending || !newPassword || !confirmPassword}
       >
         {isPending ? 'Resetting Password...' : 'Reset Password'}

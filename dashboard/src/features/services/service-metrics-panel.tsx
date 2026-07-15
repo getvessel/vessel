@@ -26,46 +26,46 @@ export function ServiceMetricsPanel({ serviceId }: ServiceMetricsPanelProps) {
     <div className="grid gap-4 md:grid-cols-3">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">Status</CardTitle>
+          <CardTitle className="font-medium text-sm">Status</CardTitle>
           <Activity className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <Skeleton className="h-8 w-1/2" />
           ) : (
-            <div className="text-2xl font-bold capitalize">{metrics?.status || 'Unknown'}</div>
+            <div className="font-bold text-2xl capitalize">{metrics?.status || 'Unknown'}</div>
           )}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">CPU Usage</CardTitle>
+          <CardTitle className="font-medium text-sm">CPU Usage</CardTitle>
           <Cpu className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <Skeleton className="h-8 w-1/2" />
           ) : (
-            <div className="text-2xl font-bold">{metrics?.cpuUsagePercentage?.toFixed(2)}%</div>
+            <div className="font-bold text-2xl">{metrics?.cpuUsagePercentage?.toFixed(2)}%</div>
           )}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">Memory Usage</CardTitle>
+          <CardTitle className="font-medium text-sm">Memory Usage</CardTitle>
           <HardDrive className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <Skeleton className="h-8 w-1/2" />
           ) : (
-            <div className="text-2xl font-bold">
+            <div className="font-bold text-2xl">
               {metrics ? formatBytes(metrics.memoryUsageBytes) : '0 B'}
             </div>
           )}
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground text-xs">
             {metrics ? `Limit: ${formatBytes(metrics.memoryLimitBytes)}` : ''}
           </p>
         </CardContent>

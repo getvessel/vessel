@@ -20,16 +20,16 @@ function RegisterPage() {
   }
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col space-y-2 text-center mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">Create an account</h1>
-        <p className="text-sm text-muted-foreground">Enter your details below to get started.</p>
+    <div className="fade-in slide-in-from-bottom-4 animate-in duration-500">
+      <div className="mb-8 flex flex-col space-y-2 text-center">
+        <h1 className="font-semibold text-3xl text-foreground tracking-tight">Create an account</h1>
+        <p className="text-muted-foreground text-sm">Enter your details below to get started.</p>
       </div>
 
       <OAuthButtons />
       <RegisterForm />
 
-      <p className="mt-8 text-center text-sm text-muted-foreground">
+      <p className="mt-8 text-center text-muted-foreground text-sm">
         Already have an account?{' '}
         <Link to="/login" className="font-semibold text-primary hover:underline">
           Sign in

@@ -1,4 +1,4 @@
-import type { BaseResponse } from "#/interfaces/base";
+import type { BaseResponse } from '#/interfaces/base';
 import type {
   CreateDatabaseRequest,
   CreateDatabaseResponse,
@@ -9,16 +9,14 @@ import type {
   ImportDatabaseRequest,
   ListTablesResponse,
   TableRowPayload,
-} from "#/interfaces/database";
-import { apiClient } from "#/lib/apiClient";
-import { handleApiError } from "#/lib/error";
+} from '#/interfaces/database';
+import { apiClient } from '#/lib/apiClient';
+import { handleApiError } from '#/lib/error';
 
 export const databasesService = {
   getDatabases: async (projectId: string): Promise<GetDatabasesResponse> => {
     try {
-      return await apiClient.get<GetDatabasesResponse>(
-        `/projects/${projectId}/databases`,
-      );
+      return await apiClient.get<GetDatabasesResponse>(`/projects/${projectId}/databases`);
     } catch (error) {
       throw handleApiError(error);
     }
@@ -32,14 +30,9 @@ export const databasesService = {
     }
   },
 
-  createDatabase: async (
-    payload: CreateDatabaseRequest,
-  ): Promise<CreateDatabaseResponse> => {
+  createDatabase: async (payload: CreateDatabaseRequest): Promise<CreateDatabaseResponse> => {
     try {
-      return await apiClient.post<CreateDatabaseResponse>(
-        "/databases",
-        payload,
-      );
+      return await apiClient.post<CreateDatabaseResponse>('/databases', payload);
     } catch (error) {
       throw handleApiError(error);
     }
@@ -69,15 +62,9 @@ export const databasesService = {
     }
   },
 
-  executeQuery: async (
-    id: string,
-    query: string,
-  ): Promise<DatabaseQueryResponseType> => {
+  executeQuery: async (id: string, query: string): Promise<DatabaseQueryResponseType> => {
     try {
-      return await apiClient.post<DatabaseQueryResponseType>(
-        `/databases/${id}/query`,
-        { query },
-      );
+      return await apiClient.post<DatabaseQueryResponseType>(`/databases/${id}/query`, { query });
     } catch (error) {
       throw handleApiError(error);
     }
@@ -95,11 +82,11 @@ export const databasesService = {
     id: string,
     table: string,
     limit: number = 100,
-    offset: number = 0,
+    offset: number = 0
   ): Promise<DatabaseQueryResponseType> => {
     try {
       return await apiClient.get<DatabaseQueryResponseType>(
-        `/databases/${id}/data/${table}?limit=${limit}&offset=${offset}`,
+        `/databases/${id}/data/${table}?limit=${limit}&offset=${offset}`
       );
     } catch (error) {
       throw handleApiError(error);
@@ -109,12 +96,12 @@ export const databasesService = {
   insertTableRow: async (
     id: string,
     table: string,
-    payload: TableRowPayload,
+    payload: TableRowPayload
   ): Promise<DatabaseQueryResponseType> => {
     try {
       return await apiClient.post<DatabaseQueryResponseType>(
         `/databases/${id}/data/${table}`,
-        payload,
+        payload
       );
     } catch (error) {
       throw handleApiError(error);
@@ -124,23 +111,19 @@ export const databasesService = {
   updateTableRow: async (
     id: string,
     table: string,
-    payload: TableRowPayload,
+    payload: TableRowPayload
   ): Promise<DatabaseQueryResponseType> => {
     try {
       return await apiClient.put<DatabaseQueryResponseType>(
         `/databases/${id}/data/${table}`,
-        payload,
+        payload
       );
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  deleteTableRow: async (
-    id: string,
-    table: string,
-    payload?: TableRowPayload,
-  ): Promise<void> => {
+  deleteTableRow: async (id: string, table: string, payload?: TableRowPayload): Promise<void> => {
     try {
       await apiClient.delete(`/databases/${id}/data/${table}`, {
         body: payload ? JSON.stringify(payload) : undefined,
@@ -152,13 +135,10 @@ export const databasesService = {
 
   importDatabase: async (
     id: string,
-    payload: ImportDatabaseRequest,
+    payload: ImportDatabaseRequest
   ): Promise<BaseResponse<void>> => {
     try {
-      return await apiClient.post<BaseResponse<void>>(
-        `/databases/${id}/import`,
-        payload,
-      );
+      return await apiClient.post<BaseResponse<void>>(`/databases/${id}/import`, payload);
     } catch (error) {
       throw handleApiError(error);
     }

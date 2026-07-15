@@ -40,18 +40,18 @@ export const SetupForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-sm font-medium">
+        <Label htmlFor="name" className="font-medium text-sm">
           Owner Full Name
         </Label>
         <div className="relative">
-          <div className="absolute left-3 top-3.5 text-muted-foreground">
+          <div className="absolute top-3.5 left-3 text-muted-foreground">
             <User className="h-5 w-5" />
           </div>
           <Input
             id="name"
             type="text"
             placeholder="John Doe"
-            className="h-12 pl-10 bg-background text-base"
+            className="h-12 bg-background pl-10 text-base"
             {...register('name')}
           />
         </div>
@@ -59,18 +59,18 @@ export const SetupForm = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-sm font-medium">
+        <Label htmlFor="email" className="font-medium text-sm">
           Owner Email
         </Label>
         <div className="relative">
-          <div className="absolute left-3 top-3.5 text-muted-foreground">
+          <div className="absolute top-3.5 left-3 text-muted-foreground">
             <Mail className="h-5 w-5" />
           </div>
           <Input
             id="email"
             type="email"
             placeholder="name@example.com"
-            className="h-12 pl-10 bg-background text-base"
+            className="h-12 bg-background pl-10 text-base"
             {...register('email')}
           />
         </div>
@@ -78,17 +78,17 @@ export const SetupForm = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-sm font-medium">
+        <Label htmlFor="password" className="font-medium text-sm">
           Owner Password
         </Label>
         <div className="relative">
-          <div className="absolute left-3 top-3.5 text-muted-foreground">
+          <div className="absolute top-3.5 left-3 text-muted-foreground">
             <Lock className="h-5 w-5" />
           </div>
           <Input
             id="password"
             type="password"
-            className="h-12 pl-10 bg-background text-base"
+            className="h-12 bg-background pl-10 text-base"
             {...register('password')}
           />
         </div>
@@ -97,7 +97,7 @@ export const SetupForm = () => {
         )}
       </div>
 
-      <Button type="submit" className="w-full h-12 text-base" disabled={isPending}>
+      <Button type="submit" className="h-12 w-full text-base" disabled={isPending}>
         {isPending ? 'Creating Owner Account...' : 'Complete Setup'}
       </Button>
     </form>

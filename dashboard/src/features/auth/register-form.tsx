@@ -42,18 +42,18 @@ export const RegisterForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-sm font-medium">
+        <Label htmlFor="name" className="font-medium text-sm">
           Full Name
         </Label>
         <div className="relative">
-          <div className="absolute left-3 top-3.5 text-muted-foreground">
+          <div className="absolute top-3.5 left-3 text-muted-foreground">
             <User className="h-5 w-5" />
           </div>
           <Input
             id="name"
             type="text"
             placeholder="John Doe"
-            className="h-12 pl-10 bg-background text-base"
+            className="h-12 bg-background pl-10 text-base"
             {...register('name')}
           />
         </div>
@@ -61,18 +61,18 @@ export const RegisterForm = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-sm font-medium">
+        <Label htmlFor="email" className="font-medium text-sm">
           Email
         </Label>
         <div className="relative">
-          <div className="absolute left-3 top-3.5 text-muted-foreground">
+          <div className="absolute top-3.5 left-3 text-muted-foreground">
             <Mail className="h-5 w-5" />
           </div>
           <Input
             id="email"
             type="email"
             placeholder="name@example.com"
-            className="h-12 pl-10 bg-background text-base"
+            className="h-12 bg-background pl-10 text-base"
             {...register('email')}
           />
         </div>
@@ -80,22 +80,22 @@ export const RegisterForm = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-sm font-medium">
+        <Label htmlFor="password" className="font-medium text-sm">
           Password
         </Label>
         <div className="relative">
-          <div className="absolute left-3 top-3.5 text-muted-foreground">
+          <div className="absolute top-3.5 left-3 text-muted-foreground">
             <Lock className="h-5 w-5" />
           </div>
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
-            className="h-12 pl-10 pr-12 bg-background text-base"
+            className="h-12 bg-background pr-12 pl-10 text-base"
             {...register('password')}
           />
           <button
             type="button"
-            className="absolute right-3 top-3.5 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute top-3.5 right-3 text-muted-foreground transition-colors hover:text-foreground"
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -104,11 +104,11 @@ export const RegisterForm = () => {
         {errors.password ? (
           <p className="text-[13px] text-destructive">{errors.password.message}</p>
         ) : (
-          <p className="text-xs text-muted-foreground pt-1">Must be at least 8 characters long.</p>
+          <p className="pt-1 text-muted-foreground text-xs">Must be at least 8 characters long.</p>
         )}
       </div>
 
-      <Button type="submit" className="h-12 w-full text-base font-medium mt-2" disabled={isPending}>
+      <Button type="submit" className="mt-2 h-12 w-full font-medium text-base" disabled={isPending}>
         {isPending ? 'Creating account...' : 'Create Account'}
       </Button>
     </form>

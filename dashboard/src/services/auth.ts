@@ -7,7 +7,6 @@ import type {
   RegisterCredentials,
   RegisterResponse,
   ResetPasswordResponse,
-  Setup2FAResponse,
   Setup2FAResponseType,
   SetupResponse,
   Verify2FARequest,

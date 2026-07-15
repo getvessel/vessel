@@ -15,10 +15,8 @@ import type {
   SaveBitbucketAppResponse,
   SaveGithubAppResponse,
   SaveGitlabAppResponse,
-  ServerSettings,
   TestNotificationRequest,
   TestNotificationResponseType,
-  UpdateInfo,
   UpdateServerSettingsResponse,
   UpdateSettingsRequest,
 } from '#/interfaces/settings';
