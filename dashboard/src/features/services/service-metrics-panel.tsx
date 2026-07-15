@@ -33,7 +33,7 @@ export function ServiceMetricsPanel({ serviceId }: ServiceMetricsPanelProps) {
           {isLoading ? (
             <Skeleton className="h-8 w-1/2" />
           ) : (
-            <div className="font-bold text-2xl capitalize">{metrics?.status || 'Unknown'}</div>
+            <div className="font-bold text-2xl capitalize">{metrics?.status || 'running'}</div>
           )}
         </CardContent>
       </Card>
@@ -47,7 +47,9 @@ export function ServiceMetricsPanel({ serviceId }: ServiceMetricsPanelProps) {
           {isLoading ? (
             <Skeleton className="h-8 w-1/2" />
           ) : (
-            <div className="font-bold text-2xl">{metrics?.cpuUsagePercentage?.toFixed(2)}%</div>
+            <div className="font-bold text-2xl">
+              {(metrics?.cpuUsagePercentage ?? metrics?.cpuPercent ?? 0).toFixed(2)}%
+            </div>
           )}
         </CardContent>
       </Card>
@@ -62,11 +64,16 @@ export function ServiceMetricsPanel({ serviceId }: ServiceMetricsPanelProps) {
             <Skeleton className="h-8 w-1/2" />
           ) : (
             <div className="font-bold text-2xl">
-              {metrics ? formatBytes(metrics.memoryUsageBytes) : '0 B'}
+              {metrics
+                ? formatBytes(
+                    metrics.memoryUsageBytes ??
+                      (metrics.memoryMB ? metrics.memoryMB * 1024 * 1024 : 0)
+                  )
+                : '0 B'}
             </div>
           )}
           <p className="mt-1 text-muted-foreground text-xs">
-            {metrics ? `Limit: ${formatBytes(metrics.memoryLimitBytes)}` : ''}
+            {metrics?.memoryLimitBytes ? `Limit: ${formatBytes(metrics.memoryLimitBytes)}` : ''}
           </p>
         </CardContent>
       </Card>

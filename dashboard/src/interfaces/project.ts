@@ -1,6 +1,10 @@
 import type { BaseResponse, PaginatedData } from './base';
-import type { Database } from './database';
+import type { Database, Storage } from './database';
 import type { AppService } from './deployment';
+
+export type MemberPermission = 'admin' | 'member' | 'viewer';
+export type MemberStatus = 'pending' | 'accepted';
+export type SSLCertStatus = 'pending' | 'issued' | 'failed';
 
 export interface ProjectConfig {
   id: string;
@@ -24,7 +28,7 @@ export interface DomainConfig {
   projectId: string;
   domainName: string;
   redirectTo?: string;
-  sslCertStatus: string;
+  sslCertStatus: SSLCertStatus;
   pathPrefix: string;
   createdAt: string;
   updatedAt: string;
@@ -88,8 +92,8 @@ export interface ProjectMember {
   projectId: string;
   userId?: string;
   email: string;
-  permission: string;
-  status: string;
+  permission: MemberPermission;
+  status: MemberStatus;
   invitedAt: string;
   acceptedAt?: string;
 }
@@ -110,7 +114,7 @@ export interface CreateTokenRequest {
 
 export interface AddMemberRequest {
   email: string;
-  permission: string;
+  permission: MemberPermission;
 }
 
 export type ListProjectsResponse = BaseResponse<PaginatedData<ProjectConfig>>;
@@ -118,3 +122,9 @@ export type GetProjectResponse = BaseResponse<ProjectConfig>;
 export type CreateProjectResponse = BaseResponse<ProjectConfig>;
 export type ListEnvironmentsResponse = BaseResponse<EnvironmentConfig[]>;
 export type CreateEnvironmentResponse = BaseResponse<EnvironmentConfig>;
+export type GetCanvasResponse = BaseResponse<CanvasSummary[]>;
+export type GetEnvironmentCanvasResponse = BaseResponse<EnvironmentCanvas>;
+export type ListDomainsResponse = BaseResponse<DomainConfig[]>;
+export type CreateDomainResponse = BaseResponse<DomainConfig>;
+export type ListMembersResponse = BaseResponse<ProjectMember[]>;
+export type ListTokensResponse = BaseResponse<ProjectToken[]>;

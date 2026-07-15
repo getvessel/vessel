@@ -1,4 +1,5 @@
 import type { BaseResponse } from '#/interfaces/base';
+import type { TeamNotificationChannel } from '#/interfaces/notification';
 import type {
   BitbucketApp,
   CheckUpdateResponse,
@@ -69,7 +70,7 @@ export const settingsService = {
   },
 
   testNotification: async (
-    payload: TestNotificationRequest
+    payload: TestNotificationRequest | Record<string, unknown>
   ): Promise<TestNotificationResponseType> => {
     try {
       return await apiClient.post<TestNotificationResponseType>(
@@ -79,6 +80,58 @@ export const settingsService = {
     } catch (error) {
       throw handleApiError(error);
     }
+  },
+
+  getNotifications: async (): Promise<BaseResponse<TeamNotificationChannel[]>> => {
+    try {
+      return await apiClient.get<BaseResponse<TeamNotificationChannel[]>>(
+        '/settings/notifications'
+      );
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  saveNotificationChannel: async (
+    payload: Record<string, unknown>
+  ): Promise<BaseResponse<TeamNotificationChannel>> => {
+    try {
+      return await apiClient.post<BaseResponse<TeamNotificationChannel>>(
+        '/settings/notifications',
+        payload
+      );
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  deleteNotificationChannel: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/settings/notifications/${id}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  getGitApps: async (
+    provider: string
+  ): Promise<GetGithubAppsResponse | GetGitlabAppsResponse | GetBitbucketAppsResponse> => {
+    if (provider === 'gitlab') return await settingsService.getGitlabApps();
+    if (provider === 'bitbucket') return await settingsService.getBitbucketApps();
+    return await settingsService.getGithubApps();
+  },
+
+  // biome-ignore lint/suspicious/noExplicitAny: Provider payload and response depend dynamically on provider string
+  saveGitApp: async (provider: string, payload: any): Promise<any> => {
+    if (provider === 'gitlab') return await settingsService.saveGitlabApp(payload);
+    if (provider === 'bitbucket') return await settingsService.saveBitbucketApp(payload);
+    return await settingsService.saveGithubApp(payload);
+  },
+
+  deleteGitApp: async (provider: string, id: string): Promise<void> => {
+    if (provider === 'gitlab') return await settingsService.deleteGitlabApp(id);
+    if (provider === 'bitbucket') return await settingsService.deleteBitbucketApp(id);
+    return await settingsService.deleteGithubApp(id);
   },
 
   getGithubApps: async (): Promise<GetGithubAppsResponse> => {
@@ -154,7 +207,7 @@ export const settingsService = {
   },
 
   exchangeGithubManifest: async (
-    payload: GitAppsManifestRequest
+    payload: GitAppsManifestRequest | Record<string, unknown>
   ): Promise<ExchangeGithubManifestResponse> => {
     try {
       return await apiClient.post<ExchangeGithubManifestResponse>(

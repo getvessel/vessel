@@ -1,5 +1,17 @@
 import type { BaseResponse, PaginatedData } from './base';
 
+export type RuntimeMode = 'web' | 'worker';
+export type BuildEngine = 'nixpacks' | 'dockerfile' | 'buildpacks' | 'static';
+export type ServiceStatus = 'created' | 'building' | 'running' | 'stopped' | 'error';
+export type DeploymentStatus =
+  | 'pending'
+  | 'BUILDING'
+  | 'PULLING'
+  | 'CLONING'
+  | 'FAILED'
+  | 'SUCCESS';
+export type JobStatus = 'active' | 'inactive';
+
 export interface AppService {
   id: string;
   projectId: string;
@@ -9,15 +21,18 @@ export interface AppService {
   imageRef?: string;
   branch: string;
   rootDirectory: string;
+  runtimeMode: RuntimeMode;
+  installCommand: string;
   buildCommand: string;
   startCommand: string;
   dockerfilePath: string;
-  buildEngine: string;
+  buildEngine: BuildEngine;
   internalPort: number;
   domain: string;
+  staticOutput: string;
   healthCheckPath: string;
   containerId: string;
-  status: string;
+  status: ServiceStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,7 +42,7 @@ export interface Deployment {
   serviceId: string;
   environmentId: string;
   projectId: string;
-  status: string;
+  status: DeploymentStatus;
   branch?: string;
   commitHash?: string;
   commitMessage?: string;
@@ -40,11 +55,15 @@ export interface Deployment {
 }
 
 export interface ServiceMetric {
-  status: string;
-  cpuUsagePercentage: number;
-  memoryUsageBytes: number;
-  memoryLimitBytes: number;
-  uptimeSeconds: number;
+  timestamp: string;
+  cpuPercent: number;
+  memoryMB: number;
+  networkRxKB: number;
+  networkTxKB: number;
+  status?: string;
+  cpuUsagePercentage?: number;
+  memoryUsageBytes?: number;
+  memoryLimitBytes?: number;
 }
 
 export interface Variable {
@@ -65,8 +84,8 @@ export interface Job {
   name: string;
   schedule: string;
   command: string;
-  status: string;
-  lastRunAt: string;
+  status: JobStatus;
+  lastRunAt?: string;
   lastOutput: string;
   createdAt: string;
   updatedAt: string;
@@ -79,7 +98,7 @@ export interface PRPreview {
   prNumber: number;
   branch: string;
   commitHash: string;
-  status: string;
+  status: DeploymentStatus;
   previewDomain: string;
   containerId: string;
   createdAt: string;
@@ -93,12 +112,15 @@ export interface CreateAppServiceRequest {
   imageRef?: string;
   branch: string;
   rootDirectory: string;
+  runtimeMode: RuntimeMode;
+  installCommand: string;
   buildCommand: string;
   startCommand: string;
   dockerfilePath: string;
-  buildEngine: string;
+  buildEngine: BuildEngine;
   internalPort: number;
   domain: string;
+  staticOutput: string;
   healthCheckPath: string;
 }
 
@@ -108,15 +130,18 @@ export interface UpdateAppServiceRequest {
   imageRef?: string;
   branch: string;
   rootDirectory: string;
+  runtimeMode: RuntimeMode;
+  installCommand: string;
   buildCommand: string;
   startCommand: string;
   dockerfilePath: string;
-  buildEngine: string;
+  buildEngine: BuildEngine;
   internalPort: number;
   domain: string;
+  staticOutput: string;
   healthCheckPath: string;
   containerId: string;
-  status: string;
+  status: ServiceStatus;
 }
 
 export interface TriggerDeploymentRequest {
@@ -148,7 +173,7 @@ export interface UpdateJobRequest {
   name?: string;
   schedule?: string;
   command?: string;
-  status?: string;
+  status?: JobStatus;
 }
 
 export type ListAppsResponse = BaseResponse<AppService[]>;
@@ -162,3 +187,10 @@ export type RollbackDeploymentResponse = BaseResponse<Deployment>;
 export type GetDeploymentLogsResponse = BaseResponse<string>;
 export type GetServiceMetricsResponse = BaseResponse<ServiceMetric>;
 export type GetDiagnosticsResponse = BaseResponse<DiagnosticsResponse>;
+
+export type ListVariablesResponse = BaseResponse<Variable[]>;
+export type SetVariablesResponse = BaseResponse<Variable[]>;
+export type ListJobsResponse = BaseResponse<Job[]>;
+export type GetJobResponse = BaseResponse<Job>;
+export type CreateJobResponse = BaseResponse<Job>;
+export type ListPRPreviewsResponse = BaseResponse<PRPreview[]>;

@@ -1,8 +1,12 @@
+import type { BaseResponse } from './base';
+
+export type UserRole = 'admin' | 'member';
+
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: string;
+  role: UserRole;
   totpEnabled: boolean;
   oauthProvider?: string;
   createdAt: string;
@@ -19,6 +23,20 @@ export interface PersonalAccessToken {
 }
 
 export interface CreatePATResponse {
-  pat: PersonalAccessToken;
-  token: string;
+  token: PersonalAccessToken;
+  plain: string;
 }
+
+export interface UpdateUserRequest {
+  email: string;
+  name: string;
+}
+
+export interface CreatePATRequest {
+  name: string;
+}
+
+export type GetUsersResponse = BaseResponse<User[]>;
+export type GetUserResponse = BaseResponse<User>;
+export type CreatePATResponseType = BaseResponse<CreatePATResponse>;
+export type ListPATsResponse = BaseResponse<PersonalAccessToken[]>;

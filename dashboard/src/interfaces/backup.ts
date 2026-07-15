@@ -1,5 +1,8 @@
 import type { BaseResponse } from './base';
 
+export type BackupConfigStatus = 'active' | 'inactive';
+export type BackupRecordStatus = 'running' | 'completed' | 'failed';
+
 export interface BackupConfig {
   id: string;
   projectId: string;
@@ -9,7 +12,7 @@ export interface BackupConfig {
   name: string;
   schedule: string;
   retentionDays: number;
-  status: string;
+  status: BackupConfigStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -19,7 +22,7 @@ export interface BackupRecord {
   backupConfigId: string;
   projectId: string;
   databaseId?: string;
-  status: string;
+  status: BackupRecordStatus;
   filePath: string;
   fileSizeBytes: number;
   s3Url?: string;

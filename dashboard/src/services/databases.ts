@@ -14,6 +14,14 @@ import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
 
 export const databasesService = {
+  listDatabases: async (): Promise<GetDatabasesResponse> => {
+    try {
+      return await apiClient.get<GetDatabasesResponse>('/databases');
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   getDatabases: async (projectId: string): Promise<GetDatabasesResponse> => {
     try {
       return await apiClient.get<GetDatabasesResponse>(`/projects/${projectId}/databases`);
@@ -70,6 +78,28 @@ export const databasesService = {
     }
   },
 
+  queryDatabase: async (
+    id: string,
+    payload: { query: string } | string
+  ): Promise<DatabaseQueryResponseType> => {
+    try {
+      const queryStr = typeof payload === 'string' ? payload : payload.query;
+      return await apiClient.post<DatabaseQueryResponseType>(`/databases/${id}/query`, {
+        query: queryStr,
+      });
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  getSchemas: async (id: string): Promise<ListTablesResponse> => {
+    try {
+      return await apiClient.get<ListTablesResponse>(`/databases/${id}/schemas`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   listTables: async (id: string): Promise<ListTablesResponse> => {
     try {
       return await apiClient.get<ListTablesResponse>(`/databases/${id}/tables`);
@@ -81,10 +111,13 @@ export const databasesService = {
   getTableData: async (
     id: string,
     table: string,
-    limit: number = 100,
-    offset: number = 0
+    limitOrParams?: number | { limit?: number; offset?: number },
+    offsetVal: number = 0
   ): Promise<DatabaseQueryResponseType> => {
     try {
+      const limit =
+        typeof limitOrParams === 'object' ? (limitOrParams?.limit ?? 100) : (limitOrParams ?? 100);
+      const offset = typeof limitOrParams === 'object' ? (limitOrParams?.offset ?? 0) : offsetVal;
       return await apiClient.get<DatabaseQueryResponseType>(
         `/databases/${id}/data/${table}?limit=${limit}&offset=${offset}`
       );

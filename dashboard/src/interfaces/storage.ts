@@ -1,12 +1,14 @@
 import type { BaseResponse } from './base';
 
+export type StorageVolumeStatus = 'running' | 'stopped' | 'error';
+
 export interface StorageVolume {
   id: string;
   projectId: string;
   environmentId?: string;
   name: string;
   sizeGb: number;
-  status: string;
+  status: StorageVolumeStatus;
   mountPath: string;
   createdAt: string;
   updatedAt: string;

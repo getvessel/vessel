@@ -1,11 +1,15 @@
 import type { BaseResponse } from './base';
 
+export type DatabaseEngine = 'postgres' | 'mysql' | 'redis' | 'mongodb' | 'mariadb';
+export type DatabaseStatus = 'running' | 'stopped' | 'error';
+export type StorageStatus = 'running' | 'stopped' | 'error';
+
 export interface Database {
   id: string;
   projectId: string;
   environmentId: string;
   name: string;
-  engine: string;
+  engine: DatabaseEngine;
   version: string;
   port: number;
   username: string;
@@ -13,10 +17,11 @@ export interface Database {
   databaseName: string;
   volumePath: string;
   containerId: string;
-  status: string;
+  status: DatabaseStatus;
   internalDns: string;
   externalDns: string;
   customArgs: string;
+  logicalReplication: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -25,7 +30,7 @@ export interface CreateDatabaseRequest {
   projectId: string;
   environmentId: string;
   name: string;
-  engine: string;
+  engine: DatabaseEngine;
   version: string;
   port: number;
   username: string;
@@ -33,6 +38,13 @@ export interface CreateDatabaseRequest {
   databaseName: string;
   volumePath: string;
   customArgs: string;
+  logicalReplication: boolean;
+}
+
+export interface UpdateDatabaseRequest {
+  externalDns: string;
+  customArgs: string;
+  logicalReplication: boolean;
 }
 
 export interface Storage {
@@ -48,7 +60,7 @@ export interface Storage {
   bucketName: string;
   volumePath: string;
   containerId: string;
-  status: string;
+  status: StorageStatus;
   internalDns: string;
   externalDns: string;
   createdAt: string;
@@ -90,3 +102,5 @@ export type DatabaseQueryResponseType = BaseResponse<DatabaseQueryResponse>;
 export type ListTablesResponse = BaseResponse<TableSchema[]>;
 export type ImportDatabaseResponse = BaseResponse<void>;
 export type DeleteDatabaseResponse = BaseResponse<void>;
+export type GetStoragesResponse = BaseResponse<Storage[]>;
+export type GetDatabaseStorageResponse = BaseResponse<Storage>;
