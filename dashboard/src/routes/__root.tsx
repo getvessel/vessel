@@ -1,11 +1,10 @@
-import { TanStackDevtools } from '@tanstack/react-devtools';
 import type { QueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, HeadContent, Scripts } from '@tanstack/react-router';
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { ThemeProvider } from '#/components/theme-provider';
 import { Toaster } from '#/components/ui/sonner';
 import { TooltipProvider } from '#/components/ui/tooltip';
-import TanStackQueryDevtools from '#/integrations/tanstack-query/devtools';
 import appCss from '#/styles.css?url';
 
 interface MyRouterContext {
@@ -65,18 +64,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <DynamicTitle />
           <TooltipProvider>{children}</TooltipProvider>
           <Toaster />
-          <TanStackDevtools
-            config={{
-              position: 'bottom-right',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-              TanStackQueryDevtools,
-            ]}
-          />
+          <TanStackRouterDevtools position="bottom-right" />
+          <ReactQueryDevtools position="bottom-left" />
         </ThemeProvider>
         <Scripts />
       </body>
