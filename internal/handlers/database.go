@@ -102,6 +102,40 @@ func (h *DatabaseHandler) GetDatabase(c echo.Context) error {
 	return utils.Success(c, "Operation successful", db)
 }
 
+// @Summary UpdateDatabase endpoint
+// @Description UpdateDatabase endpoint
+// @Tags Databases
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Param request body models.UpdateDatabaseRequest true "Payload"
+// @Router /databases/{id} [put]
+func (h *DatabaseHandler) UpdateDatabase(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing database id parameter")
+	}
+	db, err := h.databaseService.GetDatabase(c.Request().Context(), id)
+	if err != nil || db == nil {
+		return utils.Error(c, http.StatusNotFound, "database not found")
+	}
+	if err := h.verifyProjectOwnership(c, db.ProjectID); err != nil {
+		return err
+	}
+	var req models.UpdateDatabaseRequest
+	if err := c.Bind(&req); err != nil {
+		return utils.Error(c, http.StatusBadRequest, "invalid payload")
+	}
+	db.ExternalDNS = req.ExternalDNS
+	db.CustomArgs = req.CustomArgs
+	db.LogicalReplication = req.LogicalReplication
+	if err := h.databaseService.UpdateDatabase(c.Request().Context(), db); err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+	// Re-deploy is usually required to apply Traefik label changes
+	return utils.Success(c, "Operation successful", db)
+}
+
 // @Summary DeleteDatabase endpoint
 // @Description DeleteDatabase endpoint
 // @Tags Databases

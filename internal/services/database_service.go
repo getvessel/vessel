@@ -83,18 +83,19 @@ func (s *DatabaseService) CreateDatabaseFromRequest(ctx context.Context, req *mo
 		req.DatabaseName = "appdb"
 	}
 	db := &models.Database{
-		ProjectID:     req.ProjectID,
-		EnvironmentID: req.EnvironmentID,
-		Name:          req.Name,
-		Engine:        req.Engine,
-		Version:       req.Version,
-		Port:          req.Port,
-		Username:      req.Username,
-		Password:      req.Password,
-		DatabaseName:  req.DatabaseName,
-		VolumePath:    req.VolumePath,
-		CustomArgs:    req.CustomArgs,
-		Status:        "stopped",
+		ProjectID:          req.ProjectID,
+		EnvironmentID:      req.EnvironmentID,
+		Name:               req.Name,
+		Engine:             req.Engine,
+		Version:            req.Version,
+		Port:               req.Port,
+		Username:           req.Username,
+		Password:           req.Password,
+		DatabaseName:       req.DatabaseName,
+		VolumePath:         req.VolumePath,
+		CustomArgs:         req.CustomArgs,
+		LogicalReplication: req.LogicalReplication,
+		Status:             "stopped",
 	}
 	return s.CreateDatabase(ctx, db)
 }

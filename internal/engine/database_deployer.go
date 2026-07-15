@@ -90,6 +90,10 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 		cmd = append(cmd, args...)
 	}
 
+	if dbConfig.LogicalReplication && (strings.Contains(imageName, "postgres") || strings.Contains(imageName, "timescaledb")) {
+		cmd = append(cmd, "-c", "wal_level=logical", "-c", "max_replication_slots=10", "-c", "max_wal_senders=10")
+	}
+
 	if len(tmplService.Volumes) > 0 {
 		parts := strings.Split(tmplService.Volumes[0], ":")
 		if len(parts) >= 2 {
@@ -108,10 +112,21 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 	if err := utils.EnsureVesslNetwork(ctx, d.dockerClient); err != nil {
 		return "", fmt.Errorf("failed to ensure Docker network: %w", err)
 	}
+	labels := make(map[string]string)
+	if dbConfig.ExternalDNS != "" {
+		labels["traefik.enable"] = "true"
+		labels[fmt.Sprintf("traefik.tcp.routers.%s.rule", containerName)] = fmt.Sprintf("HostSNI(`%s`)", dbConfig.ExternalDNS)
+		labels[fmt.Sprintf("traefik.tcp.routers.%s.tls", containerName)] = "true"
+		labels[fmt.Sprintf("traefik.tcp.routers.%s.tls.certresolver", containerName)] = "letsencrypt"
+		labels[fmt.Sprintf("traefik.tcp.routers.%s.entrypoints", containerName)] = "websecure"
+		labels[fmt.Sprintf("traefik.tcp.services.%s.loadbalancer.server.port", containerName)] = fmt.Sprintf("%d", dbConfig.Port)
+	}
+
 	containerCfg := &container.Config{
-		Image: imageName,
-		Env:   envVars,
-		Cmd:   cmd,
+		Image:  imageName,
+		Env:    envVars,
+		Cmd:    cmd,
+		Labels: labels,
 	}
 	hostCfg := &container.HostConfig{
 		RestartPolicy: container.RestartPolicy{Name: "always"},
