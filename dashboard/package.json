@@ -13,6 +13,7 @@
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "biome check src",
     "format:fix": "biome check --write src"
@@ -24,9 +25,7 @@
     "@tailwindcss/vite": "^4.3.2",
     "@tanstack/match-sorter-utils": "latest",
     "@tanstack/react-query": "latest",
-    "@tanstack/react-query-devtools": "latest",
     "@tanstack/react-router": "latest",
-    "@tanstack/react-router-devtools": "latest",
     "@tanstack/react-store": "latest",
     "@tanstack/react-table": "latest",
     "@tanstack/router-plugin": "^1.168.20",

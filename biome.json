@@ -25,7 +25,8 @@
       "preset": "recommended",
       "style": {
         "noDefaultExport": "off",
-        "useImportType": "warn"
+        "useImportType": "warn",
+        "noNonNullAssertion": "off"
       },
       "a11y": {
         "noSvgWithoutTitle": "off"

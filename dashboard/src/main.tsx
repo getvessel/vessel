@@ -1,16 +1,10 @@
-import { RouterProvider } from '@tanstack/react-router';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { getRouter } from './router';
+import { AppRouter } from './router';
+import './styles.css';
 
-const router = getRouter();
-
-const rootElement = document.getElementById('root');
-if (rootElement && !rootElement.innerHTML) {
-  const root = createRoot(rootElement);
-  root.render(
-    <React.StrictMode>
-      <RouterProvider router={router} />
-    </React.StrictMode>
-  );
-}
+createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <AppRouter />
+  </React.StrictMode>
+);
