@@ -49,6 +49,7 @@ export const apiClient = {
     const response = await fetch(url, {
       ...options,
       headers,
+      credentials: 'include',
     });
 
     if (response.status === 401) {
@@ -89,7 +90,12 @@ export const apiClient = {
     if (csrfToken) {
       headers.set('X-CSRF-Token', csrfToken);
     }
-    const response = await fetch(url, { ...options, method: 'GET', headers });
+    const response = await fetch(url, {
+      ...options,
+      method: 'GET',
+      headers,
+      credentials: 'include',
+    });
 
     if (response.status === 401) {
       authActions.logout();
