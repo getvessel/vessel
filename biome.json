@@ -76,7 +76,9 @@
       "!**/routeTree.gen.ts",
       "!**/data",
       "!**/bootstrap",
-      "!**/*.astro"
+      "!**/*.astro",
+      "!**/router.tsx",
+      "!**/router.ts"
     ]
   }
 }

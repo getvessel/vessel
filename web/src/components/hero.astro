@@ -2,16 +2,22 @@
 import { Icon } from 'astro-icon/components';
 
 const serverRows = [
-  { k: 'HOST',    v: 'prod-eu-1.acme.com' },
-  { k: 'AGENT',   v: 'v0.5.1' },
-  { k: 'PROXY',   v: 'traefik v3.1' },
+  { k: 'HOST', v: 'prod-eu-1.acme.com' },
+  { k: 'AGENT', v: 'v0.5.1' },
+  { k: 'PROXY', v: 'traefik v3.1' },
   { k: 'NETWORK', v: 'vessl-network' },
-  { k: 'TUNNEL',  v: 'yamux / active', accent: true },
+  { k: 'TUNNEL', v: 'yamux / active', accent: true },
 ];
 
 const capabilities = [
-  'apps', 'databases', 'cron-jobs', 'backups → S3',
-  'domains + SSL', 'env secrets', 'canvas view', 'log tailing',
+  'apps',
+  'databases',
+  'cron-jobs',
+  'backups → S3',
+  'domains + SSL',
+  'env secrets',
+  'canvas view',
+  'log tailing',
 ];
 ---
 

@@ -12,8 +12,14 @@ const entries = [
       { type: 'feat', text: 'Usage metering aggregation and billing alerts' },
       { type: 'feat', text: 'Agent telemetry reporting loop (container hours, deployments)' },
       { type: 'refactor', text: 'Removed Google Wire — manual constructor injection throughout' },
-      { type: 'refactor', text: 'Extracted dependency wiring to setup.go in both vessl and vessl-cloud' },
-      { type: 'fix', text: 'Deprecated echoMiddleware.Logger replaced with RequestLoggerWithConfig' },
+      {
+        type: 'refactor',
+        text: 'Extracted dependency wiring to setup.go in both vessl and vessl-cloud',
+      },
+      {
+        type: 'fix',
+        text: 'Deprecated echoMiddleware.Logger replaced with RequestLoggerWithConfig',
+      },
     ],
   },
   {
@@ -24,7 +30,10 @@ const entries = [
     changes: [
       { type: 'feat', text: 'Notifications module with email (Resend) and webhook channels' },
       { type: 'feat', text: 'SSO / SAML handler with env-based configuration' },
-      { type: 'feat', text: 'Vessl Cloud metering handler with repo-authenticated usage reporting' },
+      {
+        type: 'feat',
+        text: 'Vessl Cloud metering handler with repo-authenticated usage reporting',
+      },
       { type: 'feat', text: 'Admin and internal staff routing split from public feature routes' },
       { type: 'fix', text: 'service/notifications renamed to avoid double-nesting' },
     ],
@@ -36,7 +45,10 @@ const entries = [
     badgeColor: '',
     changes: [
       { type: 'feat', text: 'Pull request preview environments' },
-      { type: 'feat', text: 'MCP bridge — expose deployments to AI tools via Model Context Protocol' },
+      {
+        type: 'feat',
+        text: 'MCP bridge — expose deployments to AI tools via Model Context Protocol',
+      },
       { type: 'feat', text: 'OAuth 2.0 integrations (GitHub, GitLab)' },
       { type: 'feat', text: 'Canvas feature for visual project layout' },
       { type: 'feat', text: 'Serverless function deployments' },

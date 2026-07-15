@@ -1,53 +1,53 @@
 ---
-import Layout from '../layouts/layout.astro';
 import { Icon } from 'astro-icon/components';
+import Layout from '../layouts/layout.astro';
 
 const tableRows = [
-  { feature: 'App Deployments',            sh: true,                  cloud: true },
-  { feature: 'Database Deployments',       sh: true,                  cloud: true },
-  { feature: 'Cron Jobs',                  sh: true,                  cloud: true },
-  { feature: 'Canvas View',                sh: true,                  cloud: true },
-  { feature: 'Backup to S3',               sh: true,                  cloud: true },
-  { feature: 'Traefik Routing + SSL',      sh: true,                  cloud: true },
-  { feature: 'Scoped Environment Secrets', sh: true,                  cloud: true },
-  { feature: 'AI Settings (BYO key)',      sh: true,                  cloud: true },
-  { feature: 'Git-native Deploys',         sh: true,                  cloud: true },
-  { feature: 'Log Tailing',               sh: true,                  cloud: true },
-  { feature: 'Notification Channels',      sh: true,                  cloud: true },
-  { feature: 'Codebase',                   sh: 'MIT open source',      cloud: 'MIT open source' },
-  { feature: 'Daemon Hosting',             sh: 'Your server',          cloud: 'Your server' },
-  { feature: 'Control Plane',              sh: 'Local dashboard',      cloud: 'Managed (app.vessl.dev)' },
-  { feature: 'Fleet Management',           sh: '—',                    cloud: true },
-  { feature: 'Usage Metering + Alerts',   sh: '—',                    cloud: true },
-  { feature: 'Yamux Tunnel Handshake',    sh: 'Manual token',         cloud: 'Managed' },
-  { feature: 'Team Seats',                 sh: 'Unlimited',            cloud: 'Unlimited' },
-  { feature: 'Upcoming Features',          sh: 'Free forever',        cloud: 'Included' },
+  { feature: 'App Deployments', sh: true, cloud: true },
+  { feature: 'Database Deployments', sh: true, cloud: true },
+  { feature: 'Cron Jobs', sh: true, cloud: true },
+  { feature: 'Canvas View', sh: true, cloud: true },
+  { feature: 'Backup to S3', sh: true, cloud: true },
+  { feature: 'Traefik Routing + SSL', sh: true, cloud: true },
+  { feature: 'Scoped Environment Secrets', sh: true, cloud: true },
+  { feature: 'AI Settings (BYO key)', sh: true, cloud: true },
+  { feature: 'Git-native Deploys', sh: true, cloud: true },
+  { feature: 'Log Tailing', sh: true, cloud: true },
+  { feature: 'Notification Channels', sh: true, cloud: true },
+  { feature: 'Codebase', sh: 'MIT open source', cloud: 'MIT open source' },
+  { feature: 'Daemon Hosting', sh: 'Your server', cloud: 'Your server' },
+  { feature: 'Control Plane', sh: 'Local dashboard', cloud: 'Managed (app.vessl.dev)' },
+  { feature: 'Fleet Management', sh: '—', cloud: true },
+  { feature: 'Usage Metering + Alerts', sh: '—', cloud: true },
+  { feature: 'Yamux Tunnel Handshake', sh: 'Manual token', cloud: 'Managed' },
+  { feature: 'Team Seats', sh: 'Unlimited', cloud: 'Unlimited' },
+  { feature: 'Upcoming Features', sh: 'Free forever', cloud: 'Included' },
 ];
 
 const faqs = [
   {
-    q: "Do Cloud features replace the self-hosted daemon?",
-    a: "No. Vessl Cloud is a control plane — your apps still run on your server via the Vessl daemon. Cloud adds fleet management, usage metering, and team billing on top. The daemon itself is unchanged.",
+    q: 'Do Cloud features replace the self-hosted daemon?',
+    a: 'No. Vessl Cloud is a control plane — your apps still run on your server via the Vessl daemon. Cloud adds fleet management, usage metering, and team billing on top. The daemon itself is unchanged.',
   },
   {
     q: "What exactly runs on my server vs. Vessl's infrastructure?",
-    a: "Everything that matters — Docker containers, Traefik proxy, databases, backups — runs on your machine. Vessl Cloud only stores metadata: deployment history, team config, and usage metrics. We never touch your data.",
+    a: 'Everything that matters — Docker containers, Traefik proxy, databases, backups — runs on your machine. Vessl Cloud only stores metadata: deployment history, team config, and usage metrics. We never touch your data.',
   },
   {
-    q: "Is the self-hosted edition actually free forever, or will you change your mind?",
+    q: 'Is the self-hosted edition actually free forever, or will you change your mind?',
     a: "We built self-hosted on MIT. Revoking that would break the license itself. It's free, period — read our philosophy page for the full commitment.",
   },
   {
-    q: "Can I move from Cloud back to pure self-hosted?",
+    q: 'Can I move from Cloud back to pure self-hosted?',
     a: "Yes. It's a config change — point your daemon at your own dashboard instead of app.vessl.dev. No vendor lock-in, no export-import dance.",
   },
   {
-    q: "How does billing work when I add more servers?",
-    a: "The base plan covers 2 servers. Each additional server is $3/month. There are no per-deployment or per-seat charges on top of that.",
+    q: 'How does billing work when I add more servers?',
+    a: 'The base plan covers 2 servers. Each additional server is $3/month. There are no per-deployment or per-seat charges on top of that.',
   },
   {
-    q: "Is there a trial?",
-    a: "Yes — 14 days, no credit card required. Connect your first server and explore the full Cloud dashboard before committing.",
+    q: 'Is there a trial?',
+    a: 'Yes — 14 days, no credit card required. Connect your first server and explore the full Cloud dashboard before committing.',
   },
 ];
 ---

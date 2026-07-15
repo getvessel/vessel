@@ -62,7 +62,7 @@ export interface UpdateDatabaseRequest {
   logicalReplication: boolean;
 }
 
-export interface Storage {
+export interface DatabaseStorage {
   id: string;
   projectId: string;
   environmentId: string;
@@ -82,7 +82,9 @@ export interface Storage {
   updatedAt: string;
 }
 
-export interface CreateStorageRequest {
+export type Storage = DatabaseStorage;
+
+export interface CreateDatabaseStorageRequest {
   projectId: string;
   environmentId: string;
   name: string;
@@ -95,7 +97,7 @@ export interface CreateStorageRequest {
   volumePath: string;
 }
 
-export interface UpdateStorageRequest {
+export interface UpdateDatabaseStorageRequest {
   externalDns?: string;
 }
 
@@ -141,5 +143,5 @@ export type DatabaseQueryResponseType = BaseResponse<DatabaseQueryResponse>;
 export type ListTablesResponse = BaseResponse<TableSchema[]>;
 export type ImportDatabaseResponse = BaseResponse<void>;
 export type DeleteDatabaseResponse = BaseResponse<void>;
-export type GetStoragesResponse = BaseResponse<Storage[]>;
-export type GetDatabaseStorageResponse = BaseResponse<Storage>;
+export type GetStoragesResponse = BaseResponse<DatabaseStorage[]>;
+export type GetDatabaseStorageResponse = BaseResponse<DatabaseStorage>;

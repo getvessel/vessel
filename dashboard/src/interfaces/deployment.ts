@@ -14,9 +14,14 @@ export type DeploymentStatus =
   | 'BUILDING'
   | 'PULLING'
   | 'CLONING'
+  | 'READY'
+  | 'ACTIVE'
+  | 'REMOVED'
+  | 'SLEPT'
   | 'FAILED'
   | 'SUCCESS';
-export type JobStatus = 'active' | 'inactive';
+export type JobStatus = 'active' | 'inactive' | 'running' | 'completed' | 'failed' | 'error';
+export type PRPreviewStatus = 'active' | 'inactive' | 'building' | 'failed';
 
 export interface AppService {
   id: string;
@@ -104,7 +109,7 @@ export interface PRPreview {
   prNumber: number;
   branch: string;
   commitHash: string;
-  status: DeploymentStatus;
+  status: PRPreviewStatus;
   previewDomain: string;
   containerId: string;
   createdAt: string;
