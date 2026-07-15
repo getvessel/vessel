@@ -34,7 +34,7 @@ The dashboard uses a **Contextual Shell** (`_shell.tsx`) with a global **Topbar*
 - **Overview:** Aggregated stats (running containers, total CPU/RAM usage, active jobs).
 - **Projects (`/projects`):** Grid/List of all projects with quick-status badges.
 - **Databases (`/databases`):** Global view of all relational, NoSQL, and broker instances across all projects.
-- **Marketplace (`/marketplace`):** One-click templates and object storage integrations.
+- **Templates (`/templates`):** One-click templates and object storage integrations.
 - **Imports:** Links to Railway/Vercel Importers.
 - **System Settings (`/settings/*` - Admin Only):**
   - **DNS Providers:** Cloudflare, Namecheap, Spaceship API integrations (`/settings/dns`).
@@ -97,7 +97,7 @@ src/routes/
 │   ├── index.tsx                            # Global Overview / Dashboard Home
 │   ├── projects.tsx                         # Project List (`/projects`)
 │   ├── databases.tsx                        # Global Database Inventory (`/databases`)
-│   ├── marketplace.tsx                      # One-Click Apps & Storage Templates (`/marketplace`)
+│   ├── templates.tsx                      # One-Click Apps & Storage Templates (`/templates`)
 │   │
 │   ├── imports/                             # Migration Importers
 │   │   ├── railway.tsx                      # Railway Project Importer (`/import/railway`)

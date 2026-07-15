@@ -3,31 +3,71 @@ import {
   Cloud,
   Code,
   Database,
-  FileText,
+  Download,
+  FolderKanban,
   HardDrive,
   Heart,
   LayoutDashboard,
+  LayoutTemplate,
   MessageSquare,
+  ScrollText,
   Settings,
+  Terminal,
+  Users,
 } from 'lucide-react';
-import { NavItem } from './nav-item';
+import { NavItem, type NavItemProps } from './nav-item';
 import { UserMenu } from './user-menu';
 
-const mainNav = [
-  { title: 'Dashboard', url: '/', icon: LayoutDashboard, exact: true },
-  { title: 'Marketplace', url: '/marketplace', icon: Cloud },
-  { title: 'Databases', url: '/databases', icon: Database },
-  { title: 'S3 Storages', url: '/storages', icon: HardDrive },
-  { title: 'Sources', url: '/sources', icon: Code },
-  { title: 'Notifications', url: '/notifications', icon: Bell },
-  { title: 'Audit Logs', url: '/audit-logs', icon: FileText },
+type NavGroup = {
+  title?: string;
+  items: (NavItemProps & { exact?: boolean })[];
+};
+
+const navGroups: NavGroup[] = [
+  {
+    title: 'Overview',
+    items: [
+      { title: 'Dashboard', url: '/', icon: LayoutDashboard, exact: true },
+      { title: 'Projects', url: '/projects', icon: FolderKanban },
+      { title: 'Teams', url: '/teams', icon: Users },
+    ],
+  },
+  {
+    title: 'Resources',
+    items: [
+      { title: 'Databases', url: '/databases', icon: Database },
+      { title: 'Storage', url: '/settings/backups', icon: HardDrive },
+      { title: 'Sources', url: '/settings/git-apps', icon: Code },
+    ],
+  },
+  {
+    title: 'Discover',
+    items: [
+      {
+        title: 'Templates',
+        url: '/templates',
+        icon: LayoutTemplate,
+        badge: '280+',
+      },
+      { title: 'Import', url: '/imports/railway', icon: Download },
+    ],
+  },
+  {
+    title: 'System',
+    items: [
+      { title: 'Notifications', url: '/notifications', icon: Bell },
+      { title: 'Audit Logs', url: '/audit-logs', icon: ScrollText },
+      { title: 'Terminal', url: '/terminal', icon: Terminal },
+      { title: 'Settings', url: '/settings', icon: Settings },
+    ],
+  },
 ];
 
 const bottomNav = [
   {
     title: 'Docs',
     url: 'https://docs.vessl.com',
-    icon: FileText,
+    icon: ScrollText,
     external: true,
   },
   {
@@ -42,13 +82,9 @@ const bottomNav = [
     icon: Heart,
     external: true,
   },
-  { title: 'Settings', url: '/settings', icon: Settings },
 ];
 
 export function AppSidebar() {
-  const visibleMainNav = mainNav;
-  const visibleBottomNav = bottomNav;
-
   return (
     <aside className="fixed inset-y-0 left-0 z-20 flex w-60 flex-col border-sidebar-border border-r bg-sidebar">
       <div className="flex h-14 shrink-0 items-center gap-2.5 border-sidebar-border border-b px-4">
@@ -63,14 +99,23 @@ export function AppSidebar() {
         </span>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-2">
-        {visibleMainNav.map((item) => (
-          <NavItem key={item.url} item={item} exact={item.exact} />
+      <nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-4">
+        {navGroups.map((group, i) => (
+          <div key={i} className="flex flex-col gap-1">
+            {group.title && (
+              <h4 className="mb-1 px-2 font-medium text-[11px] text-sidebar-foreground/50 uppercase tracking-wider">
+                {group.title}
+              </h4>
+            )}
+            {group.items.map((item) => (
+              <NavItem key={item.url} item={item} exact={item.exact} />
+            ))}
+          </div>
         ))}
       </nav>
 
-      <div className="mt-auto flex flex-col gap-1 px-3 pb-2">
-        {visibleBottomNav.map((item) => (
+      <div className="mt-auto flex flex-col gap-1 px-3 pt-4 pb-2">
+        {bottomNav.map((item) => (
           <NavItem key={item.url} item={item} />
         ))}
       </div>

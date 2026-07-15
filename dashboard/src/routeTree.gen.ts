@@ -13,9 +13,13 @@ import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard.index'
+import { Route as DashboardTerminalRouteImport } from './routes/_dashboard.terminal'
+import { Route as DashboardTemplatesRouteImport } from './routes/_dashboard.templates'
+import { Route as DashboardTeamsRouteImport } from './routes/_dashboard.teams'
 import { Route as DashboardProjectsRouteImport } from './routes/_dashboard.projects'
-import { Route as DashboardMarketplaceRouteImport } from './routes/_dashboard.marketplace'
+import { Route as DashboardNotificationsRouteImport } from './routes/_dashboard.notifications'
 import { Route as DashboardDatabasesRouteImport } from './routes/_dashboard.databases'
+import { Route as DashboardAuditLogsRouteImport } from './routes/_dashboard.audit-logs'
 import { Route as AuthSignupRouteImport } from './routes/_auth.signup'
 import { Route as AuthSigninRouteImport } from './routes/_auth.signin'
 import { Route as AuthSetupRouteImport } from './routes/_auth.setup'
@@ -68,19 +72,39 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardTerminalRoute = DashboardTerminalRouteImport.update({
+  id: '/terminal',
+  path: '/terminal',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTemplatesRoute = DashboardTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardMarketplaceRoute = DashboardMarketplaceRouteImport.update({
-  id: '/marketplace',
-  path: '/marketplace',
+const DashboardNotificationsRoute = DashboardNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardDatabasesRoute = DashboardDatabasesRouteImport.update({
   id: '/databases',
   path: '/databases',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAuditLogsRoute = DashboardAuditLogsRouteImport.update({
+  id: '/audit-logs',
+  path: '/audit-logs',
   getParentRoute: () => DashboardRoute,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -278,9 +302,13 @@ export interface FileRoutesByFullPath {
   '/setup': typeof AuthSetupRoute
   '/signin': typeof AuthSigninRoute
   '/signup': typeof AuthSignupRoute
+  '/audit-logs': typeof DashboardAuditLogsRoute
   '/databases': typeof DashboardDatabasesRouteWithChildren
-  '/marketplace': typeof DashboardMarketplaceRoute
+  '/notifications': typeof DashboardNotificationsRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
+  '/teams': typeof DashboardTeamsRoute
+  '/templates': typeof DashboardTemplatesRoute
+  '/terminal': typeof DashboardTerminalRoute
   '/imports/railway': typeof DashboardImportsRailwayRoute
   '/imports/vercel': typeof DashboardImportsVercelRoute
   '/settings/backups': typeof DashboardSettingsBackupsRoute
@@ -318,9 +346,13 @@ export interface FileRoutesByTo {
   '/setup': typeof AuthSetupRoute
   '/signin': typeof AuthSigninRoute
   '/signup': typeof AuthSignupRoute
+  '/audit-logs': typeof DashboardAuditLogsRoute
   '/databases': typeof DashboardDatabasesRouteWithChildren
-  '/marketplace': typeof DashboardMarketplaceRoute
+  '/notifications': typeof DashboardNotificationsRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
+  '/teams': typeof DashboardTeamsRoute
+  '/templates': typeof DashboardTemplatesRoute
+  '/terminal': typeof DashboardTerminalRoute
   '/imports/railway': typeof DashboardImportsRailwayRoute
   '/imports/vercel': typeof DashboardImportsVercelRoute
   '/settings/backups': typeof DashboardSettingsBackupsRoute
@@ -360,9 +392,13 @@ export interface FileRoutesById {
   '/_auth/setup': typeof AuthSetupRoute
   '/_auth/signin': typeof AuthSigninRoute
   '/_auth/signup': typeof AuthSignupRoute
+  '/_dashboard/audit-logs': typeof DashboardAuditLogsRoute
   '/_dashboard/databases': typeof DashboardDatabasesRouteWithChildren
-  '/_dashboard/marketplace': typeof DashboardMarketplaceRoute
+  '/_dashboard/notifications': typeof DashboardNotificationsRoute
   '/_dashboard/projects': typeof DashboardProjectsRouteWithChildren
+  '/_dashboard/teams': typeof DashboardTeamsRoute
+  '/_dashboard/templates': typeof DashboardTemplatesRoute
+  '/_dashboard/terminal': typeof DashboardTerminalRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/imports/railway': typeof DashboardImportsRailwayRoute
   '/_dashboard/imports/vercel': typeof DashboardImportsVercelRoute
@@ -403,9 +439,13 @@ export interface FileRouteTypes {
     | '/setup'
     | '/signin'
     | '/signup'
+    | '/audit-logs'
     | '/databases'
-    | '/marketplace'
+    | '/notifications'
     | '/projects'
+    | '/teams'
+    | '/templates'
+    | '/terminal'
     | '/imports/railway'
     | '/imports/vercel'
     | '/settings/backups'
@@ -443,9 +483,13 @@ export interface FileRouteTypes {
     | '/setup'
     | '/signin'
     | '/signup'
+    | '/audit-logs'
     | '/databases'
-    | '/marketplace'
+    | '/notifications'
     | '/projects'
+    | '/teams'
+    | '/templates'
+    | '/terminal'
     | '/imports/railway'
     | '/imports/vercel'
     | '/settings/backups'
@@ -484,9 +528,13 @@ export interface FileRouteTypes {
     | '/_auth/setup'
     | '/_auth/signin'
     | '/_auth/signup'
+    | '/_dashboard/audit-logs'
     | '/_dashboard/databases'
-    | '/_dashboard/marketplace'
+    | '/_dashboard/notifications'
     | '/_dashboard/projects'
+    | '/_dashboard/teams'
+    | '/_dashboard/templates'
+    | '/_dashboard/terminal'
     | '/_dashboard/'
     | '/_dashboard/imports/railway'
     | '/_dashboard/imports/vercel'
@@ -554,6 +602,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/terminal': {
+      id: '/_dashboard/terminal'
+      path: '/terminal'
+      fullPath: '/terminal'
+      preLoaderRoute: typeof DashboardTerminalRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/templates': {
+      id: '/_dashboard/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof DashboardTemplatesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/teams': {
+      id: '/_dashboard/teams'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof DashboardTeamsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/projects': {
       id: '/_dashboard/projects'
       path: '/projects'
@@ -561,11 +630,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/marketplace': {
-      id: '/_dashboard/marketplace'
-      path: '/marketplace'
-      fullPath: '/marketplace'
-      preLoaderRoute: typeof DashboardMarketplaceRouteImport
+    '/_dashboard/notifications': {
+      id: '/_dashboard/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof DashboardNotificationsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/databases': {
@@ -573,6 +642,13 @@ declare module '@tanstack/react-router' {
       path: '/databases'
       fullPath: '/databases'
       preLoaderRoute: typeof DashboardDatabasesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/audit-logs': {
+      id: '/_dashboard/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/audit-logs'
+      preLoaderRoute: typeof DashboardAuditLogsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_auth/signup': {
@@ -866,9 +942,13 @@ const DashboardProjectsRouteWithChildren =
   DashboardProjectsRoute._addFileChildren(DashboardProjectsRouteChildren)
 
 interface DashboardRouteChildren {
+  DashboardAuditLogsRoute: typeof DashboardAuditLogsRoute
   DashboardDatabasesRoute: typeof DashboardDatabasesRouteWithChildren
-  DashboardMarketplaceRoute: typeof DashboardMarketplaceRoute
+  DashboardNotificationsRoute: typeof DashboardNotificationsRoute
   DashboardProjectsRoute: typeof DashboardProjectsRouteWithChildren
+  DashboardTeamsRoute: typeof DashboardTeamsRoute
+  DashboardTemplatesRoute: typeof DashboardTemplatesRoute
+  DashboardTerminalRoute: typeof DashboardTerminalRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardImportsRailwayRoute: typeof DashboardImportsRailwayRoute
   DashboardImportsVercelRoute: typeof DashboardImportsVercelRoute
@@ -892,9 +972,13 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAuditLogsRoute: DashboardAuditLogsRoute,
   DashboardDatabasesRoute: DashboardDatabasesRouteWithChildren,
-  DashboardMarketplaceRoute: DashboardMarketplaceRoute,
+  DashboardNotificationsRoute: DashboardNotificationsRoute,
   DashboardProjectsRoute: DashboardProjectsRouteWithChildren,
+  DashboardTeamsRoute: DashboardTeamsRoute,
+  DashboardTemplatesRoute: DashboardTemplatesRoute,
+  DashboardTerminalRoute: DashboardTerminalRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardImportsRailwayRoute: DashboardImportsRailwayRoute,
   DashboardImportsVercelRoute: DashboardImportsVercelRoute,

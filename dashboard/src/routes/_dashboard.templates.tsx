@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Box, Database, Globe, Server, Star } from 'lucide-react';
 import type { DatabaseEngine } from '../interfaces/database';
 
-export const Route = createFileRoute('/_dashboard/marketplace')({
+export const Route = createFileRoute('/_dashboard/templates')({
   component: MarketplacePage,
 });
 

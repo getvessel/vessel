@@ -7,6 +7,7 @@ export type NavItemProps = {
   url: string;
   icon: React.ComponentType<{ className?: string }>;
   external?: boolean;
+  badge?: string;
 };
 
 export function NavItem({ item, exact = false }: { item: NavItemProps; exact?: boolean }) {
@@ -37,6 +38,11 @@ export function NavItem({ item, exact = false }: { item: NavItemProps; exact?: b
       <a href={item.url} target="_blank" rel="noopener noreferrer" className={className}>
         {IconComponent}
         <span className="flex-1 truncate">{item.title}</span>
+        {item.badge && (
+          <span className="ml-auto flex h-5 items-center justify-center rounded-full bg-primary/10 px-1.5 font-medium text-[10px] text-primary">
+            {item.badge}
+          </span>
+        )}
         <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-50" />
       </a>
     );
@@ -45,7 +51,12 @@ export function NavItem({ item, exact = false }: { item: NavItemProps; exact?: b
   return (
     <Link to={item.url as never} className={className}>
       {IconComponent}
-      <span className="truncate">{item.title}</span>
+      <span className="flex-1 truncate">{item.title}</span>
+      {item.badge && (
+        <span className="ml-auto flex h-5 items-center justify-center rounded-full bg-primary/10 px-1.5 font-medium text-[10px] text-primary">
+          {item.badge}
+        </span>
+      )}
     </Link>
   );
 }
