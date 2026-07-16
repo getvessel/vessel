@@ -95,8 +95,8 @@ export default defineConfig({
             { label: 'Teams & Collaboration', slug: 'operations/teams' },
             { label: 'Administration', slug: 'admin' },
             { label: 'Integrations', slug: 'integrations' },
-            { label: 'Domains', slug: 'operations/domains' },
-            { label: 'DNS Providers', slug: 'operations/dns-providers' },
+            { label: 'Observability & Logs', slug: 'operations/observability' },
+            { label: 'Domains & DNS', slug: 'operations/domains-and-dns' },
             { label: 'Account Security', slug: 'operations/account-security' },
             {
               label: 'Maintenance & Updates',

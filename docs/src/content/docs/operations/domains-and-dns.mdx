@@ -1,11 +1,9 @@
 ---
-title: Domains
-description: Configure generated service hostnames and custom domains for Vessl services.
-sidebar:
-  order: 2
+title: Domains and DNS
+description: Configure custom domains, DNS providers, and automatic hostnames for Vessl services.
 ---
 
-Vessl uses Traefik to route traffic and manage certificates once DNS resolves to the server.
+Vessl uses Traefik to route traffic and manage certificates once DNS resolves to your server. It also supports automated DNS record management through major providers.
 
 ## Control Plane Domain
 
@@ -66,18 +64,17 @@ AAAA  app.example.com     YOUR_SERVER_IPV6
 
 Then add the domain to the service in Vessl. Traefik handles routing and certificates after DNS resolves.
 
-## Service Domain Tab
+## Automated DNS Providers
 
-The service Domains tab shows:
+Vessl can create or update service-domain `A` records automatically through supported DNS providers:
+- **Cloudflare**: Supports API token or auth key. When zone ID is blank, Vessl searches Cloudflare zones from the hostname.
+- **Namecheap**: Requires API user, API key, and Client IP.
+- **Spaceship**: Requires API key and API secret.
 
-- The hostname.
-- Whether the domain is active or pending.
-- The target `A` record.
-- The server IP to point at.
-- DNS provider actions when a provider is connected.
-- Refresh and verify action for propagation checks.
+### What Automation Does
 
-Local loopback domains such as `localhost` do not need public DNS records.
+From a service Domains tab, Vessl can apply an `A` record for a public hostname directly to your DNS provider. The record points at the server's public IPv4 address.
+Automation does not run for local loopback domains, and it currently supports IPv4 `A` records only.
 
 ## Traefik Behavior
 
@@ -93,8 +90,3 @@ If Traefik reload fails, Vessl surfaces the reload detail in the deployment or s
 - Traefik is running through the Vessl Docker Compose stack.
 - The service is deployed and active.
 - The service internal port matches the app container's listening port.
-
-## Related Pages
-
-- [DNS Providers](/docs/operations/dns-providers/) for Cloudflare, Namecheap, and Spaceship automation.
-- [Public Access and TLS](/docs/databases/public-access-and-tls/) for database hostnames.

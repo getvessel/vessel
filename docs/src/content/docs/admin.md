@@ -134,24 +134,6 @@ sudo vessld rollback
 
 Restores the previous binary and a database backup taken before the upgrade.
 
-## License Management
-
-### Activating a License
-
-1. Go to **Settings → License**.
-2. Enter your license key.
-3. Click **Activate**.
-
-The license is validated against the licensing server and applied immediately.
-
-### License Features
-
-Plans may include:
-
-- Seat limits (number of users)
-- Instance limits
-- Premium features (audit logs, SSO, advanced RBAC)
-
 ## Telemetry
 
 By default, Vessl collects anonymized usage data to improve the product. This can be disabled in **Settings → Privacy**.
