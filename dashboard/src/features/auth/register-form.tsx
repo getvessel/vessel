@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Lock, Mail, User } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -42,18 +42,20 @@ export const RegisterForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="name" className="font-medium text-sm">
-          Full Name
+        <Label htmlFor="name" className="font-medium text-sm text-white/80">
+          Full name
         </Label>
         <div className="relative">
-          <div className="absolute top-3.5 left-3 text-muted-foreground">
-            <User className="h-5 w-5" />
+          <div className="absolute top-2.5 left-3 text-white/35">
+            <User className="h-4 w-4" />
           </div>
           <Input
             id="name"
             type="text"
             placeholder="John Doe"
-            className="h-12 bg-background pl-10 text-base"
+            autoComplete="name"
+            aria-invalid={!!errors.name}
+            className="h-10 border-white/10 bg-white/[0.055] pl-9 text-white placeholder:text-white/35"
             {...register('name')}
           />
         </div>
@@ -61,18 +63,20 @@ export const RegisterForm = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="font-medium text-sm">
+        <Label htmlFor="email" className="font-medium text-sm text-white/80">
           Email
         </Label>
         <div className="relative">
-          <div className="absolute top-3.5 left-3 text-muted-foreground">
-            <Mail className="h-5 w-5" />
+          <div className="absolute top-2.5 left-3 text-white/35">
+            <Mail className="h-4 w-4" />
           </div>
           <Input
             id="email"
             type="email"
             placeholder="name@example.com"
-            className="h-12 bg-background pl-10 text-base"
+            autoComplete="email"
+            aria-invalid={!!errors.email}
+            className="h-10 border-white/10 bg-white/[0.055] pl-9 text-white placeholder:text-white/35"
             {...register('email')}
           />
         </div>
@@ -80,36 +84,40 @@ export const RegisterForm = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="font-medium text-sm">
+        <Label htmlFor="password" className="font-medium text-sm text-white/80">
           Password
         </Label>
         <div className="relative">
-          <div className="absolute top-3.5 left-3 text-muted-foreground">
-            <Lock className="h-5 w-5" />
+          <div className="absolute top-2.5 left-3 text-white/35">
+            <Lock className="h-4 w-4" />
           </div>
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
-            className="h-12 bg-background pr-12 pl-10 text-base"
+            autoComplete="new-password"
+            aria-invalid={!!errors.password}
+            className="h-10 border-white/10 bg-white/[0.055] pr-10 pl-9 text-white"
             {...register('password')}
           />
           <button
             type="button"
-            className="absolute top-3.5 right-3 text-muted-foreground transition-colors hover:text-foreground"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            className="absolute top-2.5 right-3 text-white/35 transition-colors hover:text-white"
             onClick={() => setShowPassword(!showPassword)}
           >
-            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
         {errors.password ? (
           <p className="text-[13px] text-destructive">{errors.password.message}</p>
         ) : (
-          <p className="pt-1 text-muted-foreground text-xs">Must be at least 8 characters long.</p>
+          <p className="pt-1 text-white/45 text-xs">Must be at least 8 characters long.</p>
         )}
       </div>
 
-      <Button type="submit" className="mt-2 h-12 w-full font-medium text-base" disabled={isPending}>
-        {isPending ? 'Creating account...' : 'Create Account'}
+      <Button type="submit" className="mt-2 h-10 w-full font-medium" disabled={isPending}>
+        {isPending && <Loader2 className="size-4 animate-spin" />}
+        {isPending ? 'Creating account' : 'Create account'}
       </Button>
     </form>
   );

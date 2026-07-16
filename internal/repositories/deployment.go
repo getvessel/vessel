@@ -47,7 +47,7 @@ func (r *DeploymentRepo) Create(_ context.Context, d *models.Deployment) error {
 	_, err := r.db.Exec(`INSERT INTO deployments (
 		id, service_id, environment_id, project_id, status, commit_hash,
 		commit_message, branch, trigger, build_logs, container_id, created_at, updated_at, finished_at
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		d.ID, d.ServiceID, d.EnvironmentID, d.ProjectID, d.Status, d.CommitHash,
 		d.CommitMessage, d.Branch, d.Trigger, d.BuildLogs, d.ContainerID, d.CreatedAt, d.UpdatedAt, d.FinishedAt)
 	if err != nil {

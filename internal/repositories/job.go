@@ -47,7 +47,7 @@ func (r *JobRepo) Create(_ context.Context, j *models.Job) error {
 	}
 	_, err := r.db.Exec(`INSERT INTO jobs (
 		id, project_id, name, schedule, command, status, last_run_at, last_output, created_at, updated_at
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		j.ID, j.ProjectID, j.Name, j.Schedule, j.Command, j.Status, j.LastRunAt, j.LastOutput, j.CreatedAt, j.UpdatedAt)
 	return err
 }

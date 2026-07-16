@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -29,6 +30,15 @@ func NewSettingsRepo(db *sql.DB) *SettingsRepo {
 }
 
 const serverSettingsColumns = `id, traefik_wildcard_ip, discord_webhook_url, discord_ping_enabled, discord_enabled, slack_webhook_url, slack_enabled, telegram_bot_token, telegram_chat_id, telegram_enabled, smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name, smtp_from_address, smtp_enabled, resend_api_key, resend_enabled, pushover_user_key, pushover_api_token, pushover_enabled, generic_webhook_url, generic_webhook_enabled, notification_alerts, registration_enabled, registration_domain_allowlist, custom_dns_resolvers, dns_validation_enabled, ip_allowlist, mcp_server_enabled, default_wildcard_domain, site_name, public_ipv4, public_ipv6, show_sponsorship_popup, disable_two_step_confirmation, default_openai_key, default_anthropic_key, cloudflare_api_token, namecheap_api_user, namecheap_api_key, namecheap_client_ip, spaceship_api_key, update_check_cron, auto_update_enabled, concurrent_builds, deployment_timeout, server_timezone, docker_cleanup_cron, disk_usage_threshold, disk_usage_cron, current_version, latest_version, last_update_check, updated_at`
+
+func serverSettingsPlaceholders() string {
+	columns := strings.Split(serverSettingsColumns, ",")
+	placeholders := make([]string, len(columns))
+	for i := range placeholders {
+		placeholders[i] = "?"
+	}
+	return strings.Join(placeholders, ", ")
+}
 
 func scanServerSettings(scanner interface{ Scan(dest ...any) error }, cfg *models.ServerSettings) error {
 	return scanner.Scan(
@@ -80,7 +90,7 @@ func (r *SettingsRepo) GetServerSettings(ctx context.Context) (*models.ServerSet
 			UpdatedAt:            time.Now().UTC().Format(time.RFC3339),
 			ShowSponsorshipPopup: true,
 		}
-		query := fmt.Sprintf(`INSERT INTO server_settings (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, serverSettingsColumns)
+		query := fmt.Sprintf(`INSERT INTO server_settings (%s) VALUES (%s)`, serverSettingsColumns, serverSettingsPlaceholders())
 		_, _ = r.db.ExecContext(ctx, query, serverSettingsArgs(defaultSettings)...)
 		return defaultSettings, nil
 	}
@@ -98,7 +108,7 @@ func (r *SettingsRepo) UpdateServerSettings(ctx context.Context, cfg *models.Ser
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	query := fmt.Sprintf(`INSERT INTO server_settings (%s)
-	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	          VALUES (%s)
 	          ON CONFLICT(id) DO UPDATE SET
 	          traefik_wildcard_ip = excluded.traefik_wildcard_ip,
 	          discord_webhook_url = excluded.discord_webhook_url,
@@ -154,7 +164,7 @@ func (r *SettingsRepo) UpdateServerSettings(ctx context.Context, cfg *models.Ser
 	          current_version = excluded.current_version,
 	          latest_version = excluded.latest_version,
 	          last_update_check = excluded.last_update_check,
-	          updated_at = excluded.updated_at`, serverSettingsColumns)
+	          updated_at = excluded.updated_at`, serverSettingsColumns, serverSettingsPlaceholders())
 	_, err := r.db.ExecContext(ctx, query, serverSettingsArgs(cfg)...)
 	if err != nil {
 		return fmt.Errorf("failed to update server settings: %w", err)

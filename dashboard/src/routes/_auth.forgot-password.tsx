@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { AuthPageHeader } from '#/features/auth/auth-page-header';
 import { ForgotPasswordForm } from '#/features/auth/forgot-password-form';
 
 export const Route = createFileRoute('/_auth/forgot-password')({
@@ -15,12 +16,7 @@ function ForgotPasswordPage() {
 
   return (
     <div className="fade-in slide-in-from-bottom-4 animate-in duration-500">
-      <div className="mb-8 flex flex-col space-y-2 text-center">
-        <h1 className="font-semibold text-3xl text-foreground tracking-tight">
-          Reset your password
-        </h1>
-        <p className="text-muted-foreground text-sm">Enter your email to receive a reset link.</p>
-      </div>
+      <AuthPageHeader title="Reset your password" description="Receive a recovery link by email." />
 
       {!isLoading && emailEnabled === false ? (
         <Alert variant="destructive">

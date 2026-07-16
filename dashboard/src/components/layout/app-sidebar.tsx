@@ -6,10 +6,8 @@ import {
   Download,
   FolderKanban,
   HardDrive,
-  Heart,
   LayoutDashboard,
   LayoutTemplate,
-  MessageSquare,
   ScrollText,
   Settings,
   Terminal,
@@ -46,7 +44,6 @@ const navGroups: NavGroup[] = [
         title: 'Templates',
         url: '/templates',
         icon: LayoutTemplate,
-        badge: '280+',
       },
       { title: 'Import', url: '/imports/railway', icon: Download },
     ],
@@ -57,8 +54,12 @@ const navGroups: NavGroup[] = [
       { title: 'Notifications', url: '/notifications', icon: Bell },
       { title: 'Audit Logs', url: '/audit-logs', icon: ScrollText },
       { title: 'Terminal', url: '/terminal', icon: Terminal },
+<<<<<<< HEAD
       { title: 'Users', url: '/settings/users', icon: Users },
       { title: 'Settings', url: '/settings', icon: Settings },
+=======
+      { title: 'Settings', url: '/settings', icon: Settings, exact: true },
+>>>>>>> ebe5d02 (feat: ui/ux revamp)
     ],
   },
 ];
@@ -68,18 +69,6 @@ const bottomNav = [
     title: 'Docs',
     url: 'https://docs.vessl.com',
     icon: ScrollText,
-    external: true,
-  },
-  {
-    title: 'Feedback',
-    url: 'https://feedback.vessl.com',
-    icon: MessageSquare,
-    external: true,
-  },
-  {
-    title: 'Sponsor us',
-    url: 'https://github.com/sponsors/vessl',
-    icon: Heart,
     external: true,
   },
 ];

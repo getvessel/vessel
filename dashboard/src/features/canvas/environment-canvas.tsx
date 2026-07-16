@@ -1,1 +1,3 @@
-export const CanvasEditor = () => <div>CanvasEditor Component</div>;
+import { CanvasGridPanel } from './canvas-grid-panel';
+
+export const CanvasEditor = () => <CanvasGridPanel />;

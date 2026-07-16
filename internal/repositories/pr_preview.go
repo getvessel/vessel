@@ -27,7 +27,7 @@ func NewPRPreviewRepository(db *sql.DB) PRPreviewRepository {
 
 func (r *prPreviewRepo) Create(ctx context.Context, p *models.PRPreview) error {
 	q := `INSERT INTO pr_previews (id, service_id, project_id, pr_number, branch, commit_hash, status, preview_domain, container_id, created_at, updated_at)
-	      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	_, err := r.db.ExecContext(ctx, q, p.ID, p.ServiceID, p.ProjectID, p.PRNumber, p.Branch, p.CommitHash, p.Status, p.PreviewDomain, p.ContainerID, p.CreatedAt, p.UpdatedAt)
 	return err
 }

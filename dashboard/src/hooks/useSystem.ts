@@ -2,6 +2,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { RailwayImportRequest } from '#/interfaces/system';
 import { systemService } from '#/services/system';
 
+export const useGetSystemStats = () => {
+  return useQuery({
+    queryKey: ['system', 'stats'],
+    queryFn: () => systemService.getSystemStats(),
+    refetchInterval: 30_000,
+  });
+};
+
 export const useExportSystem = () => {
   return useQuery({
     queryKey: ['system', 'export'],

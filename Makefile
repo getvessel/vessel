@@ -81,7 +81,7 @@ dev:
 
 dev-daemon:
 	@echo "🚀 Running Go daemon in dev mode..."
-	go run ./cmd/vessld
+	VESSL_SKIP_TRAEFIK=true go run -tags dev ./cmd/vessld
 
 dev-dashboard:
 	@echo "💻 Running Dashboard dev server on port 3000..."

@@ -137,3 +137,26 @@ body {
     color: var(--foreground);
   }
 }
+
+@layer utilities {
+  .page-transition {
+    animation: page-enter 160ms ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-transition {
+      animation: none;
+    }
+  }
+
+  @keyframes page-enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

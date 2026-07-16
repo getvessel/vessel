@@ -45,7 +45,7 @@ func (r *sqliteServerlessRepo) SaveCode(ctx context.Context, serviceID, runtime,
 	}
 
 	id := uuid.New().String()
-	query := `INSERT INTO serverless_functions_code (id, service_id, runtime, code_content, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`
+	query := `INSERT INTO serverless_functions_code (id, service_id, runtime, code_content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`
 	_, err = r.db.ExecContext(ctx, query, id, serviceID, runtime, codeContent, now, now)
 	if err != nil {
 		return nil, err
