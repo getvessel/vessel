@@ -2,7 +2,12 @@ package handlers
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -22,6 +27,7 @@ type WebhookHandler struct {
 	appService        *services.AppService
 	deploymentService *services.DeploymentService
 	prPreviewService  *services.PRPreviewService
+	gitAppsService    *services.GitAppsService
 }
 
 func NewWebhookHandler(
@@ -30,6 +36,7 @@ func NewWebhookHandler(
 	appService *services.AppService,
 	deploymentService *services.DeploymentService,
 	prPreviewService *services.PRPreviewService,
+	gitAppsService *services.GitAppsService,
 ) *WebhookHandler {
 	return &WebhookHandler{
 		gitService:        gitService,
@@ -37,6 +44,7 @@ func NewWebhookHandler(
 		appService:        appService,
 		deploymentService: deploymentService,
 		prPreviewService:  prPreviewService,
+		gitAppsService:    gitAppsService,
 	}
 }
 
@@ -108,6 +116,16 @@ func (h *WebhookHandler) deployServiceAsync(appSvc *models.AppService) {
 	}()
 }
 
+func verifyHMAC(payload []byte, secret, signature string) bool {
+	if secret == "" {
+		return false
+	}
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write(payload)
+	expectedMAC := "sha256=" + hex.EncodeToString(mac.Sum(nil))
+	return hmac.Equal([]byte(expectedMAC), []byte(signature))
+}
+
 // @Summary HandleGitHubWebhook endpoint
 // @Description HandleGitHubWebhook endpoint
 // @Tags Webhooks
@@ -125,10 +143,36 @@ func (h *WebhookHandler) HandleGitHubWebhook(c echo.Context) error {
 	if event == "" {
 		return utils.Error(c, http.StatusBadRequest, "missing X-GitHub-Event header")
 	}
+
+	bodyBytes, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		return utils.Error(c, http.StatusBadRequest, "failed to read body")
+	}
+
+	signature := c.Request().Header.Get("X-Hub-Signature-256")
+	if signature != "" {
+		apps, err := h.gitAppsService.ListGithubApps(c.Request().Context())
+		if err != nil {
+			return utils.Error(c, http.StatusInternalServerError, "failed to check webhook secrets")
+		}
+
+		valid := false
+		for _, app := range apps {
+			if verifyHMAC(bodyBytes, app.WebhookSecret, signature) {
+				valid = true
+				break
+			}
+		}
+		if !valid {
+			return utils.Error(c, http.StatusUnauthorized, "invalid webhook signature")
+		}
+	}
+
 	var payload models.GithubWebhookPayload
-	if err := c.Bind(&payload); err != nil {
+	if err := json.Unmarshal(bodyBytes, &payload); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid payload")
 	}
+
 	if event == "pull_request" {
 		switch payload.Action {
 		case "opened", "synchronize", "reopened":

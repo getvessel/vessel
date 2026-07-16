@@ -161,7 +161,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	authHandler := handlers.NewAuthHandler(authService)
 	oAuthHandler := handlers.NewOAuthHandler(oAuthService)
 	gitHandler := handlers.NewGitHandler(gitService)
-	webhookHandler := handlers.NewWebhookHandler(gitService, projectService, appService, deploymentService, prPreviewService)
+	webhookHandler := handlers.NewWebhookHandler(gitService, projectService, appService, deploymentService, prPreviewService, gitAppsService)
 	projectHandler := handlers.NewProjectHandler(projectService)
 	environmentHandler := handlers.NewEnvironmentHandler(environmentService)
 	domainHandler := handlers.NewDomainHandler(environmentService)
