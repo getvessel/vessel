@@ -55,7 +55,15 @@ export const apiClient = {
 
     if (response.status === 401) {
       authActions.logout();
-      window.location.href = '/signin';
+      if (
+        !window.location.pathname.startsWith('/signin') &&
+        !window.location.pathname.startsWith('/signup') &&
+        !window.location.pathname.startsWith('/forgot-password') &&
+        !window.location.pathname.startsWith('/reset-password') &&
+        !window.location.pathname.startsWith('/setup')
+      ) {
+        window.location.href = '/signin';
+      }
       throw new ApiError(401, 'Session expired. Please log in again.');
     }
 
@@ -100,7 +108,15 @@ export const apiClient = {
 
     if (response.status === 401) {
       authActions.logout();
-      window.location.href = '/signin';
+      if (
+        !window.location.pathname.startsWith('/signin') &&
+        !window.location.pathname.startsWith('/signup') &&
+        !window.location.pathname.startsWith('/forgot-password') &&
+        !window.location.pathname.startsWith('/reset-password') &&
+        !window.location.pathname.startsWith('/setup')
+      ) {
+        window.location.href = '/signin';
+      }
       throw new ApiError(401, 'Session expired. Please log in again.');
     }
 
