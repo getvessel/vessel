@@ -29,7 +29,6 @@ const navGroups: NavGroup[] = [
     items: [
       { title: 'Dashboard', url: '/', icon: LayoutDashboard, exact: true },
       { title: 'Projects', url: '/projects', icon: FolderKanban },
-      { title: 'Teams', url: '/teams', icon: Users },
     ],
   },
   {
@@ -58,6 +57,7 @@ const navGroups: NavGroup[] = [
       { title: 'Notifications', url: '/notifications', icon: Bell },
       { title: 'Audit Logs', url: '/audit-logs', icon: ScrollText },
       { title: 'Terminal', url: '/terminal', icon: Terminal },
+      { title: 'Users', url: '/settings/users', icon: Users },
       { title: 'Settings', url: '/settings', icon: Settings },
     ],
   },

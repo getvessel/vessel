@@ -15,7 +15,6 @@ import { Route as SplatRouteImport } from './routes/$'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard.index'
 import { Route as DashboardTerminalRouteImport } from './routes/_dashboard.terminal'
 import { Route as DashboardTemplatesRouteImport } from './routes/_dashboard.templates'
-import { Route as DashboardTeamsRouteImport } from './routes/_dashboard.teams'
 import { Route as DashboardProjectsRouteImport } from './routes/_dashboard.projects'
 import { Route as DashboardNotificationsRouteImport } from './routes/_dashboard.notifications'
 import { Route as DashboardDatabasesRouteImport } from './routes/_dashboard.databases'
@@ -80,11 +79,6 @@ const DashboardTerminalRoute = DashboardTerminalRouteImport.update({
 const DashboardTemplatesRoute = DashboardTemplatesRouteImport.update({
   id: '/templates',
   path: '/templates',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
-  id: '/teams',
-  path: '/teams',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
@@ -306,7 +300,6 @@ export interface FileRoutesByFullPath {
   '/databases': typeof DashboardDatabasesRouteWithChildren
   '/notifications': typeof DashboardNotificationsRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
-  '/teams': typeof DashboardTeamsRoute
   '/templates': typeof DashboardTemplatesRoute
   '/terminal': typeof DashboardTerminalRoute
   '/imports/railway': typeof DashboardImportsRailwayRoute
@@ -350,7 +343,6 @@ export interface FileRoutesByTo {
   '/databases': typeof DashboardDatabasesRouteWithChildren
   '/notifications': typeof DashboardNotificationsRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
-  '/teams': typeof DashboardTeamsRoute
   '/templates': typeof DashboardTemplatesRoute
   '/terminal': typeof DashboardTerminalRoute
   '/imports/railway': typeof DashboardImportsRailwayRoute
@@ -396,7 +388,6 @@ export interface FileRoutesById {
   '/_dashboard/databases': typeof DashboardDatabasesRouteWithChildren
   '/_dashboard/notifications': typeof DashboardNotificationsRoute
   '/_dashboard/projects': typeof DashboardProjectsRouteWithChildren
-  '/_dashboard/teams': typeof DashboardTeamsRoute
   '/_dashboard/templates': typeof DashboardTemplatesRoute
   '/_dashboard/terminal': typeof DashboardTerminalRoute
   '/_dashboard/': typeof DashboardIndexRoute
@@ -443,7 +434,6 @@ export interface FileRouteTypes {
     | '/databases'
     | '/notifications'
     | '/projects'
-    | '/teams'
     | '/templates'
     | '/terminal'
     | '/imports/railway'
@@ -487,7 +477,6 @@ export interface FileRouteTypes {
     | '/databases'
     | '/notifications'
     | '/projects'
-    | '/teams'
     | '/templates'
     | '/terminal'
     | '/imports/railway'
@@ -532,7 +521,6 @@ export interface FileRouteTypes {
     | '/_dashboard/databases'
     | '/_dashboard/notifications'
     | '/_dashboard/projects'
-    | '/_dashboard/teams'
     | '/_dashboard/templates'
     | '/_dashboard/terminal'
     | '/_dashboard/'
@@ -614,13 +602,6 @@ declare module '@tanstack/react-router' {
       path: '/templates'
       fullPath: '/templates'
       preLoaderRoute: typeof DashboardTemplatesRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/teams': {
-      id: '/_dashboard/teams'
-      path: '/teams'
-      fullPath: '/teams'
-      preLoaderRoute: typeof DashboardTeamsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/projects': {
@@ -946,7 +927,6 @@ interface DashboardRouteChildren {
   DashboardDatabasesRoute: typeof DashboardDatabasesRouteWithChildren
   DashboardNotificationsRoute: typeof DashboardNotificationsRoute
   DashboardProjectsRoute: typeof DashboardProjectsRouteWithChildren
-  DashboardTeamsRoute: typeof DashboardTeamsRoute
   DashboardTemplatesRoute: typeof DashboardTemplatesRoute
   DashboardTerminalRoute: typeof DashboardTerminalRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -976,7 +956,6 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardDatabasesRoute: DashboardDatabasesRouteWithChildren,
   DashboardNotificationsRoute: DashboardNotificationsRoute,
   DashboardProjectsRoute: DashboardProjectsRouteWithChildren,
-  DashboardTeamsRoute: DashboardTeamsRoute,
   DashboardTemplatesRoute: DashboardTemplatesRoute,
   DashboardTerminalRoute: DashboardTerminalRoute,
   DashboardIndexRoute: DashboardIndexRoute,

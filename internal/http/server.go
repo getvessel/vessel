@@ -60,6 +60,7 @@ type Server struct {
 	migrationHandler       *handlers.MigrationHandler
 	onboardingHandler      *handlers.OnboardingHandler
 	railwayHandler         *handlers.RailwayHandler
+	dnsHandler             *handlers.DNSHandler
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

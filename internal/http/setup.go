@@ -79,6 +79,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	domainSQLiteRepository := repositories.NewDomainSQLiteRepository(db)
 	gitAppSQLiteRepository := repositories.NewGitAppSQLiteRepository(db, v)
 	vercelRepository := repositories.NewVercelRepository(db, v)
+	dnsSQLiteRepository := repositories.NewDNSSQLiteRepository(db)
 
 	httpEngineAdapter := newEngineAdapter(settingsSQLiteRepository, appServiceSQLiteRepository, envSQLiteRepository, databaseSQLiteRepository, storageSQLiteRepository, projectSQLiteRepository, jobSQLiteRepository, backupSQLiteRepository, s3DestinationSQLiteRepository, serviceVarSQLiteRepository, serverlessRepository)
 	databaseDeployer := engine.NewDatabaseDeployer(dockerClient, httpEngineAdapter)
@@ -131,6 +132,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	gitAppsService := services.NewGitAppsService(gitAppSQLiteRepository)
 	vercelService := services.NewVercelService(vercelRepository)
 	serverlessService := services.NewServerlessService(serverlessRepository)
+	dnsService := services.NewDNSService(dnsSQLiteRepository, dnsProviderService)
 
 	updaterService := services.NewUpdaterService(settingsSQLiteRepository)
 	updaterService.Start(context.Background())
@@ -178,6 +180,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	onboardingHandler := handlers.NewOnboardingHandler(userService, authService, settingsService)
 	railwayService := services.NewRailwayService(projectService, environmentService, appService, databaseService)
 	railwayHandler := handlers.NewRailwayHandler(railwayService)
+	dnsHandler := handlers.NewDNSHandler(dnsService)
 	authLimiter := middleware.NewRateLimiter(10, time.Minute)
 
 	srv := &Server{
@@ -224,6 +227,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		migrationHandler:       migrationHandler,
 		onboardingHandler:      onboardingHandler,
 		railwayHandler:         railwayHandler,
+		dnsHandler:             dnsHandler,
 	}
 
 	if srv.deployer != nil {
