@@ -22,15 +22,15 @@ type OAuthRepository interface {
 	UpdateUserTOTP(ctx context.Context, userID string, enabled bool, secret string, recoveryCodes []string) error
 }
 
-type OAuthSQLiteRepository struct {
+type OAuthRepo struct {
 	db *sqlx.DB
 }
 
-func NewOAuthSQLiteRepository(db *sql.DB) *OAuthSQLiteRepository {
-	return &OAuthSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewOAuthRepo(db *sql.DB) *OAuthRepo {
+	return &OAuthRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *OAuthSQLiteRepository) ListProviders(ctx context.Context) ([]models.OAuthProviderConfig, error) {
+func (r *OAuthRepo) ListProviders(ctx context.Context) ([]models.OAuthProviderConfig, error) {
 	query := `SELECT id, provider_name, enabled, COALESCE(client_id, '') AS client_id, COALESCE(client_secret, '') AS client_secret, COALESCE(redirect_uri, '') AS redirect_uri, COALESCE(base_url, '') AS base_url, COALESCE(tenant, '') AS tenant, created_at, updated_at FROM oauth_providers ORDER BY provider_name ASC`
 	var providers []models.OAuthProviderConfig
 	err := r.db.SelectContext(ctx, &providers, query)
@@ -43,7 +43,7 @@ func (r *OAuthSQLiteRepository) ListProviders(ctx context.Context) ([]models.OAu
 	return providers, nil
 }
 
-func (r *OAuthSQLiteRepository) GetProvider(ctx context.Context, idOrName string) (*models.OAuthProviderConfig, error) {
+func (r *OAuthRepo) GetProvider(ctx context.Context, idOrName string) (*models.OAuthProviderConfig, error) {
 	query := `SELECT id, provider_name, enabled, COALESCE(client_id, '') AS client_id, COALESCE(client_secret, '') AS client_secret, COALESCE(redirect_uri, '') AS redirect_uri, COALESCE(base_url, '') AS base_url, COALESCE(tenant, '') AS tenant, created_at, updated_at FROM oauth_providers WHERE id = ? OR provider_name = ?`
 	var p models.OAuthProviderConfig
 	err := r.db.GetContext(ctx, &p, query, idOrName, idOrName)
@@ -56,7 +56,7 @@ func (r *OAuthSQLiteRepository) GetProvider(ctx context.Context, idOrName string
 	return &p, nil
 }
 
-func (r *OAuthSQLiteRepository) SaveProvider(ctx context.Context, p *models.OAuthProviderConfig) error {
+func (r *OAuthRepo) SaveProvider(ctx context.Context, p *models.OAuthProviderConfig) error {
 	now := time.Now().UTC()
 	if p.CreatedAt.IsZero() {
 		p.CreatedAt = now
@@ -81,7 +81,7 @@ func (r *OAuthSQLiteRepository) SaveProvider(ctx context.Context, p *models.OAut
 	return nil
 }
 
-func (r *OAuthSQLiteRepository) GetUserTOTPSecret(ctx context.Context, userID string) (string, []string, error) {
+func (r *OAuthRepo) GetUserTOTPSecret(ctx context.Context, userID string) (string, []string, error) {
 	var secret string
 	var recovery string
 	err := r.db.QueryRowContext(ctx, `SELECT COALESCE(totp_secret, ''), COALESCE(recovery_codes, '') FROM users WHERE id = ?`, userID).Scan(&secret, &recovery)
@@ -99,7 +99,7 @@ func (r *OAuthSQLiteRepository) GetUserTOTPSecret(ctx context.Context, userID st
 	return secret, codes, nil
 }
 
-func (r *OAuthSQLiteRepository) UpdateUserTOTP(ctx context.Context, userID string, enabled bool, secret string, recoveryCodes []string) error {
+func (r *OAuthRepo) UpdateUserTOTP(ctx context.Context, userID string, enabled bool, secret string, recoveryCodes []string) error {
 	recoveryStr := strings.Join(recoveryCodes, ",")
 	_, err := r.db.ExecContext(ctx, `UPDATE users SET totp_enabled = ?, totp_secret = ?, recovery_codes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, enabled, secret, recoveryStr, userID)
 	if err != nil {

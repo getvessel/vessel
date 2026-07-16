@@ -23,16 +23,16 @@ type DeploymentRepository interface {
 	UpdateStatus(ctx context.Context, id string, status models.DeploymentStatus, buildLogs, containerID string) error
 }
 
-type DeploymentSQLiteRepository struct {
+type DeploymentRepo struct {
 	db *sqlx.DB
 	mu sync.Mutex
 }
 
-func NewDeploymentSQLiteRepository(db *sql.DB) *DeploymentSQLiteRepository {
-	return &DeploymentSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewDeploymentRepo(db *sql.DB) *DeploymentRepo {
+	return &DeploymentRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *DeploymentSQLiteRepository) Create(_ context.Context, d *models.Deployment) error {
+func (r *DeploymentRepo) Create(_ context.Context, d *models.Deployment) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if d.ID == "" {
@@ -56,7 +56,7 @@ func (r *DeploymentSQLiteRepository) Create(_ context.Context, d *models.Deploym
 	return nil
 }
 
-func (r *DeploymentSQLiteRepository) GetByID(ctx context.Context, id string) (*models.Deployment, error) {
+func (r *DeploymentRepo) GetByID(ctx context.Context, id string) (*models.Deployment, error) {
 	var d models.Deployment
 	err := r.db.GetContext(ctx, &d, `SELECT id, service_id, environment_id, project_id, status, commit_hash,
 		commit_message, branch, trigger, build_logs, container_id, created_at, updated_at, finished_at
@@ -70,7 +70,7 @@ func (r *DeploymentSQLiteRepository) GetByID(ctx context.Context, id string) (*m
 	return &d, nil
 }
 
-func (r *DeploymentSQLiteRepository) ListByService(ctx context.Context, serviceID string, limit, offset int) ([]*models.Deployment, int, error) {
+func (r *DeploymentRepo) ListByService(ctx context.Context, serviceID string, limit, offset int) ([]*models.Deployment, int, error) {
 	var total int
 	if err := r.db.GetContext(ctx, &total, `SELECT COUNT(*) FROM deployments WHERE service_id = ?`, serviceID); err != nil {
 		return nil, 0, err
@@ -89,7 +89,7 @@ func (r *DeploymentSQLiteRepository) ListByService(ctx context.Context, serviceI
 	return deps, total, nil
 }
 
-func (r *DeploymentSQLiteRepository) Update(_ context.Context, d *models.Deployment) error {
+func (r *DeploymentRepo) Update(_ context.Context, d *models.Deployment) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	d.UpdatedAt = time.Now().UTC()
@@ -99,7 +99,7 @@ func (r *DeploymentSQLiteRepository) Update(_ context.Context, d *models.Deploym
 	return err
 }
 
-func (r *DeploymentSQLiteRepository) UpdateStatus(_ context.Context, id string, status models.DeploymentStatus, buildLogs, containerID string) error {
+func (r *DeploymentRepo) UpdateStatus(_ context.Context, id string, status models.DeploymentStatus, buildLogs, containerID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	now := time.Now().UTC()

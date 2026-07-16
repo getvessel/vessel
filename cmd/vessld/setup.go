@@ -19,7 +19,7 @@ func runSetup() {
 
 	_, db, _ := initDataDir()
 
-	repo := repositories.NewUserSQLiteRepository(db)
+	repo := repositories.NewUserRepo(db)
 
 	users, _, _ := repo.ListUsers(context.Background(), 1, 0)
 	if len(users) > 0 {

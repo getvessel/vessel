@@ -22,16 +22,16 @@ type DNSRepository interface {
 	Update(ctx context.Context, record *models.DNSRecord) error
 }
 
-type DNSSQLiteRepository struct {
+type DNSRepo struct {
 	db *sqlx.DB
 	mu sync.Mutex
 }
 
-func NewDNSSQLiteRepository(db *sql.DB) *DNSSQLiteRepository {
-	return &DNSSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewDNSRepo(db *sql.DB) *DNSRepo {
+	return &DNSRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *DNSSQLiteRepository) Create(_ context.Context, record *models.DNSRecord) error {
+func (r *DNSRepo) Create(_ context.Context, record *models.DNSRecord) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -52,7 +52,7 @@ func (r *DNSSQLiteRepository) Create(_ context.Context, record *models.DNSRecord
 	return err
 }
 
-func (r *DNSSQLiteRepository) GetByID(_ context.Context, id string) (*models.DNSRecord, error) {
+func (r *DNSRepo) GetByID(_ context.Context, id string) (*models.DNSRecord, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -64,7 +64,7 @@ func (r *DNSSQLiteRepository) GetByID(_ context.Context, id string) (*models.DNS
 	return &record, err
 }
 
-func (r *DNSSQLiteRepository) ListByDomain(_ context.Context, domainName string) ([]*models.DNSRecord, error) {
+func (r *DNSRepo) ListByDomain(_ context.Context, domainName string) ([]*models.DNSRecord, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -79,7 +79,7 @@ func (r *DNSSQLiteRepository) ListByDomain(_ context.Context, domainName string)
 	return list, nil
 }
 
-func (r *DNSSQLiteRepository) Update(_ context.Context, record *models.DNSRecord) error {
+func (r *DNSRepo) Update(_ context.Context, record *models.DNSRecord) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -89,7 +89,7 @@ func (r *DNSSQLiteRepository) Update(_ context.Context, record *models.DNSRecord
 	return err
 }
 
-func (r *DNSSQLiteRepository) Delete(_ context.Context, id string) error {
+func (r *DNSRepo) Delete(_ context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 

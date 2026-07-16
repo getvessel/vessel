@@ -21,16 +21,16 @@ type GitRepository interface {
 	DeleteProvider(ctx context.Context, userID, provider string) error
 }
 
-type GitSQLiteRepository struct {
+type GitRepo struct {
 	db    *sqlx.DB
 	vault Vault
 }
 
-func NewGitSQLiteRepository(db *sql.DB, vault Vault) *GitSQLiteRepository {
-	return &GitSQLiteRepository{db: sqlx.NewDb(db, "sqlite"), vault: vault}
+func NewGitRepo(db *sql.DB, vault Vault) *GitRepo {
+	return &GitRepo{db: sqlx.NewDb(db, "sqlite"), vault: vault}
 }
 
-func (r *GitSQLiteRepository) SaveProvider(ctx context.Context, gp *models.GitProviderConfig) error {
+func (r *GitRepo) SaveProvider(ctx context.Context, gp *models.GitProviderConfig) error {
 	if gp.ID == "" {
 		gp.ID = uuid.NewString()
 	}
@@ -50,7 +50,7 @@ func (r *GitSQLiteRepository) SaveProvider(ctx context.Context, gp *models.GitPr
 	return err
 }
 
-func (r *GitSQLiteRepository) GetProvider(ctx context.Context, userID, provider string) (*models.GitProviderConfig, error) {
+func (r *GitRepo) GetProvider(ctx context.Context, userID, provider string) (*models.GitProviderConfig, error) {
 	if userID == "" {
 		return r.GetAnyProviderByType(ctx, provider)
 	}
@@ -71,7 +71,7 @@ func (r *GitSQLiteRepository) GetProvider(ctx context.Context, userID, provider 
 	return &gp, nil
 }
 
-func (r *GitSQLiteRepository) GetAnyProviderByType(ctx context.Context, provider string) (*models.GitProviderConfig, error) {
+func (r *GitRepo) GetAnyProviderByType(ctx context.Context, provider string) (*models.GitProviderConfig, error) {
 	var gp models.GitProviderConfig
 	err := r.db.GetContext(ctx, &gp, `SELECT id, user_id, provider, encrypted_access_token, account_name, created_at, updated_at
 		FROM user_git_providers WHERE provider = ? LIMIT 1`, provider)
@@ -89,7 +89,7 @@ func (r *GitSQLiteRepository) GetAnyProviderByType(ctx context.Context, provider
 	return &gp, nil
 }
 
-func (r *GitSQLiteRepository) ListProvidersByUser(ctx context.Context, userID string) ([]*models.GitProviderConfig, error) {
+func (r *GitRepo) ListProvidersByUser(ctx context.Context, userID string) ([]*models.GitProviderConfig, error) {
 	var list []*models.GitProviderConfig
 	err := r.db.SelectContext(ctx, &list, `SELECT id, user_id, provider, encrypted_access_token, account_name, created_at, updated_at
 		FROM user_git_providers WHERE user_id = ?`, userID)
@@ -106,7 +106,7 @@ func (r *GitSQLiteRepository) ListProvidersByUser(ctx context.Context, userID st
 	return list, nil
 }
 
-func (r *GitSQLiteRepository) DeleteProvider(ctx context.Context, userID, provider string) error {
+func (r *GitRepo) DeleteProvider(ctx context.Context, userID, provider string) error {
 	_, err := r.db.ExecContext(ctx, `DELETE FROM user_git_providers WHERE user_id = ? AND provider = ?`, userID, provider)
 	return err
 }

@@ -26,7 +26,7 @@ func runDatabases(args []string) {
 	_, db, vlt := initDataDir()
 	defer db.Close()
 
-	dbRepo := repositories.NewDatabaseSQLiteRepository(db, vlt)
+	dbRepo := repositories.NewDatabaseRepo(db, vlt)
 
 	cmd := args[0]
 

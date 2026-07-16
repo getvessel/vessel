@@ -31,13 +31,13 @@ type GitAppRepository interface {
 	DeleteBitbucketApp(ctx context.Context, id string) error
 }
 
-type GitAppSQLiteRepository struct {
+type GitAppRepo struct {
 	db    *sqlx.DB
 	vault Vault
 }
 
-func NewGitAppSQLiteRepository(db *sql.DB, vault Vault) *GitAppSQLiteRepository {
-	return &GitAppSQLiteRepository{db: sqlx.NewDb(db, "sqlite"), vault: vault}
+func NewGitAppRepo(db *sql.DB, vault Vault) *GitAppRepo {
+	return &GitAppRepo{db: sqlx.NewDb(db, "sqlite"), vault: vault}
 }
 
 func saveApp(ctx context.Context, db *sqlx.DB, tableName string, columns []string, values []any) error {
@@ -74,7 +74,7 @@ func deleteApp(ctx context.Context, db *sqlx.DB, tableName, id string) error {
 	return err
 }
 
-func (r *GitAppSQLiteRepository) ListGithubApps(ctx context.Context) ([]models.GithubApp, error) {
+func (r *GitAppRepo) ListGithubApps(ctx context.Context) ([]models.GithubApp, error) {
 	query := `SELECT id, name, app_id, installation_id, client_id, is_public, created_at, updated_at FROM github_apps`
 	var apps []models.GithubApp
 	if err := r.db.SelectContext(ctx, &apps, query); err != nil {
@@ -86,7 +86,7 @@ func (r *GitAppSQLiteRepository) ListGithubApps(ctx context.Context) ([]models.G
 	return apps, nil
 }
 
-func (r *GitAppSQLiteRepository) GetGithubApp(ctx context.Context, id string) (*models.GithubApp, error) {
+func (r *GitAppRepo) GetGithubApp(ctx context.Context, id string) (*models.GithubApp, error) {
 	query := `SELECT id, name, app_id, installation_id, client_id, client_secret, webhook_secret, private_key, is_public, created_at, updated_at FROM github_apps WHERE id = ?`
 	var a models.GithubApp
 	if err := r.db.GetContext(ctx, &a, query, id); err != nil {
@@ -107,7 +107,7 @@ func (r *GitAppSQLiteRepository) GetGithubApp(ctx context.Context, id string) (*
 	return &a, nil
 }
 
-func (r *GitAppSQLiteRepository) SaveGithubApp(ctx context.Context, app *models.GithubApp) error {
+func (r *GitAppRepo) SaveGithubApp(ctx context.Context, app *models.GithubApp) error {
 	cs, _ := r.vault.Encrypt(app.ClientSecret)
 	ws, _ := r.vault.Encrypt(app.WebhookSecret)
 	pk, _ := r.vault.Encrypt(app.PrivateKey)
@@ -121,11 +121,11 @@ func (r *GitAppSQLiteRepository) SaveGithubApp(ctx context.Context, app *models.
 	return saveApp(ctx, r.db, "github_apps", cols, vals)
 }
 
-func (r *GitAppSQLiteRepository) DeleteGithubApp(ctx context.Context, id string) error {
+func (r *GitAppRepo) DeleteGithubApp(ctx context.Context, id string) error {
 	return deleteApp(ctx, r.db, "github_apps", id)
 }
 
-func (r *GitAppSQLiteRepository) ListGitlabApps(ctx context.Context) ([]models.GitlabApp, error) {
+func (r *GitAppRepo) ListGitlabApps(ctx context.Context) ([]models.GitlabApp, error) {
 	query := `SELECT id, name, app_id, api_url, is_public, created_at, updated_at FROM gitlab_apps`
 	var apps []models.GitlabApp
 	if err := r.db.SelectContext(ctx, &apps, query); err != nil {
@@ -137,7 +137,7 @@ func (r *GitAppSQLiteRepository) ListGitlabApps(ctx context.Context) ([]models.G
 	return apps, nil
 }
 
-func (r *GitAppSQLiteRepository) GetGitlabApp(ctx context.Context, id string) (*models.GitlabApp, error) {
+func (r *GitAppRepo) GetGitlabApp(ctx context.Context, id string) (*models.GitlabApp, error) {
 	query := `SELECT id, name, app_id, app_secret, webhook_secret, api_url, is_public, created_at, updated_at FROM gitlab_apps WHERE id = ?`
 	var a models.GitlabApp
 	if err := r.db.GetContext(ctx, &a, query, id); err != nil {
@@ -155,7 +155,7 @@ func (r *GitAppSQLiteRepository) GetGitlabApp(ctx context.Context, id string) (*
 	return &a, nil
 }
 
-func (r *GitAppSQLiteRepository) SaveGitlabApp(ctx context.Context, app *models.GitlabApp) error {
+func (r *GitAppRepo) SaveGitlabApp(ctx context.Context, app *models.GitlabApp) error {
 	as, _ := r.vault.Encrypt(app.AppSecret)
 	ws, _ := r.vault.Encrypt(app.WebhookSecret)
 	if app.CreatedAt.IsZero() {
@@ -168,11 +168,11 @@ func (r *GitAppSQLiteRepository) SaveGitlabApp(ctx context.Context, app *models.
 	return saveApp(ctx, r.db, "gitlab_apps", cols, vals)
 }
 
-func (r *GitAppSQLiteRepository) DeleteGitlabApp(ctx context.Context, id string) error {
+func (r *GitAppRepo) DeleteGitlabApp(ctx context.Context, id string) error {
 	return deleteApp(ctx, r.db, "gitlab_apps", id)
 }
 
-func (r *GitAppSQLiteRepository) ListBitbucketApps(ctx context.Context) ([]models.BitbucketApp, error) {
+func (r *GitAppRepo) ListBitbucketApps(ctx context.Context) ([]models.BitbucketApp, error) {
 	query := `SELECT id, name, owner, client_id, is_public, created_at, updated_at FROM bitbucket_apps`
 	var apps []models.BitbucketApp
 	if err := r.db.SelectContext(ctx, &apps, query); err != nil {
@@ -184,7 +184,7 @@ func (r *GitAppSQLiteRepository) ListBitbucketApps(ctx context.Context) ([]model
 	return apps, nil
 }
 
-func (r *GitAppSQLiteRepository) GetBitbucketApp(ctx context.Context, id string) (*models.BitbucketApp, error) {
+func (r *GitAppRepo) GetBitbucketApp(ctx context.Context, id string) (*models.BitbucketApp, error) {
 	query := `SELECT id, name, owner, client_id, client_secret, webhook_secret, is_public, created_at, updated_at FROM bitbucket_apps WHERE id = ?`
 	var a models.BitbucketApp
 	if err := r.db.GetContext(ctx, &a, query, id); err != nil {
@@ -202,7 +202,7 @@ func (r *GitAppSQLiteRepository) GetBitbucketApp(ctx context.Context, id string)
 	return &a, nil
 }
 
-func (r *GitAppSQLiteRepository) SaveBitbucketApp(ctx context.Context, app *models.BitbucketApp) error {
+func (r *GitAppRepo) SaveBitbucketApp(ctx context.Context, app *models.BitbucketApp) error {
 	cs, _ := r.vault.Encrypt(app.ClientSecret)
 	ws, _ := r.vault.Encrypt(app.WebhookSecret)
 	if app.CreatedAt.IsZero() {
@@ -215,6 +215,6 @@ func (r *GitAppSQLiteRepository) SaveBitbucketApp(ctx context.Context, app *mode
 	return saveApp(ctx, r.db, "bitbucket_apps", cols, vals)
 }
 
-func (r *GitAppSQLiteRepository) DeleteBitbucketApp(ctx context.Context, id string) error {
+func (r *GitAppRepo) DeleteBitbucketApp(ctx context.Context, id string) error {
 	return deleteApp(ctx, r.db, "bitbucket_apps", id)
 }

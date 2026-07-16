@@ -22,16 +22,16 @@ type ServiceVarRepository interface {
 	Delete(ctx context.Context, id string) error
 }
 
-type ServiceVarSQLiteRepository struct {
+type ServiceVarRepo struct {
 	db *sqlx.DB
 	mu sync.Mutex
 }
 
-func NewServiceVarSQLiteRepository(db *sql.DB) *ServiceVarSQLiteRepository {
-	return &ServiceVarSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewServiceVarRepo(db *sql.DB) *ServiceVarRepo {
+	return &ServiceVarRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *ServiceVarSQLiteRepository) Create(_ context.Context, v *models.Variable) error {
+func (r *ServiceVarRepo) Create(_ context.Context, v *models.Variable) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if v.ID == "" {
@@ -50,7 +50,7 @@ func (r *ServiceVarSQLiteRepository) Create(_ context.Context, v *models.Variabl
 	return err
 }
 
-func (r *ServiceVarSQLiteRepository) Update(_ context.Context, v *models.Variable) error {
+func (r *ServiceVarRepo) Update(_ context.Context, v *models.Variable) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	v.UpdatedAt = time.Now().UTC()
@@ -60,7 +60,7 @@ func (r *ServiceVarSQLiteRepository) Update(_ context.Context, v *models.Variabl
 	return err
 }
 
-func (r *ServiceVarSQLiteRepository) GetByID(_ context.Context, id string) (*models.Variable, error) {
+func (r *ServiceVarRepo) GetByID(_ context.Context, id string) (*models.Variable, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var v models.Variable
@@ -75,7 +75,7 @@ func (r *ServiceVarSQLiteRepository) GetByID(_ context.Context, id string) (*mod
 	return &v, nil
 }
 
-func (r *ServiceVarSQLiteRepository) ListByService(_ context.Context, serviceID string) ([]*models.Variable, error) {
+func (r *ServiceVarRepo) ListByService(_ context.Context, serviceID string) ([]*models.Variable, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -90,7 +90,7 @@ func (r *ServiceVarSQLiteRepository) ListByService(_ context.Context, serviceID 
 	return list, nil
 }
 
-func (r *ServiceVarSQLiteRepository) Delete(_ context.Context, id string) error {
+func (r *ServiceVarRepo) Delete(_ context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	_, err := r.db.Exec(`DELETE FROM service_vars WHERE id = ?`, id)

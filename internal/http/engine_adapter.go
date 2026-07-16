@@ -10,9 +10,9 @@ import (
 
 type engineAdapter struct {
 	settingsRepo   repositories.SettingsRepository
-	appServiceRepo repositories.AppServiceRepository
+	appRepo        repositories.AppServiceRepository
 	envRepo        repositories.EnvRepository
-	databaseRepo   repositories.DatabaseRepository
+	dbRepo         repositories.DatabaseRepository
 	storageRepo    repositories.StorageRepository
 	projectRepo    repositories.ProjectRepository
 	jobRepo        repositories.JobRepository
@@ -24,9 +24,9 @@ type engineAdapter struct {
 
 func newEngineAdapter(
 	settingsRepo repositories.SettingsRepository,
-	appServiceRepo repositories.AppServiceRepository,
+	appRepo repositories.AppServiceRepository,
 	envRepo repositories.EnvRepository,
-	databaseRepo repositories.DatabaseRepository,
+	dbRepo repositories.DatabaseRepository,
 	storageRepo repositories.StorageRepository,
 	projectRepo repositories.ProjectRepository,
 	jobRepo repositories.JobRepository,
@@ -37,9 +37,9 @@ func newEngineAdapter(
 ) *engineAdapter {
 	return &engineAdapter{
 		settingsRepo:   settingsRepo,
-		appServiceRepo: appServiceRepo,
+		appRepo:        appRepo,
 		envRepo:        envRepo,
-		databaseRepo:   databaseRepo,
+		dbRepo:         dbRepo,
 		storageRepo:    storageRepo,
 		projectRepo:    projectRepo,
 		jobRepo:        jobRepo,
@@ -55,7 +55,7 @@ func (a *engineAdapter) GetServerSettings() (*models.ServerSettings, error) {
 }
 
 func (a *engineAdapter) ListAppServicesByProject(projectID string) ([]*models.AppService, error) {
-	return a.appServiceRepo.ListByProject(context.Background(), projectID)
+	return a.appRepo.ListByProject(context.Background(), projectID)
 }
 
 func (a *engineAdapter) GetEnvVars(projectID string) (map[string]string, error) {
@@ -71,17 +71,17 @@ func (a *engineAdapter) GetServerlessFunctionCode(serviceID string) (*models.Ser
 }
 
 func (a *engineAdapter) UpdateDatabaseStatus(id string, status models.DatabaseStatus, containerID string) error {
-	db, err := a.databaseRepo.GetByID(context.Background(), id)
+	db, err := a.dbRepo.GetByID(context.Background(), id)
 	if err != nil {
 		return err
 	}
 	db.Status = status
 	db.ContainerID = containerID
-	return a.databaseRepo.Update(context.Background(), db)
+	return a.dbRepo.Update(context.Background(), db)
 }
 
 func (a *engineAdapter) GetDatabase(id string) (*models.Database, error) {
-	return a.databaseRepo.GetByID(context.Background(), id)
+	return a.dbRepo.GetByID(context.Background(), id)
 }
 
 func (a *engineAdapter) UpdateStorageStatus(id string, status models.StorageStatus, containerID string) error {

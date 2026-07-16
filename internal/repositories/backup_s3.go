@@ -21,16 +21,16 @@ type S3DestinationRepository interface {
 	DeleteS3Destination(ctx context.Context, id, projectID string) error
 }
 
-type S3DestinationSQLiteRepository struct {
+type S3DestinationRepo struct {
 	db *sqlx.DB
 	mu sync.Mutex
 }
 
-func NewS3DestinationSQLiteRepository(db *sql.DB) *S3DestinationSQLiteRepository {
-	return &S3DestinationSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewS3DestinationRepo(db *sql.DB) *S3DestinationRepo {
+	return &S3DestinationRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *S3DestinationSQLiteRepository) CreateS3Destination(ctx context.Context, dest *models.S3Destination) error {
+func (r *S3DestinationRepo) CreateS3Destination(ctx context.Context, dest *models.S3Destination) error {
 	if dest.ID == "" {
 		dest.ID = uuid.New().String()
 	}
@@ -48,7 +48,7 @@ func (r *S3DestinationSQLiteRepository) CreateS3Destination(ctx context.Context,
 	return nil
 }
 
-func (r *S3DestinationSQLiteRepository) ListS3Destinations(ctx context.Context, projectID string) ([]*models.S3Destination, error) {
+func (r *S3DestinationRepo) ListS3Destinations(ctx context.Context, projectID string) ([]*models.S3Destination, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var list []*models.S3Destination
@@ -63,7 +63,7 @@ func (r *S3DestinationSQLiteRepository) ListS3Destinations(ctx context.Context, 
 	return list, nil
 }
 
-func (r *S3DestinationSQLiteRepository) GetS3Destination(ctx context.Context, id string) (*models.S3Destination, error) {
+func (r *S3DestinationRepo) GetS3Destination(ctx context.Context, id string) (*models.S3Destination, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var dest models.S3Destination
@@ -78,7 +78,7 @@ func (r *S3DestinationSQLiteRepository) GetS3Destination(ctx context.Context, id
 	return &dest, nil
 }
 
-func (r *S3DestinationSQLiteRepository) DeleteS3Destination(ctx context.Context, id, projectID string) error {
+func (r *S3DestinationRepo) DeleteS3Destination(ctx context.Context, id, projectID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	res, err := r.db.ExecContext(ctx, "DELETE FROM s3_destinations WHERE id = ? AND project_id = ?", id, projectID)

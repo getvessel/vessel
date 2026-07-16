@@ -23,16 +23,16 @@ type EnvRepository interface {
 	SetVar(ctx context.Context, projectID, key, value string) error
 }
 
-type ProjectSQLiteRepository struct {
+type ProjectRepo struct {
 	db           *sqlx.DB
 	environments EnvironmentRepository
 }
 
-func NewProjectSQLiteRepository(db *sql.DB, envRepo EnvironmentRepository) *ProjectSQLiteRepository {
-	return &ProjectSQLiteRepository{db: sqlx.NewDb(db, "sqlite"), environments: envRepo}
+func NewProjectRepo(db *sql.DB, envRepo EnvironmentRepository) *ProjectRepo {
+	return &ProjectRepo{db: sqlx.NewDb(db, "sqlite"), environments: envRepo}
 }
 
-func (r *ProjectSQLiteRepository) List(_ context.Context, limit, offset int) ([]models.ProjectConfig, int, error) {
+func (r *ProjectRepo) List(_ context.Context, limit, offset int) ([]models.ProjectConfig, int, error) {
 	var total int
 	var err error
 	var projects []models.ProjectConfig
@@ -51,7 +51,7 @@ func (r *ProjectSQLiteRepository) List(_ context.Context, limit, offset int) ([]
 	return projects, total, nil
 }
 
-func (r *ProjectSQLiteRepository) Get(_ context.Context, id string) (*models.ProjectConfig, error) {
+func (r *ProjectRepo) Get(_ context.Context, id string) (*models.ProjectConfig, error) {
 	var p models.ProjectConfig
 	err := r.db.Get(&p, `SELECT id, name, COALESCE(description,'') AS description, created_at, updated_at FROM projects WHERE id = ?`, id)
 	if err == sql.ErrNoRows {
@@ -63,7 +63,7 @@ func (r *ProjectSQLiteRepository) Get(_ context.Context, id string) (*models.Pro
 	return &p, nil
 }
 
-func (r *ProjectSQLiteRepository) Create(ctx context.Context, p *models.ProjectConfig) error {
+func (r *ProjectRepo) Create(ctx context.Context, p *models.ProjectConfig) error {
 	if p.ID == "" {
 		p.ID = uuid.NewString()
 	}
@@ -85,21 +85,21 @@ func (r *ProjectSQLiteRepository) Create(ctx context.Context, p *models.ProjectC
 	return r.environments.Create(ctx, defaultEnv)
 }
 
-func (r *ProjectSQLiteRepository) Delete(_ context.Context, id string) error {
+func (r *ProjectRepo) Delete(_ context.Context, id string) error {
 	_, err := r.db.Exec(`DELETE FROM projects WHERE id = ?`, id)
 	return err
 }
 
-type EnvSQLiteRepository struct {
+type EnvRepo struct {
 	db    *sqlx.DB
 	vault Vault
 }
 
-func NewEnvSQLiteRepository(db *sql.DB, vault Vault) *EnvSQLiteRepository {
-	return &EnvSQLiteRepository{db: sqlx.NewDb(db, "sqlite"), vault: vault}
+func NewEnvRepo(db *sql.DB, vault Vault) *EnvRepo {
+	return &EnvRepo{db: sqlx.NewDb(db, "sqlite"), vault: vault}
 }
 
-func (r *EnvSQLiteRepository) GetVars(_ context.Context, projectID string) (map[string]string, error) {
+func (r *EnvRepo) GetVars(_ context.Context, projectID string) (map[string]string, error) {
 	rows, err := r.db.Query(`SELECT key, encrypted_value FROM env_vars WHERE project_id = ?`, projectID)
 	if err != nil {
 		return nil, err
@@ -120,7 +120,7 @@ func (r *EnvSQLiteRepository) GetVars(_ context.Context, projectID string) (map[
 	return envs, rows.Err()
 }
 
-func (r *EnvSQLiteRepository) SetVar(_ context.Context, projectID, key, plaintextValue string) error {
+func (r *EnvRepo) SetVar(_ context.Context, projectID, key, plaintextValue string) error {
 	encrypted, err := r.vault.Encrypt(plaintextValue)
 	if err != nil {
 		return err

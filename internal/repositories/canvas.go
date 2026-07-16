@@ -17,17 +17,17 @@ type CanvasRepository interface {
 	GetEnvironmentCanvas(ctx context.Context, id string) (*models.EnvironmentCanvas, error)
 }
 
-type CanvasSQLiteRepository struct {
+type CanvasRepo struct {
 	db           *sqlx.DB
 	mu           sync.Mutex
 	environments EnvironmentRepository
 }
 
-func NewCanvasSQLiteRepository(db *sql.DB, envRepo EnvironmentRepository) *CanvasSQLiteRepository {
-	return &CanvasSQLiteRepository{db: sqlx.NewDb(db, "sqlite"), environments: envRepo}
+func NewCanvasRepo(db *sql.DB, envRepo EnvironmentRepository) *CanvasRepo {
+	return &CanvasRepo{db: sqlx.NewDb(db, "sqlite"), environments: envRepo}
 }
 
-func (r *CanvasSQLiteRepository) ListCanvasSummaries(ctx context.Context) ([]models.CanvasSummary, error) {
+func (r *CanvasRepo) ListCanvasSummaries(ctx context.Context) ([]models.CanvasSummary, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	projects, err := r.listAllProjects()
@@ -123,7 +123,7 @@ func (r *CanvasSQLiteRepository) ListCanvasSummaries(ctx context.Context) ([]mod
 	return summaries, nil
 }
 
-func (r *CanvasSQLiteRepository) GetCanvasSummary(ctx context.Context, id string) (*models.CanvasSummary, error) {
+func (r *CanvasRepo) GetCanvasSummary(ctx context.Context, id string) (*models.CanvasSummary, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	project, err := r.getProject(id)

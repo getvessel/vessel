@@ -10,7 +10,7 @@ import (
 
 func runConfig() {
 	_, db, _ := initDataDir()
-	repo := repositories.NewSettingsSQLiteRepository(db)
+	repo := repositories.NewSettingsRepo(db)
 	settings, err := repo.GetServerSettings(context.Background())
 	if err != nil {
 		exitError("Failed to load settings: %v", err)

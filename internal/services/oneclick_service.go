@@ -13,10 +13,10 @@ import (
 )
 
 type OneClickService struct {
-	tmplManager  *engine.TemplateManager
-	dbDeployer   *engine.DatabaseDeployer
-	envRepo      repositories.EnvironmentRepository
-	databaseRepo repositories.DatabaseRepository
+	tmplManager *engine.TemplateManager
+	dbDeployer  *engine.DatabaseDeployer
+	envRepo     repositories.EnvironmentRepository
+	dbRepo      repositories.DatabaseRepository
 }
 
 func NewOneClickService(
@@ -26,10 +26,10 @@ func NewOneClickService(
 	dr repositories.DatabaseRepository,
 ) *OneClickService {
 	return &OneClickService{
-		tmplManager:  tm,
-		dbDeployer:   dd,
-		envRepo:      er,
-		databaseRepo: dr,
+		tmplManager: tm,
+		dbDeployer:  dd,
+		envRepo:     er,
+		dbRepo:      dr,
 	}
 }
 
@@ -76,7 +76,7 @@ func (s *OneClickService) DeployApp(ctx context.Context, appID, projectID, name 
 	db := buildDatabaseRecord(projectID, envs[0].ID, appID, appName, extractPort(&tmpl))
 	db.Password = uuid.New().String()[:16]
 
-	if err := s.databaseRepo.Create(ctx, db); err != nil {
+	if err := s.dbRepo.Create(ctx, db); err != nil {
 		return nil, err
 	}
 
@@ -87,13 +87,13 @@ func (s *OneClickService) DeployApp(ctx context.Context, appID, projectID, name 
 	containerID, err := s.dbDeployer.SpinUp(ctx, db)
 	if err != nil {
 		db.Status = models.DatabaseStatusError
-		_ = s.databaseRepo.Update(ctx, db)
+		_ = s.dbRepo.Update(ctx, db)
 		return nil, err
 	}
 
 	db.ContainerID = containerID
 	db.Status = models.DatabaseStatusRunning
-	_ = s.databaseRepo.Update(ctx, db)
+	_ = s.dbRepo.Update(ctx, db)
 	return db, nil
 }
 

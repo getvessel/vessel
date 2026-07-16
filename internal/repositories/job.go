@@ -24,16 +24,16 @@ type JobRepository interface {
 	UpdateStatus(ctx context.Context, id string, status models.JobStatus, lastRunAt *time.Time, output string) error
 }
 
-type JobSQLiteRepository struct {
+type JobRepo struct {
 	db *sqlx.DB
 	mu sync.Mutex
 }
 
-func NewJobSQLiteRepository(db *sql.DB) *JobSQLiteRepository {
-	return &JobSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewJobRepo(db *sql.DB) *JobRepo {
+	return &JobRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *JobSQLiteRepository) Create(_ context.Context, j *models.Job) error {
+func (r *JobRepo) Create(_ context.Context, j *models.Job) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if j.ID == "" {
@@ -52,7 +52,7 @@ func (r *JobSQLiteRepository) Create(_ context.Context, j *models.Job) error {
 	return err
 }
 
-func (r *JobSQLiteRepository) GetByID(_ context.Context, id string) (*models.Job, error) {
+func (r *JobRepo) GetByID(_ context.Context, id string) (*models.Job, error) {
 	var j models.Job
 	err := r.db.Get(&j, `SELECT id, project_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at
 		FROM jobs WHERE id = ?`, id)
@@ -65,7 +65,7 @@ func (r *JobSQLiteRepository) GetByID(_ context.Context, id string) (*models.Job
 	return &j, nil
 }
 
-func (r *JobSQLiteRepository) ListAll(_ context.Context) ([]models.Job, error) {
+func (r *JobRepo) ListAll(_ context.Context) ([]models.Job, error) {
 	var jobs []models.Job
 	err := r.db.Select(&jobs, `SELECT id, project_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at FROM jobs ORDER BY created_at ASC`)
 	if err != nil {
@@ -77,7 +77,7 @@ func (r *JobSQLiteRepository) ListAll(_ context.Context) ([]models.Job, error) {
 	return jobs, nil
 }
 
-func (r *JobSQLiteRepository) ListByProject(_ context.Context, projectID string) ([]models.Job, error) {
+func (r *JobRepo) ListByProject(_ context.Context, projectID string) ([]models.Job, error) {
 	var jobs []models.Job
 	err := r.db.Select(&jobs, `SELECT id, project_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at
 		FROM jobs WHERE project_id = ? ORDER BY created_at ASC`, projectID)
@@ -90,7 +90,7 @@ func (r *JobSQLiteRepository) ListByProject(_ context.Context, projectID string)
 	return jobs, nil
 }
 
-func (r *JobSQLiteRepository) Update(_ context.Context, j *models.Job) error {
+func (r *JobRepo) Update(_ context.Context, j *models.Job) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	j.UpdatedAt = time.Now()
@@ -99,12 +99,12 @@ func (r *JobSQLiteRepository) Update(_ context.Context, j *models.Job) error {
 	return err
 }
 
-func (r *JobSQLiteRepository) Delete(_ context.Context, id string) error {
+func (r *JobRepo) Delete(_ context.Context, id string) error {
 	_, err := r.db.Exec(`DELETE FROM jobs WHERE id = ?`, id)
 	return err
 }
 
-func (r *JobSQLiteRepository) UpdateStatus(_ context.Context, id string, status models.JobStatus, lastRunAt *time.Time, output string) error {
+func (r *JobRepo) UpdateStatus(_ context.Context, id string, status models.JobStatus, lastRunAt *time.Time, output string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	now := time.Now()

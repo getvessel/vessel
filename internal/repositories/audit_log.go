@@ -12,15 +12,15 @@ type AuditLogRepository interface {
 	List(ctx context.Context, limit, offset int) ([]models.AuditLog, error)
 }
 
-type AuditLogSQLiteRepository struct {
+type AuditLogRepo struct {
 	db *sql.DB
 }
 
-func NewAuditLogSQLiteRepository(db *sql.DB) *AuditLogSQLiteRepository {
-	return &AuditLogSQLiteRepository{db: db}
+func NewAuditLogRepo(db *sql.DB) *AuditLogRepo {
+	return &AuditLogRepo{db: db}
 }
 
-func (r *AuditLogSQLiteRepository) Create(ctx context.Context, log *models.AuditLog) error {
+func (r *AuditLogRepo) Create(ctx context.Context, log *models.AuditLog) error {
 	query := `
 		INSERT INTO audit_logs (id, user_id, action, resource, details, ip_address)
 		VALUES (?, ?, ?, ?, ?, ?)
@@ -32,7 +32,7 @@ func (r *AuditLogSQLiteRepository) Create(ctx context.Context, log *models.Audit
 	return nil
 }
 
-func (r *AuditLogSQLiteRepository) List(ctx context.Context, limit, offset int) ([]models.AuditLog, error) {
+func (r *AuditLogRepo) List(ctx context.Context, limit, offset int) ([]models.AuditLog, error) {
 	query := `
 		SELECT id, user_id, action, resource, details, ip_address, created_at
 		FROM audit_logs

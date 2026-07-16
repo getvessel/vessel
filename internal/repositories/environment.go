@@ -29,16 +29,16 @@ type DomainRepository interface {
 	Delete(ctx context.Context, id string) error
 }
 
-type EnvironmentSQLiteRepository struct {
+type EnvironmentRepo struct {
 	mu sync.RWMutex
 	db *sqlx.DB
 }
 
-func NewEnvironmentSQLiteRepository(db *sql.DB) *EnvironmentSQLiteRepository {
-	return &EnvironmentSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewEnvironmentRepo(db *sql.DB) *EnvironmentRepo {
+	return &EnvironmentRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *EnvironmentSQLiteRepository) Get(_ context.Context, id string) (*models.EnvironmentConfig, error) {
+func (r *EnvironmentRepo) Get(_ context.Context, id string) (*models.EnvironmentConfig, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var env models.EnvironmentConfig
@@ -52,7 +52,7 @@ func (r *EnvironmentSQLiteRepository) Get(_ context.Context, id string) (*models
 	return &env, nil
 }
 
-func (r *EnvironmentSQLiteRepository) ListByProject(_ context.Context, projectID string) ([]models.EnvironmentConfig, error) {
+func (r *EnvironmentRepo) ListByProject(_ context.Context, projectID string) ([]models.EnvironmentConfig, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var envs []models.EnvironmentConfig
@@ -66,7 +66,7 @@ func (r *EnvironmentSQLiteRepository) ListByProject(_ context.Context, projectID
 	return envs, nil
 }
 
-func (r *EnvironmentSQLiteRepository) Create(_ context.Context, env *models.EnvironmentConfig) error {
+func (r *EnvironmentRepo) Create(_ context.Context, env *models.EnvironmentConfig) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if env.ID == "" {
@@ -85,22 +85,22 @@ func (r *EnvironmentSQLiteRepository) Create(_ context.Context, env *models.Envi
 	return nil
 }
 
-func (r *EnvironmentSQLiteRepository) Delete(_ context.Context, id string) error {
+func (r *EnvironmentRepo) Delete(_ context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	_, err := r.db.Exec(`DELETE FROM environments WHERE id = ?`, id)
 	return err
 }
 
-type DomainSQLiteRepository struct {
+type DomainRepo struct {
 	db *sqlx.DB
 }
 
-func NewDomainSQLiteRepository(db *sql.DB) *DomainSQLiteRepository {
-	return &DomainSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewDomainRepo(db *sql.DB) *DomainRepo {
+	return &DomainRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *DomainSQLiteRepository) ListByProject(_ context.Context, projectID string) ([]models.DomainConfig, error) {
+func (r *DomainRepo) ListByProject(_ context.Context, projectID string) ([]models.DomainConfig, error) {
 	var domains []models.DomainConfig
 	err := r.db.Select(&domains, `SELECT id, project_id, domain_name, redirect_to, ssl_cert_status, path_prefix, created_at, updated_at FROM domains WHERE project_id = ? ORDER BY domain_name ASC`, projectID)
 	if err != nil {
@@ -112,7 +112,7 @@ func (r *DomainSQLiteRepository) ListByProject(_ context.Context, projectID stri
 	return domains, nil
 }
 
-func (r *DomainSQLiteRepository) ListAll(ctx context.Context) ([]models.DomainConfig, error) {
+func (r *DomainRepo) ListAll(ctx context.Context) ([]models.DomainConfig, error) {
 	var domains []models.DomainConfig
 	err := r.db.Select(&domains, `SELECT id, project_id, domain_name, redirect_to, ssl_cert_status, path_prefix, created_at, updated_at FROM domains ORDER BY domain_name ASC`)
 	if err != nil {
@@ -124,7 +124,7 @@ func (r *DomainSQLiteRepository) ListAll(ctx context.Context) ([]models.DomainCo
 	return domains, nil
 }
 
-func (r *DomainSQLiteRepository) Create(_ context.Context, d *models.DomainConfig) error {
+func (r *DomainRepo) Create(_ context.Context, d *models.DomainConfig) error {
 	if d.ID == "" {
 		d.ID = uuid.NewString()
 	}
@@ -138,7 +138,7 @@ func (r *DomainSQLiteRepository) Create(_ context.Context, d *models.DomainConfi
 	return err
 }
 
-func (r *DomainSQLiteRepository) Delete(_ context.Context, id string) error {
+func (r *DomainRepo) Delete(_ context.Context, id string) error {
 	_, err := r.db.Exec(`DELETE FROM domains WHERE id = ?`, id)
 	return err
 }

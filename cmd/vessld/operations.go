@@ -26,7 +26,7 @@ func runDeployments(args []string) {
 	_, db, _ := initDataDir()
 	defer db.Close()
 
-	deployRepo := repositories.NewDeploymentSQLiteRepository(db)
+	deployRepo := repositories.NewDeploymentRepo(db)
 
 	serviceID := ""
 	for i := 1; i < len(args); i++ {
@@ -111,7 +111,7 @@ func runDomains(args []string) {
 	_, db, _ := initDataDir()
 	defer db.Close()
 
-	domainRepo := repositories.NewDomainSQLiteRepository(db)
+	domainRepo := repositories.NewDomainRepo(db)
 
 	cmd := args[0]
 

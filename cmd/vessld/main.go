@@ -41,19 +41,19 @@ type dbDeployerStore struct {
 }
 
 func (a *dbDeployerStore) GetServerSettings() (*models.ServerSettings, error) {
-	return repositories.NewSettingsSQLiteRepository(a.db).GetServerSettings(context.Background())
+	return repositories.NewSettingsRepo(a.db).GetServerSettings(context.Background())
 }
 
 func (a *dbDeployerStore) ListAppServicesByProject(projectID string) ([]*models.AppService, error) {
-	return repositories.NewAppServiceSQLiteRepository(a.db).ListByProject(context.Background(), projectID)
+	return repositories.NewAppServiceRepo(a.db).ListByProject(context.Background(), projectID)
 }
 
 func (a *dbDeployerStore) GetEnvVars(projectID string) (map[string]string, error) {
-	return repositories.NewEnvSQLiteRepository(a.db, a.vault).GetVars(context.Background(), projectID)
+	return repositories.NewEnvRepo(a.db, a.vault).GetVars(context.Background(), projectID)
 }
 
 func (a *dbDeployerStore) ListServiceVariables(serviceID string) ([]*models.Variable, error) {
-	svVarRepo := repositories.NewServiceVarSQLiteRepository(a.db)
+	svVarRepo := repositories.NewServiceVarRepo(a.db)
 	return svVarRepo.ListByService(context.Background(), serviceID)
 }
 

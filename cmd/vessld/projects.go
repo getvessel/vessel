@@ -26,8 +26,8 @@ func runProjects(args []string) {
 	_, db, _ := initDataDir()
 	defer db.Close()
 
-	envRepo := repositories.NewEnvironmentSQLiteRepository(db)
-	projectRepo := repositories.NewProjectSQLiteRepository(db, envRepo)
+	envRepo := repositories.NewEnvironmentRepo(db)
+	projectRepo := repositories.NewProjectRepo(db, envRepo)
 
 	cmd := args[0]
 
@@ -141,7 +141,7 @@ func runEnvVars(args []string) {
 	_, db, vlt := initDataDir()
 	defer db.Close()
 
-	envRepo := repositories.NewEnvSQLiteRepository(db, vlt)
+	envRepo := repositories.NewEnvRepo(db, vlt)
 
 	projectID := ""
 	for i := 1; i < len(args); i++ {

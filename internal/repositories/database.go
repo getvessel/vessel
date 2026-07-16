@@ -23,17 +23,17 @@ type DatabaseRepository interface {
 	Update(ctx context.Context, db *models.Database) error
 }
 
-type DatabaseSQLiteRepository struct {
+type DatabaseRepo struct {
 	db    *sqlx.DB
 	mu    sync.Mutex
 	vault Vault
 }
 
-func NewDatabaseSQLiteRepository(db *sql.DB, vault Vault) *DatabaseSQLiteRepository {
-	return &DatabaseSQLiteRepository{db: sqlx.NewDb(db, "sqlite"), vault: vault}
+func NewDatabaseRepo(db *sql.DB, vault Vault) *DatabaseRepo {
+	return &DatabaseRepo{db: sqlx.NewDb(db, "sqlite"), vault: vault}
 }
 
-func (r *DatabaseSQLiteRepository) Create(_ context.Context, db *models.Database) error {
+func (r *DatabaseRepo) Create(_ context.Context, db *models.Database) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if db.ID == "" {
@@ -55,13 +55,13 @@ func (r *DatabaseSQLiteRepository) Create(_ context.Context, db *models.Database
 
 const listDatabaseQuery = `SELECT id, COALESCE(project_id, '') AS project_id, COALESCE(environment_id, '') AS environment_id, name, engine, version, port, username, encrypted_password, database_name, volume_path, COALESCE(container_id, '') AS container_id, status, COALESCE(internal_dns, '') AS internal_dns, COALESCE(external_dns, '') AS external_dns, COALESCE(custom_args, '') AS custom_args, created_at, updated_at FROM databases`
 
-func (r *DatabaseSQLiteRepository) decryptPassword(encrypted string, d *models.Database) {
+func (r *DatabaseRepo) decryptPassword(encrypted string, d *models.Database) {
 	if plain, err := r.vault.Decrypt(encrypted); err == nil {
 		d.Password = plain
 	}
 }
 
-func (r *DatabaseSQLiteRepository) GetByID(_ context.Context, id string) (*models.Database, error) {
+func (r *DatabaseRepo) GetByID(_ context.Context, id string) (*models.Database, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var d models.Database
@@ -76,7 +76,7 @@ func (r *DatabaseSQLiteRepository) GetByID(_ context.Context, id string) (*model
 	return &d, nil
 }
 
-func (r *DatabaseSQLiteRepository) List(_ context.Context) ([]*models.Database, error) {
+func (r *DatabaseRepo) List(_ context.Context) ([]*models.Database, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var list []*models.Database
@@ -93,7 +93,7 @@ func (r *DatabaseSQLiteRepository) List(_ context.Context) ([]*models.Database, 
 	return list, nil
 }
 
-func (r *DatabaseSQLiteRepository) ListByProject(_ context.Context, projectID string) ([]*models.Database, error) {
+func (r *DatabaseRepo) ListByProject(_ context.Context, projectID string) ([]*models.Database, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var list []*models.Database
@@ -110,14 +110,14 @@ func (r *DatabaseSQLiteRepository) ListByProject(_ context.Context, projectID st
 	return list, nil
 }
 
-func (r *DatabaseSQLiteRepository) Delete(_ context.Context, id string) error {
+func (r *DatabaseRepo) Delete(_ context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	_, err := r.db.Exec(`DELETE FROM databases WHERE id = ?`, id)
 	return err
 }
 
-func (r *DatabaseSQLiteRepository) Update(_ context.Context, db *models.Database) error {
+func (r *DatabaseRepo) Update(_ context.Context, db *models.Database) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	db.UpdatedAt = time.Now()

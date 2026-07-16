@@ -31,16 +31,16 @@ type ProjectSettingsRepository interface {
 	AcceptAllInvitesForUser(ctx context.Context, userID string) error
 }
 
-type ProjectSettingsSQLiteRepository struct {
+type ProjectSettingsRepo struct {
 	db *sqlx.DB
 	mu sync.Mutex
 }
 
-func NewProjectSettingsSQLiteRepository(db *sql.DB) *ProjectSettingsSQLiteRepository {
-	return &ProjectSettingsSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewProjectSettingsRepo(db *sql.DB) *ProjectSettingsRepo {
+	return &ProjectSettingsRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *ProjectSettingsSQLiteRepository) CreateWebhook(ctx context.Context, w *models.Webhook) error {
+func (r *ProjectSettingsRepo) CreateWebhook(ctx context.Context, w *models.Webhook) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if w.ID == "" {
@@ -60,7 +60,7 @@ func (r *ProjectSettingsSQLiteRepository) CreateWebhook(ctx context.Context, w *
 	return nil
 }
 
-func (r *ProjectSettingsSQLiteRepository) ListWebhooksByProject(ctx context.Context, projectID string) ([]*models.Webhook, error) {
+func (r *ProjectSettingsRepo) ListWebhooksByProject(ctx context.Context, projectID string) ([]*models.Webhook, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	rows, err := r.db.QueryContext(ctx,
@@ -89,7 +89,7 @@ func (r *ProjectSettingsSQLiteRepository) ListWebhooksByProject(ctx context.Cont
 	return out, rows.Err()
 }
 
-func (r *ProjectSettingsSQLiteRepository) deleteByIDAndProject(ctx context.Context, table, id, projectID, entityName string) error {
+func (r *ProjectSettingsRepo) deleteByIDAndProject(ctx context.Context, table, id, projectID, entityName string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	query := fmt.Sprintf("DELETE FROM %s WHERE id = ? AND project_id = ?", table)
@@ -104,11 +104,11 @@ func (r *ProjectSettingsSQLiteRepository) deleteByIDAndProject(ctx context.Conte
 	return nil
 }
 
-func (r *ProjectSettingsSQLiteRepository) DeleteWebhook(ctx context.Context, id, projectID string) error {
+func (r *ProjectSettingsRepo) DeleteWebhook(ctx context.Context, id, projectID string) error {
 	return r.deleteByIDAndProject(ctx, "project_webhooks", id, projectID, "webhook")
 }
 
-func (r *ProjectSettingsSQLiteRepository) CreateToken(ctx context.Context, t *models.ProjectToken, fullToken string) error {
+func (r *ProjectSettingsRepo) CreateToken(ctx context.Context, t *models.ProjectToken, fullToken string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -128,7 +128,7 @@ func (r *ProjectSettingsSQLiteRepository) CreateToken(ctx context.Context, t *mo
 	return nil
 }
 
-func (r *ProjectSettingsSQLiteRepository) ListTokensByProject(ctx context.Context, projectID string) ([]*models.ProjectToken, error) {
+func (r *ProjectSettingsRepo) ListTokensByProject(ctx context.Context, projectID string) ([]*models.ProjectToken, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	rows, err := r.db.QueryContext(ctx,
@@ -168,11 +168,11 @@ func (r *ProjectSettingsSQLiteRepository) ListTokensByProject(ctx context.Contex
 	return out, rows.Err()
 }
 
-func (r *ProjectSettingsSQLiteRepository) DeleteToken(ctx context.Context, id, projectID string) error {
+func (r *ProjectSettingsRepo) DeleteToken(ctx context.Context, id, projectID string) error {
 	return r.deleteByIDAndProject(ctx, "project_tokens", id, projectID, "token")
 }
 
-func (r *ProjectSettingsSQLiteRepository) GetTokenByHash(ctx context.Context, tokenHash string) (*models.ProjectToken, error) {
+func (r *ProjectSettingsRepo) GetTokenByHash(ctx context.Context, tokenHash string) (*models.ProjectToken, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var t models.ProjectToken
@@ -204,14 +204,14 @@ func (r *ProjectSettingsSQLiteRepository) GetTokenByHash(ctx context.Context, to
 	return &t, nil
 }
 
-func (r *ProjectSettingsSQLiteRepository) UpdateTokenLastUsed(ctx context.Context, id string) error {
+func (r *ProjectSettingsRepo) UpdateTokenLastUsed(ctx context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	_, err := r.db.ExecContext(ctx, `UPDATE project_tokens SET last_used_at = ? WHERE id = ?`, time.Now().Format(time.RFC3339), id)
 	return err
 }
 
-func (r *ProjectSettingsSQLiteRepository) AddMember(ctx context.Context, m *models.ProjectMember) error {
+func (r *ProjectSettingsRepo) AddMember(ctx context.Context, m *models.ProjectMember) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if m.ID == "" {
@@ -238,7 +238,7 @@ func (r *ProjectSettingsSQLiteRepository) AddMember(ctx context.Context, m *mode
 	return nil
 }
 
-func (r *ProjectSettingsSQLiteRepository) ListMembers(ctx context.Context, projectID string) ([]*models.ProjectMember, error) {
+func (r *ProjectSettingsRepo) ListMembers(ctx context.Context, projectID string) ([]*models.ProjectMember, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	rows, err := r.db.QueryContext(ctx,
@@ -263,11 +263,11 @@ func (r *ProjectSettingsSQLiteRepository) ListMembers(ctx context.Context, proje
 	return out, rows.Err()
 }
 
-func (r *ProjectSettingsSQLiteRepository) RemoveMember(ctx context.Context, id, projectID string) error {
+func (r *ProjectSettingsRepo) RemoveMember(ctx context.Context, id, projectID string) error {
 	return r.deleteByIDAndProject(ctx, "project_members", id, projectID, "member")
 }
 
-func (r *ProjectSettingsSQLiteRepository) AcceptAllInvitesForUser(ctx context.Context, userID string) error {
+func (r *ProjectSettingsRepo) AcceptAllInvitesForUser(ctx context.Context, userID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	now := time.Now().Format(time.RFC3339)

@@ -22,14 +22,14 @@ type StorageRepository interface {
 	Update(ctx context.Context, s *models.Storage) error
 }
 
-type StorageSQLiteRepository struct {
+type StorageRepo struct {
 	db    *sqlx.DB
 	mu    sync.Mutex
 	vault Vault
 }
 
-func NewStorageSQLiteRepository(db *sql.DB, vault Vault) *StorageSQLiteRepository {
-	return &StorageSQLiteRepository{db: sqlx.NewDb(db, "sqlite"), vault: vault}
+func NewStorageRepo(db *sql.DB, vault Vault) *StorageRepo {
+	return &StorageRepo{db: sqlx.NewDb(db, "sqlite"), vault: vault}
 }
 
 const listStorageQuery = `SELECT id, COALESCE(project_id, ''), COALESCE(environment_id, ''), name, type, api_port, console_port, access_key, encrypted_secret_key, bucket_name, COALESCE(volume_path, ''), COALESCE(container_id, ''), COALESCE(status, 'stopped'), COALESCE(internal_dns, ''), COALESCE(external_dns, ''), created_at, updated_at FROM storage`
@@ -46,13 +46,13 @@ func scanStorage(scanner interface {
 	)
 }
 
-func (r *StorageSQLiteRepository) decryptSecretKey(encrypted string, s *models.Storage) {
+func (r *StorageRepo) decryptSecretKey(encrypted string, s *models.Storage) {
 	if plain, err := r.vault.Decrypt(encrypted); err == nil {
 		s.SecretKey = plain
 	}
 }
 
-func (r *StorageSQLiteRepository) Create(_ context.Context, s *models.Storage) error {
+func (r *StorageRepo) Create(_ context.Context, s *models.Storage) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if s.ID == "" {
@@ -79,7 +79,7 @@ func (r *StorageSQLiteRepository) Create(_ context.Context, s *models.Storage) e
 	return err
 }
 
-func (r *StorageSQLiteRepository) GetByID(_ context.Context, id string) (*models.Storage, error) {
+func (r *StorageRepo) GetByID(_ context.Context, id string) (*models.Storage, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	row := r.db.QueryRow(listStorageQuery+` WHERE id = ?`, id)
@@ -95,7 +95,7 @@ func (r *StorageSQLiteRepository) GetByID(_ context.Context, id string) (*models
 	return &s, nil
 }
 
-func (r *StorageSQLiteRepository) List(_ context.Context) ([]*models.Storage, error) {
+func (r *StorageRepo) List(_ context.Context) ([]*models.Storage, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	rows, err := r.db.Query(listStorageQuery + ` ORDER BY created_at ASC`)
@@ -116,7 +116,7 @@ func (r *StorageSQLiteRepository) List(_ context.Context) ([]*models.Storage, er
 	return list, nil
 }
 
-func (r *StorageSQLiteRepository) ListByProject(_ context.Context, projectID string) ([]*models.Storage, error) {
+func (r *StorageRepo) ListByProject(_ context.Context, projectID string) ([]*models.Storage, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	rows, err := r.db.Query(listStorageQuery+` WHERE project_id = ? ORDER BY created_at ASC`, projectID)
@@ -137,14 +137,14 @@ func (r *StorageSQLiteRepository) ListByProject(_ context.Context, projectID str
 	return list, nil
 }
 
-func (r *StorageSQLiteRepository) Delete(_ context.Context, id string) error {
+func (r *StorageRepo) Delete(_ context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	_, err := r.db.Exec(`DELETE FROM storage WHERE id = ?`, id)
 	return err
 }
 
-func (r *StorageSQLiteRepository) Update(_ context.Context, s *models.Storage) error {
+func (r *StorageRepo) Update(_ context.Context, s *models.Storage) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	s.UpdatedAt = time.Now()

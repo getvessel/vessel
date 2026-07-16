@@ -12,7 +12,7 @@ func runResetPassword() {
 	_, db, _ := initDataDir()
 
 	email := prompt("Admin email: ")
-	repo := repositories.NewUserSQLiteRepository(db)
+	repo := repositories.NewUserRepo(db)
 	user, err := repo.GetUserByEmail(context.Background(), email)
 	if err != nil {
 		exitError("User with email %s not found", email)

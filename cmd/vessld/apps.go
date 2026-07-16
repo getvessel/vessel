@@ -27,10 +27,10 @@ func runApps(args []string) {
 	_, db, _ := initDataDir()
 	defer db.Close()
 
-	appRepo := repositories.NewAppServiceSQLiteRepository(db)
-	svcVarRepo := repositories.NewServiceVarSQLiteRepository(db)
-	envRepo := repositories.NewEnvironmentSQLiteRepository(db)
-	projectRepo := repositories.NewProjectSQLiteRepository(db, envRepo)
+	appRepo := repositories.NewAppServiceRepo(db)
+	svcVarRepo := repositories.NewServiceVarRepo(db)
+	envRepo := repositories.NewEnvironmentRepo(db)
+	projectRepo := repositories.NewProjectRepo(db, envRepo)
 
 	cmd := args[0]
 

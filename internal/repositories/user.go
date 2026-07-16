@@ -27,22 +27,22 @@ type UserRepository interface {
 	DeletePAT(ctx context.Context, id, userID string) error
 }
 
-type UserSQLiteRepository struct {
+type UserRepo struct {
 	db *sqlx.DB
 	mu sync.Mutex
 }
 
-func NewUserSQLiteRepository(db *sql.DB) *UserSQLiteRepository {
-	return &UserSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewUserRepo(db *sql.DB) *UserRepo {
+	return &UserRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *UserSQLiteRepository) CountUsers(ctx context.Context) (int, error) {
+func (r *UserRepo) CountUsers(ctx context.Context) (int, error) {
 	var count int
 	err := r.db.GetContext(ctx, &count, "SELECT COUNT(*) FROM users")
 	return count, err
 }
 
-func (r *UserSQLiteRepository) CreateUser(ctx context.Context, u *models.User) error {
+func (r *UserRepo) CreateUser(ctx context.Context, u *models.User) error {
 	if u.ID == "" {
 		u.ID = uuid.NewString()
 	}
@@ -56,7 +56,7 @@ func (r *UserSQLiteRepository) CreateUser(ctx context.Context, u *models.User) e
 	return err
 }
 
-func (r *UserSQLiteRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+func (r *UserRepo) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var u models.User
@@ -71,7 +71,7 @@ func (r *UserSQLiteRepository) GetUserByEmail(ctx context.Context, email string)
 	return &u, nil
 }
 
-func (r *UserSQLiteRepository) GetUserByID(ctx context.Context, id string) (*models.User, error) {
+func (r *UserRepo) GetUserByID(ctx context.Context, id string) (*models.User, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var u models.User
@@ -86,7 +86,7 @@ func (r *UserSQLiteRepository) GetUserByID(ctx context.Context, id string) (*mod
 	return &u, nil
 }
 
-func (r *UserSQLiteRepository) ListUsers(ctx context.Context, limit, offset int) ([]models.User, int, error) {
+func (r *UserRepo) ListUsers(ctx context.Context, limit, offset int) ([]models.User, int, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -106,7 +106,7 @@ func (r *UserSQLiteRepository) ListUsers(ctx context.Context, limit, offset int)
 	return users, total, nil
 }
 
-func (r *UserSQLiteRepository) UpdateUser(ctx context.Context, u *models.User) error {
+func (r *UserRepo) UpdateUser(ctx context.Context, u *models.User) error {
 	u.UpdatedAt = time.Now()
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -115,7 +115,7 @@ func (r *UserSQLiteRepository) UpdateUser(ctx context.Context, u *models.User) e
 	return err
 }
 
-func (r *UserSQLiteRepository) CreatePAT(ctx context.Context, pat *models.PersonalAccessToken) error {
+func (r *UserRepo) CreatePAT(ctx context.Context, pat *models.PersonalAccessToken) error {
 	if pat.ID == "" {
 		pat.ID = uuid.NewString()
 	}
@@ -136,7 +136,7 @@ func (r *UserSQLiteRepository) CreatePAT(ctx context.Context, pat *models.Person
 	return nil
 }
 
-func (r *UserSQLiteRepository) ListPATs(ctx context.Context, userID string) ([]*models.PersonalAccessToken, error) {
+func (r *UserRepo) ListPATs(ctx context.Context, userID string) ([]*models.PersonalAccessToken, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var list []*models.PersonalAccessToken
@@ -150,7 +150,7 @@ func (r *UserSQLiteRepository) ListPATs(ctx context.Context, userID string) ([]*
 	return list, nil
 }
 
-func (r *UserSQLiteRepository) DeletePAT(ctx context.Context, id, userID string) error {
+func (r *UserRepo) DeletePAT(ctx context.Context, id, userID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	res, err := r.db.ExecContext(ctx, `DELETE FROM personal_access_tokens WHERE id = ? AND user_id = ?`, id, userID)

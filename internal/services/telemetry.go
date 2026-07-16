@@ -25,7 +25,7 @@ func StartTelemetryReporter(db *sql.DB, version string) {
 }
 
 func pingTelemetry(db *sql.DB, version string) {
-	settingsRepo := repositories.NewSettingsSQLiteRepository(db)
+	settingsRepo := repositories.NewSettingsRepo(db)
 	settings, err := settingsRepo.GetServerSettings(context.Background())
 	if err != nil {
 		return
@@ -35,7 +35,7 @@ func pingTelemetry(db *sql.DB, version string) {
 		return
 	}
 
-	appRepo := repositories.NewAppServiceSQLiteRepository(db)
+	appRepo := repositories.NewAppServiceRepo(db)
 	apps, err := appRepo.ListAll(context.Background())
 	activeApps := 0
 	if err == nil {

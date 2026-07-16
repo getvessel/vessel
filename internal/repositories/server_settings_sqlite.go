@@ -19,13 +19,13 @@ type SettingsRepository interface {
 	ListProjects(ctx context.Context) ([]map[string]any, error)
 }
 
-type SettingsSQLiteRepository struct {
+type SettingsRepo struct {
 	db *sqlx.DB
 	mu sync.Mutex
 }
 
-func NewSettingsSQLiteRepository(db *sql.DB) *SettingsSQLiteRepository {
-	return &SettingsSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewSettingsRepo(db *sql.DB) *SettingsRepo {
+	return &SettingsRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
 const serverSettingsColumns = `id, traefik_wildcard_ip, discord_webhook_url, discord_ping_enabled, discord_enabled, slack_webhook_url, slack_enabled, telegram_bot_token, telegram_chat_id, telegram_enabled, smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name, smtp_from_address, smtp_enabled, resend_api_key, resend_enabled, pushover_user_key, pushover_api_token, pushover_enabled, generic_webhook_url, generic_webhook_enabled, notification_alerts, registration_enabled, registration_domain_allowlist, custom_dns_resolvers, dns_validation_enabled, ip_allowlist, mcp_server_enabled, default_wildcard_domain, site_name, public_ipv4, public_ipv6, show_sponsorship_popup, disable_two_step_confirmation, default_openai_key, default_anthropic_key, cloudflare_api_token, namecheap_api_user, namecheap_api_key, namecheap_client_ip, spaceship_api_key, update_check_cron, auto_update_enabled, concurrent_builds, deployment_timeout, server_timezone, docker_cleanup_cron, disk_usage_threshold, disk_usage_cron, current_version, latest_version, last_update_check, updated_at`
@@ -60,7 +60,7 @@ func serverSettingsArgs(cfg *models.ServerSettings) []any {
 	}
 }
 
-func (r *SettingsSQLiteRepository) GetServerSettings(ctx context.Context) (*models.ServerSettings, error) {
+func (r *SettingsRepo) GetServerSettings(ctx context.Context) (*models.ServerSettings, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var cfg models.ServerSettings
@@ -90,7 +90,7 @@ func (r *SettingsSQLiteRepository) GetServerSettings(ctx context.Context) (*mode
 	return &cfg, nil
 }
 
-func (r *SettingsSQLiteRepository) UpdateServerSettings(ctx context.Context, cfg *models.ServerSettings) error {
+func (r *SettingsRepo) UpdateServerSettings(ctx context.Context, cfg *models.ServerSettings) error {
 	if cfg.ID == "" {
 		cfg.ID = "global"
 	}
@@ -162,7 +162,7 @@ func (r *SettingsSQLiteRepository) UpdateServerSettings(ctx context.Context, cfg
 	return nil
 }
 
-func (r *SettingsSQLiteRepository) ListProjects(ctx context.Context) ([]map[string]any, error) {
+func (r *SettingsRepo) ListProjects(ctx context.Context) ([]map[string]any, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	rows, err := r.db.QueryContext(ctx, `SELECT id, name, repo_url, branch, status, updated_at FROM projects ORDER BY created_at DESC`)

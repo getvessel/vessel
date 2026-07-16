@@ -16,7 +16,7 @@ import (
 type ProjectService struct {
 	projectRepo    repositories.ProjectRepository
 	envRepo        repositories.EnvironmentRepository
-	appServiceRepo repositories.AppServiceRepository
+	appRepo        repositories.AppServiceRepository
 	serviceVarRepo repositories.ServiceVarRepository
 	settingsRepo   repositories.SettingsRepository
 }
@@ -25,7 +25,7 @@ func NewProjectService(pr repositories.ProjectRepository, er repositories.Enviro
 	return &ProjectService{
 		projectRepo:    pr,
 		envRepo:        er,
-		appServiceRepo: ar,
+		appRepo:        ar,
 		serviceVarRepo: svr,
 		settingsRepo:   sr,
 	}
@@ -106,7 +106,7 @@ func (s *ProjectService) CreateProjectFromRequest(ctx context.Context, req *mode
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
-	_ = s.appServiceRepo.Create(ctx, app)
+	_ = s.appRepo.Create(ctx, app)
 	return p, nil
 }
 
@@ -172,21 +172,21 @@ func (s *ProjectService) CreateAppService(ctx context.Context, svc *models.AppSe
 	}
 	svc.CreatedAt = time.Now()
 	svc.UpdatedAt = time.Now()
-	return s.appServiceRepo.Create(ctx, svc)
+	return s.appRepo.Create(ctx, svc)
 }
 
 func (s *ProjectService) GetAppService(ctx context.Context, id string) (*models.AppService, error) {
 	if id == "" {
 		return nil, errors.New("service id is required")
 	}
-	return s.appServiceRepo.GetByID(ctx, id)
+	return s.appRepo.GetByID(ctx, id)
 }
 
 func (s *ProjectService) ListAppServicesByProject(ctx context.Context, projectID string) ([]*models.AppService, error) {
 	if projectID == "" {
 		return nil, errors.New("project id is required")
 	}
-	return s.appServiceRepo.ListByProject(ctx, projectID)
+	return s.appRepo.ListByProject(ctx, projectID)
 }
 
 func (s *ProjectService) UpdateAppService(ctx context.Context, svc *models.AppService) error {
@@ -194,14 +194,14 @@ func (s *ProjectService) UpdateAppService(ctx context.Context, svc *models.AppSe
 		return errors.New("valid app service required for update")
 	}
 	svc.UpdatedAt = time.Now()
-	return s.appServiceRepo.Update(ctx, svc)
+	return s.appRepo.Update(ctx, svc)
 }
 
 func (s *ProjectService) DeleteAppService(ctx context.Context, id string) error {
 	if id == "" {
 		return errors.New("service id is required")
 	}
-	return s.appServiceRepo.Delete(ctx, id)
+	return s.appRepo.Delete(ctx, id)
 }
 
 func (s *ProjectService) CreateServiceVariable(ctx context.Context, v *models.Variable) error {

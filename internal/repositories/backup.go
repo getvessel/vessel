@@ -26,16 +26,16 @@ type BackupRepository interface {
 	UpdateRecord(ctx context.Context, rec *models.BackupRecord) error
 }
 
-type BackupSQLiteRepository struct {
+type BackupRepo struct {
 	db *sqlx.DB
 	mu sync.Mutex
 }
 
-func NewBackupSQLiteRepository(db *sql.DB) *BackupSQLiteRepository {
-	return &BackupSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewBackupRepo(db *sql.DB) *BackupRepo {
+	return &BackupRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *BackupSQLiteRepository) EnsureTables() error {
+func (r *BackupRepo) EnsureTables() error {
 	queries := []string{
 		`CREATE TABLE IF NOT EXISTS backup_configs (
 			id TEXT PRIMARY KEY,
@@ -83,7 +83,7 @@ func (r *BackupSQLiteRepository) EnsureTables() error {
 	return nil
 }
 
-func (r *BackupSQLiteRepository) CreateConfig(ctx context.Context, cfg *models.BackupConfig) error {
+func (r *BackupRepo) CreateConfig(ctx context.Context, cfg *models.BackupConfig) error {
 	if cfg.ID == "" {
 		cfg.ID = uuid.New().String()
 	}
@@ -108,7 +108,7 @@ func (r *BackupSQLiteRepository) CreateConfig(ctx context.Context, cfg *models.B
 	return nil
 }
 
-func (r *BackupSQLiteRepository) GetConfigByID(ctx context.Context, id string) (*models.BackupConfig, error) {
+func (r *BackupRepo) GetConfigByID(ctx context.Context, id string) (*models.BackupConfig, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var cfg models.BackupConfig
@@ -123,7 +123,7 @@ func (r *BackupSQLiteRepository) GetConfigByID(ctx context.Context, id string) (
 	return &cfg, nil
 }
 
-func (r *BackupSQLiteRepository) ListConfigsByProject(ctx context.Context, projectID string) ([]*models.BackupConfig, error) {
+func (r *BackupRepo) ListConfigsByProject(ctx context.Context, projectID string) ([]*models.BackupConfig, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var list []*models.BackupConfig
@@ -138,7 +138,7 @@ func (r *BackupSQLiteRepository) ListConfigsByProject(ctx context.Context, proje
 	return list, nil
 }
 
-func (r *BackupSQLiteRepository) ListAllActiveConfigs(ctx context.Context) ([]*models.BackupConfig, error) {
+func (r *BackupRepo) ListAllActiveConfigs(ctx context.Context) ([]*models.BackupConfig, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var list []*models.BackupConfig
@@ -153,7 +153,7 @@ func (r *BackupSQLiteRepository) ListAllActiveConfigs(ctx context.Context) ([]*m
 	return list, nil
 }
 
-func (r *BackupSQLiteRepository) DeleteConfig(ctx context.Context, id, projectID string) error {
+func (r *BackupRepo) DeleteConfig(ctx context.Context, id, projectID string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	res, err := r.db.ExecContext(ctx, "DELETE FROM backup_configs WHERE id = ? AND project_id = ?", id, projectID)
@@ -167,7 +167,7 @@ func (r *BackupSQLiteRepository) DeleteConfig(ctx context.Context, id, projectID
 	return nil
 }
 
-func (r *BackupSQLiteRepository) CreateRecord(ctx context.Context, rec *models.BackupRecord) error {
+func (r *BackupRepo) CreateRecord(ctx context.Context, rec *models.BackupRecord) error {
 	if rec.ID == "" {
 		rec.ID = uuid.New().String()
 	}
@@ -188,7 +188,7 @@ func (r *BackupSQLiteRepository) CreateRecord(ctx context.Context, rec *models.B
 	return nil
 }
 
-func (r *BackupSQLiteRepository) ListRecordsByConfig(ctx context.Context, backupConfigID string) ([]*models.BackupRecord, error) {
+func (r *BackupRepo) ListRecordsByConfig(ctx context.Context, backupConfigID string) ([]*models.BackupRecord, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var list []*models.BackupRecord
@@ -203,7 +203,7 @@ func (r *BackupSQLiteRepository) ListRecordsByConfig(ctx context.Context, backup
 	return list, nil
 }
 
-func (r *BackupSQLiteRepository) GetRecordByID(ctx context.Context, id string) (*models.BackupRecord, error) {
+func (r *BackupRepo) GetRecordByID(ctx context.Context, id string) (*models.BackupRecord, error) {
 	var rec models.BackupRecord
 	err := r.db.GetContext(ctx, &rec, `
 		SELECT id, backup_config_id, project_id, COALESCE(database_id, '') as database_id, status, COALESCE(file_path, '') as file_path, file_size_bytes, COALESCE(s3_url, '') as s3_url, COALESCE(logs, '') as logs, started_at, COALESCE(completed_at, '') as completed_at
@@ -217,7 +217,7 @@ func (r *BackupSQLiteRepository) GetRecordByID(ctx context.Context, id string) (
 	return &rec, nil
 }
 
-func (r *BackupSQLiteRepository) UpdateRecord(ctx context.Context, rec *models.BackupRecord) error {
+func (r *BackupRepo) UpdateRecord(ctx context.Context, rec *models.BackupRecord) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	res, err := r.db.ExecContext(ctx, `

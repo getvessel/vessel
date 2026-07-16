@@ -25,16 +25,16 @@ type AppServiceRepository interface {
 	Delete(ctx context.Context, id string) error
 }
 
-type AppServiceSQLiteRepository struct {
+type AppServiceRepo struct {
 	mu sync.RWMutex
 	db *sqlx.DB
 }
 
-func NewAppServiceSQLiteRepository(db *sql.DB) *AppServiceSQLiteRepository {
-	return &AppServiceSQLiteRepository{db: sqlx.NewDb(db, "sqlite")}
+func NewAppServiceRepo(db *sql.DB) *AppServiceRepo {
+	return &AppServiceRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *AppServiceSQLiteRepository) Create(_ context.Context, svc *models.AppService) error {
+func (r *AppServiceRepo) Create(_ context.Context, svc *models.AppService) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if svc.ID == "" {
@@ -62,7 +62,7 @@ func (r *AppServiceSQLiteRepository) Create(_ context.Context, svc *models.AppSe
 	return nil
 }
 
-func (r *AppServiceSQLiteRepository) GetByID(ctx context.Context, id string) (*models.AppService, error) {
+func (r *AppServiceRepo) GetByID(ctx context.Context, id string) (*models.AppService, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var svc models.AppService
@@ -79,7 +79,7 @@ func (r *AppServiceSQLiteRepository) GetByID(ctx context.Context, id string) (*m
 	return &svc, nil
 }
 
-func (r *AppServiceSQLiteRepository) ListByEnvironment(ctx context.Context, environmentID string) ([]*models.AppService, error) {
+func (r *AppServiceRepo) ListByEnvironment(ctx context.Context, environmentID string) ([]*models.AppService, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var list []*models.AppService
@@ -96,7 +96,7 @@ func (r *AppServiceSQLiteRepository) ListByEnvironment(ctx context.Context, envi
 	return list, nil
 }
 
-func (r *AppServiceSQLiteRepository) ListByProject(ctx context.Context, projectID string) ([]*models.AppService, error) {
+func (r *AppServiceRepo) ListByProject(ctx context.Context, projectID string) ([]*models.AppService, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var list []*models.AppService
@@ -113,7 +113,7 @@ func (r *AppServiceSQLiteRepository) ListByProject(ctx context.Context, projectI
 	return list, nil
 }
 
-func (r *AppServiceSQLiteRepository) ListAll(ctx context.Context) ([]*models.AppService, error) {
+func (r *AppServiceRepo) ListAll(ctx context.Context) ([]*models.AppService, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	var list []*models.AppService
@@ -130,7 +130,7 @@ func (r *AppServiceSQLiteRepository) ListAll(ctx context.Context) ([]*models.App
 	return list, nil
 }
 
-func (r *AppServiceSQLiteRepository) Update(_ context.Context, svc *models.AppService) error {
+func (r *AppServiceRepo) Update(_ context.Context, svc *models.AppService) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	svc.UpdatedAt = time.Now().UTC()
@@ -147,7 +147,7 @@ func (r *AppServiceSQLiteRepository) Update(_ context.Context, svc *models.AppSe
 	return nil
 }
 
-func (r *AppServiceSQLiteRepository) Delete(_ context.Context, id string) error {
+func (r *AppServiceRepo) Delete(_ context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	_, err := r.db.Exec(`DELETE FROM app_services WHERE id = ?`, id)

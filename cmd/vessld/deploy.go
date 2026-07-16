@@ -115,10 +115,10 @@ func runDeploy(args []string) {
 		exitError("Failed to connect to Docker: %v", err)
 	}
 
-	envRepo := repositories.NewEnvironmentSQLiteRepository(db)
-	appRepo := repositories.NewAppServiceSQLiteRepository(db)
-	projectRepo := repositories.NewProjectSQLiteRepository(db, envRepo)
-	settingsRepo := repositories.NewSettingsSQLiteRepository(db)
+	envRepo := repositories.NewEnvironmentRepo(db)
+	appRepo := repositories.NewAppServiceRepo(db)
+	projectRepo := repositories.NewProjectRepo(db, envRepo)
+	settingsRepo := repositories.NewSettingsRepo(db)
 
 	appName := extractRepoName(gitURL)
 	if appName == "app" && imageRef != "" {
