@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/containerd/errdefs"
@@ -89,26 +90,27 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 		fmt.Fprintf(logWriter, "🔄 [Deployer] Rolling out container %s with %d encrypted environment variables...\n", newContainerName, len(envSlice))
 	}
 
-	if err := d.startContainer(ctx, StartContainerOpts{
+	startedNames, err := d.startContainer(ctx, StartContainerOpts{
 		App:           app,
 		ContainerName: newContainerName,
 		ImageTag:      imageTag,
 		EnvSlice:      envSlice,
-	}); err != nil {
+	})
+	if err != nil {
 		return "", err
 	}
 
-	if err := d.verifyHealthCheck(ctx, app, newContainerName, logWriter); err != nil {
+	if err := d.verifyHealthCheck(ctx, app, startedNames[0], logWriter); err != nil {
 		return "", err
 	}
 
 	if logWriter != nil {
 		fmt.Fprintf(logWriter, "🎉 [Deployer] Health check passed! Container is ready.\n")
-		fmt.Fprintf(logWriter, "🎉 [Deployer] Deployment successful! Container ID: %s\n", newContainerName)
+		fmt.Fprintf(logWriter, "🎉 [Deployer] Deployment successful! Replicas started: %d\n", len(startedNames))
 	}
 
-	d.scheduleCleanup(app, newContainerName, logWriter)
-	return newContainerName, nil
+	d.scheduleCleanup(app, startedNames, logWriter)
+	return startedNames[0], nil
 }
 
 func (d *Deployer) prepareServerlessCode(app *models.AppService, sourceDir string, logWriter io.Writer) error {
@@ -181,7 +183,7 @@ type StartContainerOpts struct {
 	EnvSlice      []string
 }
 
-func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) error {
+func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) ([]string, error) {
 	port := opts.App.InternalPort
 	if port <= 0 {
 		port = defaultAppPort()
@@ -190,40 +192,88 @@ func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) 
 		port = 80 // NGINX alpine default port
 	}
 
-	containerOpts := ContainerRunOptions{
-		Name:            opts.ContainerName,
-		ImageTag:        opts.ImageTag,
-		ServiceID:       opts.App.ID,
-		Domain:          opts.App.Domain,
-		InternalPort:    port,
-		RuntimeMode:     opts.App.RuntimeMode,
-		Envs:            opts.EnvSlice,
-		MemoryLimitMB:   defaultMemoryMB(),
-		CPURequest:      defaultCPURequest(),
-		HealthCheckPath: opts.App.HealthCheckPath,
+	replicas := opts.App.Replicas
+	if replicas <= 0 {
+		replicas = 1
 	}
 
-	_, err := d.containerManager.CreateAndStart(ctx, containerOpts)
-	if err != nil {
-		return fmt.Errorf("container rollout failed: %w", err)
+	var startedNames []string
+
+	for i := 0; i < replicas; i++ {
+		containerName := opts.ContainerName
+		if replicas > 1 {
+			containerName = fmt.Sprintf("%s-%d", opts.ContainerName, i)
+		}
+
+		containerOpts := ContainerRunOptions{
+			Name:            containerName,
+			ImageTag:        opts.ImageTag,
+			ServiceID:       opts.App.ID,
+			Domain:          opts.App.Domain,
+			InternalPort:    port,
+			RuntimeMode:     opts.App.RuntimeMode,
+			Envs:            opts.EnvSlice,
+			MemoryLimitMB:   defaultMemoryMB(),
+			CPURequest:      defaultCPURequest(),
+			HealthCheckPath: opts.App.HealthCheckPath,
+		}
+
+		_, err := d.containerManager.CreateAndStart(ctx, containerOpts)
+		if err != nil {
+			return startedNames, fmt.Errorf("container rollout failed for replica %d: %w", i, err)
+		}
+		startedNames = append(startedNames, containerName)
 	}
-	return nil
+
+	// For database apps, scheduleCleanup shouldn't run unless we support replicas.
+	return startedNames, nil
 }
 
-func (d *Deployer) scheduleCleanup(app *models.AppService, newContainerName string, logWriter io.Writer) {
+func (d *Deployer) scheduleCleanup(app *models.AppService, newContainerNames []string, logWriter io.Writer) {
 	prefix := utils.NormalizeContainerName(app.ID)
 	go func() {
 		time.Sleep(10 * time.Second)
 		if logWriter != nil {
 			fmt.Fprintf(logWriter, "🧹 [Deployer] Cleaning up old orphaned containers...\n")
 		}
-		_ = d.containerManager.CleanupOrphanedContainers(context.Background(), prefix, newContainerName)
+		_ = d.containerManager.CleanupOrphanedContainers(context.Background(), prefix, newContainerNames)
 	}()
 }
 
 func (d *Deployer) Stop(ctx context.Context, containerID string) error {
 	stopTimeout := 10
 	return d.containerManager.dockerClient.ContainerStop(ctx, containerID, container.StopOptions{Timeout: &stopTimeout})
+}
+
+func (d *Deployer) StopAppService(ctx context.Context, appID string) error {
+	prefix := utils.NormalizeContainerName(appID)
+	return d.containerManager.CleanupOrphanedContainers(ctx, prefix, []string{})
+}
+
+func (d *Deployer) RestartAppService(ctx context.Context, appID string) error {
+	prefix := utils.NormalizeContainerName(appID)
+	containers, err := d.containerManager.dockerClient.ContainerList(ctx, container.ListOptions{All: true})
+	if err != nil {
+		return fmt.Errorf("failed to list containers: %w", err)
+	}
+
+	timeout := 10
+	restarted := 0
+	for _, ctn := range containers {
+		for _, name := range ctn.Names {
+			if strings.HasPrefix(name, "/"+prefix+"-") {
+				if err := d.containerManager.dockerClient.ContainerRestart(ctx, ctn.ID, container.StopOptions{Timeout: &timeout}); err != nil {
+					return fmt.Errorf("failed to restart container %s: %w", ctn.ID, err)
+				}
+				restarted++
+				break
+			}
+		}
+	}
+	if restarted == 0 {
+		return fmt.Errorf("no containers found for app")
+	}
+	return nil
 }
 
 func (d *Deployer) Remove(ctx context.Context, containerID string) error {
@@ -245,30 +295,21 @@ func (d *Deployer) DeployImage(ctx context.Context, app *models.AppService, logW
 	}
 
 	containerName := fmt.Sprintf("%s-%s", utils.NormalizeContainerName(app.ID), uuid.New().String()[:8])
-	domain := app.Domain
 
-	opts := ContainerRunOptions{
-		Name:            containerName,
-		ImageTag:        app.ImageRef,
-		ServiceID:       app.ID,
-		Domain:          domain,
-		InternalPort:    port,
-		RuntimeMode:     app.RuntimeMode,
-		Envs:            nil, // Serverless relies on runtime env vars
-		MemoryLimitMB:   defaultMemoryMB(),
-		CPURequest:      defaultCPURequest(),
-		HealthCheckPath: app.HealthCheckPath,
-	}
-
-	cid, err := d.containerManager.CreateAndStart(ctx, opts)
+	startedNames, err := d.startContainer(ctx, StartContainerOpts{
+		App:           app,
+		ContainerName: containerName,
+		ImageTag:      app.ImageRef,
+		EnvSlice:      nil,
+	})
 	if err != nil {
 		return "", err
 	}
 
-	if err := d.verifyHealthCheck(ctx, app, containerName, logWriter); err != nil {
+	if err := d.verifyHealthCheck(ctx, app, startedNames[0], logWriter); err != nil {
 		return "", err
 	}
 
-	d.scheduleCleanup(app, containerName, logWriter)
-	return cid, nil
+	d.scheduleCleanup(app, startedNames, logWriter)
+	return startedNames[0], nil
 }

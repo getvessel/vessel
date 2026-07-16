@@ -129,6 +129,7 @@ type AppService struct {
 	HealthCheckPath string           `json:"healthCheckPath" db:"health_check_path"`
 	ContainerID     string           `json:"containerId" db:"container_id"`
 	Status          AppServiceStatus `json:"status" db:"status"`
+	Replicas        int              `json:"replicas" db:"replicas"`
 	CreatedAt       time.Time        `json:"createdAt" db:"created_at"`
 	UpdatedAt       time.Time        `json:"updatedAt" db:"updated_at"`
 }

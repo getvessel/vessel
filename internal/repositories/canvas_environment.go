@@ -94,15 +94,15 @@ func (r *CanvasRepo) listAllEnvironments(ctx context.Context) ([]*models.Environ
 }
 
 func (r *CanvasRepo) listAllAppServices() ([]*models.AppService, error) {
-	return r.scanAppServices(context.Background(), `SELECT id, project_id, environment_id, name, COALESCE(repository_url,'') as repository_url, COALESCE(image_ref,'') as image_ref, COALESCE(branch,'') as branch, internal_port, COALESCE(domain,'') as domain, COALESCE(container_id,'') as container_id, status, created_at, updated_at FROM app_services ORDER BY created_at DESC`)
+	return r.scanAppServices(context.Background(), `SELECT id, project_id, environment_id, name, COALESCE(repository_url,'') as repository_url, COALESCE(image_ref,'') as image_ref, COALESCE(branch,'') as branch, internal_port, COALESCE(domain,'') as domain, COALESCE(container_id,'') as container_id, status, replicas, created_at, updated_at FROM app_services ORDER BY created_at DESC`)
 }
 
 func (r *CanvasRepo) listAppServicesByProject(projectID string) ([]*models.AppService, error) {
-	return r.scanAppServices(context.Background(), `SELECT id, project_id, environment_id, name, COALESCE(repository_url,'') as repository_url, COALESCE(image_ref,'') as image_ref, COALESCE(branch,'') as branch, internal_port, COALESCE(domain,'') as domain, COALESCE(container_id,'') as container_id, status, created_at, updated_at FROM app_services WHERE project_id = ? ORDER BY created_at DESC`, projectID)
+	return r.scanAppServices(context.Background(), `SELECT id, project_id, environment_id, name, COALESCE(repository_url,'') as repository_url, COALESCE(image_ref,'') as image_ref, COALESCE(branch,'') as branch, internal_port, COALESCE(domain,'') as domain, COALESCE(container_id,'') as container_id, status, replicas, created_at, updated_at FROM app_services WHERE project_id = ? ORDER BY created_at DESC`, projectID)
 }
 
 func (r *CanvasRepo) listAppServicesByEnvironment(ctx context.Context, environmentID string) ([]*models.AppService, error) {
-	return r.scanAppServices(ctx, `SELECT id, project_id, environment_id, name, COALESCE(repository_url,'') as repository_url, COALESCE(image_ref,'') as image_ref, COALESCE(branch,'') as branch, internal_port, COALESCE(domain,'') as domain, COALESCE(container_id,'') as container_id, status, created_at, updated_at FROM app_services WHERE environment_id = ? ORDER BY created_at DESC`, environmentID)
+	return r.scanAppServices(ctx, `SELECT id, project_id, environment_id, name, COALESCE(repository_url,'') as repository_url, COALESCE(image_ref,'') as image_ref, COALESCE(branch,'') as branch, internal_port, COALESCE(domain,'') as domain, COALESCE(container_id,'') as container_id, status, replicas, created_at, updated_at FROM app_services WHERE environment_id = ? ORDER BY created_at DESC`, environmentID)
 }
 
 func (r *CanvasRepo) scanAppServices(ctx context.Context, query string, args ...any) ([]*models.AppService, error) {

@@ -212,6 +212,35 @@ func (h *DatabaseHandler) StopDatabase(c echo.Context) error {
 	return utils.Success(c, "Operation successful", map[string]string{"status": "stopped"})
 }
 
+// @Summary RestartDatabase endpoint
+// @Description RestartDatabase endpoint
+// @Tags Databases
+// @Accept json
+// @Produce json
+// @Param id path string true "id"
+// @Router /databases/{id}/restart [post]
+func (h *DatabaseHandler) RestartDatabase(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing database id parameter")
+	}
+	db, err := h.databaseService.GetDatabase(c.Request().Context(), id)
+	if err != nil || db == nil {
+		return utils.Error(c, http.StatusNotFound, "database not found")
+	}
+	if err := h.verifyProjectOwnership(c, db.ProjectID); err != nil {
+		return err
+	}
+	if err := h.databaseService.StopDatabase(c.Request().Context(), id); err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+	dbStarted, err := h.databaseService.StartDatabase(c.Request().Context(), id)
+	if err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+	return utils.Success(c, "Operation successful", dbStarted)
+}
+
 // @Summary ImportData endpoint
 // @Description ImportData endpoint
 // @Tags Databases

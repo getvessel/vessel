@@ -7,18 +7,26 @@ import (
 
 	"vessl.dev/vessl/internal/utils"
 
+	"vessl.dev/vessl/internal/engine"
 	"vessl.dev/vessl/internal/http/middleware"
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/services"
 )
 
 type AppHandler struct {
-	appService     *services.AppService
-	projectService *services.ProjectService
+	appService        *services.AppService
+	projectService    *services.ProjectService
+	deployer          *engine.Deployer
+	deploymentService *services.DeploymentService
 }
 
-func NewAppHandler(s *services.AppService, ps *services.ProjectService) *AppHandler {
-	return &AppHandler{appService: s, projectService: ps}
+func NewAppHandler(s *services.AppService, ps *services.ProjectService, d *engine.Deployer, ds *services.DeploymentService) *AppHandler {
+	return &AppHandler{
+		appService:        s,
+		projectService:    ps,
+		deployer:          d,
+		deploymentService: ds,
+	}
 }
 
 func (h *AppHandler) verifyProjectOwnership(c echo.Context, projectID string) error {
@@ -191,4 +199,87 @@ func (h *AppHandler) Delete(c echo.Context) error {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)
+}
+
+// @Summary Stop App Service
+// @Description Stops all containers belonging to this app service
+// @Tags AppServices
+// @Accept json
+// @Produce json
+// @Param id path string true "App ID"
+// @Router /apps/{id}/stop [post]
+func (h *AppHandler) StopService(c echo.Context) error {
+	id := c.Param("id")
+	existing, err := h.appService.GetAppService(c.Request().Context(), id)
+	if err != nil || existing == nil {
+		return utils.Error(c, http.StatusNotFound, "app service not found")
+	}
+	if err := h.verifyProjectOwnership(c, existing.ProjectID); err != nil {
+		return err
+	}
+	if err := h.deployer.StopAppService(c.Request().Context(), id); err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+	existing.Status = models.AppServiceStatusStopped
+	_ = h.appService.UpdateAppService(c.Request().Context(), existing)
+	return utils.Success(c, "Service stopped successfully", existing)
+}
+
+// @Summary Redeploy App Service
+// @Description Creates a new deployment for this app service using the same branch/commit as the last deployment
+// @Tags AppServices
+// @Accept json
+// @Produce json
+// @Param id path string true "App ID"
+// @Router /apps/{id}/redeploy [post]
+func (h *AppHandler) RedeployService(c echo.Context) error {
+	id := c.Param("id")
+	existing, err := h.appService.GetAppService(c.Request().Context(), id)
+	if err != nil || existing == nil {
+		return utils.Error(c, http.StatusNotFound, "app service not found")
+	}
+	if err := h.verifyProjectOwnership(c, existing.ProjectID); err != nil {
+		return err
+	}
+
+	newDep := &models.Deployment{
+		ServiceID:     existing.ID,
+		EnvironmentID: existing.EnvironmentID,
+		ProjectID:     existing.ProjectID,
+		Status:        "BUILDING",
+		CommitMessage: "Manual Redeploy",
+		Branch:        existing.Branch,
+		Trigger:       "Manual Redeploy",
+	}
+	created, err := h.deploymentService.CreateDeployment(c.Request().Context(), newDep)
+	if err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+
+	h.deploymentService.ExecuteDeploymentAsync(created)
+	return utils.Accepted(c, "Redeployment triggered", created)
+}
+
+// @Summary Restart App Service
+// @Description Restarts all containers belonging to this app service
+// @Tags AppServices
+// @Accept json
+// @Produce json
+// @Param id path string true "App ID"
+// @Router /apps/{id}/restart [post]
+func (h *AppHandler) RestartService(c echo.Context) error {
+	id := c.Param("id")
+	existing, err := h.appService.GetAppService(c.Request().Context(), id)
+	if err != nil || existing == nil {
+		return utils.Error(c, http.StatusNotFound, "app service not found")
+	}
+	if err := h.verifyProjectOwnership(c, existing.ProjectID); err != nil {
+		return err
+	}
+	if err := h.deployer.RestartAppService(c.Request().Context(), id); err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+	existing.Status = models.AppServiceStatusRunning
+	_ = h.appService.UpdateAppService(c.Request().Context(), existing)
+	return utils.Success(c, "Service restarted successfully", existing)
 }

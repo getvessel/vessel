@@ -123,6 +123,10 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	gitService := services.NewGitService(gitRepo)
 	statsMonitor := engine.NewStatsMonitor(dockerClient)
 	deploymentService := services.NewDeploymentService(deployRepo, appRepo, projectRepo, deployer, gitService, statsMonitor)
+
+	autoscaler := engine.NewAutoscalerWorker(appRepo, statsMonitor, deploymentService)
+	autoscaler.Start()
+
 	backupService := services.NewBackupService(backupRepo, s3DestinationRepo, backupManager)
 	userService := services.NewUserService(userRepo)
 	oAuthService := services.NewOAuthService(oauthRepo, userRepo, tokenService)
@@ -145,7 +149,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 
 	authGuard := middleware.NewAuthGuard(tokenService, settingsService, projectSettingsService)
 
-	appHandler := handlers.NewAppHandler(appService, projectService)
+	appHandler := handlers.NewAppHandler(appService, projectService, deployer, deploymentService)
 	databaseHandler := handlers.NewDatabaseHandler(databaseService, projectService)
 	storageHandler := handlers.NewStorageHandler(storageService)
 	jobHandler := handlers.NewJobHandler(jobService)

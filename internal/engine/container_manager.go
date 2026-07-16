@@ -81,6 +81,8 @@ func (c *ContainerManager) buildTraefikLabels(serviceID, domain string, internal
 	labels := map[string]string{
 		"traefik.enable": "true",
 		fmt.Sprintf("traefik.http.routers.%s.rule", serviceID):                      fmt.Sprintf("Host(`%s`)", domain),
+		fmt.Sprintf("traefik.http.routers.%s.tls", serviceID):                       "true",
+		fmt.Sprintf("traefik.http.routers.%s.tls.certresolver", serviceID):          "letsencrypt",
 		fmt.Sprintf("traefik.http.services.%s.loadbalancer.server.port", serviceID): fmt.Sprintf("%d", internalPort),
 	}
 	if healthCheckPath != "" {
@@ -140,15 +142,22 @@ func (c *ContainerManager) StreamLogs(ctx context.Context, containerIDOrName str
 	return err
 }
 
-func (c *ContainerManager) CleanupOrphanedContainers(ctx context.Context, prefix string, excludeContainerID string) error {
+func (c *ContainerManager) CleanupOrphanedContainers(ctx context.Context, prefix string, excludeContainerNames []string) error {
 	containers, err := c.dockerClient.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
 		return fmt.Errorf("failed to list containers: %w", err)
 	}
+
+	excludeMap := make(map[string]bool)
+	for _, n := range excludeContainerNames {
+		excludeMap[n] = true
+		excludeMap["/"+n] = true
+	}
+
 	for _, ctn := range containers {
 		for _, name := range ctn.Names {
 			if strings.HasPrefix(name, "/"+prefix+"-") {
-				if ctn.ID != excludeContainerID && name != "/"+excludeContainerID {
+				if !excludeMap[ctn.ID] && !excludeMap[name] {
 					_ = c.StopAndRemove(ctx, ctn.ID)
 				}
 				break

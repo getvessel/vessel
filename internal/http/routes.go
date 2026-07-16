@@ -62,6 +62,7 @@ func (s *Server) registerRoutes() {
 	authGroup.DELETE("/databases/:id", s.dbHandler.DeleteDatabase, s.authGuard.RequireScope("database:manage"))
 	authGroup.POST("/databases/:id/start", s.dbHandler.StartDatabase, s.authGuard.RequireScope("database:manage"))
 	authGroup.POST("/databases/:id/stop", s.dbHandler.StopDatabase, s.authGuard.RequireScope("database:manage"))
+	authGroup.POST("/databases/:id/restart", s.dbHandler.RestartDatabase, s.authGuard.RequireScope("database:manage"))
 	authGroup.POST("/databases/:id/query", s.dbHandler.QueryDatabase, s.authGuard.RequireScope("database:manage"))
 	authGroup.POST("/databases/:id/import", s.dbHandler.ImportData, s.authGuard.RequireScope("database:manage"))
 
@@ -101,6 +102,9 @@ func (s *Server) registerRoutes() {
 	authGroup.GET("/apps/:id", s.appServiceHandler.Get)
 	authGroup.PUT("/apps/:id", s.appServiceHandler.Update)
 	authGroup.DELETE("/apps/:id", s.appServiceHandler.Delete)
+	authGroup.POST("/apps/:id/stop", s.appServiceHandler.StopService)
+	authGroup.POST("/apps/:id/redeploy", s.appServiceHandler.RedeployService)
+	authGroup.POST("/apps/:id/restart", s.appServiceHandler.RestartService)
 	authGroup.GET("/services/:serviceId/deployments", s.deploymentHandler.ListServiceDeployments)
 	authGroup.POST("/services/:serviceId/deploy", s.deploymentHandler.Trigger)
 	authGroup.POST("/deployments/:id/rollback", s.deploymentHandler.Rollback)
