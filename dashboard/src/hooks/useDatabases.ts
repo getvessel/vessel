@@ -56,6 +56,16 @@ export const useStopDatabase = () => {
   });
 };
 
+export const useRestartDatabase = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { id: string }) => databasesService.restartDatabase(payload.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['databases'] });
+    },
+  });
+};
+
 export const useQueryDatabase = () => {
   const queryClient = useQueryClient();
   return useMutation({

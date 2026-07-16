@@ -70,6 +70,14 @@ export const databasesService = {
     }
   },
 
+  restartDatabase: async (id: string): Promise<void> => {
+    try {
+      await apiClient.post(`/databases/${id}/restart`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   executeQuery: async (id: string, query: string): Promise<DatabaseQueryResponseType> => {
     try {
       return await apiClient.post<DatabaseQueryResponseType>(`/databases/${id}/query`, { query });

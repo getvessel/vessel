@@ -66,4 +66,28 @@ export const appsService = {
       throw handleApiError(error);
     }
   },
+
+  stopApp: async (appId: string): Promise<void> => {
+    try {
+      await apiClient.post(`/apps/${appId}/stop`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  redeployApp: async (appId: string): Promise<void> => {
+    try {
+      await apiClient.post(`/apps/${appId}/redeploy`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  restartApp: async (appId: string): Promise<void> => {
+    try {
+      await apiClient.post(`/apps/${appId}/restart`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
 };

@@ -35,7 +35,7 @@ const navGroups: NavGroup[] = [
     title: 'Resources',
     items: [
       { title: 'Databases', url: '/databases', icon: Database },
-      { title: 'Storage', url: '/settings/backups', icon: HardDrive },
+      { title: 'Storage', url: '/storage', icon: HardDrive },
       { title: 'Sources', url: '/settings/git-apps', icon: Code },
     ],
   },
