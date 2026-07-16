@@ -1,4 +1,4 @@
-package repositories
+package repositories_test
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"vessl.dev/vessl/internal/models"
+	"vessl.dev/vessl/internal/repositories"
 
 	_ "modernc.org/sqlite"
 )
@@ -27,11 +28,11 @@ func TestDatabaseRepositoryListAfterMigrations(t *testing.T) {
 	}
 	defer db.Close()
 
-	if err := RunMigrations(db); err != nil {
+	if err := repositories.RunMigrations(db); err != nil {
 		t.Fatalf("run migrations: %v", err)
 	}
 
-	repo := NewDatabaseSQLiteRepository(db, testVault{})
+	repo := repositories.NewDatabaseRepo(db, testVault{})
 	database := &models.Database{
 		ProjectID:          "project-1",
 		EnvironmentID:      "environment-1",

@@ -40,6 +40,9 @@ func (d *StorageDeployer) SpinUp(ctx context.Context, sc *models.Storage) (strin
 	if d.dockerClient == nil {
 		return "", fmt.Errorf("docker daemon connection is not available")
 	}
+	if utils.IsDryRun() {
+		return fmt.Sprintf("vessl-storage-%s-dryrun", sc.Name), nil
+	}
 	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessl-storage-%s", sc.Name))
 	_ = d.dockerClient.ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true})
 	imageName := minioImage()
@@ -107,6 +110,9 @@ func (d *StorageDeployer) SpinUp(ctx context.Context, sc *models.Storage) (strin
 func (d *StorageDeployer) Stop(ctx context.Context, storageID string) error {
 	if d.dockerClient == nil {
 		return fmt.Errorf("docker daemon connection is not available")
+	}
+	if utils.IsDryRun() {
+		return nil
 	}
 	sc, err := d.store.GetStorage(storageID)
 	if err != nil || sc == nil {

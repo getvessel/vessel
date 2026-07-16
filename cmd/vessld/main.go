@@ -105,9 +105,7 @@ func startServer() {
 	}
 
 	traefikMgr := engine.NewTraefikManager(dockerClient, os.Getenv("VESSL_TLS_EMAIL"))
-	if os.Getenv("VESSL_SKIP_TRAEFIK") == "true" {
-		slog.Info("skipping Traefik startup")
-	} else if err := traefikMgr.EnsureTraefikRunning(context.Background()); err != nil {
+	if err := traefikMgr.EnsureTraefikRunning(context.Background()); err != nil {
 		slog.Warn("failed to start Traefik proxy", "err", err)
 	}
 

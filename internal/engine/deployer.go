@@ -53,7 +53,7 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 		fmt.Fprintf(logWriter, "🚀 [Deployer] Starting deployment for service: %s (ID: %s)\n", app.Name, app.ID)
 	}
 
-	if os.Getenv("DEPLOY_DRY_RUN") == "true" {
+	if utils.IsDryRun() {
 		if logWriter != nil {
 			fmt.Fprintf(logWriter, "🚀 [Deployer] Dry-run mode is enabled. Skipping actual build and run steps.\n")
 		}
@@ -287,6 +287,14 @@ func (d *Deployer) Remove(ctx context.Context, containerID string) error {
 func (d *Deployer) DeployImage(ctx context.Context, app *models.AppService, logWriter io.Writer) (string, error) {
 	if app.ImageRef == "" {
 		return "", fmt.Errorf("image ref is empty")
+	}
+
+	if utils.IsDryRun() {
+		if logWriter != nil {
+			fmt.Fprintf(logWriter, "🚀 [Deployer] Dry-run mode is enabled. Skipping image deploy.\n")
+		}
+		newContainerName := fmt.Sprintf("%s-dryrun", utils.NormalizeContainerName(app.ID))
+		return newContainerName, nil
 	}
 
 	port := app.InternalPort

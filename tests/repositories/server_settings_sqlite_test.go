@@ -1,9 +1,10 @@
-package repositories
+package repositories_test
 
 import (
 	"context"
 	"database/sql"
 	"testing"
+	"vessl.dev/vessl/internal/repositories"
 
 	_ "modernc.org/sqlite"
 )
@@ -15,11 +16,11 @@ func TestSettingsRepositoryCreatesAndUpdatesDefaults(t *testing.T) {
 	}
 	defer db.Close()
 
-	if err := RunMigrations(db); err != nil {
+	if err := repositories.RunMigrations(db); err != nil {
 		t.Fatalf("run migrations: %v", err)
 	}
 
-	repo := NewSettingsSQLiteRepository(db)
+	repo := repositories.NewSettingsRepo(db)
 	settings, err := repo.GetServerSettings(context.Background())
 	if err != nil {
 		t.Fatalf("get default settings: %v", err)

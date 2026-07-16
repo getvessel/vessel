@@ -34,6 +34,11 @@ func (d *DatabaseDeployer) SpinUp(ctx context.Context, dbConfig *models.Database
 	if d.dockerClient == nil {
 		return "", fmt.Errorf("docker daemon connection is not available")
 	}
+
+	if utils.IsDryRun() {
+		return fmt.Sprintf("vessl-db-%s-dryrun", dbConfig.Name), nil
+	}
+
 	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessl-db-%s", dbConfig.Name))
 	_ = d.dockerClient.ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true})
 	var imageName string
@@ -175,6 +180,9 @@ func (d *DatabaseDeployer) Stop(ctx context.Context, dbID string) error {
 	if d.dockerClient == nil {
 		return fmt.Errorf("docker daemon connection is not available")
 	}
+	if utils.IsDryRun() {
+		return nil
+	}
 	dbConfig, err := d.store.GetDatabase(dbID)
 	if err != nil || dbConfig == nil {
 		return utils.NewNotFoundError("Database", dbID)
@@ -187,6 +195,9 @@ func (d *DatabaseDeployer) Stop(ctx context.Context, dbID string) error {
 func (d *DatabaseDeployer) ImportData(ctx context.Context, dbConfig *models.Database, sourceURL string) error {
 	if d.dockerClient == nil {
 		return fmt.Errorf("docker daemon connection is not available")
+	}
+	if utils.IsDryRun() {
+		return nil
 	}
 
 	containerName := utils.NormalizeContainerName(fmt.Sprintf("vessl-db-%s", dbConfig.Name))

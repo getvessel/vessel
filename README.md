@@ -56,7 +56,7 @@ vessl deploy <service-id>
 
 Want to contribute or hack on Vessl locally?
 
-```bash
+````bash
 # 1. Clone the repository
 git clone https://github.com/vesslhq/vessl.git
 cd vessl
@@ -64,7 +64,24 @@ cd vessl
 # 2. Setup your environment
 cp .env.example .env
 
-# 3. Run the Go daemon locally (starts on :8080)
+# 3. Run locally
+You can run the Go daemon and the frontend dashboard concurrently using the provided Makefiles.
+
+To run the daemon normally + frontend:
+```bash
+make dev
+````
+
+To run the daemon in dry-run mode (skips Docker actions) + frontend:
+
+```bash
+make dev-dryrun
+```
+
+Alternatively, you can manually build the dashboard and run the daemon:
+
+```bash
+cd dashboard && npm install && npm run build && cd ..
 go run ./cmd/vessld
 ```
 

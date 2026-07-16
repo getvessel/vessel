@@ -54,12 +54,8 @@ const navGroups: NavGroup[] = [
       { title: 'Notifications', url: '/notifications', icon: Bell },
       { title: 'Audit Logs', url: '/audit-logs', icon: ScrollText },
       { title: 'Terminal', url: '/terminal', icon: Terminal },
-<<<<<<< HEAD
       { title: 'Users', url: '/settings/users', icon: Users },
-      { title: 'Settings', url: '/settings', icon: Settings },
-=======
       { title: 'Settings', url: '/settings', icon: Settings, exact: true },
->>>>>>> ebe5d02 (feat: ui/ux revamp)
     ],
   },
 ];

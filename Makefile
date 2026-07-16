@@ -2,53 +2,26 @@ SERVICES = dashboard web docs
 BINARY_NAME = vessld
 BUILD_DIR = bin
 
-.PHONY: help all build build-daemon build-dashboard dev dev-daemon dev-dashboard clean check fmt test install update organize-imports deploy deploy-web deploy-docs docker-build docker-up docker-down
+.PHONY: help all build build-daemon build-dashboard dev dev-dryrun dev-daemon dev-dashboard clean check fmt test docker-build docker-up docker-down
 
 all: check build
 
 help:
 	@echo "Vessl — available commands:"
 	@echo ""
-	@echo "  make install           Install all npm dependencies"
 	@echo "  make check             Run Go fmt + vet"
 	@echo "  make fmt               Run Go fmt only"
 	@echo "  make test              Run Go tests"
 	@echo "  make build             Build daemon binary + dashboard"
 	@echo "  make dev               Run daemon + dashboard concurrently"
+	@echo "  make dev-dryrun        Run daemon (with DEPLOY_DRY_RUN=true) + dashboard concurrently"
 	@echo "  make dev-daemon        Run Go daemon in dev mode"
 	@echo "  make dev-dashboard     Run dashboard dev server"
 	@echo "  make clean             Remove build artifacts"
-	@echo "  make update            Check npm dependency updates"
-	@echo "  make organize-imports  Organize TS import order"
-	@echo "  make deploy-web        Deploy web to Cloudflare Pages"
-	@echo "  make deploy-docs       Deploy docs to Cloudflare Pages"
-	@echo "  make deploy            Deploy all frontends"
 	@echo "  make docker-build      Build Docker image"
 	@echo "  make docker-up         Start Docker stack"
 	@echo "  make docker-down       Stop Docker stack"
 
-install:
-	@echo "📦 Installing all dependencies..."
-	npm install
-
-update:
-	@echo "⬆️  Checking for dependency updates..."
-	@for dir in . $(SERVICES); do \
-		if [ -f "$$dir/package.json" ]; then \
-			echo "  📦 $$dir"; \
-			(cd $$dir && npx npm-check-updates -u 2>/dev/null) || true; \
-		fi \
-	done
-	@echo "✅ Update check complete. Run 'make install' to apply."
-
-organize-imports:
-	@echo "🗂️  Organizing TypeScript imports..."
-	@for dir in $(SERVICES); do \
-		if [ -f "$$dir/package.json" ]; then \
-			echo "  📦 $$dir"; \
-			(cd $$dir && npx organize-imports-cli tsconfig*.json 2>/dev/null) || true; \
-		fi \
-	done
 
 check:
 	@echo "🔍 Running Go checks and formatting..."
@@ -79,9 +52,13 @@ dev:
 	@echo "🚀 Launching self-hosted backend daemon and frontend GUI concurrently..."
 	npx concurrently -k "make dev-daemon" "make dev-dashboard"
 
+dev-dryrun:
+	@echo "🚀 Launching with DEPLOY_DRY_RUN=true and frontend GUI concurrently..."
+	npx concurrently -k "DEPLOY_DRY_RUN=true make dev-daemon" "make dev-dashboard"
+
 dev-daemon:
 	@echo "🚀 Running Go daemon in dev mode..."
-	VESSL_SKIP_TRAEFIK=true go run -tags dev ./cmd/vessld
+	go run ./cmd/vessld
 
 dev-dashboard:
 	@echo "💻 Running Dashboard dev server on port 3000..."
@@ -108,14 +85,3 @@ clean:
 	rm -rf $(BUILD_DIR)
 	rm -f $(BINARY_NAME)
 
-deploy-web:
-	@echo "🌐 Deploying web to Cloudflare Pages..."
-	npm run deploy:web
-
-deploy-docs:
-	@echo "📖 Deploying docs to Cloudflare Pages..."
-	npm run deploy:docs
-
-deploy:
-	@echo "🚀 Deploying all frontends to Cloudflare Pages..."
-	npm run deploy:all
