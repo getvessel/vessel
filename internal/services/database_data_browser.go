@@ -189,45 +189,58 @@ func (s *DatabaseService) InsertTableRow(ctx context.Context, id, table string, 
 }
 
 // UpdateTableRow updates a row.
-func (s *DatabaseService) UpdateTableRow(ctx context.Context, id, table string, keys map[string]any, data map[string]any) (*models.DatabaseQueryResponse, error) {
-	db, err := s.repo.GetByID(ctx, id)
+type UpdateTableRowOpts struct {
+	ID    string
+	Table string
+	Keys  map[string]any
+	Data  map[string]any
+}
+
+func (s *DatabaseService) UpdateTableRow(ctx context.Context, opts UpdateTableRowOpts) (*models.DatabaseQueryResponse, error) {
+	db, err := s.repo.GetByID(ctx, opts.ID)
 	if err != nil || db == nil {
 		return nil, errors.New("database not found")
-	}
-
-	var sets []string
-	for k, v := range data {
-		if db.Engine == "postgresql" || db.Engine == "postgres" {
-			sets = append(sets, fmt.Sprintf("\"%s\"=%s", k, escapeSQLValue(v)))
-		} else {
-			sets = append(sets, fmt.Sprintf("`%s`=%s", k, escapeSQLValue(v)))
-		}
-	}
-
-	var wheres []string
-	for k, v := range keys {
-		if db.Engine == "postgresql" || db.Engine == "postgres" {
-			wheres = append(wheres, fmt.Sprintf("\"%s\"=%s", k, escapeSQLValue(v)))
-		} else {
-			wheres = append(wheres, fmt.Sprintf("`%s`=%s", k, escapeSQLValue(v)))
-		}
-	}
-
-	if len(wheres) == 0 {
-		return nil, errors.New("at least one primary key is required for updates")
 	}
 
 	var query string
 	switch db.Engine {
 	case "postgresql", "postgres":
-		query = fmt.Sprintf("UPDATE \"%s\" SET %s WHERE %s", table, strings.Join(sets, ", "), strings.Join(wheres, " AND "))
+		var sets []string
+		for k, v := range opts.Data {
+			sets = append(sets, fmt.Sprintf("\"%s\"=%s", k, escapeSQLValue(v)))
+		}
+
+		var wheres []string
+		for k, v := range opts.Keys {
+			wheres = append(wheres, fmt.Sprintf("\"%s\"=%s", k, escapeSQLValue(v)))
+		}
+
+		if len(wheres) == 0 {
+			return nil, errors.New("at least one primary key is required for updates")
+		}
+
+		query = fmt.Sprintf("UPDATE \"%s\" SET %s WHERE %s", opts.Table, strings.Join(sets, ", "), strings.Join(wheres, " AND "))
+		return s.QueryDatabase(ctx, opts.ID, query)
 	case "mysql", "mariadb":
-		query = fmt.Sprintf("UPDATE `%s` SET %s WHERE %s", table, strings.Join(sets, ", "), strings.Join(wheres, " AND "))
+		var sets []string
+		for k, v := range opts.Data {
+			sets = append(sets, fmt.Sprintf("`%s`=%s", k, escapeSQLValue(v)))
+		}
+
+		var wheres []string
+		for k, v := range opts.Keys {
+			wheres = append(wheres, fmt.Sprintf("`%s`=%s", k, escapeSQLValue(v)))
+		}
+
+		if len(wheres) == 0 {
+			return nil, errors.New("at least one primary key is required for updates")
+		}
+
+		query = fmt.Sprintf("UPDATE `%s` SET %s WHERE %s", opts.Table, strings.Join(sets, ", "), strings.Join(wheres, " AND "))
+		return s.QueryDatabase(ctx, opts.ID, query)
 	default:
 		return nil, fmt.Errorf("updates not supported for engine: %s", db.Engine)
 	}
-
-	return s.QueryDatabase(ctx, id, query)
 }
 
 // DeleteTableRow deletes a row.

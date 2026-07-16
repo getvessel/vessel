@@ -22,25 +22,44 @@ func NewMetricsService() *MetricsService {
 }
 
 // GetServiceMetrics queries the TSDB for a given serviceID within the specified time range.
-func (s *MetricsService) GetServiceMetrics(ctx context.Context, serviceID string, start, end time.Time, step string) (map[string]any, error) {
-	// e.g., CPU query
-	cpuQuery := fmt.Sprintf(`container_cpu_usage_percent{service_id="%s"}`, serviceID)
-	// Memory query
-	memQuery := fmt.Sprintf(`container_memory_usage_bytes{service_id="%s"}`, serviceID)
+type ServiceMetricsOpts struct {
+	ServiceID string
+	Start     time.Time
+	End       time.Time
+	Step      string
+}
 
-	cpuData, err := s.queryRange(ctx, cpuQuery, start, end, step)
+func (s *MetricsService) GetServiceMetrics(ctx context.Context, opts ServiceMetricsOpts) (map[string]any, error) {
+	cpuQuery := fmt.Sprintf(`rate(container_cpu_usage_seconds_total{container_label_vessl_service="%s"}[5m])`, opts.ServiceID)
+	memQuery := fmt.Sprintf(`container_memory_usage_bytes{container_label_vessl_service="%s"}`, opts.ServiceID)
+	netRxQuery := fmt.Sprintf(`rate(container_network_receive_bytes_total{container_label_vessl_service="%s"}[5m])`, opts.ServiceID)
+	netTxQuery := fmt.Sprintf(`rate(container_network_transmit_bytes_total{container_label_vessl_service="%s"}[5m])`, opts.ServiceID)
+
+	cpuData, err := s.queryRange(ctx, cpuQuery, opts.Start, opts.End, opts.Step)
 	if err != nil {
 		return nil, err
 	}
 
-	memData, err := s.queryRange(ctx, memQuery, start, end, step)
+	memData, err := s.queryRange(ctx, memQuery, opts.Start, opts.End, opts.Step)
+	if err != nil {
+		return nil, err
+	}
+
+	netRxData, err := s.queryRange(ctx, netRxQuery, opts.Start, opts.End, opts.Step)
+	if err != nil {
+		return nil, err
+	}
+
+	netTxData, err := s.queryRange(ctx, netTxQuery, opts.Start, opts.End, opts.Step)
 	if err != nil {
 		return nil, err
 	}
 
 	return map[string]any{
-		"cpu":    cpuData,
-		"memory": memData,
+		"cpu":        cpuData,
+		"memory":     memData,
+		"network_rx": netRxData,
+		"network_tx": netTxData,
 	}, nil
 }
 

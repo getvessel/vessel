@@ -58,7 +58,13 @@ func (h *LogHandler) GetHistoricalLogs(c echo.Context) error {
 		start = end.Add(-24 * time.Hour)
 	}
 
-	logs, err := h.logService.GetHistoricalLogs(c.Request().Context(), serviceID, start, end, limit)
+	opts := services.HistoricalLogsOpts{
+		ServiceID: serviceID,
+		Start:     start,
+		End:       end,
+		Limit:     limit,
+	}
+	logs, err := h.logService.GetHistoricalLogs(c.Request().Context(), opts)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}

@@ -40,17 +40,6 @@ func NewWebhookHandler(
 	}
 }
 
-type GithubWebhookPayload struct {
-	Action      string `json:"action"`
-	Number      int    `json:"number"`
-	PullRequest struct {
-		Head struct {
-			Ref string `json:"ref"`
-			Sha string `json:"sha"`
-		} `json:"head"`
-	} `json:"pull_request"`
-}
-
 // @Summary HandleProjectWebhook endpoint
 // @Description HandleProjectWebhook endpoint
 // @Tags Webhooks
@@ -67,12 +56,16 @@ func (h *WebhookHandler) HandleProjectWebhook(c echo.Context) error {
 	if err != nil || project == nil {
 		return utils.Error(c, http.StatusNotFound, "project not found")
 	}
+	h.deployProjectAsync(project)
+	return utils.Accepted(c, fmt.Sprintf("triggering background build & deployment for %s", project.Name), nil)
+}
+
+func (h *WebhookHandler) deployProjectAsync(project *models.ProjectConfig) {
 	go func() {
 		ctx := context.Background()
 		sourceDir := filepath.Join(utils.GetDataDir(), "builds", project.ID)
 		_, _ = h.deploymentService.DeployProject(ctx, project.ID, sourceDir, nil)
 	}()
-	return utils.Accepted(c, fmt.Sprintf("triggering background build & deployment for %s", project.Name), nil)
 }
 
 // @Summary HandleServiceWebhook endpoint
@@ -91,6 +84,11 @@ func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 	if err != nil || appSvc == nil {
 		return utils.Error(c, http.StatusNotFound, "service not found")
 	}
+	h.deployServiceAsync(appSvc)
+	return utils.Accepted(c, fmt.Sprintf("triggering background build & rollout for service %s", appSvc.Name), nil)
+}
+
+func (h *WebhookHandler) deployServiceAsync(appSvc *models.AppService) {
 	go func() {
 		ctx := context.Background()
 		dep := &models.Deployment{
@@ -108,7 +106,6 @@ func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 		dep, _ = h.deploymentService.CreateDeployment(ctx, dep)
 		h.deploymentService.ExecuteDeploymentAsync(dep)
 	}()
-	return utils.Accepted(c, fmt.Sprintf("triggering background build & rollout for service %s", appSvc.Name), nil)
 }
 
 // @Summary HandleGitHubWebhook endpoint
@@ -117,7 +114,7 @@ func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param serviceId path string true "serviceId"
-// @Param request body handlers.GithubWebhookPayload true "Payload"
+// @Param request body models.GithubWebhookPayload true "Payload"
 // @Router /webhooks/github/services/{serviceId} [post]
 func (h *WebhookHandler) HandleGitHubWebhook(c echo.Context) error {
 	serviceID := c.Param("serviceId")
@@ -128,24 +125,39 @@ func (h *WebhookHandler) HandleGitHubWebhook(c echo.Context) error {
 	if event == "" {
 		return utils.Error(c, http.StatusBadRequest, "missing X-GitHub-Event header")
 	}
-	var payload GithubWebhookPayload
+	var payload models.GithubWebhookPayload
 	if err := c.Bind(&payload); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid payload")
 	}
 	if event == "pull_request" {
-		if payload.Action == "opened" || payload.Action == "synchronize" {
-			go func() {
-				ctx := context.Background()
-				_, _ = h.prPreviewService.DeployPRPreview(ctx, serviceID, payload.Number, payload.PullRequest.Head.Sha, payload.PullRequest.Head.Ref)
-			}()
+		switch payload.Action {
+		case "opened", "synchronize", "reopened":
+			h.deployPRPreviewAsync(serviceID, payload)
 			return utils.Accepted(c, "Deploying PR preview", nil)
-		} else if payload.Action == "closed" {
-			go func() {
-				ctx := context.Background()
-				_ = h.prPreviewService.DestroyPRPreview(ctx, serviceID, payload.Number)
-			}()
+		case "closed":
+			h.destroyPRPreviewAsync(serviceID, payload.Number)
 			return utils.Accepted(c, "Destroying PR preview", nil)
 		}
 	}
 	return utils.Success(c, "Operation successful", map[string]string{"message": "Event ignored"})
+}
+
+func (h *WebhookHandler) deployPRPreviewAsync(serviceID string, payload models.GithubWebhookPayload) {
+	go func() {
+		ctx := context.Background()
+		opts := services.DeployPRPreviewOpts{
+			AppID:      serviceID,
+			PRNumber:   payload.Number,
+			CommitHash: payload.PullRequest.Head.Sha,
+			Branch:     payload.PullRequest.Head.Ref,
+		}
+		_, _ = h.prPreviewService.DeployPRPreview(ctx, opts)
+	}()
+}
+
+func (h *WebhookHandler) destroyPRPreviewAsync(serviceID string, prNumber int) {
+	go func() {
+		ctx := context.Background()
+		_ = h.prPreviewService.DestroyPRPreview(ctx, serviceID, prNumber)
+	}()
 }

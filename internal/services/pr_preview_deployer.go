@@ -41,26 +41,33 @@ func NewPRPreviewService(
 	}
 }
 
-func (s *PRPreviewService) DeployPRPreview(ctx context.Context, appID string, prNumber int, commitHash, branch string) (*models.PRPreview, error) {
-	app, err := s.appService.GetAppService(ctx, appID)
+type DeployPRPreviewOpts struct {
+	AppID      string
+	PRNumber   int
+	CommitHash string
+	Branch     string
+}
+
+func (s *PRPreviewService) DeployPRPreview(ctx context.Context, opts DeployPRPreviewOpts) (*models.PRPreview, error) {
+	app, err := s.appService.GetAppService(ctx, opts.AppID)
 	if err != nil || app == nil {
-		return nil, utils.NewNotFoundError("AppService", appID)
+		return nil, utils.NewNotFoundError("AppService", opts.AppID)
 	}
-	previewDomain := fmt.Sprintf("pr-%d.%s", prNumber, app.Domain)
+	previewDomain := fmt.Sprintf("pr-%d.%s", opts.PRNumber, app.Domain)
 	if app.Domain == "" {
 		magicDomain := os.Getenv("VESSL_MAGIC_DOMAIN")
 		if magicDomain == "" {
 			magicDomain = "sslip.io"
 		}
-		previewDomain = fmt.Sprintf("pr-%d.%s.%s", prNumber, app.Name, magicDomain)
+		previewDomain = fmt.Sprintf("pr-%d.%s.%s", opts.PRNumber, app.Name, magicDomain)
 	}
 	preview := &models.PRPreview{
 		ID:            uuid.NewString(),
 		ServiceID:     app.ID,
 		ProjectID:     app.ProjectID,
-		PRNumber:      prNumber,
-		Branch:        branch,
-		CommitHash:    commitHash,
+		PRNumber:      opts.PRNumber,
+		Branch:        opts.Branch,
+		CommitHash:    opts.CommitHash,
 		Status:        "BUILDING",
 		PreviewDomain: previewDomain,
 		CreatedAt:     time.Now().UTC(),
@@ -73,15 +80,15 @@ func (s *PRPreviewService) DeployPRPreview(ctx context.Context, appID string, pr
 		bgCtx := context.Background()
 		sourceDir := filepath.Join(utils.GetDataDir(), "builds", "pr-previews", preview.ID)
 		clonedApp := *app
-		clonedApp.Branch = branch
+		clonedApp.Branch = opts.Branch
 		if err := s.gitService.CloneOrPullAppRepository(bgCtx, &clonedApp, sourceDir, nil); err != nil {
-			slog.Warn("PR preview clone failed", "branch", branch, "err", err)
+			slog.Warn("PR preview clone failed", "branch", opts.Branch, "err", err)
 			preview.Status = "FAILED"
 			_ = s.repo.Update(bgCtx, preview)
 			return
 		}
 		clonedApp.Domain = previewDomain
-		clonedApp.Name = fmt.Sprintf("%s-pr-%d", app.Name, prNumber)
+		clonedApp.Name = fmt.Sprintf("%s-pr-%d", app.Name, opts.PRNumber)
 		containerID, deployErr := s.deployer.DeployAppService(bgCtx, &clonedApp, sourceDir, nil)
 		if deployErr != nil {
 			slog.Warn("PR preview deploy failed", "err", deployErr)
@@ -92,7 +99,7 @@ func (s *PRPreviewService) DeployPRPreview(ctx context.Context, appID string, pr
 		preview.ContainerID = containerID
 		preview.Status = "READY"
 		_ = s.repo.Update(bgCtx, preview)
-		s.updateCommitStatus(bgCtx, app, commitHash, previewDomain)
+		s.updateCommitStatus(bgCtx, app, opts.CommitHash, previewDomain)
 	}()
 	return preview, nil
 }

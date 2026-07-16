@@ -102,22 +102,29 @@ func (s *ProjectSettingsService) DeleteToken(ctx context.Context, id, projectID 
 	return s.repo.DeleteToken(ctx, id, projectID)
 }
 
-func (s *ProjectSettingsService) AddMemberByEmail(ctx context.Context, projectID, email string, permission models.MemberPermission, originUrl string) (*models.ProjectMember, error) {
-	if projectID == "" || email == "" {
+type AddMemberOpts struct {
+	ProjectID  string
+	Email      string
+	Permission models.MemberPermission
+	OriginURL  string
+}
+
+func (s *ProjectSettingsService) AddMemberByEmail(ctx context.Context, opts AddMemberOpts) (*models.ProjectMember, error) {
+	if opts.ProjectID == "" || opts.Email == "" {
 		return nil, errors.New("valid member with projectId and email required")
 	}
 
-	u, err := s.authService.InviteUser(ctx, email, originUrl)
+	u, err := s.authService.InviteUser(ctx, opts.Email, opts.OriginURL)
 	if err != nil {
 		return nil, err
 	}
 
 	m := &models.ProjectMember{
 		ID:         uuid.New().String(),
-		ProjectID:  projectID,
+		ProjectID:  opts.ProjectID,
 		UserID:     u.ID,
-		Email:      email,
-		Permission: permission,
+		Email:      opts.Email,
+		Permission: opts.Permission,
 		Status:     models.MemberStatusPending,
 		InvitedAt:  time.Now(),
 	}

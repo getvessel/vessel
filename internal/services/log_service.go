@@ -35,8 +35,15 @@ type LokiStream struct {
 }
 
 // GetHistoricalLogs fetches logs from Loki for a given serviceID within the specified time range.
-func (s *LogService) GetHistoricalLogs(ctx context.Context, serviceID string, start, end time.Time, limit int) ([]map[string]any, error) {
-	reqURL := s.buildLokiURL(serviceID, start, end, limit)
+type HistoricalLogsOpts struct {
+	ServiceID string
+	Start     time.Time
+	End       time.Time
+	Limit     int
+}
+
+func (s *LogService) GetHistoricalLogs(ctx context.Context, opts HistoricalLogsOpts) ([]map[string]any, error) {
+	reqURL := s.buildLokiURL(opts)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
 	if err != nil {
@@ -61,14 +68,18 @@ func (s *LogService) GetHistoricalLogs(ctx context.Context, serviceID string, st
 	return s.parseLokiLogs(res), nil
 }
 
-func (s *LogService) buildLokiURL(serviceID string, start, end time.Time, limit int) string {
-	query := fmt.Sprintf(`{service_id="%s"}`, serviceID)
+func (s *LogService) buildLokiURL(opts HistoricalLogsOpts) string {
+	if s.lokiURL == "" {
+		return ""
+	}
+
+	query := fmt.Sprintf(`{container_label_vessl_service="%s"}`, opts.ServiceID)
 	u, _ := url.Parse(s.lokiURL + "/loki/api/v1/query_range")
 	q := u.Query()
 	q.Set("query", query)
-	q.Set("start", fmt.Sprintf("%d", start.UnixNano()))
-	q.Set("end", fmt.Sprintf("%d", end.UnixNano()))
-	q.Set("limit", fmt.Sprintf("%d", limit))
+	q.Set("start", fmt.Sprintf("%d", opts.Start.UnixNano()))
+	q.Set("end", fmt.Sprintf("%d", opts.End.UnixNano()))
+	q.Set("limit", fmt.Sprintf("%d", opts.Limit))
 	u.RawQuery = q.Encode()
 	return u.String()
 }

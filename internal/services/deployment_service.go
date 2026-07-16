@@ -84,24 +84,31 @@ func (s *DeploymentService) UpdateDeployment(ctx context.Context, d *models.Depl
 	return s.repo.Update(ctx, d)
 }
 
-func (s *DeploymentService) UpdateStatus(ctx context.Context, id string, status models.DeploymentStatus, buildLogs, containerID string) error {
-	if id == "" {
+type DeployStatusOpts struct {
+	ID          string
+	Status      models.DeploymentStatus
+	BuildLogs   string
+	ContainerID string
+}
+
+func (s *DeploymentService) UpdateStatus(ctx context.Context, opts DeployStatusOpts) error {
+	if opts.ID == "" {
 		return errors.New("deployment id required")
 	}
-	return s.repo.UpdateStatus(ctx, id, status, buildLogs, containerID)
+	return s.repo.UpdateStatus(ctx, opts.ID, opts.Status, opts.BuildLogs, opts.ContainerID)
 }
 
 func (s *DeploymentService) ExecuteDeploymentAsync(d *models.Deployment) {
 	go func() {
 		bgCtx := context.Background()
 		if s.deployer == nil || s.appRepo == nil || s.gitService == nil {
-			_ = s.UpdateStatus(bgCtx, d.ID, models.DeploymentStatusFailed, "Deployment dependencies missing\n", "")
+			_ = s.UpdateStatus(bgCtx, DeployStatusOpts{ID: d.ID, Status: models.DeploymentStatusFailed, BuildLogs: "Deployment dependencies missing\n", ContainerID: ""})
 			return
 		}
 
 		app, err := s.appRepo.GetByID(bgCtx, d.ServiceID)
 		if err != nil {
-			_ = s.UpdateStatus(bgCtx, d.ID, models.DeploymentStatusFailed, fmt.Sprintf("Failed to get app service: %v\n", err), "")
+			_ = s.UpdateStatus(bgCtx, DeployStatusOpts{ID: d.ID, Status: models.DeploymentStatusFailed, BuildLogs: fmt.Sprintf("Failed to get app service: %v\n", err), ContainerID: ""})
 			return
 		}
 
@@ -111,11 +118,11 @@ func (s *DeploymentService) ExecuteDeploymentAsync(d *models.Deployment) {
 
 			containerID, err := s.deployer.DeployImage(bgCtx, app, nil)
 			if err != nil {
-				_ = s.UpdateStatus(bgCtx, d.ID, models.DeploymentStatusFailed, fmt.Sprintf("Image deploy failed: %v\n", err), "")
+				_ = s.UpdateStatus(bgCtx, DeployStatusOpts{ID: d.ID, Status: models.DeploymentStatusFailed, BuildLogs: fmt.Sprintf("Image deploy failed: %v\n", err), ContainerID: ""})
 				return
 			}
 
-			_ = s.UpdateStatus(bgCtx, d.ID, models.DeploymentStatusReady, "Deployment succeeded.\n", containerID)
+			_ = s.UpdateStatus(bgCtx, DeployStatusOpts{ID: d.ID, Status: models.DeploymentStatusReady, BuildLogs: "Deployment succeeded.\n", ContainerID: containerID})
 			app.ContainerID = containerID
 			_ = s.appRepo.Update(bgCtx, app)
 			return
@@ -127,7 +134,7 @@ func (s *DeploymentService) ExecuteDeploymentAsync(d *models.Deployment) {
 		_ = s.repo.Update(bgCtx, d)
 
 		if err := s.gitService.CloneOrPullAppRepository(bgCtx, app, sourceDir, nil); err != nil {
-			_ = s.UpdateStatus(bgCtx, d.ID, models.DeploymentStatusFailed, fmt.Sprintf("Git clone failed: %v\n", err), "")
+			_ = s.UpdateStatus(bgCtx, DeployStatusOpts{ID: d.ID, Status: models.DeploymentStatusFailed, BuildLogs: fmt.Sprintf("Git clone failed: %v\n", err), ContainerID: ""})
 			return
 		}
 
@@ -136,11 +143,11 @@ func (s *DeploymentService) ExecuteDeploymentAsync(d *models.Deployment) {
 
 		containerID, err := s.deployer.DeployAppService(bgCtx, app, sourceDir, nil)
 		if err != nil {
-			_ = s.UpdateStatus(bgCtx, d.ID, models.DeploymentStatusFailed, fmt.Sprintf("Deployment failed: %v\n", err), "")
+			_ = s.UpdateStatus(bgCtx, DeployStatusOpts{ID: d.ID, Status: models.DeploymentStatusFailed, BuildLogs: fmt.Sprintf("Deployment failed: %v\n", err), ContainerID: ""})
 			return
 		}
 
-		_ = s.UpdateStatus(bgCtx, d.ID, models.DeploymentStatusReady, "Deployment succeeded.\n", containerID)
+		_ = s.UpdateStatus(bgCtx, DeployStatusOpts{ID: d.ID, Status: models.DeploymentStatusReady, BuildLogs: "Deployment succeeded.\n", ContainerID: containerID})
 
 		app.ContainerID = containerID
 		_ = s.appRepo.Update(bgCtx, app)

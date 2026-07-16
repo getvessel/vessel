@@ -208,7 +208,13 @@ func (h *ProjectSettingsHandler) AddMember(c echo.Context) error {
 	}
 	originUrl := scheme + "://" + c.Request().Host
 
-	added, err := h.settingsService.AddMemberByEmail(c.Request().Context(), projectID, req.Email, req.Permission, originUrl)
+	opts := services.AddMemberOpts{
+		ProjectID:  projectID,
+		Email:      req.Email,
+		Permission: req.Permission,
+		OriginURL:  originUrl,
+	}
+	added, err := h.settingsService.AddMemberByEmail(c.Request().Context(), opts)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}

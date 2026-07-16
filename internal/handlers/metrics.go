@@ -55,7 +55,13 @@ func (h *MetricsHandler) GetHistoricalMetrics(c echo.Context) error {
 		step = "5m"
 	}
 
-	data, err := h.metricsService.GetServiceMetrics(c.Request().Context(), serviceID, start, end, step)
+	opts := services.ServiceMetricsOpts{
+		ServiceID: serviceID,
+		Start:     start,
+		End:       end,
+		Step:      step,
+	}
+	data, err := h.metricsService.GetServiceMetrics(c.Request().Context(), opts)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}

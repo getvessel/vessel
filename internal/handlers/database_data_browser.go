@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"vessl.dev/vessl/internal/services"
 	"vessl.dev/vessl/internal/utils"
 )
 
@@ -118,7 +119,13 @@ func (h *DatabaseHandler) UpdateTableRow(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid payload")
 	}
-	res, err := h.databaseService.UpdateTableRow(c.Request().Context(), id, table, req["keys"], req["data"])
+	opts := services.UpdateTableRowOpts{
+		ID:    id,
+		Table: table,
+		Keys:  req["keys"],
+		Data:  req["data"],
+	}
+	res, err := h.databaseService.UpdateTableRow(c.Request().Context(), opts)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
