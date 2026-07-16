@@ -109,6 +109,14 @@ func startServer() {
 		slog.Warn("failed to start Traefik proxy", "err", err)
 	}
 
+	tsdbMgr := engine.NewTSDBManager(dockerClient)
+	if err := tsdbMgr.EnsureTSDBRunning(context.Background()); err != nil {
+		slog.Warn("failed to start TSDB", "err", err)
+	}
+
+	metricsWorker := engine.NewMetricsWorker(dockerClient)
+	metricsWorker.Start()
+
 	services.StartTelemetryReporter(db, vesslVersion)
 
 	host := os.Getenv("HOST")

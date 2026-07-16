@@ -6,6 +6,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/containerd/errdefs"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -24,59 +25,49 @@ func NewContainerManager(dockerClient *client.Client, st ContainerManagerStore) 
 	return &ContainerManager{dockerClient: dockerClient, store: st}
 }
 
-func (c *ContainerManager) CreateAndStart(ctx context.Context, name, imageTag, serviceID, domain string, internalPort int, runtimeMode models.RuntimeMode, envs []string, memoryLimitMB int, cpuRequest float64, healthCheckPath string) (string, error) {
-	containerPort, err := nat.NewPort("tcp", fmt.Sprintf("%d", internalPort))
+type ContainerRunOptions struct {
+	Name            string
+	ImageTag        string
+	ServiceID       string
+	Domain          string
+	InternalPort    int
+	RuntimeMode     models.RuntimeMode
+	Envs            []string
+	MemoryLimitMB   int
+	CPURequest      float64
+	HealthCheckPath string
+}
+
+func (c *ContainerManager) CreateAndStart(ctx context.Context, opts ContainerRunOptions) (string, error) {
+	containerPort, err := nat.NewPort("tcp", fmt.Sprintf("%d", opts.InternalPort))
 	if err != nil {
 		return "", fmt.Errorf("invalid port definition: %w", err)
 	}
-	labels := map[string]string{}
-	if serviceID != "" && domain != "" && runtimeMode != models.RuntimeModeWorker {
-		labels = map[string]string{
-			"traefik.enable": "true",
-			fmt.Sprintf("traefik.http.routers.%s.rule", serviceID):                      fmt.Sprintf("Host(`%s`)", domain),
-			fmt.Sprintf("traefik.http.services.%s.loadbalancer.server.port", serviceID): fmt.Sprintf("%d", internalPort),
-		}
-		if healthCheckPath != "" {
-			labels[fmt.Sprintf("traefik.http.services.%s.loadbalancer.healthcheck.path", serviceID)] = healthCheckPath
-			labels[fmt.Sprintf("traefik.http.services.%s.loadbalancer.healthcheck.interval", serviceID)] = "5s"
-			labels[fmt.Sprintf("traefik.http.services.%s.loadbalancer.healthcheck.timeout", serviceID)] = "2s"
+
+	config := &container.Config{
+		Image: opts.ImageTag,
+		Env:   opts.Envs,
+	}
+
+	if opts.RuntimeMode != models.RuntimeModeWorker {
+		config.ExposedPorts = nat.PortSet{containerPort: struct{}{}}
+		if opts.ServiceID != "" && opts.Domain != "" {
+			config.Labels = c.buildTraefikLabels(opts.ServiceID, opts.Domain, opts.InternalPort, opts.HealthCheckPath)
 		}
 	}
 
-	config := &container.Config{
-		Image: imageTag,
-		Env:   envs,
-	}
-	if runtimeMode != models.RuntimeModeWorker {
-		config.ExposedPorts = nat.PortSet{containerPort: struct{}{}}
-		config.Labels = labels
-	}
 	hostConfig := &container.HostConfig{
 		RestartPolicy: container.RestartPolicy{Name: "always"},
 		Resources: container.Resources{
-			Memory:   utils.MegaBytesToBytes(memoryLimitMB),
-			NanoCPUs: utils.CPURequestToNanoCPUs(cpuRequest),
+			Memory:   utils.MegaBytesToBytes(opts.MemoryLimitMB),
+			NanoCPUs: utils.CPURequestToNanoCPUs(opts.CPURequest),
 		},
 		NetworkMode: container.NetworkMode(utils.GetRuntimeNetwork()),
+		DNS:         c.getCustomDNSResolvers(),
 	}
-	if c.store != nil {
-		settings, _ := c.store.GetServerSettings()
-		if settings != nil && strings.TrimSpace(settings.CustomDNSResolvers) != "" {
-			parts := strings.Split(settings.CustomDNSResolvers, ",")
-			var dnsList []string
-			for _, p := range parts {
-				p = strings.TrimSpace(p)
-				if p != "" {
-					dnsList = append(dnsList, p)
-				}
-			}
-			if len(dnsList) > 0 {
-				hostConfig.DNS = dnsList
-			}
-		}
-	}
-	_ = c.StopAndRemove(ctx, name)
-	resp, err := c.dockerClient.ContainerCreate(ctx, config, hostConfig, nil, nil, name)
+
+	_ = c.StopAndRemove(ctx, opts.Name)
+	resp, err := c.dockerClient.ContainerCreate(ctx, config, hostConfig, nil, nil, opts.Name)
 	if err != nil {
 		return "", fmt.Errorf("docker container create failed: %w", err)
 	}
@@ -86,11 +77,45 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, name, imageTag, s
 	return resp.ID, nil
 }
 
+func (c *ContainerManager) buildTraefikLabels(serviceID, domain string, internalPort int, healthCheckPath string) map[string]string {
+	labels := map[string]string{
+		"traefik.enable": "true",
+		fmt.Sprintf("traefik.http.routers.%s.rule", serviceID):                      fmt.Sprintf("Host(`%s`)", domain),
+		fmt.Sprintf("traefik.http.services.%s.loadbalancer.server.port", serviceID): fmt.Sprintf("%d", internalPort),
+	}
+	if healthCheckPath != "" {
+		labels[fmt.Sprintf("traefik.http.services.%s.loadbalancer.healthcheck.path", serviceID)] = healthCheckPath
+		labels[fmt.Sprintf("traefik.http.services.%s.loadbalancer.healthcheck.interval", serviceID)] = "5s"
+		labels[fmt.Sprintf("traefik.http.services.%s.loadbalancer.healthcheck.timeout", serviceID)] = "2s"
+	}
+	return labels
+}
+
+func (c *ContainerManager) getCustomDNSResolvers() []string {
+	if c.store == nil {
+		return nil
+	}
+	settings, _ := c.store.GetServerSettings()
+	if settings == nil || strings.TrimSpace(settings.CustomDNSResolvers) == "" {
+		return nil
+	}
+
+	parts := strings.Split(settings.CustomDNSResolvers, ",")
+	var dnsList []string
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			dnsList = append(dnsList, p)
+		}
+	}
+	return dnsList
+}
+
 func (c *ContainerManager) StopAndRemove(ctx context.Context, containerIDOrName string) error {
 	stopTimeout := 10
 	_ = c.dockerClient.ContainerStop(ctx, containerIDOrName, container.StopOptions{Timeout: &stopTimeout})
 	err := c.dockerClient.ContainerRemove(ctx, containerIDOrName, container.RemoveOptions{Force: true})
-	if err != nil && !client.IsErrNotFound(err) {
+	if err != nil && !errdefs.IsNotFound(err) {
 		return err
 	}
 	return nil

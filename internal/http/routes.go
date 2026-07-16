@@ -106,6 +106,7 @@ func (s *Server) registerRoutes() {
 	authGroup.POST("/deployments/:id/rollback", s.deploymentHandler.Rollback)
 	authGroup.GET("/deployments/:id/logs", s.deploymentHandler.GetLogs, s.authGuard.RequireScope("logs:read"))
 	authGroup.GET("/services/:serviceId/metrics", s.deploymentHandler.GetMetrics)
+	authGroup.GET("/services/:serviceId/metrics/historical", s.metricsHandler.GetHistoricalMetrics)
 	authGroup.GET("/services/:serviceId/variables", s.serviceVarHandler.List)
 	authGroup.POST("/services/:serviceId/variables", s.serviceVarHandler.Create)
 	authGroup.PUT("/services/:serviceId/variables/:id", s.serviceVarHandler.Update)

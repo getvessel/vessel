@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/containerd/errdefs"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/google/uuid"
@@ -164,21 +165,21 @@ func (d *Deployer) startContainer(ctx context.Context, app *models.AppService, c
 	if app.StaticOutput != "" {
 		port = 80 // NGINX alpine default port
 	}
-	memMB := defaultMemoryMB()
-	cpuReq := defaultCPURequest()
-	_, err := d.containerManager.CreateAndStart(
-		ctx,
-		containerName,
-		imageTag,
-		app.ID,
-		app.Domain,
-		port,
-		app.RuntimeMode,
-		envSlice,
-		memMB,
-		cpuReq,
-		app.HealthCheckPath,
-	)
+
+	opts := ContainerRunOptions{
+		Name:            containerName,
+		ImageTag:        imageTag,
+		ServiceID:       app.ID,
+		Domain:          app.Domain,
+		InternalPort:    port,
+		RuntimeMode:     app.RuntimeMode,
+		Envs:            envSlice,
+		MemoryLimitMB:   defaultMemoryMB(),
+		CPURequest:      defaultCPURequest(),
+		HealthCheckPath: app.HealthCheckPath,
+	}
+
+	_, err := d.containerManager.CreateAndStart(ctx, opts)
 	if err != nil {
 		return fmt.Errorf("container rollout failed: %w", err)
 	}
@@ -203,7 +204,7 @@ func (d *Deployer) Stop(ctx context.Context, containerID string) error {
 
 func (d *Deployer) Remove(ctx context.Context, containerID string) error {
 	err := d.containerManager.dockerClient.ContainerRemove(ctx, containerID, container.RemoveOptions{Force: true})
-	if err != nil && !client.IsErrNotFound(err) {
+	if err != nil && !errdefs.IsNotFound(err) {
 		return err
 	}
 	return nil
@@ -222,7 +223,20 @@ func (d *Deployer) DeployImage(ctx context.Context, app *models.AppService, logW
 	containerName := fmt.Sprintf("%s-%s", utils.NormalizeContainerName(app.ID), uuid.New().String()[:8])
 	domain := app.Domain
 
-	cid, err := d.containerManager.CreateAndStart(ctx, containerName, app.ImageRef, app.ID, domain, port, app.RuntimeMode, nil, defaultMemoryMB(), defaultCPURequest(), app.HealthCheckPath)
+	opts := ContainerRunOptions{
+		Name:            containerName,
+		ImageTag:        app.ImageRef,
+		ServiceID:       app.ID,
+		Domain:          domain,
+		InternalPort:    port,
+		RuntimeMode:     app.RuntimeMode,
+		Envs:            nil, // Serverless relies on runtime env vars
+		MemoryLimitMB:   defaultMemoryMB(),
+		CPURequest:      defaultCPURequest(),
+		HealthCheckPath: app.HealthCheckPath,
+	}
+
+	cid, err := d.containerManager.CreateAndStart(ctx, opts)
 	if err != nil {
 		return "", err
 	}

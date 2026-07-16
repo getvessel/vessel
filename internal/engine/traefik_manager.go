@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/containerd/errdefs"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
@@ -37,7 +38,7 @@ func (m *TraefikManager) EnsureTraefikRunning(ctx context.Context) error {
 
 	_, err := m.dockerClient.ContainerInspect(ctx, TraefikContainerName)
 	if err != nil {
-		if client.IsErrNotFound(err) {
+		if errdefs.IsNotFound(err) {
 			if err := m.createTraefikContainer(ctx); err != nil {
 				return fmt.Errorf("failed to create traefik: %w", err)
 			}
@@ -57,7 +58,7 @@ func (m *TraefikManager) EnsureTraefikRunning(ctx context.Context) error {
 func (m *TraefikManager) ensureNetwork(ctx context.Context) error {
 	_, err := m.dockerClient.NetworkInspect(ctx, VesslNetworkName, network.InspectOptions{})
 	if err != nil {
-		if client.IsErrNotFound(err) {
+		if errdefs.IsNotFound(err) {
 			_, err = m.dockerClient.NetworkCreate(ctx, VesslNetworkName, network.CreateOptions{
 				Driver: "bridge",
 			})
