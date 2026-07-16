@@ -250,13 +250,13 @@ type BackupRecord struct {
 }
 
 type UpdateBackupRecordOpts struct {
-	ID            string
-	Status        BackupRecordStatus
-	FilePath      string
-	S3URL         string
-	Logs          string
-	FileSizeBytes int64
-	CompletedAt   string
+	ID            string             `json:"id"`
+	Status        BackupRecordStatus `json:"status"`
+	FilePath      string             `json:"file_path"`
+	S3URL         string             `json:"s3_url"`
+	Logs          string             `json:"logs"`
+	FileSizeBytes int64              `json:"file_size_bytes"`
+	CompletedAt   string             `json:"completed_at"`
 }
 
 type S3Destination struct {
