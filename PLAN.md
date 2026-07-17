@@ -453,6 +453,8 @@ We will build the dashboard in distinct phases to ensure stability, proper data-
 - [x] Create `Users` management (`/settings/users`) and API Tokens (`/settings/api`).
 - [x] Build the `Maintenance` and `Updates` dashboards (`docker system prune`, `vessld` auto-updates).
 - [x] Finalize the `Migration` bundle logic (`.vessl` export/import functionality).
+- [x] Build Instance Settings (`/settings/general`), `Notifications` (`/settings/notifications`), and `OAuth` (`/settings/oauth`).
+- [ ] Implement `Backups` configuration.
 
 **Phase 6: Polish & Verification**
 

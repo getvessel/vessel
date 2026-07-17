@@ -140,13 +140,40 @@ func (r *UserRepo) CreatePAT(ctx context.Context, pat *models.PersonalAccessToke
 func (r *UserRepo) ListPATs(ctx context.Context, userID string) ([]*models.PersonalAccessToken, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	var list []*models.PersonalAccessToken
-	err := r.db.SelectContext(ctx, &list, `SELECT id, user_id, name, prefix, access_level, project_scope, allowed_projects, expires_at, created_at FROM personal_access_tokens WHERE user_id = ? ORDER BY created_at DESC`, userID)
+
+	type rawPAT struct {
+		ID              string  `db:"id"`
+		UserID          string  `db:"user_id"`
+		Name            string  `db:"name"`
+		Prefix          string  `db:"prefix"`
+		AccessLevel     string  `db:"access_level"`
+		ProjectScope    string  `db:"project_scope"`
+		AllowedProjects *string `db:"allowed_projects"`
+		ExpiresAt       string  `db:"expires_at"`
+		CreatedAt       string  `db:"created_at"`
+	}
+
+	var rawList []rawPAT
+	err := r.db.SelectContext(ctx, &rawList, `SELECT id, user_id, name, prefix, access_level, project_scope, allowed_projects, expires_at, created_at FROM personal_access_tokens WHERE user_id = ? ORDER BY created_at DESC`, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list personal access tokens: %w", err)
 	}
-	if list == nil {
-		list = make([]*models.PersonalAccessToken, 0)
+
+	list := make([]*models.PersonalAccessToken, 0, len(rawList))
+	for _, raw := range rawList {
+		eat, _ := time.Parse(time.RFC3339, raw.ExpiresAt)
+		cat, _ := time.Parse(time.RFC3339, raw.CreatedAt)
+		list = append(list, &models.PersonalAccessToken{
+			ID:              raw.ID,
+			UserID:          raw.UserID,
+			Name:            raw.Name,
+			Prefix:          raw.Prefix,
+			AccessLevel:     raw.AccessLevel,
+			ProjectScope:    raw.ProjectScope,
+			AllowedProjects: raw.AllowedProjects,
+			ExpiresAt:       eat,
+			CreatedAt:       cat,
+		})
 	}
 	return list, nil
 }

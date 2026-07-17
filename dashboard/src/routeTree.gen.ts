@@ -20,8 +20,10 @@ import { Route as DashboardStorageRouteImport } from './routes/_dashboard.storag
 import { Route as DashboardSourcesRouteImport } from './routes/_dashboard.sources'
 import { Route as DashboardSettingsRouteImport } from './routes/_dashboard.settings'
 import { Route as DashboardProjectsRouteImport } from './routes/_dashboard.projects'
+import { Route as DashboardMigrationsRouteImport } from './routes/_dashboard.migrations'
 import { Route as DashboardJobsRouteImport } from './routes/_dashboard.jobs'
 import { Route as DashboardDomainsRouteImport } from './routes/_dashboard.domains'
+import { Route as DashboardDnsRouteImport } from './routes/_dashboard.dns'
 import { Route as DashboardDeploymentsRouteImport } from './routes/_dashboard.deployments'
 import { Route as DashboardAuditLogsRouteImport } from './routes/_dashboard.audit-logs'
 import { Route as DashboardAiRouteImport } from './routes/_dashboard.ai'
@@ -34,10 +36,8 @@ import { Route as DashboardProfileIndexRouteImport } from './routes/_dashboard.p
 import { Route as DashboardSettingsUpdatesRouteImport } from './routes/_dashboard.settings/updates'
 import { Route as DashboardSettingsOauthRouteImport } from './routes/_dashboard.settings/oauth'
 import { Route as DashboardSettingsNotificationsRouteImport } from './routes/_dashboard.settings/notifications'
-import { Route as DashboardSettingsMigrationRouteImport } from './routes/_dashboard.settings/migration'
 import { Route as DashboardSettingsMaintenanceRouteImport } from './routes/_dashboard.settings/maintenance'
 import { Route as DashboardSettingsGeneralRouteImport } from './routes/_dashboard.settings/general'
-import { Route as DashboardSettingsDnsRouteImport } from './routes/_dashboard.settings/dns'
 import { Route as DashboardSettingsBackupsRouteImport } from './routes/_dashboard.settings/backups'
 import { Route as DashboardSettingsApiRouteImport } from './routes/_dashboard.settings/api'
 import { Route as DashboardServicesServiceIdIndexRouteImport } from './routes/_dashboard.services/$serviceId.index'
@@ -106,6 +106,11 @@ const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardMigrationsRoute = DashboardMigrationsRouteImport.update({
+  id: '/migrations',
+  path: '/migrations',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardJobsRoute = DashboardJobsRouteImport.update({
   id: '/jobs',
   path: '/jobs',
@@ -114,6 +119,11 @@ const DashboardJobsRoute = DashboardJobsRouteImport.update({
 const DashboardDomainsRoute = DashboardDomainsRouteImport.update({
   id: '/domains',
   path: '/domains',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDnsRoute = DashboardDnsRouteImport.update({
+  id: '/dns',
+  path: '/dns',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardDeploymentsRoute = DashboardDeploymentsRouteImport.update({
@@ -178,12 +188,6 @@ const DashboardSettingsNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => DashboardSettingsRoute,
   } as any)
-const DashboardSettingsMigrationRoute =
-  DashboardSettingsMigrationRouteImport.update({
-    id: '/migration',
-    path: '/migration',
-    getParentRoute: () => DashboardSettingsRoute,
-  } as any)
 const DashboardSettingsMaintenanceRoute =
   DashboardSettingsMaintenanceRouteImport.update({
     id: '/maintenance',
@@ -196,11 +200,6 @@ const DashboardSettingsGeneralRoute =
     path: '/general',
     getParentRoute: () => DashboardSettingsRoute,
   } as any)
-const DashboardSettingsDnsRoute = DashboardSettingsDnsRouteImport.update({
-  id: '/dns',
-  path: '/dns',
-  getParentRoute: () => DashboardSettingsRoute,
-} as any)
 const DashboardSettingsBackupsRoute =
   DashboardSettingsBackupsRouteImport.update({
     id: '/backups',
@@ -296,8 +295,10 @@ export interface FileRoutesByFullPath {
   '/ai': typeof DashboardAiRoute
   '/audit-logs': typeof DashboardAuditLogsRoute
   '/deployments': typeof DashboardDeploymentsRoute
+  '/dns': typeof DashboardDnsRoute
   '/domains': typeof DashboardDomainsRoute
   '/jobs': typeof DashboardJobsRoute
+  '/migrations': typeof DashboardMigrationsRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
   '/settings': typeof DashboardSettingsRouteWithChildren
   '/sources': typeof DashboardSourcesRoute
@@ -306,10 +307,8 @@ export interface FileRoutesByFullPath {
   '/users': typeof DashboardUsersRoute
   '/settings/api': typeof DashboardSettingsApiRoute
   '/settings/backups': typeof DashboardSettingsBackupsRoute
-  '/settings/dns': typeof DashboardSettingsDnsRoute
   '/settings/general': typeof DashboardSettingsGeneralRoute
   '/settings/maintenance': typeof DashboardSettingsMaintenanceRoute
-  '/settings/migration': typeof DashboardSettingsMigrationRoute
   '/settings/notifications': typeof DashboardSettingsNotificationsRoute
   '/settings/oauth': typeof DashboardSettingsOauthRoute
   '/settings/updates': typeof DashboardSettingsUpdatesRoute
@@ -339,8 +338,10 @@ export interface FileRoutesByTo {
   '/ai': typeof DashboardAiRoute
   '/audit-logs': typeof DashboardAuditLogsRoute
   '/deployments': typeof DashboardDeploymentsRoute
+  '/dns': typeof DashboardDnsRoute
   '/domains': typeof DashboardDomainsRoute
   '/jobs': typeof DashboardJobsRoute
+  '/migrations': typeof DashboardMigrationsRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
   '/sources': typeof DashboardSourcesRoute
   '/storage': typeof DashboardStorageRoute
@@ -348,10 +349,8 @@ export interface FileRoutesByTo {
   '/users': typeof DashboardUsersRoute
   '/settings/api': typeof DashboardSettingsApiRoute
   '/settings/backups': typeof DashboardSettingsBackupsRoute
-  '/settings/dns': typeof DashboardSettingsDnsRoute
   '/settings/general': typeof DashboardSettingsGeneralRoute
   '/settings/maintenance': typeof DashboardSettingsMaintenanceRoute
-  '/settings/migration': typeof DashboardSettingsMigrationRoute
   '/settings/notifications': typeof DashboardSettingsNotificationsRoute
   '/settings/oauth': typeof DashboardSettingsOauthRoute
   '/settings/updates': typeof DashboardSettingsUpdatesRoute
@@ -383,8 +382,10 @@ export interface FileRoutesById {
   '/_dashboard/ai': typeof DashboardAiRoute
   '/_dashboard/audit-logs': typeof DashboardAuditLogsRoute
   '/_dashboard/deployments': typeof DashboardDeploymentsRoute
+  '/_dashboard/dns': typeof DashboardDnsRoute
   '/_dashboard/domains': typeof DashboardDomainsRoute
   '/_dashboard/jobs': typeof DashboardJobsRoute
+  '/_dashboard/migrations': typeof DashboardMigrationsRoute
   '/_dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/_dashboard/settings': typeof DashboardSettingsRouteWithChildren
   '/_dashboard/sources': typeof DashboardSourcesRoute
@@ -394,10 +395,8 @@ export interface FileRoutesById {
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/settings/api': typeof DashboardSettingsApiRoute
   '/_dashboard/settings/backups': typeof DashboardSettingsBackupsRoute
-  '/_dashboard/settings/dns': typeof DashboardSettingsDnsRoute
   '/_dashboard/settings/general': typeof DashboardSettingsGeneralRoute
   '/_dashboard/settings/maintenance': typeof DashboardSettingsMaintenanceRoute
-  '/_dashboard/settings/migration': typeof DashboardSettingsMigrationRoute
   '/_dashboard/settings/notifications': typeof DashboardSettingsNotificationsRoute
   '/_dashboard/settings/oauth': typeof DashboardSettingsOauthRoute
   '/_dashboard/settings/updates': typeof DashboardSettingsUpdatesRoute
@@ -429,8 +428,10 @@ export interface FileRouteTypes {
     | '/ai'
     | '/audit-logs'
     | '/deployments'
+    | '/dns'
     | '/domains'
     | '/jobs'
+    | '/migrations'
     | '/projects'
     | '/settings'
     | '/sources'
@@ -439,10 +440,8 @@ export interface FileRouteTypes {
     | '/users'
     | '/settings/api'
     | '/settings/backups'
-    | '/settings/dns'
     | '/settings/general'
     | '/settings/maintenance'
-    | '/settings/migration'
     | '/settings/notifications'
     | '/settings/oauth'
     | '/settings/updates'
@@ -472,8 +471,10 @@ export interface FileRouteTypes {
     | '/ai'
     | '/audit-logs'
     | '/deployments'
+    | '/dns'
     | '/domains'
     | '/jobs'
+    | '/migrations'
     | '/projects'
     | '/sources'
     | '/storage'
@@ -481,10 +482,8 @@ export interface FileRouteTypes {
     | '/users'
     | '/settings/api'
     | '/settings/backups'
-    | '/settings/dns'
     | '/settings/general'
     | '/settings/maintenance'
-    | '/settings/migration'
     | '/settings/notifications'
     | '/settings/oauth'
     | '/settings/updates'
@@ -515,8 +514,10 @@ export interface FileRouteTypes {
     | '/_dashboard/ai'
     | '/_dashboard/audit-logs'
     | '/_dashboard/deployments'
+    | '/_dashboard/dns'
     | '/_dashboard/domains'
     | '/_dashboard/jobs'
+    | '/_dashboard/migrations'
     | '/_dashboard/projects'
     | '/_dashboard/settings'
     | '/_dashboard/sources'
@@ -526,10 +527,8 @@ export interface FileRouteTypes {
     | '/_dashboard/'
     | '/_dashboard/settings/api'
     | '/_dashboard/settings/backups'
-    | '/_dashboard/settings/dns'
     | '/_dashboard/settings/general'
     | '/_dashboard/settings/maintenance'
-    | '/_dashboard/settings/migration'
     | '/_dashboard/settings/notifications'
     | '/_dashboard/settings/oauth'
     | '/_dashboard/settings/updates'
@@ -635,6 +634,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/migrations': {
+      id: '/_dashboard/migrations'
+      path: '/migrations'
+      fullPath: '/migrations'
+      preLoaderRoute: typeof DashboardMigrationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/jobs': {
       id: '/_dashboard/jobs'
       path: '/jobs'
@@ -647,6 +653,13 @@ declare module '@tanstack/react-router' {
       path: '/domains'
       fullPath: '/domains'
       preLoaderRoute: typeof DashboardDomainsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dns': {
+      id: '/_dashboard/dns'
+      path: '/dns'
+      fullPath: '/dns'
+      preLoaderRoute: typeof DashboardDnsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/deployments': {
@@ -733,13 +746,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsNotificationsRouteImport
       parentRoute: typeof DashboardSettingsRoute
     }
-    '/_dashboard/settings/migration': {
-      id: '/_dashboard/settings/migration'
-      path: '/migration'
-      fullPath: '/settings/migration'
-      preLoaderRoute: typeof DashboardSettingsMigrationRouteImport
-      parentRoute: typeof DashboardSettingsRoute
-    }
     '/_dashboard/settings/maintenance': {
       id: '/_dashboard/settings/maintenance'
       path: '/maintenance'
@@ -752,13 +758,6 @@ declare module '@tanstack/react-router' {
       path: '/general'
       fullPath: '/settings/general'
       preLoaderRoute: typeof DashboardSettingsGeneralRouteImport
-      parentRoute: typeof DashboardSettingsRoute
-    }
-    '/_dashboard/settings/dns': {
-      id: '/_dashboard/settings/dns'
-      path: '/dns'
-      fullPath: '/settings/dns'
-      preLoaderRoute: typeof DashboardSettingsDnsRouteImport
       parentRoute: typeof DashboardSettingsRoute
     }
     '/_dashboard/settings/backups': {
@@ -902,10 +901,8 @@ const DashboardProjectsRouteWithChildren =
 interface DashboardSettingsRouteChildren {
   DashboardSettingsApiRoute: typeof DashboardSettingsApiRoute
   DashboardSettingsBackupsRoute: typeof DashboardSettingsBackupsRoute
-  DashboardSettingsDnsRoute: typeof DashboardSettingsDnsRoute
   DashboardSettingsGeneralRoute: typeof DashboardSettingsGeneralRoute
   DashboardSettingsMaintenanceRoute: typeof DashboardSettingsMaintenanceRoute
-  DashboardSettingsMigrationRoute: typeof DashboardSettingsMigrationRoute
   DashboardSettingsNotificationsRoute: typeof DashboardSettingsNotificationsRoute
   DashboardSettingsOauthRoute: typeof DashboardSettingsOauthRoute
   DashboardSettingsUpdatesRoute: typeof DashboardSettingsUpdatesRoute
@@ -915,10 +912,8 @@ interface DashboardSettingsRouteChildren {
 const DashboardSettingsRouteChildren: DashboardSettingsRouteChildren = {
   DashboardSettingsApiRoute: DashboardSettingsApiRoute,
   DashboardSettingsBackupsRoute: DashboardSettingsBackupsRoute,
-  DashboardSettingsDnsRoute: DashboardSettingsDnsRoute,
   DashboardSettingsGeneralRoute: DashboardSettingsGeneralRoute,
   DashboardSettingsMaintenanceRoute: DashboardSettingsMaintenanceRoute,
-  DashboardSettingsMigrationRoute: DashboardSettingsMigrationRoute,
   DashboardSettingsNotificationsRoute: DashboardSettingsNotificationsRoute,
   DashboardSettingsOauthRoute: DashboardSettingsOauthRoute,
   DashboardSettingsUpdatesRoute: DashboardSettingsUpdatesRoute,
@@ -932,8 +927,10 @@ interface DashboardRouteChildren {
   DashboardAiRoute: typeof DashboardAiRoute
   DashboardAuditLogsRoute: typeof DashboardAuditLogsRoute
   DashboardDeploymentsRoute: typeof DashboardDeploymentsRoute
+  DashboardDnsRoute: typeof DashboardDnsRoute
   DashboardDomainsRoute: typeof DashboardDomainsRoute
   DashboardJobsRoute: typeof DashboardJobsRoute
+  DashboardMigrationsRoute: typeof DashboardMigrationsRoute
   DashboardProjectsRoute: typeof DashboardProjectsRouteWithChildren
   DashboardSettingsRoute: typeof DashboardSettingsRouteWithChildren
   DashboardSourcesRoute: typeof DashboardSourcesRoute
@@ -955,8 +952,10 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAiRoute: DashboardAiRoute,
   DashboardAuditLogsRoute: DashboardAuditLogsRoute,
   DashboardDeploymentsRoute: DashboardDeploymentsRoute,
+  DashboardDnsRoute: DashboardDnsRoute,
   DashboardDomainsRoute: DashboardDomainsRoute,
   DashboardJobsRoute: DashboardJobsRoute,
+  DashboardMigrationsRoute: DashboardMigrationsRoute,
   DashboardProjectsRoute: DashboardProjectsRouteWithChildren,
   DashboardSettingsRoute: DashboardSettingsRouteWithChildren,
   DashboardSourcesRoute: DashboardSourcesRoute,

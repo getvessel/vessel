@@ -52,8 +52,8 @@ const navGroups: NavGroup[] = [
     title: 'System & Settings',
     items: [
       { title: 'API Access', url: '/settings/api', icon: Key },
-      { title: 'DNS', url: '/settings/dns', icon: Network },
-      { title: 'Migration', url: '/settings/migration', icon: Download },
+      { title: 'DNS', url: '/dns', icon: Network },
+      { title: 'Migration', url: '/migrations', icon: Download },
       { title: 'Maintenance', url: '/settings/maintenance', icon: Wrench },
       { title: 'Updates', url: '/settings/updates', icon: RefreshCw },
       { title: 'Settings', url: '/settings', icon: Settings, exact: true },
