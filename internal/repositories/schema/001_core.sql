@@ -72,7 +72,9 @@ CREATE TABLE IF NOT EXISTS databases (
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		,
-			environment_id TEXT DEFAULT '');
+			environment_id TEXT DEFAULT '',
+            logical_replication INTEGER DEFAULT 0,
+            project_id TEXT DEFAULT '');
 
 CREATE TABLE IF NOT EXISTS storage (
 			id TEXT PRIMARY KEY,
@@ -91,7 +93,8 @@ CREATE TABLE IF NOT EXISTS storage (
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		,
-			environment_id TEXT DEFAULT '');
+			environment_id TEXT DEFAULT '',
+            project_id TEXT DEFAULT '');
 
 CREATE TABLE IF NOT EXISTS jobs (
 			id TEXT PRIMARY KEY,
@@ -325,28 +328,6 @@ CREATE TABLE IF NOT EXISTS s3_destinations (
 CREATE TABLE IF NOT EXISTS server_settings (
 			id TEXT PRIMARY KEY,
 			traefik_wildcard_ip TEXT DEFAULT '127.0.0.1',
-			discord_webhook_url TEXT,
-			discord_ping_enabled BOOLEAN DEFAULT FALSE,
-			discord_enabled BOOLEAN DEFAULT FALSE,
-			slack_webhook_url TEXT,
-			slack_enabled BOOLEAN DEFAULT FALSE,
-			telegram_bot_token TEXT,
-			telegram_chat_id TEXT,
-			telegram_enabled BOOLEAN DEFAULT FALSE,
-			smtp_host TEXT,
-			smtp_port INTEGER DEFAULT 587,
-			smtp_user TEXT,
-			smtp_password TEXT,
-			smtp_from_name TEXT DEFAULT '',
-			smtp_from_address TEXT DEFAULT '',
-			smtp_enabled BOOLEAN DEFAULT FALSE,
-			resend_api_key TEXT,
-			resend_enabled BOOLEAN DEFAULT FALSE,
-			pushover_user_key TEXT,
-			pushover_api_token TEXT,
-			pushover_enabled BOOLEAN DEFAULT FALSE,
-			generic_webhook_url TEXT,
-			generic_webhook_enabled BOOLEAN DEFAULT FALSE,
 			registration_enabled BOOLEAN DEFAULT TRUE,
 			registration_domain_allowlist TEXT DEFAULT '',
 			custom_dns_resolvers TEXT DEFAULT '',
@@ -354,15 +335,12 @@ CREATE TABLE IF NOT EXISTS server_settings (
 			ip_allowlist TEXT DEFAULT '',
 			mcp_server_enabled BOOLEAN DEFAULT TRUE,
 			default_wildcard_domain TEXT DEFAULT '',
-			default_openai_key TEXT DEFAULT '',
-			default_anthropic_key TEXT DEFAULT '',
 			update_check_cron TEXT DEFAULT '0 * * * *',
 			auto_update_enabled BOOLEAN DEFAULT FALSE,
 			current_version TEXT DEFAULT '0.1.0',
 			latest_version TEXT DEFAULT '0.1.0',
 			last_update_check TEXT DEFAULT '',
 			updated_at TEXT,
-			notification_alerts TEXT DEFAULT '',
 			site_name TEXT DEFAULT '',
 			public_ipv4 TEXT DEFAULT '',
 			public_ipv6 TEXT DEFAULT '',
@@ -374,7 +352,12 @@ CREATE TABLE IF NOT EXISTS server_settings (
 			server_timezone TEXT NOT NULL DEFAULT 'UTC',
 			docker_cleanup_cron TEXT NOT NULL DEFAULT '0 0 * * *',
 			disk_usage_threshold INTEGER NOT NULL DEFAULT 80,
-			disk_usage_cron TEXT NOT NULL DEFAULT '0 23 * * *'
+			disk_usage_cron TEXT NOT NULL DEFAULT '0 23 * * *',
+			cloudflare_api_token TEXT DEFAULT '',
+			namecheap_api_user TEXT DEFAULT '',
+			namecheap_api_key TEXT DEFAULT '',
+			namecheap_client_ip TEXT DEFAULT '',
+			spaceship_api_key TEXT DEFAULT ''
 		);
 
 CREATE TABLE IF NOT EXISTS personal_access_tokens (
@@ -439,5 +422,3 @@ CREATE TABLE IF NOT EXISTS oauth_providers (
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);
-
-

@@ -48,43 +48,6 @@ definitions:
       token:
         type: string
     type: object
-  handlers.SetupRequest:
-    properties:
-      defaultWildcardDomain:
-        description: Domain (optional)
-        type: string
-      email:
-        type: string
-      githubAppId:
-        description: Github Integration (optional)
-        type: string
-      githubAppName:
-        type: string
-      githubClientId:
-        type: string
-      githubClientSecret:
-        type: string
-      githubPrivateKey:
-        type: string
-      githubWebhookSecret:
-        type: string
-      name:
-        description: User
-        type: string
-      password:
-        type: string
-      s3AccessKeyId:
-        type: string
-      s3AccountId:
-        description: Backups (optional)
-        type: string
-      s3Bucket:
-        type: string
-      s3SecretAccessKey:
-        type: string
-      s3Skip:
-        type: boolean
-    type: object
   handlers.TestNotificationRequest:
     properties:
       provider:
@@ -110,6 +73,40 @@ definitions:
         type: string
       projectId:
         type: string
+    type: object
+  handlers.setupEnv:
+    properties:
+      dashboardUrl:
+        type: string
+      dataDir:
+        type: string
+      jwtSecret:
+        type: string
+      port:
+        type: integer
+    type: object
+  handlers.setupRequest:
+    properties:
+      defaultWildcardDomain:
+        type: string
+      email:
+        type: string
+      env:
+        $ref: '#/definitions/handlers.setupEnv'
+      name:
+        type: string
+      password:
+        type: string
+      s3AccessKeyId:
+        type: string
+      s3AccountId:
+        type: string
+      s3Bucket:
+        type: string
+      s3SecretAccessKey:
+        type: string
+      s3Skip:
+        type: boolean
     type: object
   models.AddMemberRequest:
     properties:
@@ -363,6 +360,30 @@ definitions:
       usedGb:
         type: integer
     type: object
+  models.DockerLayerStat:
+    properties:
+      active:
+        type: string
+      reclaimable:
+        type: string
+      size:
+        type: string
+      totalCount:
+        type: string
+    type: object
+  models.DockerStats:
+    properties:
+      buildCache:
+        $ref: '#/definitions/models.DockerLayerStat'
+      containers:
+        $ref: '#/definitions/models.DockerLayerStat'
+      images:
+        $ref: '#/definitions/models.DockerLayerStat'
+      reclaimableGb:
+        type: number
+      volumes:
+        $ref: '#/definitions/models.DockerLayerStat'
+    type: object
   models.DomainConfig:
     properties:
       createdAt:
@@ -583,19 +604,13 @@ definitions:
         type: string
       customDnsResolvers:
         type: string
-      defaultAnthropicKey:
-        type: string
-      defaultOpenAIKey:
+      dashboardDomain:
         type: string
       defaultWildcardDomain:
         type: string
       deploymentTimeout:
         type: integer
       disableTwoStepConfirmation:
-        type: boolean
-      discordEnabled:
-        type: boolean
-      discordPingEnabled:
         type: boolean
       discordWebhookUrl:
         type: string
@@ -606,10 +621,6 @@ definitions:
       dnsValidationEnabled:
         type: boolean
       dockerCleanupCron:
-        type: string
-      genericWebhookEnabled:
-        type: boolean
-      genericWebhookUrl:
         type: string
       id:
         type: string
@@ -627,25 +638,13 @@ definitions:
         type: string
       namecheapClientIp:
         type: string
-      notificationAlerts:
-        type: boolean
       publicIpv4:
         type: string
       publicIpv6:
         type: string
-      pushoverApiToken:
-        type: string
-      pushoverEnabled:
-        type: boolean
-      pushoverUserKey:
-        type: string
       registrationDomainAllowlist:
         type: string
       registrationEnabled:
-        type: boolean
-      resendApiKey:
-        type: string
-      resendEnabled:
         type: boolean
       serverTimezone:
         type: string
@@ -653,32 +652,8 @@ definitions:
         type: boolean
       siteName:
         type: string
-      slackEnabled:
-        type: boolean
-      slackWebhookUrl:
-        type: string
-      smtpEnabled:
-        type: boolean
-      smtpFromAddress:
-        type: string
-      smtpFromName:
-        type: string
-      smtpHost:
-        type: string
-      smtpPassword:
-        type: string
-      smtpPort:
-        type: integer
-      smtpUser:
-        type: string
       spaceshipApiKey:
         type: string
-      telegramBotToken:
-        type: string
-      telegramChatId:
-        type: string
-      telegramEnabled:
-        type: boolean
       telemetryEnabled:
         type: boolean
       traefikWildcardIp:
@@ -749,6 +724,8 @@ definitions:
         $ref: '#/definitions/models.CPUStats'
       disk:
         $ref: '#/definitions/models.DiskStats'
+      docker:
+        $ref: '#/definitions/models.DockerStats'
       loadAvg:
         items:
           type: number
@@ -2924,15 +2901,20 @@ paths:
       tags:
       - Storage
   /system/export:
-    get:
+    post:
+      consumes:
+      - application/json
       description: Exports the full server state (SQLite database + all DB container
         dumps) into an AES-256-GCM encrypted .vessl bundle. Admin only.
       parameters:
-      - description: Passphrase used to encrypt the bundle
-        in: query
-        name: passphrase
+      - description: JSON with passphrase
+        in: body
+        name: request
         required: true
-        type: string
+        schema:
+          additionalProperties:
+            type: string
+          type: object
       produces:
       - application/octet-stream
       responses:
@@ -2961,7 +2943,7 @@ paths:
         and all DB container data. Admin only. Triggers a server restart after restore.
       parameters:
       - description: Passphrase used to decrypt the bundle
-        in: query
+        in: formData
         name: passphrase
         required: true
         type: string
@@ -3085,7 +3067,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/handlers.SetupRequest'
+          $ref: '#/definitions/handlers.setupRequest'
       produces:
       - application/json
       responses:

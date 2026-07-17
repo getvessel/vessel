@@ -17,15 +17,15 @@ type ServerlessRepository interface {
 	GetCodeByServiceID(ctx context.Context, serviceID string) (*models.ServerlessFunctionCode, error)
 }
 
-type sqliteServerlessRepo struct {
+type serverlessRepo struct {
 	db *sqlx.DB
 }
 
 func NewServerlessRepository(db *sql.DB) ServerlessRepository {
-	return &sqliteServerlessRepo{db: sqlx.NewDb(db, "sqlite")}
+	return &serverlessRepo{db: sqlx.NewDb(db, "sqlite")}
 }
 
-func (r *sqliteServerlessRepo) SaveCode(ctx context.Context, serviceID, runtime, codeContent string) (*models.ServerlessFunctionCode, error) {
+func (r *serverlessRepo) SaveCode(ctx context.Context, serviceID, runtime, codeContent string) (*models.ServerlessFunctionCode, error) {
 	existing, err := r.GetCodeByServiceID(ctx, serviceID)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, err
@@ -61,7 +61,7 @@ func (r *sqliteServerlessRepo) SaveCode(ctx context.Context, serviceID, runtime,
 	}, nil
 }
 
-func (r *sqliteServerlessRepo) GetCodeByServiceID(ctx context.Context, serviceID string) (*models.ServerlessFunctionCode, error) {
+func (r *serverlessRepo) GetCodeByServiceID(ctx context.Context, serviceID string) (*models.ServerlessFunctionCode, error) {
 	query := `SELECT id, service_id, runtime, code_content, created_at, updated_at FROM serverless_functions_code WHERE service_id = ?`
 	var code models.ServerlessFunctionCode
 	err := r.db.GetContext(ctx, &code, query, serviceID)

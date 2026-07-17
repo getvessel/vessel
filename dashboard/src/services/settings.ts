@@ -71,19 +71,19 @@ export const settingsService = {
     }
   },
 
-  getAISettings: async (): Promise<BaseResponse<Record<string, string>>> => {
+  getAISettings: async (): Promise<BaseResponse<Record<string, unknown>>> => {
     try {
-      return await apiClient.get<BaseResponse<Record<string, string>>>('/ai');
+      return await apiClient.get<BaseResponse<Record<string, unknown>>>('/ai');
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
   updateAISettings: async (
-    payload: Record<string, string>
-  ): Promise<BaseResponse<Record<string, string>>> => {
+    payload: Record<string, unknown>
+  ): Promise<BaseResponse<Record<string, unknown>>> => {
     try {
-      return await apiClient.put<BaseResponse<Record<string, string>>>('/ai', payload);
+      return await apiClient.put<BaseResponse<Record<string, unknown>>>('/ai', payload);
     } catch (error) {
       throw handleApiError(error);
     }

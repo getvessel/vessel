@@ -3,7 +3,6 @@ package models
 type ServerSettings struct {
 	ID                          string `json:"id"`
 	TraefikWildcardIP           string `json:"traefikWildcardIp"`
-	DiscordWebhookURL           string `json:"discordWebhookUrl,omitempty"`
 	RegistrationEnabled         bool   `json:"registrationEnabled"`
 	RegistrationDomainAllowlist string `json:"registrationDomainAllowlist,omitempty"`
 	CustomDNSResolvers          string `json:"customDnsResolvers"`

@@ -83,7 +83,7 @@ type setupRequest struct {
 // @Tags System
 // @Accept json
 // @Produce json
-// @Param request body SetupRequest true "Setup details"
+// @Param request body setupRequest true "Setup details"
 // @Success 200 {object} map[string]any
 // @Router /system/setup [post]
 func (h *OnboardingHandler) Setup(c echo.Context) error {

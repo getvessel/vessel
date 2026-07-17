@@ -3073,8 +3073,11 @@ const docTemplate = `{
             }
         },
         "/system/export": {
-            "get": {
+            "post": {
                 "description": "Exports the full server state (SQLite database + all DB container dumps) into an AES-256-GCM encrypted .vessl bundle. Admin only.",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/octet-stream"
                 ],
@@ -3084,11 +3087,16 @@ const docTemplate = `{
                 "summary": "Export server bundle",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Passphrase used to encrypt the bundle",
-                        "name": "passphrase",
-                        "in": "query",
-                        "required": true
+                        "description": "JSON with passphrase",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
                     }
                 ],
                 "responses": {
@@ -3133,7 +3141,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Passphrase used to decrypt the bundle",
                         "name": "passphrase",
-                        "in": "query",
+                        "in": "formData",
                         "required": true
                     },
                     {
@@ -3312,7 +3320,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.SetupRequest"
+                            "$ref": "#/definitions/handlers.setupRequest"
                         }
                     }
                 ],
@@ -3638,60 +3646,6 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.SetupRequest": {
-            "type": "object",
-            "properties": {
-                "defaultWildcardDomain": {
-                    "description": "Domain (optional)",
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "githubAppId": {
-                    "description": "Github Integration (optional)",
-                    "type": "string"
-                },
-                "githubAppName": {
-                    "type": "string"
-                },
-                "githubClientId": {
-                    "type": "string"
-                },
-                "githubClientSecret": {
-                    "type": "string"
-                },
-                "githubPrivateKey": {
-                    "type": "string"
-                },
-                "githubWebhookSecret": {
-                    "type": "string"
-                },
-                "name": {
-                    "description": "User",
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "s3AccessKeyId": {
-                    "type": "string"
-                },
-                "s3AccountId": {
-                    "description": "Backups (optional)",
-                    "type": "string"
-                },
-                "s3Bucket": {
-                    "type": "string"
-                },
-                "s3SecretAccessKey": {
-                    "type": "string"
-                },
-                "s3Skip": {
-                    "type": "boolean"
-                }
-            }
-        },
         "handlers.TestNotificationRequest": {
             "type": "object",
             "properties": {
@@ -3730,6 +3684,58 @@ const docTemplate = `{
                 },
                 "projectId": {
                     "type": "string"
+                }
+            }
+        },
+        "handlers.setupEnv": {
+            "type": "object",
+            "properties": {
+                "dashboardUrl": {
+                    "type": "string"
+                },
+                "dataDir": {
+                    "type": "string"
+                },
+                "jwtSecret": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.setupRequest": {
+            "type": "object",
+            "properties": {
+                "defaultWildcardDomain": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "env": {
+                    "$ref": "#/definitions/handlers.setupEnv"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "s3AccessKeyId": {
+                    "type": "string"
+                },
+                "s3AccountId": {
+                    "type": "string"
+                },
+                "s3Bucket": {
+                    "type": "string"
+                },
+                "s3SecretAccessKey": {
+                    "type": "string"
+                },
+                "s3Skip": {
+                    "type": "boolean"
                 }
             }
         },
@@ -4093,6 +4099,43 @@ const docTemplate = `{
                 }
             }
         },
+        "models.DockerLayerStat": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "string"
+                },
+                "reclaimable": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "string"
+                },
+                "totalCount": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DockerStats": {
+            "type": "object",
+            "properties": {
+                "buildCache": {
+                    "$ref": "#/definitions/models.DockerLayerStat"
+                },
+                "containers": {
+                    "$ref": "#/definitions/models.DockerLayerStat"
+                },
+                "images": {
+                    "$ref": "#/definitions/models.DockerLayerStat"
+                },
+                "reclaimableGb": {
+                    "type": "number"
+                },
+                "volumes": {
+                    "$ref": "#/definitions/models.DockerLayerStat"
+                }
+            }
+        },
         "models.DomainConfig": {
             "type": "object",
             "properties": {
@@ -4419,10 +4462,7 @@ const docTemplate = `{
                 "customDnsResolvers": {
                     "type": "string"
                 },
-                "defaultAnthropicKey": {
-                    "type": "string"
-                },
-                "defaultOpenAIKey": {
+                "dashboardDomain": {
                     "type": "string"
                 },
                 "defaultWildcardDomain": {
@@ -4432,12 +4472,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "disableTwoStepConfirmation": {
-                    "type": "boolean"
-                },
-                "discordEnabled": {
-                    "type": "boolean"
-                },
-                "discordPingEnabled": {
                     "type": "boolean"
                 },
                 "discordWebhookUrl": {
@@ -4453,12 +4487,6 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "dockerCleanupCron": {
-                    "type": "string"
-                },
-                "genericWebhookEnabled": {
-                    "type": "boolean"
-                },
-                "genericWebhookUrl": {
                     "type": "string"
                 },
                 "id": {
@@ -4485,34 +4513,16 @@ const docTemplate = `{
                 "namecheapClientIp": {
                     "type": "string"
                 },
-                "notificationAlerts": {
-                    "type": "boolean"
-                },
                 "publicIpv4": {
                     "type": "string"
                 },
                 "publicIpv6": {
                     "type": "string"
                 },
-                "pushoverApiToken": {
-                    "type": "string"
-                },
-                "pushoverEnabled": {
-                    "type": "boolean"
-                },
-                "pushoverUserKey": {
-                    "type": "string"
-                },
                 "registrationDomainAllowlist": {
                     "type": "string"
                 },
                 "registrationEnabled": {
-                    "type": "boolean"
-                },
-                "resendApiKey": {
-                    "type": "string"
-                },
-                "resendEnabled": {
                     "type": "boolean"
                 },
                 "serverTimezone": {
@@ -4524,44 +4534,8 @@ const docTemplate = `{
                 "siteName": {
                     "type": "string"
                 },
-                "slackEnabled": {
-                    "type": "boolean"
-                },
-                "slackWebhookUrl": {
-                    "type": "string"
-                },
-                "smtpEnabled": {
-                    "type": "boolean"
-                },
-                "smtpFromAddress": {
-                    "type": "string"
-                },
-                "smtpFromName": {
-                    "type": "string"
-                },
-                "smtpHost": {
-                    "type": "string"
-                },
-                "smtpPassword": {
-                    "type": "string"
-                },
-                "smtpPort": {
-                    "type": "integer"
-                },
-                "smtpUser": {
-                    "type": "string"
-                },
                 "spaceshipApiKey": {
                     "type": "string"
-                },
-                "telegramBotToken": {
-                    "type": "string"
-                },
-                "telegramChatId": {
-                    "type": "string"
-                },
-                "telegramEnabled": {
-                    "type": "boolean"
                 },
                 "telemetryEnabled": {
                     "type": "boolean"
@@ -4665,6 +4639,9 @@ const docTemplate = `{
                 },
                 "disk": {
                     "$ref": "#/definitions/models.DiskStats"
+                },
+                "docker": {
+                    "$ref": "#/definitions/models.DockerStats"
                 },
                 "loadAvg": {
                     "type": "array",
