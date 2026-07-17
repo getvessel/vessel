@@ -79,7 +79,8 @@
       "!**/bootstrap",
       "!**/*.astro",
       "!**/router.tsx",
-      "!**/router.ts"
+      "!**/router.ts",
+      "!**/*.svg"
     ]
   }
 }
