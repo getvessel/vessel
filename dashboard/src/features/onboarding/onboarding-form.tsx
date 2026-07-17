@@ -38,11 +38,12 @@ export const OnboardingForm = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      githubAppId: '',
-      githubClientId: '',
-      githubClientSecret: '',
-      githubPrivateKey: '',
-      githubWebhookSecret: '',
+      env: {
+        jwtSecret: '',
+        dataDir: './data',
+        dashboardUrl: 'http://localhost:3000',
+        port: 8080,
+      },
       dashboardDomain: '',
       defaultWildcardDomain: '',
       s3Skip: false,
@@ -62,28 +63,19 @@ export const OnboardingForm = () => {
         fieldsToValidate = ['name', 'email', 'password', 'confirmPassword'];
         break;
       case 2:
-        fieldsToValidate = [];
+        fieldsToValidate = ['env'];
         break;
       case 3:
-        fieldsToValidate = [
-          'githubAppId',
-          'githubClientId',
-          'githubClientSecret',
-          'githubPrivateKey',
-          'githubWebhookSecret',
-        ];
-        break;
-      case 4:
         fieldsToValidate = ['dashboardDomain', 'defaultWildcardDomain'];
         break;
-      case 5:
+      case 4:
         fieldsToValidate = ['s3AccountId', 's3Bucket', 's3AccessKeyId', 's3SecretAccessKey'];
         break;
     }
 
     const isValid = await trigger(fieldsToValidate);
     if (isValid) {
-      setCurrentStep((prev) => Math.min(prev + 1, 5));
+      setCurrentStep((prev) => Math.min(prev + 1, 4));
     }
   };
 
@@ -110,26 +102,18 @@ export const OnboardingForm = () => {
       num: 2,
       label: 'Runtime',
       title: 'Runtime environment',
-      description: 'Configure the Docker deployment runtime settings.',
+      description: 'Configure the deployment runtime settings. These are written to .env.local.',
       icon: Settings,
     },
     {
       num: 3,
-      label: 'GitHub',
-      title: 'GitHub integration',
-      description:
-        'Optional. Connect in one click to create and install a GitHub App automatically, or skip this and configure it from system settings later.',
-      icon: GitBranch,
-    },
-    {
-      num: 4,
       label: 'Root Domain',
       title: 'Root domain',
       description: 'Configure the default domains for your applications.',
       icon: Globe,
     },
     {
-      num: 5,
+      num: 4,
       label: 'Backups',
       title: 'Database backups',
       description: 'Optional. Configure automated daily backups to S3/R2 compatible storage.',
@@ -162,7 +146,7 @@ export const OnboardingForm = () => {
         <div className="absolute top-1/2 left-0 h-px w-full -translate-y-1/2 bg-border/50" />
         <div
           className="absolute top-1/2 left-0 h-px -translate-y-1/2 bg-primary transition-all duration-300"
-          style={{ width: `${((currentStep - 1) / 4) * 100}%` }}
+          style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
         />
         {steps.map((step) => {
           const isComplete = step.num < currentStep;
@@ -213,9 +197,8 @@ export const OnboardingForm = () => {
             </div>
             {currentStep === 1 && <StepOwner />}
             {currentStep === 2 && <StepRuntime />}
-            {currentStep === 3 && <StepGithub />}
-            {currentStep === 4 && <StepDomain />}
-            {currentStep === 5 && <StepBackups />}
+            {currentStep === 3 && <StepDomain />}
+            {currentStep === 4 && <StepBackups />}
           </div>
 
           {/* Bottom Buttons */}
@@ -230,7 +213,7 @@ export const OnboardingForm = () => {
               <ArrowLeft className="h-4 w-4" /> BACK
             </Button>
 
-            {currentStep < 5 ? (
+            {currentStep < 4 ? (
               <Button
                 type="button"
                 variant="outline"

@@ -33,23 +33,23 @@ export function Topbar({ onOpenCommand, onMenuToggle, mobileMenuOpen }: TopbarPr
           </kbd>
         </button>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => toast.info('Railway Import', { description: 'Coming soon' })}
-            className="flex h-9 items-center gap-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-4 font-semibold text-indigo-400 text-xs tracking-wider transition-all hover:bg-indigo-500/20 active:scale-[0.97]"
+            className="flex h-9 items-center gap-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 font-semibold text-indigo-400 text-xs tracking-wider transition-all hover:bg-indigo-500/20 active:scale-[0.97] md:px-4"
           >
-            <TrainFront className="h-3.5 w-3.5" />
-            <span>IMPORT RAILWAY</span>
+            <TrainFront className="h-4 w-4 shrink-0 md:h-3.5 md:w-3.5" />
+            <span className="hidden md:inline">IMPORT RAILWAY</span>
           </button>
 
           <button
             type="button"
             onClick={() => toast.info('Vercel Import', { description: 'Coming soon' })}
-            className="flex h-9 items-center gap-2 rounded-xl border border-border/60 bg-zinc-950 px-4 font-semibold text-xs text-zinc-100 tracking-wider transition-all hover:bg-zinc-900 active:scale-[0.97] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="flex h-9 items-center gap-2 rounded-xl border border-border/60 bg-zinc-950 px-3 font-semibold text-xs text-zinc-100 tracking-wider transition-all hover:bg-zinc-900 active:scale-[0.97] md:px-4 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
-            <Triangle className="h-3.5 w-3.5 fill-current" />
-            <span>IMPORT VERCEL</span>
+            <Triangle className="h-4 w-4 shrink-0 fill-current md:h-3.5 md:w-3.5" />
+            <span className="hidden md:inline">IMPORT VERCEL</span>
           </button>
         </div>
 

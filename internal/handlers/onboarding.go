@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/labstack/echo/v4"
 
@@ -50,6 +51,13 @@ func (h *OnboardingHandler) SetupStatus(c echo.Context) error {
 	})
 }
 
+type SetupEnv struct {
+	JWTSecret    string `json:"jwtSecret"`
+	DataDir      string `json:"dataDir"`
+	DashboardURL string `json:"dashboardUrl"`
+	Port         int    `json:"port"`
+}
+
 // RegisterRequest defines the expected payload for setup
 type SetupRequest struct {
 	// User
@@ -57,13 +65,8 @@ type SetupRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 
-	// Github Integration (optional)
-	GithubAppID         string `json:"githubAppId,omitempty"`
-	GithubClientID      string `json:"githubClientId,omitempty"`
-	GithubClientSecret  string `json:"githubClientSecret,omitempty"`
-	GithubPrivateKey    string `json:"githubPrivateKey,omitempty"`
-	GithubWebhookSecret string `json:"githubWebhookSecret,omitempty"`
-	GithubAppName       string `json:"githubAppName,omitempty"`
+	// Runtime Environment (written to .env.local)
+	Env SetupEnv `json:"env"`
 
 	// Domain (optional)
 	DefaultWildcardDomain string `json:"defaultWildcardDomain,omitempty"`
@@ -106,6 +109,11 @@ func (h *OnboardingHandler) Setup(c echo.Context) error {
 		return utils.Error(c, 400, err.Error())
 	}
 
+	// Write to .env.local
+	envContent := fmt.Sprintf("VESSL_JWT_SECRET=%s\nVESSL_DATA_DIR=%s\nVESSL_DASHBOARD_URL=%s\nPORT=%d\n",
+		req.Env.JWTSecret, req.Env.DataDir, req.Env.DashboardURL, req.Env.Port)
+	_ = os.WriteFile(".env.local", []byte(envContent), 0644)
+
 	// Update settings
 	settings, err := h.settingsRepo.GetSettings(ctx)
 	if err == nil && settings != nil {
@@ -117,23 +125,6 @@ func (h *OnboardingHandler) Setup(c echo.Context) error {
 		if updated {
 			_ = h.settingsRepo.UpdateSettings(ctx, settings)
 		}
-	}
-
-	// Save Github App
-	if req.GithubAppID != "" && req.GithubClientID != "" && req.GithubClientSecret != "" && req.GithubPrivateKey != "" {
-		appName := req.GithubAppName
-		if appName == "" {
-			appName = "Vessl Setup App"
-		}
-		_ = h.gitAppsService.SaveGithubApp(ctx, &models.GithubApp{
-			Name:          appName,
-			AppID:         req.GithubAppID,
-			ClientID:      req.GithubClientID,
-			ClientSecret:  req.GithubClientSecret,
-			WebhookSecret: req.GithubWebhookSecret,
-			PrivateKey:    req.GithubPrivateKey,
-			IsPublic:      false,
-		})
 	}
 
 	// Save S3 Destination

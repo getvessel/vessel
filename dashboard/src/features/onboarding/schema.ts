@@ -7,11 +7,12 @@ export const setupSchema = z
     password: z.string().min(8, 'Password must be at least 8 characters long'),
     confirmPassword: z.string(),
 
-    githubAppId: z.string().optional(),
-    githubClientId: z.string().optional(),
-    githubClientSecret: z.string().optional(),
-    githubPrivateKey: z.string().optional(),
-    githubWebhookSecret: z.string().optional(),
+    env: z.object({
+      jwtSecret: z.string().min(32, 'Secret must be at least 32 characters'),
+      dataDir: z.string().min(1, 'Data directory is required'),
+      dashboardUrl: z.string().url('Must be a valid URL'),
+      port: z.number().min(1).max(65535),
+    }),
 
     dashboardDomain: z.string().optional(),
     defaultWildcardDomain: z.string().optional(),
