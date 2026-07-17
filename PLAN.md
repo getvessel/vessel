@@ -570,6 +570,8 @@ We will build the dashboard in distinct phases to ensure stability, proper data-
 - [x] `POST /git/connect`
 - [x] `POST /jobs`
 - [x] `POST /jobs/:id/trigger`
+- [x] `POST /profile/email/request`
+- [x] `POST /profile/email/verify`
 - [x] `POST /profile/tokens`
 - [x] `POST /projects`
 - [x] `POST /projects/:id/deploy`
@@ -614,21 +616,21 @@ We will build the dashboard in distinct phases to ensure stability, proper data-
 
 ### Unwired Endpoints
 
-- [ ] `GET /auth/me`
-- [ ] `GET /auth/oauth/:provider/callback`
+- [x] `GET /auth/me` (Removed)
+- [x] `GET /auth/oauth/:provider/callback` (Implicitly wired/external)
 - [x] `GET /git/repos`
-- [ ] `GET /mcp/sse`
-- [ ] `GET /oauth/vercel/callback`
+- [x] `GET /mcp/sse` (Implicitly wired/external)
+- [x] `GET /oauth/vercel/callback` (Implicitly wired/external)
 - [x] `GET /one-click`
 - [x] `GET /services/:serviceId/logs/historical`
 - [x] `GET /services/:serviceId/metrics/historical`
 - [x] `GET /system/migration/railway/projects`
-- [ ] `GET /ws/services/:id/terminal`
-- [ ] `GET /ws/terminal/:id`
+- [x] `GET /ws/services/:id/terminal` (Implicitly wired/external)
+- [x] `GET /ws/terminal/:id` (Implicitly wired/external)
 - [x] `POST /compose/deploy`
 - [x] `POST /deploy/archive`
-- [ ] `POST /mcp/messages`
+- [x] `POST /mcp/messages` (Implicitly wired/external)
 - [x] `POST /one-click/deploy`
-- [ ] `POST /webhooks/git/:projectId`
-- [ ] `POST /webhooks/git/services/:serviceId`
-- [ ] `POST /webhooks/github/services/:serviceId`
+- [x] `POST /webhooks/git/:projectId` (Implicitly wired/external)
+- [x] `POST /webhooks/git/services/:serviceId` (Implicitly wired/external)
+- [x] `POST /webhooks/github/services/:serviceId` (Implicitly wired/external)

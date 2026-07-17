@@ -10,6 +10,6 @@ export * from './profile';
 export * from './project';
 export * from './settings';
 export * from './storage';
+export * from './templates';
 export * from './users';
 export * from './vercel';
-export * from './templates';

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { templatesService } from '#/services/templates';
 import type { OneClickDeployRequest } from '#/interfaces/templates';
+import { templatesService } from '#/services/templates';
 
 export const useListOneClickApps = () => {
   return useQuery({

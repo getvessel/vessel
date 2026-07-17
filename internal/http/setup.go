@@ -170,7 +170,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	notifSettingsHandler := handlers.NewNotificationSettingsHandler(notifSettingsService)
 	aiSettingsHandler := handlers.NewAISettingsHandler(aiSettingsService)
 	updaterHandler := handlers.NewUpdaterHandler(updaterService)
-	userHandler := handlers.NewUserHandler(userService)
+	userHandler := handlers.NewUserHandler(userService, mailerService)
 	authHandler := handlers.NewAuthHandler(authService)
 	oAuthHandler := handlers.NewOAuthHandler(oAuthService)
 	gitHandler := handlers.NewGitHandler(gitService)

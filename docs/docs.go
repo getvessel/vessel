@@ -1725,6 +1725,38 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/profile/email/request": {
+            "post": {
+                "description": "Request an OTP to change email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "RequestEmailChange endpoint",
+                "responses": {}
+            }
+        },
+        "/profile/email/verify": {
+            "post": {
+                "description": "Verify the OTP to change email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "VerifyEmailChange endpoint",
+                "responses": {}
+            }
+        },
         "/profile/password": {
             "put": {
                 "description": "ChangePassword endpoint",
@@ -3600,7 +3632,22 @@ const docTemplate = `{
         "handlers.CreatePATRequest": {
             "type": "object",
             "properties": {
+                "accessLevel": {
+                    "type": "string"
+                },
+                "allowedProjects": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "expiresAt": {
+                    "type": "string"
+                },
                 "name": {
+                    "type": "string"
+                },
+                "projectScope": {
                     "type": "string"
                 }
             }
@@ -3657,7 +3704,7 @@ const docTemplate = `{
         "handlers.UpdateProfileRequest": {
             "type": "object",
             "properties": {
-                "email": {
+                "name": {
                     "type": "string"
                 },
                 "role": {
@@ -4473,9 +4520,6 @@ const docTemplate = `{
                 },
                 "disableTwoStepConfirmation": {
                     "type": "boolean"
-                },
-                "discordWebhookUrl": {
-                    "type": "string"
                 },
                 "diskUsageCron": {
                     "type": "string"

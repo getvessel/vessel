@@ -1,12 +1,12 @@
-import { apiClient } from '#/lib/apiClient';
-import { handleApiError } from '#/lib/error';
+import type { OneClickApp } from '#/interfaces/database';
 import type {
   ArchiveDeployResponse,
   ComposeDeployResponse,
   OneClickDeployRequest,
   OneClickDeployResponse,
 } from '#/interfaces/templates';
-import type { OneClickApp } from '#/interfaces/database';
+import { apiClient } from '#/lib/apiClient';
+import { handleApiError } from '#/lib/error';
 
 export const templatesService = {
   listOneClickApps: async (): Promise<Record<string, OneClickApp>> => {

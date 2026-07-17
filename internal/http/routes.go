@@ -155,6 +155,8 @@ func (s *Server) registerRoutes() {
 	authGroup.POST("/mcp/messages", s.HandleMCPMessage)
 	authGroup.GET("/profile", s.userHandler.GetProfile)
 	authGroup.PUT("/profile", s.userHandler.UpdateProfile)
+	authGroup.POST("/profile/email/request", s.userHandler.RequestEmailChange)
+	authGroup.POST("/profile/email/verify", s.userHandler.VerifyEmailChange)
 	authGroup.PUT("/profile/password", s.userHandler.ChangePassword)
 	authGroup.GET("/profile/tokens", s.userHandler.ListPATs)
 	authGroup.POST("/profile/tokens", s.userHandler.CreatePAT)

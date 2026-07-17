@@ -19,6 +19,24 @@ export const useUpdateProfile = () => {
   });
 };
 
+export const useRequestEmailChange = () => {
+  return useMutation({
+    mutationFn: (payload: Parameters<typeof profileService.requestEmailChange>[0]) =>
+      profileService.requestEmailChange(payload),
+  });
+};
+
+export const useVerifyEmailChange = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: Parameters<typeof profileService.verifyEmailChange>[0]) =>
+      profileService.verifyEmailChange(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+  });
+};
+
 export const useChangePassword = () => {
   return useMutation({
     mutationFn: (payload: Parameters<typeof profileService.changePassword>[0]) =>

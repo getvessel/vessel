@@ -19,7 +19,17 @@ definitions:
     type: object
   handlers.CreatePATRequest:
     properties:
+      accessLevel:
+        type: string
+      allowedProjects:
+        items:
+          type: string
+        type: array
+      expiresAt:
+        type: string
       name:
+        type: string
+      projectScope:
         type: string
     type: object
   handlers.ForgotPasswordRequest:
@@ -55,7 +65,7 @@ definitions:
     type: object
   handlers.UpdateProfileRequest:
     properties:
-      email:
+      name:
         type: string
       role:
         $ref: '#/definitions/models.UserRole'
@@ -612,8 +622,6 @@ definitions:
         type: integer
       disableTwoStepConfirmation:
         type: boolean
-      discordWebhookUrl:
-        type: string
       diskUsageCron:
         type: string
       diskUsageThreshold:
@@ -1977,6 +1985,28 @@ paths:
       - application/json
       responses: {}
       summary: UpdateProfile endpoint
+      tags:
+      - Users
+  /profile/email/request:
+    post:
+      consumes:
+      - application/json
+      description: Request an OTP to change email
+      produces:
+      - application/json
+      responses: {}
+      summary: RequestEmailChange endpoint
+      tags:
+      - Users
+  /profile/email/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verify the OTP to change email
+      produces:
+      - application/json
+      responses: {}
+      summary: VerifyEmailChange endpoint
       tags:
       - Users
   /profile/password:

@@ -1,10 +1,15 @@
 import { Database, Info } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
 import { Checkbox } from '#/components/ui/checkbox';
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
+import {
+  useCreateS3Destination,
+  useDeleteS3Destination,
+  useS3Destinations,
+} from '#/hooks/useBackup';
 
 export function S3DestinationsList() {
   const [accountId, setAccountId] = useState('');
@@ -14,12 +19,47 @@ export function S3DestinationsList() {
   const [createOrVerify, setCreateOrVerify] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
+  const { data: destinationsData, isLoading } = useS3Destinations();
+  const createS3Dest = useCreateS3Destination();
+  const deleteS3Dest = useDeleteS3Destination();
+
+  // If there's an existing configuration, populate it
+  const existingDest = destinationsData?.data?.[0];
+
+  useEffect(() => {
+    if (existingDest) {
+      // For R2, the account ID is usually the subdomain of the endpoint.
+      // But we can just store the endpoint directly or reconstruct it.
+      // E.g., https://<account_id>.r2.cloudflarestorage.com
+      const match = existingDest.endpoint.match(/https?:\/\/([^.]+)\.r2/);
+      if (match) {
+        setAccountId(match[1]);
+      } else {
+        setAccountId(existingDest.endpoint); // fallback
+      }
+      setBucket(existingDest.bucket);
+      setAccessKeyId(existingDest.accessKeyId);
+      // Secret access key is usually not returned or shouldn't be populated for security
+    }
+  }, [existingDest]);
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      // TODO: Implement actual save logic
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const endpoint = accountId.includes('http')
+        ? accountId
+        : `https://${accountId}.r2.cloudflarestorage.com`;
+
+      await createS3Dest.mutateAsync({
+        projectId: 'global', // assuming global for instance-level settings
+        name: 'default',
+        endpoint,
+        bucket,
+        region: 'auto',
+        accessKeyId,
+        secretAccessKey,
+      });
       toast.success('R2 connection saved successfully');
     } catch (_error) {
       toast.error('Failed to save R2 connection');
@@ -27,6 +67,24 @@ export function S3DestinationsList() {
       setIsSaving(false);
     }
   };
+
+  const handleDelete = async () => {
+    if (!existingDest) return;
+    try {
+      await deleteS3Dest.mutateAsync(existingDest.id);
+      toast.success('R2 connection deleted successfully');
+      setAccountId('');
+      setBucket('');
+      setAccessKeyId('');
+      setSecretAccessKey('');
+    } catch (_error) {
+      toast.error('Failed to delete R2 connection');
+    }
+  };
+
+  if (isLoading) {
+    return <div className="p-6">Loading configuration...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -154,10 +212,21 @@ export function S3DestinationsList() {
               </Label>
             </div>
 
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-end gap-3 pt-2">
+              {existingDest && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={deleteS3Dest.isPending}
+                  className="h-11 font-bold text-xs uppercase tracking-wider"
+                >
+                  DELETE
+                </Button>
+              )}
               <Button
                 type="submit"
-                disabled={isSaving}
+                disabled={isSaving || createS3Dest.isPending}
                 className="h-11 bg-primary font-bold text-primary-foreground text-xs uppercase tracking-wider"
               >
                 {isSaving ? 'SAVING...' : 'SAVE R2 CONFIGURATION'}

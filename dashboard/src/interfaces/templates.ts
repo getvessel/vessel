@@ -1,4 +1,3 @@
-
 export interface OneClickDeployRequest {
   appId: string;
   projectId: string;

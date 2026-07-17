@@ -141,40 +141,48 @@ func (r *UserRepo) ListPATs(ctx context.Context, userID string) ([]*models.Perso
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	type rawPAT struct {
-		ID              string  `db:"id"`
-		UserID          string  `db:"user_id"`
-		Name            string  `db:"name"`
-		Prefix          string  `db:"prefix"`
-		AccessLevel     string  `db:"access_level"`
-		ProjectScope    string  `db:"project_scope"`
-		AllowedProjects *string `db:"allowed_projects"`
-		ExpiresAt       string  `db:"expires_at"`
-		CreatedAt       string  `db:"created_at"`
-	}
-
-	var rawList []rawPAT
-	err := r.db.SelectContext(ctx, &rawList, `SELECT id, user_id, name, prefix, access_level, project_scope, allowed_projects, expires_at, created_at FROM personal_access_tokens WHERE user_id = ? ORDER BY created_at DESC`, userID)
+	rows, err := r.db.QueryContext(ctx, `SELECT id, user_id, name, prefix, access_level, project_scope, allowed_projects, expires_at, created_at FROM personal_access_tokens WHERE user_id = ? ORDER BY created_at DESC`, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list personal access tokens: %w", err)
 	}
+	defer rows.Close()
 
-	list := make([]*models.PersonalAccessToken, 0, len(rawList))
-	for _, raw := range rawList {
-		eat, _ := time.Parse(time.RFC3339, raw.ExpiresAt)
-		cat, _ := time.Parse(time.RFC3339, raw.CreatedAt)
+	var list []*models.PersonalAccessToken
+	for rows.Next() {
+		var (
+			id, uid, name, prefix, accessLevel, projectScope, createdAt string
+			allowedProjects, expiresAt                                  *string
+		)
+		if err := rows.Scan(&id, &uid, &name, &prefix, &accessLevel, &projectScope, &allowedProjects, &expiresAt, &createdAt); err != nil {
+			return nil, fmt.Errorf("failed to scan pat: %w", err)
+		}
+
+		cat, _ := time.Parse(time.RFC3339, createdAt)
+		var eat time.Time
+		if expiresAt != nil {
+			parsed, err := time.Parse(time.RFC3339, *expiresAt)
+			if err == nil {
+				eat = parsed
+			}
+		}
+
 		list = append(list, &models.PersonalAccessToken{
-			ID:              raw.ID,
-			UserID:          raw.UserID,
-			Name:            raw.Name,
-			Prefix:          raw.Prefix,
-			AccessLevel:     raw.AccessLevel,
-			ProjectScope:    raw.ProjectScope,
-			AllowedProjects: raw.AllowedProjects,
+			ID:              id,
+			UserID:          uid,
+			Name:            name,
+			Prefix:          prefix,
+			AccessLevel:     accessLevel,
+			ProjectScope:    projectScope,
+			AllowedProjects: allowedProjects,
 			ExpiresAt:       eat,
 			CreatedAt:       cat,
 		})
 	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return list, nil
 }
 
