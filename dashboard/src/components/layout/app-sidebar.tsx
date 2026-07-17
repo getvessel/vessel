@@ -32,7 +32,6 @@ const navGroups: NavGroup[] = [
     items: [
       { title: 'Dashboard', url: '/', icon: LayoutDashboard, exact: true },
       { title: 'Users', url: '/settings/users', icon: Users },
-      { title: 'Deployments', url: '/deployments', icon: Cloud },
     ],
   },
   {

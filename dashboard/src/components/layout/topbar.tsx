@@ -1,5 +1,4 @@
-import { useNavigate } from '@tanstack/react-router';
-import { BellIcon, Menu, PlusIcon, SearchIcon, X } from 'lucide-react';
+import { BellIcon, Menu, PlusIcon, SearchIcon, TrainFront, Triangle, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface TopbarProps {
@@ -9,8 +8,6 @@ interface TopbarProps {
 }
 
 export function Topbar({ onOpenCommand, onMenuToggle, mobileMenuOpen }: TopbarProps) {
-  const navigate = useNavigate();
-
   return (
     <header className="flex h-14 shrink-0 items-center justify-between gap-2 bg-transparent px-4 md:px-8">
       <div className="flex items-center gap-2">
@@ -23,7 +20,7 @@ export function Topbar({ onOpenCommand, onMenuToggle, mobileMenuOpen }: TopbarPr
         </button>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={onOpenCommand}
@@ -36,22 +33,38 @@ export function Topbar({ onOpenCommand, onMenuToggle, mobileMenuOpen }: TopbarPr
           </kbd>
         </button>
 
+        <div className="hidden items-center gap-2 md:flex">
+          <button
+            type="button"
+            onClick={() => toast.info('Railway Import', { description: 'Coming soon' })}
+            className="flex h-9 items-center gap-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-4 font-semibold text-indigo-400 text-xs tracking-wider transition-all hover:bg-indigo-500/20 active:scale-[0.97]"
+          >
+            <TrainFront className="h-3.5 w-3.5" />
+            <span>IMPORT RAILWAY</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toast.info('Vercel Import', { description: 'Coming soon' })}
+            className="flex h-9 items-center gap-2 rounded-xl border border-border/60 bg-zinc-950 px-4 font-semibold text-xs text-zinc-100 tracking-wider transition-all hover:bg-zinc-900 active:scale-[0.97] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          >
+            <Triangle className="h-3.5 w-3.5 fill-current" />
+            <span>IMPORT VERCEL</span>
+          </button>
+        </div>
+
         <button
           type="button"
-          onClick={() =>
-            toast.info('New resource', {
-              description: 'Creation menu coming soon',
-            })
-          }
-          className="flex h-9 items-center gap-1.5 rounded-xl bg-primary px-4 font-semibold text-primary-foreground text-sm shadow-lg shadow-primary/25 transition-all hover:brightness-110 active:scale-[0.97]"
+          onClick={() => toast.info('New resource', { description: 'Creation menu coming soon' })}
+          className="flex h-9 items-center gap-1.5 rounded-xl bg-primary px-4 font-semibold text-primary-foreground text-xs tracking-wider shadow-lg shadow-primary/25 transition-all hover:brightness-110 active:scale-[0.97]"
         >
           <PlusIcon className="h-4 w-4" />
-          <span>New</span>
+          <span>NEW</span>
         </button>
 
         <button
           type="button"
-          onClick={() => navigate({ to: '/notifications' })}
+          onClick={() => {}}
           className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 transition-colors hover:bg-muted"
         >
           <BellIcon className="h-4 w-4" />

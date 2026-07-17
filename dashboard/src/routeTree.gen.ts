@@ -14,14 +14,16 @@ import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard.index'
-import { Route as DashboardTerminalRouteImport } from './routes/_dashboard.terminal'
 import { Route as DashboardTemplatesRouteImport } from './routes/_dashboard.templates'
-import { Route as DashboardTeamsRouteImport } from './routes/_dashboard.teams'
+import { Route as DashboardStorageRouteImport } from './routes/_dashboard.storage'
 import { Route as DashboardSourcesRouteImport } from './routes/_dashboard.sources'
 import { Route as DashboardProjectsRouteImport } from './routes/_dashboard.projects'
-import { Route as DashboardNotificationsRouteImport } from './routes/_dashboard.notifications'
+import { Route as DashboardJobsRouteImport } from './routes/_dashboard.jobs'
+import { Route as DashboardDomainsRouteImport } from './routes/_dashboard.domains'
+import { Route as DashboardDeploymentsRouteImport } from './routes/_dashboard.deployments'
 import { Route as DashboardDatabasesRouteImport } from './routes/_dashboard.databases'
 import { Route as DashboardAuditLogsRouteImport } from './routes/_dashboard.audit-logs'
+import { Route as DashboardAiRouteImport } from './routes/_dashboard.ai'
 import { Route as AuthSignupRouteImport } from './routes/_auth.signup'
 import { Route as AuthSigninRouteImport } from './routes/_auth.signin'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth.reset-password'
@@ -35,8 +37,7 @@ import { Route as DashboardSettingsMigrationRouteImport } from './routes/_dashbo
 import { Route as DashboardSettingsMaintenanceRouteImport } from './routes/_dashboard.settings/maintenance'
 import { Route as DashboardSettingsDnsRouteImport } from './routes/_dashboard.settings/dns'
 import { Route as DashboardSettingsBackupsRouteImport } from './routes/_dashboard.settings/backups'
-import { Route as DashboardImportsVercelRouteImport } from './routes/_dashboard.imports/vercel'
-import { Route as DashboardImportsRailwayRouteImport } from './routes/_dashboard.imports/railway'
+import { Route as DashboardSettingsApiRouteImport } from './routes/_dashboard.settings/api'
 import { Route as DashboardServicesServiceIdIndexRouteImport } from './routes/_dashboard.services/$serviceId.index'
 import { Route as DashboardProjectsProjectIdIndexRouteImport } from './routes/_dashboard.projects/$projectId.index'
 import { Route as DashboardDatabasesDbIdIndexRouteImport } from './routes/_dashboard.databases/$dbId.index'
@@ -77,19 +78,14 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardTerminalRoute = DashboardTerminalRouteImport.update({
-  id: '/terminal',
-  path: '/terminal',
-  getParentRoute: () => DashboardRoute,
-} as any)
 const DashboardTemplatesRoute = DashboardTemplatesRouteImport.update({
   id: '/templates',
   path: '/templates',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
-  id: '/teams',
-  path: '/teams',
+const DashboardStorageRoute = DashboardStorageRouteImport.update({
+  id: '/storage',
+  path: '/storage',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardSourcesRoute = DashboardSourcesRouteImport.update({
@@ -102,9 +98,19 @@ const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardNotificationsRoute = DashboardNotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
+const DashboardJobsRoute = DashboardJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDomainsRoute = DashboardDomainsRouteImport.update({
+  id: '/domains',
+  path: '/domains',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDeploymentsRoute = DashboardDeploymentsRouteImport.update({
+  id: '/deployments',
+  path: '/deployments',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardDatabasesRoute = DashboardDatabasesRouteImport.update({
@@ -115,6 +121,11 @@ const DashboardDatabasesRoute = DashboardDatabasesRouteImport.update({
 const DashboardAuditLogsRoute = DashboardAuditLogsRouteImport.update({
   id: '/audit-logs',
   path: '/audit-logs',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAiRoute = DashboardAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
   getParentRoute: () => DashboardRoute,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -186,14 +197,9 @@ const DashboardSettingsBackupsRoute =
     path: '/settings/backups',
     getParentRoute: () => DashboardRoute,
   } as any)
-const DashboardImportsVercelRoute = DashboardImportsVercelRouteImport.update({
-  id: '/imports/vercel',
-  path: '/imports/vercel',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardImportsRailwayRoute = DashboardImportsRailwayRouteImport.update({
-  id: '/imports/railway',
-  path: '/imports/railway',
+const DashboardSettingsApiRoute = DashboardSettingsApiRouteImport.update({
+  id: '/settings/api',
+  path: '/settings/api',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardServicesServiceIdIndexRoute =
@@ -301,16 +307,17 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof AuthResetPasswordRoute
   '/signin': typeof AuthSigninRoute
   '/signup': typeof AuthSignupRoute
+  '/ai': typeof DashboardAiRoute
   '/audit-logs': typeof DashboardAuditLogsRoute
   '/databases': typeof DashboardDatabasesRouteWithChildren
-  '/notifications': typeof DashboardNotificationsRoute
+  '/deployments': typeof DashboardDeploymentsRoute
+  '/domains': typeof DashboardDomainsRoute
+  '/jobs': typeof DashboardJobsRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
   '/sources': typeof DashboardSourcesRoute
-  '/teams': typeof DashboardTeamsRoute
+  '/storage': typeof DashboardStorageRoute
   '/templates': typeof DashboardTemplatesRoute
-  '/terminal': typeof DashboardTerminalRoute
-  '/imports/railway': typeof DashboardImportsRailwayRoute
-  '/imports/vercel': typeof DashboardImportsVercelRoute
+  '/settings/api': typeof DashboardSettingsApiRoute
   '/settings/backups': typeof DashboardSettingsBackupsRoute
   '/settings/dns': typeof DashboardSettingsDnsRoute
   '/settings/maintenance': typeof DashboardSettingsMaintenanceRoute
@@ -345,16 +352,17 @@ export interface FileRoutesByTo {
   '/reset-password': typeof AuthResetPasswordRoute
   '/signin': typeof AuthSigninRoute
   '/signup': typeof AuthSignupRoute
+  '/ai': typeof DashboardAiRoute
   '/audit-logs': typeof DashboardAuditLogsRoute
   '/databases': typeof DashboardDatabasesRouteWithChildren
-  '/notifications': typeof DashboardNotificationsRoute
+  '/deployments': typeof DashboardDeploymentsRoute
+  '/domains': typeof DashboardDomainsRoute
+  '/jobs': typeof DashboardJobsRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
   '/sources': typeof DashboardSourcesRoute
-  '/teams': typeof DashboardTeamsRoute
+  '/storage': typeof DashboardStorageRoute
   '/templates': typeof DashboardTemplatesRoute
-  '/terminal': typeof DashboardTerminalRoute
-  '/imports/railway': typeof DashboardImportsRailwayRoute
-  '/imports/vercel': typeof DashboardImportsVercelRoute
+  '/settings/api': typeof DashboardSettingsApiRoute
   '/settings/backups': typeof DashboardSettingsBackupsRoute
   '/settings/dns': typeof DashboardSettingsDnsRoute
   '/settings/maintenance': typeof DashboardSettingsMaintenanceRoute
@@ -391,17 +399,18 @@ export interface FileRoutesById {
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/signin': typeof AuthSigninRoute
   '/_auth/signup': typeof AuthSignupRoute
+  '/_dashboard/ai': typeof DashboardAiRoute
   '/_dashboard/audit-logs': typeof DashboardAuditLogsRoute
   '/_dashboard/databases': typeof DashboardDatabasesRouteWithChildren
-  '/_dashboard/notifications': typeof DashboardNotificationsRoute
+  '/_dashboard/deployments': typeof DashboardDeploymentsRoute
+  '/_dashboard/domains': typeof DashboardDomainsRoute
+  '/_dashboard/jobs': typeof DashboardJobsRoute
   '/_dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/_dashboard/sources': typeof DashboardSourcesRoute
-  '/_dashboard/teams': typeof DashboardTeamsRoute
+  '/_dashboard/storage': typeof DashboardStorageRoute
   '/_dashboard/templates': typeof DashboardTemplatesRoute
-  '/_dashboard/terminal': typeof DashboardTerminalRoute
   '/_dashboard/': typeof DashboardIndexRoute
-  '/_dashboard/imports/railway': typeof DashboardImportsRailwayRoute
-  '/_dashboard/imports/vercel': typeof DashboardImportsVercelRoute
+  '/_dashboard/settings/api': typeof DashboardSettingsApiRoute
   '/_dashboard/settings/backups': typeof DashboardSettingsBackupsRoute
   '/_dashboard/settings/dns': typeof DashboardSettingsDnsRoute
   '/_dashboard/settings/maintenance': typeof DashboardSettingsMaintenanceRoute
@@ -438,16 +447,17 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signin'
     | '/signup'
+    | '/ai'
     | '/audit-logs'
     | '/databases'
-    | '/notifications'
+    | '/deployments'
+    | '/domains'
+    | '/jobs'
     | '/projects'
     | '/sources'
-    | '/teams'
+    | '/storage'
     | '/templates'
-    | '/terminal'
-    | '/imports/railway'
-    | '/imports/vercel'
+    | '/settings/api'
     | '/settings/backups'
     | '/settings/dns'
     | '/settings/maintenance'
@@ -482,16 +492,17 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signin'
     | '/signup'
+    | '/ai'
     | '/audit-logs'
     | '/databases'
-    | '/notifications'
+    | '/deployments'
+    | '/domains'
+    | '/jobs'
     | '/projects'
     | '/sources'
-    | '/teams'
+    | '/storage'
     | '/templates'
-    | '/terminal'
-    | '/imports/railway'
-    | '/imports/vercel'
+    | '/settings/api'
     | '/settings/backups'
     | '/settings/dns'
     | '/settings/maintenance'
@@ -527,17 +538,18 @@ export interface FileRouteTypes {
     | '/_auth/reset-password'
     | '/_auth/signin'
     | '/_auth/signup'
+    | '/_dashboard/ai'
     | '/_dashboard/audit-logs'
     | '/_dashboard/databases'
-    | '/_dashboard/notifications'
+    | '/_dashboard/deployments'
+    | '/_dashboard/domains'
+    | '/_dashboard/jobs'
     | '/_dashboard/projects'
     | '/_dashboard/sources'
-    | '/_dashboard/teams'
+    | '/_dashboard/storage'
     | '/_dashboard/templates'
-    | '/_dashboard/terminal'
     | '/_dashboard/'
-    | '/_dashboard/imports/railway'
-    | '/_dashboard/imports/vercel'
+    | '/_dashboard/settings/api'
     | '/_dashboard/settings/backups'
     | '/_dashboard/settings/dns'
     | '/_dashboard/settings/maintenance'
@@ -609,13 +621,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/terminal': {
-      id: '/_dashboard/terminal'
-      path: '/terminal'
-      fullPath: '/terminal'
-      preLoaderRoute: typeof DashboardTerminalRouteImport
-      parentRoute: typeof DashboardRoute
-    }
     '/_dashboard/templates': {
       id: '/_dashboard/templates'
       path: '/templates'
@@ -623,11 +628,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTemplatesRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/teams': {
-      id: '/_dashboard/teams'
-      path: '/teams'
-      fullPath: '/teams'
-      preLoaderRoute: typeof DashboardTeamsRouteImport
+    '/_dashboard/storage': {
+      id: '/_dashboard/storage'
+      path: '/storage'
+      fullPath: '/storage'
+      preLoaderRoute: typeof DashboardStorageRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/sources': {
@@ -644,11 +649,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/notifications': {
-      id: '/_dashboard/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof DashboardNotificationsRouteImport
+    '/_dashboard/jobs': {
+      id: '/_dashboard/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof DashboardJobsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/domains': {
+      id: '/_dashboard/domains'
+      path: '/domains'
+      fullPath: '/domains'
+      preLoaderRoute: typeof DashboardDomainsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/deployments': {
+      id: '/_dashboard/deployments'
+      path: '/deployments'
+      fullPath: '/deployments'
+      preLoaderRoute: typeof DashboardDeploymentsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/databases': {
@@ -663,6 +682,13 @@ declare module '@tanstack/react-router' {
       path: '/audit-logs'
       fullPath: '/audit-logs'
       preLoaderRoute: typeof DashboardAuditLogsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/ai': {
+      id: '/_dashboard/ai'
+      path: '/ai'
+      fullPath: '/ai'
+      preLoaderRoute: typeof DashboardAiRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_auth/signup': {
@@ -756,18 +782,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsBackupsRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/imports/vercel': {
-      id: '/_dashboard/imports/vercel'
-      path: '/imports/vercel'
-      fullPath: '/imports/vercel'
-      preLoaderRoute: typeof DashboardImportsVercelRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/imports/railway': {
-      id: '/_dashboard/imports/railway'
-      path: '/imports/railway'
-      fullPath: '/imports/railway'
-      preLoaderRoute: typeof DashboardImportsRailwayRouteImport
+    '/_dashboard/settings/api': {
+      id: '/_dashboard/settings/api'
+      path: '/settings/api'
+      fullPath: '/settings/api'
+      preLoaderRoute: typeof DashboardSettingsApiRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/services/$serviceId/': {
@@ -940,17 +959,18 @@ const DashboardProjectsRouteWithChildren =
   DashboardProjectsRoute._addFileChildren(DashboardProjectsRouteChildren)
 
 interface DashboardRouteChildren {
+  DashboardAiRoute: typeof DashboardAiRoute
   DashboardAuditLogsRoute: typeof DashboardAuditLogsRoute
   DashboardDatabasesRoute: typeof DashboardDatabasesRouteWithChildren
-  DashboardNotificationsRoute: typeof DashboardNotificationsRoute
+  DashboardDeploymentsRoute: typeof DashboardDeploymentsRoute
+  DashboardDomainsRoute: typeof DashboardDomainsRoute
+  DashboardJobsRoute: typeof DashboardJobsRoute
   DashboardProjectsRoute: typeof DashboardProjectsRouteWithChildren
   DashboardSourcesRoute: typeof DashboardSourcesRoute
-  DashboardTeamsRoute: typeof DashboardTeamsRoute
+  DashboardStorageRoute: typeof DashboardStorageRoute
   DashboardTemplatesRoute: typeof DashboardTemplatesRoute
-  DashboardTerminalRoute: typeof DashboardTerminalRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardImportsRailwayRoute: typeof DashboardImportsRailwayRoute
-  DashboardImportsVercelRoute: typeof DashboardImportsVercelRoute
+  DashboardSettingsApiRoute: typeof DashboardSettingsApiRoute
   DashboardSettingsBackupsRoute: typeof DashboardSettingsBackupsRoute
   DashboardSettingsDnsRoute: typeof DashboardSettingsDnsRoute
   DashboardSettingsMaintenanceRoute: typeof DashboardSettingsMaintenanceRoute
@@ -970,17 +990,18 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAiRoute: DashboardAiRoute,
   DashboardAuditLogsRoute: DashboardAuditLogsRoute,
   DashboardDatabasesRoute: DashboardDatabasesRouteWithChildren,
-  DashboardNotificationsRoute: DashboardNotificationsRoute,
+  DashboardDeploymentsRoute: DashboardDeploymentsRoute,
+  DashboardDomainsRoute: DashboardDomainsRoute,
+  DashboardJobsRoute: DashboardJobsRoute,
   DashboardProjectsRoute: DashboardProjectsRouteWithChildren,
   DashboardSourcesRoute: DashboardSourcesRoute,
-  DashboardTeamsRoute: DashboardTeamsRoute,
+  DashboardStorageRoute: DashboardStorageRoute,
   DashboardTemplatesRoute: DashboardTemplatesRoute,
-  DashboardTerminalRoute: DashboardTerminalRoute,
   DashboardIndexRoute: DashboardIndexRoute,
-  DashboardImportsRailwayRoute: DashboardImportsRailwayRoute,
-  DashboardImportsVercelRoute: DashboardImportsVercelRoute,
+  DashboardSettingsApiRoute: DashboardSettingsApiRoute,
   DashboardSettingsBackupsRoute: DashboardSettingsBackupsRoute,
   DashboardSettingsDnsRoute: DashboardSettingsDnsRoute,
   DashboardSettingsMaintenanceRoute: DashboardSettingsMaintenanceRoute,

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/_dashboard/imports/railway')({
+export const Route = createFileRoute('/_dashboard/domains')({
   component: () => null,
 });
