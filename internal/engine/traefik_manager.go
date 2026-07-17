@@ -165,9 +165,10 @@ func (m *TraefikManager) buildTraefikMounts() []mount.Mount {
 	sockPath := dockerSocketPath()
 	mounts := []mount.Mount{
 		{
-			Type:   mount.TypeBind,
-			Source: sockPath,
-			Target: "/var/run/docker.sock",
+			Type:     mount.TypeBind,
+			Source:   sockPath,
+			Target:   "/var/run/docker.sock",
+			ReadOnly: true,
 		},
 	}
 	if m.tlsEmail != "" {
