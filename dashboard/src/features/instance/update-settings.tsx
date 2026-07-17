@@ -35,7 +35,7 @@ export const UpdatesPage = () => {
   return (
     <div className="space-y-6">
       {/* Top Section */}
-      <div className="flex flex-col justify-between gap-6 rounded-2xl border border-border/50 bg-card/40 p-8 md:flex-row md:items-start">
+      <div className="flex flex-col justify-between gap-6 pb-2 md:flex-row md:items-start">
         <div className="flex-1 space-y-4">
           <div className="space-y-1">
             <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
@@ -47,31 +47,6 @@ export const UpdatesPage = () => {
             Compare this install with the official Vessl releases, review changelogs, and update the
             daemon when you are ready.
           </p>
-
-          <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="space-y-2 rounded-xl border border-border/50 bg-background/50 p-4">
-              <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                REPOSITORY
-              </p>
-              <p className="font-mono text-sm">vesslhq/vessl</p>
-            </div>
-            <div className="space-y-2 rounded-xl border border-border/50 bg-background/50 p-4">
-              <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                INSTALLED
-              </p>
-              <p className="font-mono text-sm">
-                {isLoading ? <Skeleton className="h-5 w-20" /> : info?.currentVersion || 'unknown'}
-              </p>
-            </div>
-            <div className="space-y-2 rounded-xl border border-border/50 bg-background/50 p-4">
-              <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                GITHUB LATEST
-              </p>
-              <p className="font-mono text-sm">
-                {isLoading ? <Skeleton className="h-5 w-20" /> : info?.latestVersion || 'unknown'}
-              </p>
-            </div>
-          </div>
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-4">
@@ -96,6 +71,31 @@ export const UpdatesPage = () => {
             <RefreshCw className={`h-4 w-4 ${checking ? 'animate-spin' : ''}`} />
             {checking ? 'CHECKING...' : 'CHECK UPDATES'}
           </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="flex flex-col justify-center space-y-2 rounded-2xl border border-border/50 bg-card/40 p-6">
+          <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+            REPOSITORY
+          </p>
+          <p className="font-mono text-sm">vesslhq/vessl</p>
+        </div>
+        <div className="flex flex-col justify-center space-y-2 rounded-2xl border border-border/50 bg-card/40 p-6">
+          <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+            INSTALLED
+          </p>
+          <p className="font-mono text-sm">
+            {isLoading ? <Skeleton className="h-5 w-20" /> : info?.currentVersion || 'unknown'}
+          </p>
+        </div>
+        <div className="flex flex-col justify-center space-y-2 rounded-2xl border border-border/50 bg-card/40 p-6">
+          <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+            GITHUB LATEST
+          </p>
+          <p className="font-mono text-sm">
+            {isLoading ? <Skeleton className="h-5 w-20" /> : info?.latestVersion || 'unknown'}
+          </p>
         </div>
       </div>
 

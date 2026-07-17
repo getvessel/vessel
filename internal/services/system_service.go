@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"os"
@@ -39,6 +40,7 @@ func (s *SystemService) GetStats() (*models.SystemStats, error) {
 	uptime := getUptime()
 	load := getLoadAvg()
 	procs := getProcessCount()
+	docker := getDockerStats()
 
 	return &models.SystemStats{
 		CPU:       cpu,
@@ -47,6 +49,7 @@ func (s *SystemService) GetStats() (*models.SystemStats, error) {
 		Uptime:    uptime,
 		LoadAvg:   load,
 		Processes: procs,
+		Docker:    docker,
 	}, nil
 }
 
@@ -212,4 +215,91 @@ func getProcessCount() int {
 		}
 	}
 	return count
+}
+
+func getDockerStats() models.DockerStats {
+	stats := models.DockerStats{}
+	cmd := exec.Command("docker", "system", "df", "--format", "{{json .}}")
+	out, err := cmd.Output()
+	if err != nil {
+		return stats
+	}
+
+	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+	var totalReclaimable float64
+
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+		var parsed struct {
+			Type        string `json:"Type"`
+			TotalCount  string `json:"TotalCount"`
+			Active      string `json:"Active"`
+			Size        string `json:"Size"`
+			Reclaimable string `json:"Reclaimable"`
+		}
+		if err := json.Unmarshal([]byte(line), &parsed); err != nil {
+			continue
+		}
+
+		layer := models.DockerLayerStat{
+			Active:      parsed.Active,
+			TotalCount:  parsed.TotalCount,
+			Size:        parsed.Size,
+			Reclaimable: parsed.Reclaimable,
+		}
+
+		totalReclaimable += parseDockerSizeToGB(parsed.Reclaimable)
+
+		switch parsed.Type {
+		case "Images":
+			stats.Images = layer
+		case "Containers":
+			stats.Containers = layer
+		case "Local Volumes":
+			stats.Volumes = layer
+		case "Build Cache":
+			stats.BuildCache = layer
+		}
+	}
+
+	stats.ReclaimableGB = math.Round(totalReclaimable*100) / 100
+	return stats
+}
+
+func parseDockerSizeToGB(s string) float64 {
+	parts := strings.Split(s, " ")
+	if len(parts) == 0 {
+		return 0
+	}
+	sizeStr := parts[0]
+	idx := -1
+	for i, c := range sizeStr {
+		if (c < '0' || c > '9') && c != '.' {
+			idx = i
+			break
+		}
+	}
+	if idx == -1 {
+		return 0
+	}
+	val, err := strconv.ParseFloat(sizeStr[:idx], 64)
+	if err != nil {
+		return 0
+	}
+	unit := strings.ToUpper(sizeStr[idx:])
+	switch unit {
+	case "B", "BYTES":
+		return val / (1024 * 1024 * 1024)
+	case "KB":
+		return val / (1024 * 1024)
+	case "MB":
+		return val / 1024
+	case "GB":
+		return val
+	case "TB":
+		return val * 1024
+	}
+	return 0
 }

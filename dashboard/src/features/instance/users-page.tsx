@@ -77,8 +77,9 @@ export const UsersPage = () => {
       toast.success('User invited successfully');
       setInviteOpen(false);
       setInviteEmail('');
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to invite user');
+    } catch (err) {
+      const error = err as Error;
+      toast.error(error.message || 'Failed to invite user');
     }
   };
 

@@ -55,10 +55,18 @@ export const MaintenancePage = () => {
   const usedGb = stats?.disk.usedGb ? stats.disk.usedGb.toFixed(1) : '0';
   const totalGb = stats?.disk.totalGb ? stats.disk.totalGb.toFixed(1) : '0';
 
-  // Mocked Docker stats for visual fidelity based on the design mockups
-  const dockerPercent = 1;
-  const reclaimableGb = 5.86;
-  const buildCacheGb = 4.34;
+  // Dynamic Docker stats
+  const dockerPercent =
+    stats?.disk?.totalGb && stats?.docker?.reclaimableGb
+      ? Number(((stats.docker.reclaimableGb / stats.disk.totalGb) * 100).toFixed(1))
+      : 0;
+  const reclaimableGb = stats?.docker?.reclaimableGb ? stats.docker.reclaimableGb.toFixed(2) : '0';
+
+  // Extract just the numerical part for the build cache summary if possible
+  const buildCacheReclaimableStr = stats?.docker?.buildCache?.reclaimable || '0';
+  const buildCacheGb = parseFloat(buildCacheReclaimableStr)
+    ? parseFloat(buildCacheReclaimableStr).toFixed(2)
+    : '0';
 
   return (
     <div className="space-y-6">
@@ -72,9 +80,10 @@ export const MaintenancePage = () => {
             <h1 className="font-bold text-3xl tracking-tight">Host health and cleanup</h1>
           </div>
           <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">
-            Watch disk pressure, Docker growth, logs, and Aeroplane build artifacts before they take
-            the server down.
+            Watch disk pressure, Docker growth, logs, and Vessl build artifacts before they take the
+            server down.
           </p>
+        </div>
 
         <div className="flex shrink-0 flex-col items-end gap-4">
           <Badge
@@ -93,9 +102,11 @@ export const MaintenancePage = () => {
         </div>
       </div>
 
-      <div className="flex w-full items-center gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 font-medium text-sm text-yellow-500">
-        <AlertTriangle className="h-4 w-4" /> Docker has more than 3 GB reclaimable.
-      </div>
+      {stats?.docker?.reclaimableGb && stats.docker.reclaimableGb > 3 ? (
+        <div className="flex w-full items-center gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 font-medium text-sm text-yellow-500">
+          <AlertTriangle className="h-4 w-4" /> Docker has more than 3 GB reclaimable.
+        </div>
+      ) : null}
 
       {/* Top Cards Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -147,7 +158,7 @@ export const MaintenancePage = () => {
               0%
             </p>
           </div>
-          <h2 className="font-bold text-3xl">Unknown</h2>
+          <h2 className="font-bold text-3xl">0 GB</h2>
           <div className="space-y-2">
             <ProgressBar value={0} colorClass="bg-primary" />
             <p className="text-muted-foreground text-xs">No build artifact directory yet.</p>
@@ -218,15 +229,20 @@ export const MaintenancePage = () => {
                 <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
                   IMAGES
                 </p>
-                <p className="mt-1 text-muted-foreground text-xs">8/12 active</p>
+                <p className="mt-1 text-muted-foreground text-xs">
+                  {stats?.docker?.images?.active || 0}/{stats?.docker?.images?.totalCount || 0}{' '}
+                  active
+                </p>
               </div>
               <div className="col-span-2 flex items-center gap-6">
                 <div className="flex h-2 w-48 overflow-hidden rounded-full bg-background">
                   <div className="h-full w-1/3 bg-muted-foreground" />
                 </div>
                 <div className="space-x-2 font-mono text-sm">
-                  <span className="text-foreground">3.12 GB</span>
-                  <span className="text-yellow-500">1.52 GB candidate</span>
+                  <span className="text-foreground">{stats?.docker?.images?.size || '0 B'}</span>
+                  <span className="text-yellow-500">
+                    {stats?.docker?.images?.reclaimable || '0 B'} candidate
+                  </span>
                 </div>
               </div>
             </div>
@@ -236,15 +252,22 @@ export const MaintenancePage = () => {
                 <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
                   CONTAINERS
                 </p>
-                <p className="mt-1 text-muted-foreground text-xs">6/8 active</p>
+                <p className="mt-1 text-muted-foreground text-xs">
+                  {stats?.docker?.containers?.active || 0}/
+                  {stats?.docker?.containers?.totalCount || 0} active
+                </p>
               </div>
               <div className="col-span-2 flex items-center gap-6">
                 <div className="flex h-2 w-48 overflow-hidden rounded-full bg-background">
                   <div className="h-full w-1/12 bg-muted-foreground" />
                 </div>
                 <div className="space-x-2 font-mono text-sm">
-                  <span className="text-foreground">63 B</span>
-                  <span className="text-muted-foreground/50">0 B candidate</span>
+                  <span className="text-foreground">
+                    {stats?.docker?.containers?.size || '0 B'}
+                  </span>
+                  <span className="text-muted-foreground/50">
+                    {stats?.docker?.containers?.reclaimable || '0 B'} candidate
+                  </span>
                 </div>
               </div>
             </div>
@@ -254,15 +277,20 @@ export const MaintenancePage = () => {
                 <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
                   LOCAL VOLUMES
                 </p>
-                <p className="mt-1 text-muted-foreground text-xs">7/8 active</p>
+                <p className="mt-1 text-muted-foreground text-xs">
+                  {stats?.docker?.volumes?.active || 0}/{stats?.docker?.volumes?.totalCount || 0}{' '}
+                  active
+                </p>
               </div>
               <div className="col-span-2 flex items-center gap-6">
                 <div className="flex h-2 w-48 overflow-hidden rounded-full bg-background">
                   <div className="h-full w-1/6 bg-muted-foreground" />
                 </div>
                 <div className="space-x-2 font-mono text-sm">
-                  <span className="text-foreground">48.4 MB</span>
-                  <span className="text-muted-foreground/50">0 B candidate</span>
+                  <span className="text-foreground">{stats?.docker?.volumes?.size || '0 B'}</span>
+                  <span className="text-muted-foreground/50">
+                    {stats?.docker?.volumes?.reclaimable || '0 B'} candidate
+                  </span>
                 </div>
               </div>
             </div>
@@ -272,15 +300,22 @@ export const MaintenancePage = () => {
                 <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
                   BUILD CACHE
                 </p>
-                <p className="mt-1 text-muted-foreground text-xs">0/98 active</p>
+                <p className="mt-1 text-muted-foreground text-xs">
+                  {stats?.docker?.buildCache?.active || 0}/
+                  {stats?.docker?.buildCache?.totalCount || 0} active
+                </p>
               </div>
               <div className="col-span-2 flex items-center gap-6">
                 <div className="flex h-2 w-48 overflow-hidden rounded-full bg-background">
                   <div className="h-full w-[80%] bg-muted-foreground" />
                 </div>
                 <div className="space-x-2 font-mono text-sm">
-                  <span className="text-foreground">5.39 GB</span>
-                  <span className="text-yellow-500">4.34 GB candidate</span>
+                  <span className="text-foreground">
+                    {stats?.docker?.buildCache?.size || '0 B'}
+                  </span>
+                  <span className="text-yellow-500">
+                    {stats?.docker?.buildCache?.reclaimable || '0 B'} candidate
+                  </span>
                 </div>
               </div>
             </div>
@@ -309,10 +344,12 @@ export const MaintenancePage = () => {
           <div className="divide-y divide-border/50 rounded-xl border border-border/50 text-sm">
             <div className="flex justify-between bg-background/30 p-4">
               <span className="text-muted-foreground">Top Docker candidate</span>
-              <span className="font-mono">4.34 GB Build Cache</span>
+              <span className="font-mono">
+                {stats?.docker?.buildCache?.reclaimable || '0 B'} Build Cache
+              </span>
             </div>
             <div className="flex justify-between p-4">
-              <span className="text-muted-foreground">Aeroplane data</span>
+              <span className="text-muted-foreground">Vessl data</span>
               <span className="font-mono">1.81 MB</span>
             </div>
             <div className="flex justify-between p-4">
@@ -336,8 +373,7 @@ export const MaintenancePage = () => {
               disabled={cleaning}
               className="h-12 border-primary/30 bg-primary/5 font-semibold text-primary text-xs uppercase tracking-widest hover:bg-primary/10 hover:text-primary"
             >
-              <RefreshCw className="mr-2 h-4 w-4" />{' '}
-              {cleaning ? 'CLEANING...' : 'SAFE CLEANUP'}
+              <RefreshCw className="mr-2 h-4 w-4" /> {cleaning ? 'CLEANING...' : 'SAFE CLEANUP'}
             </Button>
             <Button
               variant="outline"

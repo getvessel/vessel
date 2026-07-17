@@ -7,6 +7,22 @@ type SystemStats struct {
 	Uptime    int64       `json:"uptimeSeconds"`
 	LoadAvg   [3]float64  `json:"loadAvg"`
 	Processes int         `json:"processes"`
+	Docker    DockerStats `json:"docker"`
+}
+
+type DockerStats struct {
+	Images        DockerLayerStat `json:"images"`
+	Containers    DockerLayerStat `json:"containers"`
+	Volumes       DockerLayerStat `json:"volumes"`
+	BuildCache    DockerLayerStat `json:"buildCache"`
+	ReclaimableGB float64         `json:"reclaimableGb"`
+}
+
+type DockerLayerStat struct {
+	Active      string `json:"active"`
+	TotalCount  string `json:"totalCount"`
+	Size        string `json:"size"`
+	Reclaimable string `json:"reclaimable"`
 }
 
 type CPUStats struct {

@@ -29,8 +29,8 @@ export const DomainsPage = () => {
     try {
       await updateSettings({
         payload: {
-          [field]: formData[field],
-        } as any,
+          [field]: formData[field as keyof typeof formData],
+        } as Record<string, string>,
       });
       toast.success('Settings updated successfully');
     } catch {
@@ -49,7 +49,7 @@ export const DomainsPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-6 rounded-2xl border border-border/50 bg-card/40 p-8 md:flex-row md:items-start">
+      <div className="flex flex-col justify-between gap-6 pb-2 md:flex-row md:items-start">
         <div className="flex-1 space-y-4">
           <div className="space-y-1">
             <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
@@ -102,7 +102,7 @@ export const DomainsPage = () => {
         {/* Root Domain */}
         <div className="space-y-6 rounded-2xl border border-border/50 bg-card/40 p-8">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 text-blue-500">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
               <Globe className="h-5 w-5" />
             </div>
             <div>

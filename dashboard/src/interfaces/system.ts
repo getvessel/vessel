@@ -53,6 +53,22 @@ export interface SystemStats {
   loadAvg: number[];
   processes: number;
   uptimeSeconds: number;
+  docker: DockerStats;
+}
+
+export interface DockerStats {
+  images: DockerLayerStat;
+  containers: DockerLayerStat;
+  volumes: DockerLayerStat;
+  buildCache: DockerLayerStat;
+  reclaimableGb: number;
+}
+
+export interface DockerLayerStat {
+  active: string;
+  totalCount: string;
+  size: string;
+  reclaimable: string;
 }
 
 export interface CPUStats {
