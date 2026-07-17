@@ -4,12 +4,11 @@ import type {
   GetProfileResponse,
   UpdateProfileRequest,
 } from '#/interfaces/profile';
-import type { CreatePATResponse, PersonalAccessToken } from '#/interfaces/users';
+import type { CreatePATRequest, CreatePATResponse, PersonalAccessToken } from '#/interfaces/users';
 import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
 
 type ListPATsResponse = BaseResponse<PersonalAccessToken[]>;
-type CreatePATRequest = { name: string; scopes: string[]; expiresAt?: string };
 
 export const profileService = {
   getProfile: async (): Promise<GetProfileResponse> => {

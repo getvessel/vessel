@@ -30,13 +30,16 @@ type UserClaims struct {
 }
 
 type PersonalAccessToken struct {
-	ID        string    `json:"id" db:"id"`
-	UserID    string    `json:"userId" db:"user_id"`
-	Name      string    `json:"name" db:"name"`
-	TokenHash string    `json:"-" db:"token_hash"`
-	Prefix    string    `json:"prefix" db:"prefix"`
-	ExpiresAt time.Time `json:"expiresAt" db:"expires_at"`
-	CreatedAt time.Time `json:"createdAt" db:"created_at"`
+	ID              string    `json:"id" db:"id"`
+	UserID          string    `json:"userId" db:"user_id"`
+	Name            string    `json:"name" db:"name"`
+	TokenHash       string    `json:"-" db:"token_hash"`
+	Prefix          string    `json:"prefix" db:"prefix"`
+	AccessLevel     string    `json:"accessLevel" db:"access_level"`
+	ProjectScope    string    `json:"projectScope" db:"project_scope"`
+	AllowedProjects *string   `json:"allowedProjects" db:"allowed_projects"` // JSON array of project IDs if specific
+	ExpiresAt       time.Time `json:"expiresAt" db:"expires_at"`
+	CreatedAt       time.Time `json:"createdAt" db:"created_at"`
 }
 
 type UpdateProfileRequest struct {
@@ -45,7 +48,11 @@ type UpdateProfileRequest struct {
 }
 
 type CreatePATRequest struct {
-	Name string `json:"name"`
+	Name            string     `json:"name"`
+	AccessLevel     string     `json:"accessLevel"`
+	ProjectScope    string     `json:"projectScope"`
+	AllowedProjects []string   `json:"allowedProjects"` // Array of strings in the API
+	ExpiresAt       *time.Time `json:"expiresAt"`
 }
 
 type CreatePATResponse struct {

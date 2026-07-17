@@ -18,6 +18,9 @@ export interface PersonalAccessToken {
   userId: string;
   name: string;
   prefix: string;
+  accessLevel: 'read' | 'read_write';
+  projectScope: 'all' | 'specific';
+  allowedProjects: string[] | null;
   expiresAt?: string;
   createdAt: string;
 }
@@ -34,6 +37,10 @@ export interface UpdateUserRequest {
 
 export interface CreatePATRequest {
   name: string;
+  accessLevel: 'read' | 'read_write';
+  projectScope: 'all' | 'specific';
+  allowedProjects: string[];
+  expiresAt?: string;
 }
 
 export type GetUsersResponse = BaseResponse<User[]>;

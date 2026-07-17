@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -93,9 +94,15 @@ func (s *UserService) UpdateUser(ctx context.Context, u *models.User) error {
 	return s.userRepo.UpdateUser(ctx, u)
 }
 
-func (s *UserService) CreatePAT(ctx context.Context, userID, name string, expiresAt *time.Time) (*models.PersonalAccessToken, string, error) {
+func (s *UserService) CreatePAT(ctx context.Context, userID, name string, accessLevel string, projectScope string, allowedProjects []string, expiresAt *time.Time) (*models.PersonalAccessToken, string, error) {
 	if userID == "" || name == "" {
 		return nil, "", errors.New("userId and name are required")
+	}
+	if accessLevel == "" {
+		accessLevel = "read_write"
+	}
+	if projectScope == "" {
+		projectScope = "all"
 	}
 	bytes := make([]byte, 32)
 	rand.Read(bytes)
@@ -105,12 +112,24 @@ func (s *UserService) CreatePAT(ctx context.Context, userID, name string, expire
 	hasher.Write([]byte(rawToken))
 	hash := hex.EncodeToString(hasher.Sum(nil))
 
+	var allowedProjectsJSON *string
+	if projectScope == "specific" && len(allowedProjects) > 0 {
+		if j, err := json.Marshal(allowedProjects); err == nil {
+			s := string(j)
+			allowedProjectsJSON = &s
+		}
+	}
+
 	pat := &models.PersonalAccessToken{
-		ID:        uuid.New().String(),
-		UserID:    userID,
-		Name:      name,
-		TokenHash: hash,
-		CreatedAt: time.Now(),
+		ID:              uuid.New().String(),
+		UserID:          userID,
+		Name:            name,
+		TokenHash:       hash,
+		Prefix:          rawToken[:8],
+		AccessLevel:     accessLevel,
+		ProjectScope:    projectScope,
+		AllowedProjects: allowedProjectsJSON,
+		CreatedAt:       time.Now(),
 	}
 	if expiresAt != nil {
 		pat.ExpiresAt = *expiresAt

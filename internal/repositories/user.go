@@ -129,8 +129,8 @@ func (r *UserRepo) CreatePAT(ctx context.Context, pat *models.PersonalAccessToke
 	}
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	_, err := r.db.ExecContext(ctx, `INSERT INTO personal_access_tokens (id, user_id, name, token_hash, prefix, expires_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		pat.ID, pat.UserID, pat.Name, pat.TokenHash, pat.Prefix, pat.ExpiresAt.Format(time.RFC3339), pat.CreatedAt.Format(time.RFC3339))
+	_, err := r.db.ExecContext(ctx, `INSERT INTO personal_access_tokens (id, user_id, name, token_hash, prefix, access_level, project_scope, allowed_projects, expires_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		pat.ID, pat.UserID, pat.Name, pat.TokenHash, pat.Prefix, pat.AccessLevel, pat.ProjectScope, pat.AllowedProjects, pat.ExpiresAt.Format(time.RFC3339), pat.CreatedAt.Format(time.RFC3339))
 	if err != nil {
 		return fmt.Errorf("failed to create personal access token: %w", err)
 	}
@@ -141,7 +141,7 @@ func (r *UserRepo) ListPATs(ctx context.Context, userID string) ([]*models.Perso
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var list []*models.PersonalAccessToken
-	err := r.db.SelectContext(ctx, &list, `SELECT id, user_id, name, prefix, expires_at, created_at FROM personal_access_tokens WHERE user_id = ? ORDER BY created_at DESC`, userID)
+	err := r.db.SelectContext(ctx, &list, `SELECT id, user_id, name, prefix, access_level, project_scope, allowed_projects, expires_at, created_at FROM personal_access_tokens WHERE user_id = ? ORDER BY created_at DESC`, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list personal access tokens: %w", err)
 	}

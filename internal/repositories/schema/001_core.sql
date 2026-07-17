@@ -366,6 +366,9 @@ CREATE TABLE IF NOT EXISTS personal_access_tokens (
 			name TEXT NOT NULL,
 			token_hash TEXT NOT NULL,
 			prefix TEXT NOT NULL,
+			access_level TEXT DEFAULT 'read_write',
+			project_scope TEXT DEFAULT 'all',
+			allowed_projects TEXT,
 			expires_at TEXT,
 			created_at TEXT
 		);

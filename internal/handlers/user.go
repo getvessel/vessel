@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 
@@ -26,7 +27,11 @@ type UpdateProfileRequest struct {
 }
 
 type CreatePATRequest struct {
-	Name string `json:"name"`
+	Name            string     `json:"name"`
+	AccessLevel     string     `json:"accessLevel"`
+	ProjectScope    string     `json:"projectScope"`
+	AllowedProjects []string   `json:"allowedProjects"`
+	ExpiresAt       *time.Time `json:"expiresAt"`
 }
 
 // @Summary ListUsers endpoint
@@ -169,9 +174,9 @@ func (h *UserHandler) CreatePAT(c echo.Context) error {
 	}
 	var payload CreatePATRequest
 	if err := c.Bind(&payload); err != nil {
-		return utils.Error(c, http.StatusBadRequest, "token name is required")
+		return utils.Error(c, http.StatusBadRequest, "invalid payload")
 	}
-	pat, rawToken, err := h.userService.CreatePAT(c.Request().Context(), userID, payload.Name, nil)
+	pat, rawToken, err := h.userService.CreatePAT(c.Request().Context(), userID, payload.Name, payload.AccessLevel, payload.ProjectScope, payload.AllowedProjects, payload.ExpiresAt)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
