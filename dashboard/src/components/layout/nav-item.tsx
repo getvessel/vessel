@@ -1,7 +1,6 @@
 import { Link, useRouterState } from '@tanstack/react-router';
 import { ExternalLink } from 'lucide-react';
 import type React from 'react';
-import { useInterfaceSound } from '../../hooks/use-interface-sound';
 
 export type NavItemProps = {
   title: string;
@@ -21,7 +20,6 @@ export function NavItem({
   collapsed?: boolean;
 }) {
   const routerState = useRouterState();
-  const { playNavigationSound } = useInterfaceSound();
   const pathname = routerState.location.pathname;
   const isActive = exact
     ? pathname === item.url
@@ -37,7 +35,6 @@ export function NavItem({
           ? 'nav-active-glow bg-sidebar-accent text-sidebar-accent-foreground shadow-inner'
           : 'text-sidebar-foreground/60 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground'
       }`}
-      onClick={playNavigationSound}
       target={item.external ? '_blank' : undefined}
       rel={item.external ? 'noopener noreferrer' : undefined}
     >

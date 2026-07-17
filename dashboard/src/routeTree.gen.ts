@@ -16,6 +16,7 @@ import { Route as DashboardIndexRouteImport } from './routes/_dashboard.index'
 import { Route as DashboardTerminalRouteImport } from './routes/_dashboard.terminal'
 import { Route as DashboardTemplatesRouteImport } from './routes/_dashboard.templates'
 import { Route as DashboardTeamsRouteImport } from './routes/_dashboard.teams'
+import { Route as DashboardSourcesRouteImport } from './routes/_dashboard.sources'
 import { Route as DashboardProjectsRouteImport } from './routes/_dashboard.projects'
 import { Route as DashboardNotificationsRouteImport } from './routes/_dashboard.notifications'
 import { Route as DashboardDatabasesRouteImport } from './routes/_dashboard.databases'
@@ -32,7 +33,6 @@ import { Route as DashboardSettingsUpdatesRouteImport } from './routes/_dashboar
 import { Route as DashboardSettingsOauthRouteImport } from './routes/_dashboard.settings/oauth'
 import { Route as DashboardSettingsMigrationRouteImport } from './routes/_dashboard.settings/migration'
 import { Route as DashboardSettingsMaintenanceRouteImport } from './routes/_dashboard.settings/maintenance'
-import { Route as DashboardSettingsGitAppsRouteImport } from './routes/_dashboard.settings/git-apps'
 import { Route as DashboardSettingsDnsRouteImport } from './routes/_dashboard.settings/dns'
 import { Route as DashboardSettingsBackupsRouteImport } from './routes/_dashboard.settings/backups'
 import { Route as DashboardImportsVercelRouteImport } from './routes/_dashboard.imports/vercel'
@@ -85,6 +85,11 @@ const DashboardTemplatesRoute = DashboardTemplatesRouteImport.update({
 const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
   id: '/teams',
   path: '/teams',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSourcesRoute = DashboardSourcesRouteImport.update({
+  id: '/sources',
+  path: '/sources',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
@@ -168,12 +173,6 @@ const DashboardSettingsMaintenanceRoute =
   DashboardSettingsMaintenanceRouteImport.update({
     id: '/settings/maintenance',
     path: '/settings/maintenance',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardSettingsGitAppsRoute =
-  DashboardSettingsGitAppsRouteImport.update({
-    id: '/settings/git-apps',
-    path: '/settings/git-apps',
     getParentRoute: () => DashboardRoute,
   } as any)
 const DashboardSettingsDnsRoute = DashboardSettingsDnsRouteImport.update({
@@ -306,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/databases': typeof DashboardDatabasesRouteWithChildren
   '/notifications': typeof DashboardNotificationsRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
+  '/sources': typeof DashboardSourcesRoute
   '/teams': typeof DashboardTeamsRoute
   '/templates': typeof DashboardTemplatesRoute
   '/terminal': typeof DashboardTerminalRoute
@@ -313,7 +313,6 @@ export interface FileRoutesByFullPath {
   '/imports/vercel': typeof DashboardImportsVercelRoute
   '/settings/backups': typeof DashboardSettingsBackupsRoute
   '/settings/dns': typeof DashboardSettingsDnsRoute
-  '/settings/git-apps': typeof DashboardSettingsGitAppsRoute
   '/settings/maintenance': typeof DashboardSettingsMaintenanceRoute
   '/settings/migration': typeof DashboardSettingsMigrationRoute
   '/settings/oauth': typeof DashboardSettingsOauthRoute
@@ -350,6 +349,7 @@ export interface FileRoutesByTo {
   '/databases': typeof DashboardDatabasesRouteWithChildren
   '/notifications': typeof DashboardNotificationsRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
+  '/sources': typeof DashboardSourcesRoute
   '/teams': typeof DashboardTeamsRoute
   '/templates': typeof DashboardTemplatesRoute
   '/terminal': typeof DashboardTerminalRoute
@@ -357,7 +357,6 @@ export interface FileRoutesByTo {
   '/imports/vercel': typeof DashboardImportsVercelRoute
   '/settings/backups': typeof DashboardSettingsBackupsRoute
   '/settings/dns': typeof DashboardSettingsDnsRoute
-  '/settings/git-apps': typeof DashboardSettingsGitAppsRoute
   '/settings/maintenance': typeof DashboardSettingsMaintenanceRoute
   '/settings/migration': typeof DashboardSettingsMigrationRoute
   '/settings/oauth': typeof DashboardSettingsOauthRoute
@@ -396,6 +395,7 @@ export interface FileRoutesById {
   '/_dashboard/databases': typeof DashboardDatabasesRouteWithChildren
   '/_dashboard/notifications': typeof DashboardNotificationsRoute
   '/_dashboard/projects': typeof DashboardProjectsRouteWithChildren
+  '/_dashboard/sources': typeof DashboardSourcesRoute
   '/_dashboard/teams': typeof DashboardTeamsRoute
   '/_dashboard/templates': typeof DashboardTemplatesRoute
   '/_dashboard/terminal': typeof DashboardTerminalRoute
@@ -404,7 +404,6 @@ export interface FileRoutesById {
   '/_dashboard/imports/vercel': typeof DashboardImportsVercelRoute
   '/_dashboard/settings/backups': typeof DashboardSettingsBackupsRoute
   '/_dashboard/settings/dns': typeof DashboardSettingsDnsRoute
-  '/_dashboard/settings/git-apps': typeof DashboardSettingsGitAppsRoute
   '/_dashboard/settings/maintenance': typeof DashboardSettingsMaintenanceRoute
   '/_dashboard/settings/migration': typeof DashboardSettingsMigrationRoute
   '/_dashboard/settings/oauth': typeof DashboardSettingsOauthRoute
@@ -443,6 +442,7 @@ export interface FileRouteTypes {
     | '/databases'
     | '/notifications'
     | '/projects'
+    | '/sources'
     | '/teams'
     | '/templates'
     | '/terminal'
@@ -450,7 +450,6 @@ export interface FileRouteTypes {
     | '/imports/vercel'
     | '/settings/backups'
     | '/settings/dns'
-    | '/settings/git-apps'
     | '/settings/maintenance'
     | '/settings/migration'
     | '/settings/oauth'
@@ -487,6 +486,7 @@ export interface FileRouteTypes {
     | '/databases'
     | '/notifications'
     | '/projects'
+    | '/sources'
     | '/teams'
     | '/templates'
     | '/terminal'
@@ -494,7 +494,6 @@ export interface FileRouteTypes {
     | '/imports/vercel'
     | '/settings/backups'
     | '/settings/dns'
-    | '/settings/git-apps'
     | '/settings/maintenance'
     | '/settings/migration'
     | '/settings/oauth'
@@ -532,6 +531,7 @@ export interface FileRouteTypes {
     | '/_dashboard/databases'
     | '/_dashboard/notifications'
     | '/_dashboard/projects'
+    | '/_dashboard/sources'
     | '/_dashboard/teams'
     | '/_dashboard/templates'
     | '/_dashboard/terminal'
@@ -540,7 +540,6 @@ export interface FileRouteTypes {
     | '/_dashboard/imports/vercel'
     | '/_dashboard/settings/backups'
     | '/_dashboard/settings/dns'
-    | '/_dashboard/settings/git-apps'
     | '/_dashboard/settings/maintenance'
     | '/_dashboard/settings/migration'
     | '/_dashboard/settings/oauth'
@@ -621,6 +620,13 @@ declare module '@tanstack/react-router' {
       path: '/teams'
       fullPath: '/teams'
       preLoaderRoute: typeof DashboardTeamsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/sources': {
+      id: '/_dashboard/sources'
+      path: '/sources'
+      fullPath: '/sources'
+      preLoaderRoute: typeof DashboardSourcesRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/projects': {
@@ -733,13 +739,6 @@ declare module '@tanstack/react-router' {
       path: '/settings/maintenance'
       fullPath: '/settings/maintenance'
       preLoaderRoute: typeof DashboardSettingsMaintenanceRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/settings/git-apps': {
-      id: '/_dashboard/settings/git-apps'
-      path: '/settings/git-apps'
-      fullPath: '/settings/git-apps'
-      preLoaderRoute: typeof DashboardSettingsGitAppsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/settings/dns': {
@@ -946,6 +945,7 @@ interface DashboardRouteChildren {
   DashboardDatabasesRoute: typeof DashboardDatabasesRouteWithChildren
   DashboardNotificationsRoute: typeof DashboardNotificationsRoute
   DashboardProjectsRoute: typeof DashboardProjectsRouteWithChildren
+  DashboardSourcesRoute: typeof DashboardSourcesRoute
   DashboardTeamsRoute: typeof DashboardTeamsRoute
   DashboardTemplatesRoute: typeof DashboardTemplatesRoute
   DashboardTerminalRoute: typeof DashboardTerminalRoute
@@ -954,7 +954,6 @@ interface DashboardRouteChildren {
   DashboardImportsVercelRoute: typeof DashboardImportsVercelRoute
   DashboardSettingsBackupsRoute: typeof DashboardSettingsBackupsRoute
   DashboardSettingsDnsRoute: typeof DashboardSettingsDnsRoute
-  DashboardSettingsGitAppsRoute: typeof DashboardSettingsGitAppsRoute
   DashboardSettingsMaintenanceRoute: typeof DashboardSettingsMaintenanceRoute
   DashboardSettingsMigrationRoute: typeof DashboardSettingsMigrationRoute
   DashboardSettingsOauthRoute: typeof DashboardSettingsOauthRoute
@@ -976,6 +975,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardDatabasesRoute: DashboardDatabasesRouteWithChildren,
   DashboardNotificationsRoute: DashboardNotificationsRoute,
   DashboardProjectsRoute: DashboardProjectsRouteWithChildren,
+  DashboardSourcesRoute: DashboardSourcesRoute,
   DashboardTeamsRoute: DashboardTeamsRoute,
   DashboardTemplatesRoute: DashboardTemplatesRoute,
   DashboardTerminalRoute: DashboardTerminalRoute,
@@ -984,7 +984,6 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardImportsVercelRoute: DashboardImportsVercelRoute,
   DashboardSettingsBackupsRoute: DashboardSettingsBackupsRoute,
   DashboardSettingsDnsRoute: DashboardSettingsDnsRoute,
-  DashboardSettingsGitAppsRoute: DashboardSettingsGitAppsRoute,
   DashboardSettingsMaintenanceRoute: DashboardSettingsMaintenanceRoute,
   DashboardSettingsMigrationRoute: DashboardSettingsMigrationRoute,
   DashboardSettingsOauthRoute: DashboardSettingsOauthRoute,
