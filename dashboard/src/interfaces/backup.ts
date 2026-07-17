@@ -7,7 +7,7 @@ export interface BackupConfig {
   id: string;
   projectId: string;
   databaseId?: string;
-  storageId?: string;
+
   s3DestinationId?: string;
   name: string;
   schedule: string;
@@ -51,7 +51,7 @@ export interface CreateBackupConfigRequest {
   schedule: string;
   retentionDays: number;
   databaseId?: string;
-  storageId?: string;
+
   s3DestinationId?: string;
 }
 

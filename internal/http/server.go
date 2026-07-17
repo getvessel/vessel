@@ -30,7 +30,6 @@ type Server struct {
 	dispatcherService      *core.DispatcherService
 	appServiceHandler      *handlers.AppHandler
 	dbHandler              *handlers.DatabaseHandler
-	storageHandler         *handlers.StorageHandler
 	jobHandler             *handlers.JobHandler
 	canvasHandler          *handlers.CanvasHandler
 	terminalHandler        *handlers.TerminalHandler

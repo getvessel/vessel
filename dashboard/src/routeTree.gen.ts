@@ -17,7 +17,6 @@ import { Route as DashboardIndexRouteImport } from './routes/_dashboard.index'
 import { Route as DashboardUsersRouteImport } from './routes/_dashboard.users'
 import { Route as DashboardUpdatesRouteImport } from './routes/_dashboard.updates'
 import { Route as DashboardTemplatesRouteImport } from './routes/_dashboard.templates'
-import { Route as DashboardStorageRouteImport } from './routes/_dashboard.storage'
 import { Route as DashboardSourcesRouteImport } from './routes/_dashboard.sources'
 import { Route as DashboardSettingsRouteImport } from './routes/_dashboard.settings'
 import { Route as DashboardS3DestinationsRouteImport } from './routes/_dashboard.s3-destinations'
@@ -85,11 +84,6 @@ const DashboardUpdatesRoute = DashboardUpdatesRouteImport.update({
 const DashboardTemplatesRoute = DashboardTemplatesRouteImport.update({
   id: '/templates',
   path: '/templates',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardStorageRoute = DashboardStorageRouteImport.update({
-  id: '/storage',
-  path: '/storage',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardSourcesRoute = DashboardSourcesRouteImport.update({
@@ -277,7 +271,6 @@ export interface FileRoutesByFullPath {
   '/s3-destinations': typeof DashboardS3DestinationsRoute
   '/settings': typeof DashboardSettingsRoute
   '/sources': typeof DashboardSourcesRoute
-  '/storage': typeof DashboardStorageRoute
   '/templates': typeof DashboardTemplatesRoute
   '/updates': typeof DashboardUpdatesRoute
   '/users': typeof DashboardUsersRoute
@@ -316,7 +309,6 @@ export interface FileRoutesByTo {
   '/s3-destinations': typeof DashboardS3DestinationsRoute
   '/settings': typeof DashboardSettingsRoute
   '/sources': typeof DashboardSourcesRoute
-  '/storage': typeof DashboardStorageRoute
   '/templates': typeof DashboardTemplatesRoute
   '/updates': typeof DashboardUpdatesRoute
   '/users': typeof DashboardUsersRoute
@@ -357,7 +349,6 @@ export interface FileRoutesById {
   '/_dashboard/s3-destinations': typeof DashboardS3DestinationsRoute
   '/_dashboard/settings': typeof DashboardSettingsRoute
   '/_dashboard/sources': typeof DashboardSourcesRoute
-  '/_dashboard/storage': typeof DashboardStorageRoute
   '/_dashboard/templates': typeof DashboardTemplatesRoute
   '/_dashboard/updates': typeof DashboardUpdatesRoute
   '/_dashboard/users': typeof DashboardUsersRoute
@@ -399,7 +390,6 @@ export interface FileRouteTypes {
     | '/s3-destinations'
     | '/settings'
     | '/sources'
-    | '/storage'
     | '/templates'
     | '/updates'
     | '/users'
@@ -438,7 +428,6 @@ export interface FileRouteTypes {
     | '/s3-destinations'
     | '/settings'
     | '/sources'
-    | '/storage'
     | '/templates'
     | '/updates'
     | '/users'
@@ -478,7 +467,6 @@ export interface FileRouteTypes {
     | '/_dashboard/s3-destinations'
     | '/_dashboard/settings'
     | '/_dashboard/sources'
-    | '/_dashboard/storage'
     | '/_dashboard/templates'
     | '/_dashboard/updates'
     | '/_dashboard/users'
@@ -560,13 +548,6 @@ declare module '@tanstack/react-router' {
       path: '/templates'
       fullPath: '/templates'
       preLoaderRoute: typeof DashboardTemplatesRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/storage': {
-      id: '/_dashboard/storage'
-      path: '/storage'
-      fullPath: '/storage'
-      preLoaderRoute: typeof DashboardStorageRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/sources': {
@@ -834,7 +815,6 @@ interface DashboardRouteChildren {
   DashboardS3DestinationsRoute: typeof DashboardS3DestinationsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardSourcesRoute: typeof DashboardSourcesRoute
-  DashboardStorageRoute: typeof DashboardStorageRoute
   DashboardTemplatesRoute: typeof DashboardTemplatesRoute
   DashboardUpdatesRoute: typeof DashboardUpdatesRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
@@ -863,7 +843,6 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardS3DestinationsRoute: DashboardS3DestinationsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardSourcesRoute: DashboardSourcesRoute,
-  DashboardStorageRoute: DashboardStorageRoute,
   DashboardTemplatesRoute: DashboardTemplatesRoute,
   DashboardUpdatesRoute: DashboardUpdatesRoute,
   DashboardUsersRoute: DashboardUsersRoute,

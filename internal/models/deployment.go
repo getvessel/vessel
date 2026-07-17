@@ -226,7 +226,6 @@ type BackupConfig struct {
 	ID              string             `json:"id" db:"id"`
 	ProjectID       string             `json:"projectId" db:"project_id"`
 	DatabaseID      string             `json:"databaseId,omitempty" db:"database_id"`
-	StorageID       string             `json:"storageId,omitempty" db:"storage_id"`
 	S3DestinationID string             `json:"s3DestinationId,omitempty" db:"s3_destination_id"`
 	Name            string             `json:"name" db:"name"`
 	Schedule        string             `json:"schedule" db:"schedule"`

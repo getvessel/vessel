@@ -213,11 +213,9 @@ func (bm *BackupManager) buildDumpCommand(cfg *models.BackupConfig) (string, []s
 		}
 		return containerName, []string{"sh", "-c", "echo 'Generic volume snapshot'"}, ".tar.gz", nil
 
-	} else if cfg.StorageID != "" {
-		return utils.NormalizeContainerName(cfg.StorageID), []string{"tar", "-czf", "-", "/data"}, ".tar.gz", nil
 	}
-
-	return "", nil, "", errors.New("backup config requires either databaseId or storageId")
+	
+	return "", nil, "", errors.New("backup config requires databaseId")
 }
 
 func (bm *BackupManager) executeDump(ctx context.Context, containerName string, dumpCmd []string, backupName string) ([]byte, string, error) {

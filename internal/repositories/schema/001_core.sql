@@ -76,25 +76,6 @@ CREATE TABLE IF NOT EXISTS databases (
             logical_replication INTEGER DEFAULT 0,
             project_id TEXT DEFAULT '');
 
-CREATE TABLE IF NOT EXISTS storage (
-			id TEXT PRIMARY KEY,
-			name TEXT UNIQUE NOT NULL,
-			type TEXT DEFAULT 'minio',
-			api_port INTEGER DEFAULT 9000,
-			console_port INTEGER DEFAULT 9001,
-			access_key TEXT NOT NULL,
-			encrypted_secret_key TEXT NOT NULL,
-			bucket_name TEXT NOT NULL,
-			volume_path TEXT NOT NULL,
-			container_id TEXT,
-			status TEXT DEFAULT 'stopped',
-			internal_dns TEXT,
-			external_dns TEXT,
-			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		,
-			environment_id TEXT DEFAULT '',
-            project_id TEXT DEFAULT '');
 
 CREATE TABLE IF NOT EXISTS jobs (
 			id TEXT PRIMARY KEY,
@@ -285,7 +266,6 @@ CREATE TABLE IF NOT EXISTS backup_configs (
 			id TEXT PRIMARY KEY,
 			project_id TEXT NOT NULL,
 			database_id TEXT,
-			storage_id TEXT,
 			s3_destination_id TEXT,
 			name TEXT NOT NULL,
 			schedule TEXT NOT NULL,

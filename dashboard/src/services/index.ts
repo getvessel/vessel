@@ -15,7 +15,7 @@ export { projectsService } from './projects';
 export { serverlessService } from './serverless';
 export { serviceVarsService } from './services';
 export { settingsService } from './settings';
-export { storageService } from './storage';
+
 export { systemService } from './system';
 export * from './templates';
 export { vercelService } from './vercel';

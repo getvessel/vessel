@@ -74,12 +74,7 @@ func (s *Server) registerRoutes() {
 	authGroup.POST("/databases/:id/data/:table", s.dbHandler.InsertTableRow, s.authGuard.RequireScope("database:manage"))
 	authGroup.PUT("/databases/:id/data/:table", s.dbHandler.UpdateTableRow, s.authGuard.RequireScope("database:manage"))
 	authGroup.DELETE("/databases/:id/data/:table", s.dbHandler.DeleteTableRow, s.authGuard.RequireScope("database:manage"))
-	authGroup.GET("/storage", s.storageHandler.ListStorage)
-	authGroup.POST("/storage", s.storageHandler.CreateStorage)
-	authGroup.GET("/storage/:id", s.storageHandler.GetStorage)
-	authGroup.DELETE("/storage/:id", s.storageHandler.DeleteStorage)
-	authGroup.POST("/storage/:id/start", s.storageHandler.StartStorage)
-	authGroup.POST("/storage/:id/stop", s.storageHandler.StopStorage)
+
 	authGroup.GET("/jobs", s.jobHandler.ListProjectJobs)
 	authGroup.POST("/jobs", s.jobHandler.Create)
 	authGroup.GET("/jobs/:id", s.jobHandler.Get)

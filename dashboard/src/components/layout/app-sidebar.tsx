@@ -4,7 +4,6 @@ import {
   Code,
   Download,
   Globe,
-  HardDrive,
   Key,
   LayoutDashboard,
   LayoutTemplate,
@@ -36,7 +35,6 @@ const navGroups: NavGroup[] = [
   {
     title: 'Resources',
     items: [
-      { title: 'Storage', url: '/storage', icon: HardDrive },
       { title: 'S3/R2 Destinations', url: '/s3-destinations', icon: Cloud },
       { title: 'Domains', url: '/domains', icon: Globe },
     ],

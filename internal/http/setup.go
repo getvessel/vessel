@@ -69,7 +69,6 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	notifRepo := repositories.NewNotificationSettingsRepo(db)
 	aiRepo := repositories.NewAISettingsRepo(db)
 	envVarRepo := repositories.NewEnvRepo(db, v)
-	storageRepo := repositories.NewStorageRepo(db, v)
 	jobRepo := repositories.NewJobRepo(db)
 	backupRepo := repositories.NewBackupRepo(db)
 	s3DestinationRepo := repositories.NewS3DestinationRepo(db)
@@ -87,9 +86,8 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	auditRepository := repositories.NewAuditLogRepo(db)
 	vercelRepository := repositories.NewVercelRepository(db, v)
 
-	httpEngineAdapter := newEngineAdapter(settingsRepo, appRepo, envVarRepo, dbRepo, storageRepo, projectRepo, jobRepo, backupRepo, s3DestinationRepo, serviceVarRepo, serverlessRepository)
+	httpEngineAdapter := newEngineAdapter(settingsRepo, appRepo, envVarRepo, dbRepo, projectRepo, jobRepo, backupRepo, s3DestinationRepo, serviceVarRepo, serverlessRepository)
 	databaseDeployer := engine.NewDatabaseDeployer(dockerClient, httpEngineAdapter)
-	storageDeployer := engine.NewStorageDeployer(dockerClient, httpEngineAdapter)
 
 	cronManager := engine.NewCronManager(dockerClient, httpEngineAdapter)
 
@@ -116,7 +114,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	settingsService := services.NewSettingsService(settingsRepo)
 	notifSettingsService := services.NewNotificationSettingsService(notifRepo)
 	aiSettingsService := services.NewAISettingsService(aiRepo)
-	serviceLinker := services.NewServiceLinker(dbRepo, storageRepo)
+	serviceLinker := services.NewServiceLinker(dbRepo)
 	mailerService, err := notifications.NewMailerService(notifSettingsService)
 	if err != nil {
 		return nil, fmt.Errorf("mailer service: %w", err)
@@ -124,7 +122,6 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	authService := services.NewAuthService(userRepo, settingsRepo, notifRepo, projectSettingsRepo, tokenService, mailerService)
 	projectSettingsService := services.NewProjectSettingsService(projectSettingsRepo, userRepo, authService)
 	dispatcherService := core.NewDispatcherService(settingsRepo, notifRepo, userRepo, mailerService)
-	storageService := services.NewStorageService(storageRepo, storageDeployer)
 	jobService := services.NewJobService(jobRepo, cronManager)
 	canvasService := services.NewCanvasService(canvasRepo)
 	gitService := services.NewGitService(gitRepo)
@@ -158,7 +155,6 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 
 	appHandler := handlers.NewAppHandler(appService, projectService, deployer, deploymentService)
 	databaseHandler := handlers.NewDatabaseHandler(databaseService, projectService)
-	storageHandler := handlers.NewStorageHandler(storageService)
 	jobHandler := handlers.NewJobHandler(jobService)
 	canvasHandler := handlers.NewCanvasHandler(canvasService)
 	terminalHandler := handlers.NewTerminalHandler(dockerClient, tokenService, appService)
@@ -217,7 +213,6 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		dispatcherService:      dispatcherService,
 		appServiceHandler:      appHandler,
 		dbHandler:              databaseHandler,
-		storageHandler:         storageHandler,
 		jobHandler:             jobHandler,
 		canvasHandler:          canvasHandler,
 		terminalHandler:        terminalHandler,
