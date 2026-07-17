@@ -1,17 +1,27 @@
 import { useNavigate } from '@tanstack/react-router';
-import { BellIcon, PlusIcon, SearchIcon } from 'lucide-react';
+import { BellIcon, Menu, PlusIcon, SearchIcon, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface TopbarProps {
   onOpenCommand: () => void;
+  onMenuToggle: () => void;
+  mobileMenuOpen: boolean;
 }
 
-export function Topbar({ onOpenCommand }: TopbarProps) {
+export function Topbar({ onOpenCommand, onMenuToggle, mobileMenuOpen }: TopbarProps) {
   const navigate = useNavigate();
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between bg-background/80 px-8 backdrop-blur-xl">
-      <div />
+    <header className="flex h-14 shrink-0 items-center justify-between gap-2 bg-transparent px-4 md:px-8">
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onMenuToggle}
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 text-muted-foreground transition-colors hover:bg-muted md:hidden"
+        >
+          {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        </button>
+      </div>
 
       <div className="flex items-center gap-2">
         <button
@@ -21,7 +31,7 @@ export function Topbar({ onOpenCommand }: TopbarProps) {
         >
           <SearchIcon className="h-4 w-4 shrink-0" />
           <span className="hidden sm:inline">Search...</span>
-          <kbd className="rounded-md border bg-background/60 px-1.5 py-0.5 font-mono text-[11px] leading-none">
+          <kbd className="hidden rounded-md border bg-background/60 px-1.5 py-0.5 font-mono text-[11px] leading-none sm:inline">
             ⌘K
           </kbd>
         </button>
@@ -45,7 +55,7 @@ export function Topbar({ onOpenCommand }: TopbarProps) {
           className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 transition-colors hover:bg-muted"
         >
           <BellIcon className="h-4 w-4" />
-          <div className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-primary ring-2 ring-background" />
+          <div className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-primary ring-2 ring-transparent" />
         </button>
       </div>
     </header>
