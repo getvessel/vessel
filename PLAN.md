@@ -459,4 +459,4 @@ We will build the dashboard in distinct phases to ensure stability, proper data-
 - [ ] Strict Biome formatting (`npm run format:fix`) and type-checking across all components.
 - [ ] Audit all inputs and buttons to ensure minimalist "plain" design (no weird autofill backgrounds, sharp padding/margins).
 - [ ] Ensure all components are under 350 lines and correctly modularized in `src/features/`.
-      export TEST_TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNvbG9tb25AdmVzc2wuZGV2IiwiZXhwIjoxNzg0NTUzNTM2LCJpYXQiOjE3ODQyOTQzMzYsImlzcyI6InZlc3NsLWF1dGgiLCJyb2xlIjoiYWRtaW4iLCJzdWIiOiI4MzZiMzllNi0zOWMwLTRiZTYtODAzMy1jNjc4YmY3MDEwMTAiLCJ0b3RwRW5hYmxlZCI6ZmFsc2V9.HNI7CWy2rv4pMa2ysbNMWkWjmDVOAHC6v0mHuQAcV-Y"
+      export TEST_TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNvbG9tb25AdmVzc2wuZGV2IiwiZXhwIjoxNzg0NTU2MzM1LCJpYXQiOjE3ODQyOTcxMzUsImlzcyI6InZlc3NsLWF1dGgiLCJyb2xlIjoiYWRtaW4iLCJzdWIiOiJkNjhmNWJmZC01MWNjLTQ3MTMtOTk2ZS1jNzE0MGJjYmQzYjMiLCJ0b3RwRW5hYmxlZCI6ZmFsc2V9.qaYRN4Bw26wpuwrfw4kCtugRcKbx1RRdSvLty3QwhXA"
