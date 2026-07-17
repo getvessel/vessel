@@ -1,15 +1,30 @@
-import { useRouterState } from '@tanstack/react-router';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { BellIcon, PlusIcon, SearchIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 const routeLabels: Record<string, { title: string; description: string }> = {
-  '/': { title: 'Instance overview', description: 'Health and resource pressure' },
+  '/': {
+    title: 'Instance overview',
+    description: 'Health and resource pressure',
+  },
   '/projects': { title: 'Projects', description: 'Workloads and environments' },
-  '/databases': { title: 'Databases', description: 'Persistent services and backups' },
-  '/templates': { title: 'Templates', description: 'Starter services and resources' },
+  '/databases': {
+    title: 'Databases',
+    description: 'Persistent services and backups',
+  },
+  '/templates': {
+    title: 'Templates',
+    description: 'Starter services and resources',
+  },
   '/teams': { title: 'Teams', description: 'Ownership and permissions' },
-  '/notifications': { title: 'Notifications', description: 'Event delivery channels' },
-  '/audit-logs': { title: 'Audit logs', description: 'Security and operator activity' },
+  '/notifications': {
+    title: 'Notifications',
+    description: 'Event delivery channels',
+  },
+  '/audit-logs': {
+    title: 'Audit logs',
+    description: 'Security and operator activity',
+  },
   '/terminal': { title: 'Terminal', description: 'Controlled host sessions' },
   '/settings': { title: 'Settings', description: 'Instance administration' },
 };
@@ -41,61 +56,60 @@ function titleFromPath(pathname: string) {
   };
 }
 
-export function Topbar({ onOpenCommand }: { onOpenCommand: () => void }) {
+interface TopbarProps {
+  onOpenCommand: () => void;
+}
+
+export function Topbar({ onOpenCommand }: TopbarProps) {
   const routerState = useRouterState();
+  const navigate = useNavigate();
   const pathname = routerState.location.pathname;
   const current = titleFromPath(pathname);
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-border border-b bg-background/95 px-6 backdrop-blur-sm">
-      <div className="flex items-center gap-3">
-        <div>
-          <h1 className="font-semibold text-foreground text-sm leading-none">{current.title}</h1>
-          {current.description && (
-            <p className="mt-0.5 text-muted-foreground text-xs leading-none">
-              {current.description}
-            </p>
-          )}
-        </div>
+    <header className="flex h-16 shrink-0 items-center justify-between bg-background/80 px-8 shadow-[inset_0_-1px_0_0_rgb(255_255_255_/_0.06)] backdrop-blur-xl">
+      <div className="min-w-0">
+        <h1 className="truncate font-semibold text-foreground text-lg tracking-tight">
+          {current.title}
+        </h1>
+        {current.description && (
+          <p className="text-muted-foreground text-xs">{current.description}</p>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={onOpenCommand}
-          className="flex items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-1.5 text-muted-foreground text-sm transition-colors duration-150 hover:bg-muted/70 hover:text-foreground"
+          className="flex h-9 items-center gap-2 rounded-xl border border-border/60 bg-muted/40 px-3 text-muted-foreground text-sm transition-all hover:border-border hover:bg-muted hover:text-foreground active:scale-[0.97]"
         >
-          <SearchIcon className="h-3.5 w-3.5" />
-          <span className="hidden text-xs sm:inline">Search...</span>
-          <kbd className="hidden h-4 items-center gap-0.5 rounded border border-border bg-background px-1 font-mono text-[9px] text-muted-foreground sm:inline-flex">
-            Win K
+          <SearchIcon className="h-4 w-4 shrink-0" />
+          <span className="hidden sm:inline">Search...</span>
+          <kbd className="rounded-md border bg-background/60 px-1.5 py-0.5 font-mono text-[11px] leading-none">
+            ⌘K
           </kbd>
         </button>
 
         <button
           type="button"
           onClick={() =>
-            toast.info('Create menu unavailable', {
-              description: 'Project, service, and database creation will appear here.',
+            toast.info('New resource', {
+              description: 'Creation menu coming soon',
             })
           }
-          className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 font-semibold text-primary-foreground text-xs transition-colors duration-150 hover:bg-primary/90"
+          className="flex h-9 items-center gap-1.5 rounded-xl bg-primary px-4 font-semibold text-primary-foreground text-sm shadow-lg shadow-primary/25 transition-all hover:brightness-110 active:scale-[0.97]"
         >
-          <PlusIcon className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">New</span>
+          <PlusIcon className="h-4 w-4" />
+          <span>New</span>
         </button>
 
         <button
           type="button"
-          onClick={() =>
-            toast.info('No unread notifications', {
-              description: 'Alert delivery channels can be configured from Notifications.',
-            })
-          }
-          className="relative flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors duration-150 hover:bg-muted/50 hover:text-foreground"
+          onClick={() => navigate({ to: '/notifications' })}
+          className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 transition-colors hover:bg-muted"
         >
           <BellIcon className="h-4 w-4" />
-          <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary" />
+          <div className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-primary ring-2 ring-background" />
         </button>
       </div>
     </header>

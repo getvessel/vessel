@@ -29,36 +29,96 @@ interface CommandPaletteProps {
 }
 
 const navigationItems = [
-  { label: 'Dashboard', description: 'Instance overview', to: '/', icon: LayoutDashboard },
+  {
+    label: 'Dashboard',
+    description: 'Instance overview',
+    to: '/',
+    icon: LayoutDashboard,
+  },
   {
     label: 'Projects',
     description: 'Services and environments',
     to: '/projects',
     icon: FolderKanban,
   },
-  { label: 'Databases', description: 'Persistent services', to: '/databases', icon: Database },
-  { label: 'Teams', description: 'Access and ownership', to: '/teams', icon: Users },
-  { label: 'Templates', description: 'Starter workloads', to: '/templates', icon: LayoutTemplate },
+  {
+    label: 'Databases',
+    description: 'Persistent services',
+    to: '/databases',
+    icon: Database,
+  },
+  {
+    label: 'Teams',
+    description: 'Access and ownership',
+    to: '/teams',
+    icon: Users,
+  },
+  {
+    label: 'Templates',
+    description: 'Starter workloads',
+    to: '/templates',
+    icon: LayoutTemplate,
+  },
   {
     label: 'Import Railway',
     description: 'Migration workflow',
     to: '/imports/railway',
     icon: UploadCloud,
   },
-  { label: 'Notifications', description: 'Event channels', to: '/notifications', icon: Bell },
-  { label: 'Audit logs', description: 'Security activity', to: '/audit-logs', icon: FileClock },
-  { label: 'Terminal', description: 'Host session', to: '/terminal', icon: Terminal },
-  { label: 'Settings', description: 'Instance administration', to: '/settings', icon: Settings },
+  {
+    label: 'Notifications',
+    description: 'Event channels',
+    to: '/notifications',
+    icon: Bell,
+  },
+  {
+    label: 'Audit logs',
+    description: 'Security activity',
+    to: '/audit-logs',
+    icon: FileClock,
+  },
+  {
+    label: 'Terminal',
+    description: 'Host session',
+    to: '/terminal',
+    icon: Terminal,
+  },
+  {
+    label: 'Settings',
+    description: 'Instance administration',
+    to: '/settings',
+    icon: Settings,
+  },
 ];
 
 const creationItems = ['New project', 'New service', 'New database', 'New notification channel'];
 
 const operationItems = [
-  { label: 'Deploy latest', description: 'Redeploy the selected service', icon: RefreshCw },
-  { label: 'Open live logs', description: 'Stream service logs', icon: Terminal },
-  { label: 'Restart service', description: 'Recycle the runtime process', icon: RotateCw },
-  { label: 'Add domain', description: 'Attach a public hostname', icon: Globe2 },
-  { label: 'Edit variables', description: 'Update environment secrets', icon: FileCog },
+  {
+    label: 'Deploy latest',
+    description: 'Redeploy the selected service',
+    icon: RefreshCw,
+  },
+  {
+    label: 'Open live logs',
+    description: 'Stream service logs',
+    icon: Terminal,
+  },
+  {
+    label: 'Restart service',
+    description: 'Recycle the runtime process',
+    icon: RotateCw,
+  },
+  {
+    label: 'Add domain',
+    description: 'Attach a public hostname',
+    icon: Globe2,
+  },
+  {
+    label: 'Edit variables',
+    description: 'Update environment secrets',
+    icon: FileCog,
+  },
 ];
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
@@ -118,14 +178,14 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             </kbd>
           </div>
 
-          <Command.List className="max-h-[560px] overflow-y-auto p-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <Command.List className="scrollbar-none max-h-140 overflow-y-auto p-3 [&::-webkit-scrollbar]:hidden">
             <Command.Empty className="px-3 py-8 text-center text-muted-foreground text-sm">
               No matching command.
             </Command.Empty>
 
             <Command.Group
               heading="Navigate"
-              className="px-1 py-2 text-muted-foreground text-xs [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-2"
+              className="px-1 py-2 text-muted-foreground text-xs **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-2"
             >
               <div className="grid gap-1 md:grid-cols-2">
                 {navigationItems.map((item) => (
@@ -151,7 +211,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
 
             <Command.Group
               heading="Operate"
-              className="px-1 py-2 text-muted-foreground text-xs [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-2"
+              className="px-1 py-2 text-muted-foreground text-xs **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-2"
             >
               <div className="grid gap-1 md:grid-cols-2">
                 {operationItems.map((item) => (
@@ -177,7 +237,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
 
             <Command.Group
               heading="Create"
-              className="px-1 py-2 text-muted-foreground text-xs [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-2"
+              className="px-1 py-2 text-muted-foreground text-xs **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-2"
             >
               <div className="grid gap-1 md:grid-cols-2">
                 {creationItems.map((label) => (

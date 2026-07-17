@@ -162,15 +162,12 @@ body {
 }
 
 @layer utilities {
-  .backdrop-blur-xl {
+  .sidebar-glass {
+    background: rgba(10, 10, 15, 0.95);
     backdrop-filter: blur(20px);
   }
 
-  input:focus {
-    box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.15);
-  }
-
-  .rounded-3xl {
-    border-radius: 1.5rem;
+  .nav-active-glow {
+    box-shadow: 0 0 15px -3px rgb(109 40 217 / 0.3);
   }
 }

@@ -1,5 +1,4 @@
 import {
-  Bell,
   Cloud,
   Code,
   Database,
@@ -8,6 +7,7 @@ import {
   HardDrive,
   LayoutDashboard,
   LayoutTemplate,
+  PanelLeft,
   ScrollText,
   Settings,
   Terminal,
@@ -40,18 +40,13 @@ const navGroups: NavGroup[] = [
   {
     title: 'Discover',
     items: [
-      {
-        title: 'Templates',
-        url: '/templates',
-        icon: LayoutTemplate,
-      },
+      { title: 'Templates', url: '/templates', icon: LayoutTemplate },
       { title: 'Import', url: '/imports/railway', icon: Download },
     ],
   },
   {
     title: 'System',
     items: [
-      { title: 'Notifications', url: '/notifications', icon: Bell },
       { title: 'Audit Logs', url: '/audit-logs', icon: ScrollText },
       { title: 'Terminal', url: '/terminal', icon: Terminal },
       { title: 'Users', url: '/settings/users', icon: Users },
@@ -69,43 +64,70 @@ const bottomNav = [
   },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  collapsed: boolean;
+  onToggle: () => void;
+}
+
+export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   return (
-    <aside className="fixed inset-y-0 left-0 z-20 flex w-60 flex-col border-sidebar-border border-r bg-sidebar">
-      <div className="flex h-14 shrink-0 items-center gap-2.5 border-sidebar-border border-b px-4">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
-          <Cloud className="h-4 w-4 text-primary" />
+    <aside
+      className={`sidebar-glass fixed inset-y-0 left-0 z-20 flex flex-col shadow-[inset_-1px_0_0_0_rgb(255_255_255_/_0.06)] transition-all duration-300 ${
+        collapsed ? 'w-16' : 'w-64'
+      }`}
+    >
+      <div className="flex h-13 shrink-0 items-center gap-2 px-3">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+            <Cloud className="h-4 w-4 text-primary" />
+          </div>
+          {!collapsed && (
+            <span className="font-semibold text-sidebar-foreground text-sm tracking-tight">
+              Vessl
+            </span>
+          )}
         </div>
-        <span className="font-semibold text-[15px] text-sidebar-foreground tracking-tight">
-          Vessl
-        </span>
-        <span className="ml-auto rounded bg-sidebar-accent px-1.5 py-0.5 font-medium text-[10px] text-muted-foreground">
-          v0.1
-        </span>
+        <div className="flex-1" />
+        {!collapsed && (
+          <span className="rounded bg-sidebar-accent/80 px-1.5 py-0.5 font-medium text-[10px] text-muted-foreground">
+            v0.1
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={onToggle}
+          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        >
+          <PanelLeft
+            className={`h-4 w-4 transition-transform duration-300 ${collapsed ? 'scale-x-[-1]' : ''}`}
+          />
+        </button>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-4">
+      <nav className="flex flex-1 flex-col gap-5 overflow-y-auto px-2 pt-3 pb-3">
         {navGroups.map((group, i) => (
-          <div key={i} className="flex flex-col gap-1">
-            {group.title && (
-              <h4 className="mb-1 px-2 font-medium text-[11px] text-sidebar-foreground/50 uppercase tracking-wider">
+          <div key={i} className="flex flex-col gap-0.5">
+            {!collapsed && group.title && (
+              <h4 className="px-2 pb-1 font-medium text-[10px] text-sidebar-foreground/40 uppercase tracking-widest">
                 {group.title}
               </h4>
             )}
             {group.items.map((item) => (
-              <NavItem key={item.url} item={item} exact={item.exact} />
+              <NavItem key={item.url} item={item} exact={item.exact} collapsed={collapsed} />
             ))}
           </div>
         ))}
       </nav>
 
-      <div className="mt-auto flex flex-col gap-1 px-3 pt-4 pb-2">
+      <div
+        className={`mt-auto flex flex-col gap-0.5 bg-sidebar-accent/20 ${collapsed ? 'px-1 py-1' : 'px-2 py-2'}`}
+      >
         {bottomNav.map((item) => (
-          <NavItem key={item.url} item={item} />
+          <NavItem key={item.url} item={item} collapsed={collapsed} />
         ))}
       </div>
 
-      <UserMenu />
+      <UserMenu collapsed={collapsed} />
     </aside>
   );
 }
