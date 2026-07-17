@@ -14,14 +14,15 @@ import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard.index'
+import { Route as DashboardUsersRouteImport } from './routes/_dashboard.users'
 import { Route as DashboardTemplatesRouteImport } from './routes/_dashboard.templates'
 import { Route as DashboardStorageRouteImport } from './routes/_dashboard.storage'
 import { Route as DashboardSourcesRouteImport } from './routes/_dashboard.sources'
+import { Route as DashboardSettingsRouteImport } from './routes/_dashboard.settings'
 import { Route as DashboardProjectsRouteImport } from './routes/_dashboard.projects'
 import { Route as DashboardJobsRouteImport } from './routes/_dashboard.jobs'
 import { Route as DashboardDomainsRouteImport } from './routes/_dashboard.domains'
 import { Route as DashboardDeploymentsRouteImport } from './routes/_dashboard.deployments'
-import { Route as DashboardDatabasesRouteImport } from './routes/_dashboard.databases'
 import { Route as DashboardAuditLogsRouteImport } from './routes/_dashboard.audit-logs'
 import { Route as DashboardAiRouteImport } from './routes/_dashboard.ai'
 import { Route as AuthSignupRouteImport } from './routes/_auth.signup'
@@ -30,17 +31,17 @@ import { Route as AuthResetPasswordRouteImport } from './routes/_auth.reset-pass
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth.forgot-password'
 import { Route as DashboardSettingsIndexRouteImport } from './routes/_dashboard.settings/index'
 import { Route as DashboardProfileIndexRouteImport } from './routes/_dashboard.profile/index'
-import { Route as DashboardSettingsUsersRouteImport } from './routes/_dashboard.settings/users'
 import { Route as DashboardSettingsUpdatesRouteImport } from './routes/_dashboard.settings/updates'
 import { Route as DashboardSettingsOauthRouteImport } from './routes/_dashboard.settings/oauth'
+import { Route as DashboardSettingsNotificationsRouteImport } from './routes/_dashboard.settings/notifications'
 import { Route as DashboardSettingsMigrationRouteImport } from './routes/_dashboard.settings/migration'
 import { Route as DashboardSettingsMaintenanceRouteImport } from './routes/_dashboard.settings/maintenance'
+import { Route as DashboardSettingsGeneralRouteImport } from './routes/_dashboard.settings/general'
 import { Route as DashboardSettingsDnsRouteImport } from './routes/_dashboard.settings/dns'
 import { Route as DashboardSettingsBackupsRouteImport } from './routes/_dashboard.settings/backups'
 import { Route as DashboardSettingsApiRouteImport } from './routes/_dashboard.settings/api'
 import { Route as DashboardServicesServiceIdIndexRouteImport } from './routes/_dashboard.services/$serviceId.index'
 import { Route as DashboardProjectsProjectIdIndexRouteImport } from './routes/_dashboard.projects/$projectId.index'
-import { Route as DashboardDatabasesDbIdIndexRouteImport } from './routes/_dashboard.databases/$dbId.index'
 import { Route as DashboardServicesServiceIdVariablesRouteImport } from './routes/_dashboard.services/$serviceId.variables'
 import { Route as DashboardServicesServiceIdTerminalRouteImport } from './routes/_dashboard.services/$serviceId.terminal'
 import { Route as DashboardServicesServiceIdServerlessRouteImport } from './routes/_dashboard.services/$serviceId.serverless'
@@ -51,9 +52,6 @@ import { Route as DashboardProjectsProjectIdSettingsRouteImport } from './routes
 import { Route as DashboardProjectsProjectIdJobsRouteImport } from './routes/_dashboard.projects/$projectId.jobs'
 import { Route as DashboardProjectsProjectIdComposeRouteImport } from './routes/_dashboard.projects/$projectId.compose'
 import { Route as DashboardProjectsProjectIdCanvasRouteImport } from './routes/_dashboard.projects/$projectId.canvas'
-import { Route as DashboardDatabasesDbIdQueryRouteImport } from './routes/_dashboard.databases/$dbId.query'
-import { Route as DashboardDatabasesDbIdDataRouteImport } from './routes/_dashboard.databases/$dbId.data'
-import { Route as DashboardDatabasesDbIdBackupsRouteImport } from './routes/_dashboard.databases/$dbId.backups'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -78,6 +76,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardUsersRoute = DashboardUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardTemplatesRoute = DashboardTemplatesRouteImport.update({
   id: '/templates',
   path: '/templates',
@@ -91,6 +94,11 @@ const DashboardStorageRoute = DashboardStorageRouteImport.update({
 const DashboardSourcesRoute = DashboardSourcesRouteImport.update({
   id: '/sources',
   path: '/sources',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
@@ -111,11 +119,6 @@ const DashboardDomainsRoute = DashboardDomainsRouteImport.update({
 const DashboardDeploymentsRoute = DashboardDeploymentsRouteImport.update({
   id: '/deployments',
   path: '/deployments',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardDatabasesRoute = DashboardDatabasesRouteImport.update({
-  id: '/databases',
-  path: '/databases',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardAuditLogsRoute = DashboardAuditLogsRouteImport.update({
@@ -149,58 +152,65 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   getParentRoute: () => AuthRoute,
 } as any)
 const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
-  id: '/settings/',
-  path: '/settings/',
-  getParentRoute: () => DashboardRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardSettingsRoute,
 } as any)
 const DashboardProfileIndexRoute = DashboardProfileIndexRouteImport.update({
   id: '/profile/',
   path: '/profile/',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardSettingsUsersRoute = DashboardSettingsUsersRouteImport.update({
-  id: '/settings/users',
-  path: '/settings/users',
-  getParentRoute: () => DashboardRoute,
-} as any)
 const DashboardSettingsUpdatesRoute =
   DashboardSettingsUpdatesRouteImport.update({
-    id: '/settings/updates',
-    path: '/settings/updates',
-    getParentRoute: () => DashboardRoute,
+    id: '/updates',
+    path: '/updates',
+    getParentRoute: () => DashboardSettingsRoute,
   } as any)
 const DashboardSettingsOauthRoute = DashboardSettingsOauthRouteImport.update({
-  id: '/settings/oauth',
-  path: '/settings/oauth',
-  getParentRoute: () => DashboardRoute,
+  id: '/oauth',
+  path: '/oauth',
+  getParentRoute: () => DashboardSettingsRoute,
 } as any)
+const DashboardSettingsNotificationsRoute =
+  DashboardSettingsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => DashboardSettingsRoute,
+  } as any)
 const DashboardSettingsMigrationRoute =
   DashboardSettingsMigrationRouteImport.update({
-    id: '/settings/migration',
-    path: '/settings/migration',
-    getParentRoute: () => DashboardRoute,
+    id: '/migration',
+    path: '/migration',
+    getParentRoute: () => DashboardSettingsRoute,
   } as any)
 const DashboardSettingsMaintenanceRoute =
   DashboardSettingsMaintenanceRouteImport.update({
-    id: '/settings/maintenance',
-    path: '/settings/maintenance',
-    getParentRoute: () => DashboardRoute,
+    id: '/maintenance',
+    path: '/maintenance',
+    getParentRoute: () => DashboardSettingsRoute,
+  } as any)
+const DashboardSettingsGeneralRoute =
+  DashboardSettingsGeneralRouteImport.update({
+    id: '/general',
+    path: '/general',
+    getParentRoute: () => DashboardSettingsRoute,
   } as any)
 const DashboardSettingsDnsRoute = DashboardSettingsDnsRouteImport.update({
-  id: '/settings/dns',
-  path: '/settings/dns',
-  getParentRoute: () => DashboardRoute,
+  id: '/dns',
+  path: '/dns',
+  getParentRoute: () => DashboardSettingsRoute,
 } as any)
 const DashboardSettingsBackupsRoute =
   DashboardSettingsBackupsRouteImport.update({
-    id: '/settings/backups',
-    path: '/settings/backups',
-    getParentRoute: () => DashboardRoute,
+    id: '/backups',
+    path: '/backups',
+    getParentRoute: () => DashboardSettingsRoute,
   } as any)
 const DashboardSettingsApiRoute = DashboardSettingsApiRouteImport.update({
-  id: '/settings/api',
-  path: '/settings/api',
-  getParentRoute: () => DashboardRoute,
+  id: '/api',
+  path: '/api',
+  getParentRoute: () => DashboardSettingsRoute,
 } as any)
 const DashboardServicesServiceIdIndexRoute =
   DashboardServicesServiceIdIndexRouteImport.update({
@@ -213,12 +223,6 @@ const DashboardProjectsProjectIdIndexRoute =
     id: '/$projectId/',
     path: '/$projectId/',
     getParentRoute: () => DashboardProjectsRoute,
-  } as any)
-const DashboardDatabasesDbIdIndexRoute =
-  DashboardDatabasesDbIdIndexRouteImport.update({
-    id: '/$dbId/',
-    path: '/$dbId/',
-    getParentRoute: () => DashboardDatabasesRoute,
   } as any)
 const DashboardServicesServiceIdVariablesRoute =
   DashboardServicesServiceIdVariablesRouteImport.update({
@@ -280,24 +284,6 @@ const DashboardProjectsProjectIdCanvasRoute =
     path: '/$projectId/canvas',
     getParentRoute: () => DashboardProjectsRoute,
   } as any)
-const DashboardDatabasesDbIdQueryRoute =
-  DashboardDatabasesDbIdQueryRouteImport.update({
-    id: '/$dbId/query',
-    path: '/$dbId/query',
-    getParentRoute: () => DashboardDatabasesRoute,
-  } as any)
-const DashboardDatabasesDbIdDataRoute =
-  DashboardDatabasesDbIdDataRouteImport.update({
-    id: '/$dbId/data',
-    path: '/$dbId/data',
-    getParentRoute: () => DashboardDatabasesRoute,
-  } as any)
-const DashboardDatabasesDbIdBackupsRoute =
-  DashboardDatabasesDbIdBackupsRouteImport.update({
-    id: '/$dbId/backups',
-    path: '/$dbId/backups',
-    getParentRoute: () => DashboardDatabasesRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
@@ -309,27 +295,26 @@ export interface FileRoutesByFullPath {
   '/signup': typeof AuthSignupRoute
   '/ai': typeof DashboardAiRoute
   '/audit-logs': typeof DashboardAuditLogsRoute
-  '/databases': typeof DashboardDatabasesRouteWithChildren
   '/deployments': typeof DashboardDeploymentsRoute
   '/domains': typeof DashboardDomainsRoute
   '/jobs': typeof DashboardJobsRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
+  '/settings': typeof DashboardSettingsRouteWithChildren
   '/sources': typeof DashboardSourcesRoute
   '/storage': typeof DashboardStorageRoute
   '/templates': typeof DashboardTemplatesRoute
+  '/users': typeof DashboardUsersRoute
   '/settings/api': typeof DashboardSettingsApiRoute
   '/settings/backups': typeof DashboardSettingsBackupsRoute
   '/settings/dns': typeof DashboardSettingsDnsRoute
+  '/settings/general': typeof DashboardSettingsGeneralRoute
   '/settings/maintenance': typeof DashboardSettingsMaintenanceRoute
   '/settings/migration': typeof DashboardSettingsMigrationRoute
+  '/settings/notifications': typeof DashboardSettingsNotificationsRoute
   '/settings/oauth': typeof DashboardSettingsOauthRoute
   '/settings/updates': typeof DashboardSettingsUpdatesRoute
-  '/settings/users': typeof DashboardSettingsUsersRoute
   '/profile/': typeof DashboardProfileIndexRoute
   '/settings/': typeof DashboardSettingsIndexRoute
-  '/databases/$dbId/backups': typeof DashboardDatabasesDbIdBackupsRoute
-  '/databases/$dbId/data': typeof DashboardDatabasesDbIdDataRoute
-  '/databases/$dbId/query': typeof DashboardDatabasesDbIdQueryRoute
   '/projects/$projectId/canvas': typeof DashboardProjectsProjectIdCanvasRoute
   '/projects/$projectId/compose': typeof DashboardProjectsProjectIdComposeRoute
   '/projects/$projectId/jobs': typeof DashboardProjectsProjectIdJobsRoute
@@ -340,7 +325,6 @@ export interface FileRoutesByFullPath {
   '/services/$serviceId/serverless': typeof DashboardServicesServiceIdServerlessRoute
   '/services/$serviceId/terminal': typeof DashboardServicesServiceIdTerminalRoute
   '/services/$serviceId/variables': typeof DashboardServicesServiceIdVariablesRoute
-  '/databases/$dbId/': typeof DashboardDatabasesDbIdIndexRoute
   '/projects/$projectId/': typeof DashboardProjectsProjectIdIndexRoute
   '/services/$serviceId/': typeof DashboardServicesServiceIdIndexRoute
 }
@@ -354,7 +338,6 @@ export interface FileRoutesByTo {
   '/signup': typeof AuthSignupRoute
   '/ai': typeof DashboardAiRoute
   '/audit-logs': typeof DashboardAuditLogsRoute
-  '/databases': typeof DashboardDatabasesRouteWithChildren
   '/deployments': typeof DashboardDeploymentsRoute
   '/domains': typeof DashboardDomainsRoute
   '/jobs': typeof DashboardJobsRoute
@@ -362,19 +345,18 @@ export interface FileRoutesByTo {
   '/sources': typeof DashboardSourcesRoute
   '/storage': typeof DashboardStorageRoute
   '/templates': typeof DashboardTemplatesRoute
+  '/users': typeof DashboardUsersRoute
   '/settings/api': typeof DashboardSettingsApiRoute
   '/settings/backups': typeof DashboardSettingsBackupsRoute
   '/settings/dns': typeof DashboardSettingsDnsRoute
+  '/settings/general': typeof DashboardSettingsGeneralRoute
   '/settings/maintenance': typeof DashboardSettingsMaintenanceRoute
   '/settings/migration': typeof DashboardSettingsMigrationRoute
+  '/settings/notifications': typeof DashboardSettingsNotificationsRoute
   '/settings/oauth': typeof DashboardSettingsOauthRoute
   '/settings/updates': typeof DashboardSettingsUpdatesRoute
-  '/settings/users': typeof DashboardSettingsUsersRoute
   '/profile': typeof DashboardProfileIndexRoute
   '/settings': typeof DashboardSettingsIndexRoute
-  '/databases/$dbId/backups': typeof DashboardDatabasesDbIdBackupsRoute
-  '/databases/$dbId/data': typeof DashboardDatabasesDbIdDataRoute
-  '/databases/$dbId/query': typeof DashboardDatabasesDbIdQueryRoute
   '/projects/$projectId/canvas': typeof DashboardProjectsProjectIdCanvasRoute
   '/projects/$projectId/compose': typeof DashboardProjectsProjectIdComposeRoute
   '/projects/$projectId/jobs': typeof DashboardProjectsProjectIdJobsRoute
@@ -385,7 +367,6 @@ export interface FileRoutesByTo {
   '/services/$serviceId/serverless': typeof DashboardServicesServiceIdServerlessRoute
   '/services/$serviceId/terminal': typeof DashboardServicesServiceIdTerminalRoute
   '/services/$serviceId/variables': typeof DashboardServicesServiceIdVariablesRoute
-  '/databases/$dbId': typeof DashboardDatabasesDbIdIndexRoute
   '/projects/$projectId': typeof DashboardProjectsProjectIdIndexRoute
   '/services/$serviceId': typeof DashboardServicesServiceIdIndexRoute
 }
@@ -401,28 +382,27 @@ export interface FileRoutesById {
   '/_auth/signup': typeof AuthSignupRoute
   '/_dashboard/ai': typeof DashboardAiRoute
   '/_dashboard/audit-logs': typeof DashboardAuditLogsRoute
-  '/_dashboard/databases': typeof DashboardDatabasesRouteWithChildren
   '/_dashboard/deployments': typeof DashboardDeploymentsRoute
   '/_dashboard/domains': typeof DashboardDomainsRoute
   '/_dashboard/jobs': typeof DashboardJobsRoute
   '/_dashboard/projects': typeof DashboardProjectsRouteWithChildren
+  '/_dashboard/settings': typeof DashboardSettingsRouteWithChildren
   '/_dashboard/sources': typeof DashboardSourcesRoute
   '/_dashboard/storage': typeof DashboardStorageRoute
   '/_dashboard/templates': typeof DashboardTemplatesRoute
+  '/_dashboard/users': typeof DashboardUsersRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/settings/api': typeof DashboardSettingsApiRoute
   '/_dashboard/settings/backups': typeof DashboardSettingsBackupsRoute
   '/_dashboard/settings/dns': typeof DashboardSettingsDnsRoute
+  '/_dashboard/settings/general': typeof DashboardSettingsGeneralRoute
   '/_dashboard/settings/maintenance': typeof DashboardSettingsMaintenanceRoute
   '/_dashboard/settings/migration': typeof DashboardSettingsMigrationRoute
+  '/_dashboard/settings/notifications': typeof DashboardSettingsNotificationsRoute
   '/_dashboard/settings/oauth': typeof DashboardSettingsOauthRoute
   '/_dashboard/settings/updates': typeof DashboardSettingsUpdatesRoute
-  '/_dashboard/settings/users': typeof DashboardSettingsUsersRoute
   '/_dashboard/profile/': typeof DashboardProfileIndexRoute
   '/_dashboard/settings/': typeof DashboardSettingsIndexRoute
-  '/_dashboard/databases/$dbId/backups': typeof DashboardDatabasesDbIdBackupsRoute
-  '/_dashboard/databases/$dbId/data': typeof DashboardDatabasesDbIdDataRoute
-  '/_dashboard/databases/$dbId/query': typeof DashboardDatabasesDbIdQueryRoute
   '/_dashboard/projects/$projectId/canvas': typeof DashboardProjectsProjectIdCanvasRoute
   '/_dashboard/projects/$projectId/compose': typeof DashboardProjectsProjectIdComposeRoute
   '/_dashboard/projects/$projectId/jobs': typeof DashboardProjectsProjectIdJobsRoute
@@ -433,7 +413,6 @@ export interface FileRoutesById {
   '/_dashboard/services/$serviceId/serverless': typeof DashboardServicesServiceIdServerlessRoute
   '/_dashboard/services/$serviceId/terminal': typeof DashboardServicesServiceIdTerminalRoute
   '/_dashboard/services/$serviceId/variables': typeof DashboardServicesServiceIdVariablesRoute
-  '/_dashboard/databases/$dbId/': typeof DashboardDatabasesDbIdIndexRoute
   '/_dashboard/projects/$projectId/': typeof DashboardProjectsProjectIdIndexRoute
   '/_dashboard/services/$serviceId/': typeof DashboardServicesServiceIdIndexRoute
 }
@@ -449,27 +428,26 @@ export interface FileRouteTypes {
     | '/signup'
     | '/ai'
     | '/audit-logs'
-    | '/databases'
     | '/deployments'
     | '/domains'
     | '/jobs'
     | '/projects'
+    | '/settings'
     | '/sources'
     | '/storage'
     | '/templates'
+    | '/users'
     | '/settings/api'
     | '/settings/backups'
     | '/settings/dns'
+    | '/settings/general'
     | '/settings/maintenance'
     | '/settings/migration'
+    | '/settings/notifications'
     | '/settings/oauth'
     | '/settings/updates'
-    | '/settings/users'
     | '/profile/'
     | '/settings/'
-    | '/databases/$dbId/backups'
-    | '/databases/$dbId/data'
-    | '/databases/$dbId/query'
     | '/projects/$projectId/canvas'
     | '/projects/$projectId/compose'
     | '/projects/$projectId/jobs'
@@ -480,7 +458,6 @@ export interface FileRouteTypes {
     | '/services/$serviceId/serverless'
     | '/services/$serviceId/terminal'
     | '/services/$serviceId/variables'
-    | '/databases/$dbId/'
     | '/projects/$projectId/'
     | '/services/$serviceId/'
   fileRoutesByTo: FileRoutesByTo
@@ -494,7 +471,6 @@ export interface FileRouteTypes {
     | '/signup'
     | '/ai'
     | '/audit-logs'
-    | '/databases'
     | '/deployments'
     | '/domains'
     | '/jobs'
@@ -502,19 +478,18 @@ export interface FileRouteTypes {
     | '/sources'
     | '/storage'
     | '/templates'
+    | '/users'
     | '/settings/api'
     | '/settings/backups'
     | '/settings/dns'
+    | '/settings/general'
     | '/settings/maintenance'
     | '/settings/migration'
+    | '/settings/notifications'
     | '/settings/oauth'
     | '/settings/updates'
-    | '/settings/users'
     | '/profile'
     | '/settings'
-    | '/databases/$dbId/backups'
-    | '/databases/$dbId/data'
-    | '/databases/$dbId/query'
     | '/projects/$projectId/canvas'
     | '/projects/$projectId/compose'
     | '/projects/$projectId/jobs'
@@ -525,7 +500,6 @@ export interface FileRouteTypes {
     | '/services/$serviceId/serverless'
     | '/services/$serviceId/terminal'
     | '/services/$serviceId/variables'
-    | '/databases/$dbId'
     | '/projects/$projectId'
     | '/services/$serviceId'
   id:
@@ -540,28 +514,27 @@ export interface FileRouteTypes {
     | '/_auth/signup'
     | '/_dashboard/ai'
     | '/_dashboard/audit-logs'
-    | '/_dashboard/databases'
     | '/_dashboard/deployments'
     | '/_dashboard/domains'
     | '/_dashboard/jobs'
     | '/_dashboard/projects'
+    | '/_dashboard/settings'
     | '/_dashboard/sources'
     | '/_dashboard/storage'
     | '/_dashboard/templates'
+    | '/_dashboard/users'
     | '/_dashboard/'
     | '/_dashboard/settings/api'
     | '/_dashboard/settings/backups'
     | '/_dashboard/settings/dns'
+    | '/_dashboard/settings/general'
     | '/_dashboard/settings/maintenance'
     | '/_dashboard/settings/migration'
+    | '/_dashboard/settings/notifications'
     | '/_dashboard/settings/oauth'
     | '/_dashboard/settings/updates'
-    | '/_dashboard/settings/users'
     | '/_dashboard/profile/'
     | '/_dashboard/settings/'
-    | '/_dashboard/databases/$dbId/backups'
-    | '/_dashboard/databases/$dbId/data'
-    | '/_dashboard/databases/$dbId/query'
     | '/_dashboard/projects/$projectId/canvas'
     | '/_dashboard/projects/$projectId/compose'
     | '/_dashboard/projects/$projectId/jobs'
@@ -572,7 +545,6 @@ export interface FileRouteTypes {
     | '/_dashboard/services/$serviceId/serverless'
     | '/_dashboard/services/$serviceId/terminal'
     | '/_dashboard/services/$serviceId/variables'
-    | '/_dashboard/databases/$dbId/'
     | '/_dashboard/projects/$projectId/'
     | '/_dashboard/services/$serviceId/'
   fileRoutesById: FileRoutesById
@@ -621,6 +593,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/users': {
+      id: '/_dashboard/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof DashboardUsersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/templates': {
       id: '/_dashboard/templates'
       path: '/templates'
@@ -640,6 +619,13 @@ declare module '@tanstack/react-router' {
       path: '/sources'
       fullPath: '/sources'
       preLoaderRoute: typeof DashboardSourcesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/settings': {
+      id: '/_dashboard/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/projects': {
@@ -668,13 +654,6 @@ declare module '@tanstack/react-router' {
       path: '/deployments'
       fullPath: '/deployments'
       preLoaderRoute: typeof DashboardDeploymentsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/databases': {
-      id: '/_dashboard/databases'
-      path: '/databases'
-      fullPath: '/databases'
-      preLoaderRoute: typeof DashboardDatabasesRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/audit-logs': {
@@ -721,10 +700,10 @@ declare module '@tanstack/react-router' {
     }
     '/_dashboard/settings/': {
       id: '/_dashboard/settings/'
-      path: '/settings'
+      path: '/'
       fullPath: '/settings/'
       preLoaderRoute: typeof DashboardSettingsIndexRouteImport
-      parentRoute: typeof DashboardRoute
+      parentRoute: typeof DashboardSettingsRoute
     }
     '/_dashboard/profile/': {
       id: '/_dashboard/profile/'
@@ -733,61 +712,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProfileIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/settings/users': {
-      id: '/_dashboard/settings/users'
-      path: '/settings/users'
-      fullPath: '/settings/users'
-      preLoaderRoute: typeof DashboardSettingsUsersRouteImport
-      parentRoute: typeof DashboardRoute
-    }
     '/_dashboard/settings/updates': {
       id: '/_dashboard/settings/updates'
-      path: '/settings/updates'
+      path: '/updates'
       fullPath: '/settings/updates'
       preLoaderRoute: typeof DashboardSettingsUpdatesRouteImport
-      parentRoute: typeof DashboardRoute
+      parentRoute: typeof DashboardSettingsRoute
     }
     '/_dashboard/settings/oauth': {
       id: '/_dashboard/settings/oauth'
-      path: '/settings/oauth'
+      path: '/oauth'
       fullPath: '/settings/oauth'
       preLoaderRoute: typeof DashboardSettingsOauthRouteImport
-      parentRoute: typeof DashboardRoute
+      parentRoute: typeof DashboardSettingsRoute
+    }
+    '/_dashboard/settings/notifications': {
+      id: '/_dashboard/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof DashboardSettingsNotificationsRouteImport
+      parentRoute: typeof DashboardSettingsRoute
     }
     '/_dashboard/settings/migration': {
       id: '/_dashboard/settings/migration'
-      path: '/settings/migration'
+      path: '/migration'
       fullPath: '/settings/migration'
       preLoaderRoute: typeof DashboardSettingsMigrationRouteImport
-      parentRoute: typeof DashboardRoute
+      parentRoute: typeof DashboardSettingsRoute
     }
     '/_dashboard/settings/maintenance': {
       id: '/_dashboard/settings/maintenance'
-      path: '/settings/maintenance'
+      path: '/maintenance'
       fullPath: '/settings/maintenance'
       preLoaderRoute: typeof DashboardSettingsMaintenanceRouteImport
-      parentRoute: typeof DashboardRoute
+      parentRoute: typeof DashboardSettingsRoute
+    }
+    '/_dashboard/settings/general': {
+      id: '/_dashboard/settings/general'
+      path: '/general'
+      fullPath: '/settings/general'
+      preLoaderRoute: typeof DashboardSettingsGeneralRouteImport
+      parentRoute: typeof DashboardSettingsRoute
     }
     '/_dashboard/settings/dns': {
       id: '/_dashboard/settings/dns'
-      path: '/settings/dns'
+      path: '/dns'
       fullPath: '/settings/dns'
       preLoaderRoute: typeof DashboardSettingsDnsRouteImport
-      parentRoute: typeof DashboardRoute
+      parentRoute: typeof DashboardSettingsRoute
     }
     '/_dashboard/settings/backups': {
       id: '/_dashboard/settings/backups'
-      path: '/settings/backups'
+      path: '/backups'
       fullPath: '/settings/backups'
       preLoaderRoute: typeof DashboardSettingsBackupsRouteImport
-      parentRoute: typeof DashboardRoute
+      parentRoute: typeof DashboardSettingsRoute
     }
     '/_dashboard/settings/api': {
       id: '/_dashboard/settings/api'
-      path: '/settings/api'
+      path: '/api'
       fullPath: '/settings/api'
       preLoaderRoute: typeof DashboardSettingsApiRouteImport
-      parentRoute: typeof DashboardRoute
+      parentRoute: typeof DashboardSettingsRoute
     }
     '/_dashboard/services/$serviceId/': {
       id: '/_dashboard/services/$serviceId/'
@@ -802,13 +788,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/projects/$projectId/'
       preLoaderRoute: typeof DashboardProjectsProjectIdIndexRouteImport
       parentRoute: typeof DashboardProjectsRoute
-    }
-    '/_dashboard/databases/$dbId/': {
-      id: '/_dashboard/databases/$dbId/'
-      path: '/$dbId'
-      fullPath: '/databases/$dbId/'
-      preLoaderRoute: typeof DashboardDatabasesDbIdIndexRouteImport
-      parentRoute: typeof DashboardDatabasesRoute
     }
     '/_dashboard/services/$serviceId/variables': {
       id: '/_dashboard/services/$serviceId/variables'
@@ -880,27 +859,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsProjectIdCanvasRouteImport
       parentRoute: typeof DashboardProjectsRoute
     }
-    '/_dashboard/databases/$dbId/query': {
-      id: '/_dashboard/databases/$dbId/query'
-      path: '/$dbId/query'
-      fullPath: '/databases/$dbId/query'
-      preLoaderRoute: typeof DashboardDatabasesDbIdQueryRouteImport
-      parentRoute: typeof DashboardDatabasesRoute
-    }
-    '/_dashboard/databases/$dbId/data': {
-      id: '/_dashboard/databases/$dbId/data'
-      path: '/$dbId/data'
-      fullPath: '/databases/$dbId/data'
-      preLoaderRoute: typeof DashboardDatabasesDbIdDataRouteImport
-      parentRoute: typeof DashboardDatabasesRoute
-    }
-    '/_dashboard/databases/$dbId/backups': {
-      id: '/_dashboard/databases/$dbId/backups'
-      path: '/$dbId/backups'
-      fullPath: '/databases/$dbId/backups'
-      preLoaderRoute: typeof DashboardDatabasesDbIdBackupsRouteImport
-      parentRoute: typeof DashboardDatabasesRoute
-    }
   }
 }
 
@@ -919,23 +877,6 @@ const AuthRouteChildren: AuthRouteChildren = {
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
-
-interface DashboardDatabasesRouteChildren {
-  DashboardDatabasesDbIdBackupsRoute: typeof DashboardDatabasesDbIdBackupsRoute
-  DashboardDatabasesDbIdDataRoute: typeof DashboardDatabasesDbIdDataRoute
-  DashboardDatabasesDbIdQueryRoute: typeof DashboardDatabasesDbIdQueryRoute
-  DashboardDatabasesDbIdIndexRoute: typeof DashboardDatabasesDbIdIndexRoute
-}
-
-const DashboardDatabasesRouteChildren: DashboardDatabasesRouteChildren = {
-  DashboardDatabasesDbIdBackupsRoute: DashboardDatabasesDbIdBackupsRoute,
-  DashboardDatabasesDbIdDataRoute: DashboardDatabasesDbIdDataRoute,
-  DashboardDatabasesDbIdQueryRoute: DashboardDatabasesDbIdQueryRoute,
-  DashboardDatabasesDbIdIndexRoute: DashboardDatabasesDbIdIndexRoute,
-}
-
-const DashboardDatabasesRouteWithChildren =
-  DashboardDatabasesRoute._addFileChildren(DashboardDatabasesRouteChildren)
 
 interface DashboardProjectsRouteChildren {
   DashboardProjectsProjectIdCanvasRoute: typeof DashboardProjectsProjectIdCanvasRoute
@@ -958,28 +899,49 @@ const DashboardProjectsRouteChildren: DashboardProjectsRouteChildren = {
 const DashboardProjectsRouteWithChildren =
   DashboardProjectsRoute._addFileChildren(DashboardProjectsRouteChildren)
 
+interface DashboardSettingsRouteChildren {
+  DashboardSettingsApiRoute: typeof DashboardSettingsApiRoute
+  DashboardSettingsBackupsRoute: typeof DashboardSettingsBackupsRoute
+  DashboardSettingsDnsRoute: typeof DashboardSettingsDnsRoute
+  DashboardSettingsGeneralRoute: typeof DashboardSettingsGeneralRoute
+  DashboardSettingsMaintenanceRoute: typeof DashboardSettingsMaintenanceRoute
+  DashboardSettingsMigrationRoute: typeof DashboardSettingsMigrationRoute
+  DashboardSettingsNotificationsRoute: typeof DashboardSettingsNotificationsRoute
+  DashboardSettingsOauthRoute: typeof DashboardSettingsOauthRoute
+  DashboardSettingsUpdatesRoute: typeof DashboardSettingsUpdatesRoute
+  DashboardSettingsIndexRoute: typeof DashboardSettingsIndexRoute
+}
+
+const DashboardSettingsRouteChildren: DashboardSettingsRouteChildren = {
+  DashboardSettingsApiRoute: DashboardSettingsApiRoute,
+  DashboardSettingsBackupsRoute: DashboardSettingsBackupsRoute,
+  DashboardSettingsDnsRoute: DashboardSettingsDnsRoute,
+  DashboardSettingsGeneralRoute: DashboardSettingsGeneralRoute,
+  DashboardSettingsMaintenanceRoute: DashboardSettingsMaintenanceRoute,
+  DashboardSettingsMigrationRoute: DashboardSettingsMigrationRoute,
+  DashboardSettingsNotificationsRoute: DashboardSettingsNotificationsRoute,
+  DashboardSettingsOauthRoute: DashboardSettingsOauthRoute,
+  DashboardSettingsUpdatesRoute: DashboardSettingsUpdatesRoute,
+  DashboardSettingsIndexRoute: DashboardSettingsIndexRoute,
+}
+
+const DashboardSettingsRouteWithChildren =
+  DashboardSettingsRoute._addFileChildren(DashboardSettingsRouteChildren)
+
 interface DashboardRouteChildren {
   DashboardAiRoute: typeof DashboardAiRoute
   DashboardAuditLogsRoute: typeof DashboardAuditLogsRoute
-  DashboardDatabasesRoute: typeof DashboardDatabasesRouteWithChildren
   DashboardDeploymentsRoute: typeof DashboardDeploymentsRoute
   DashboardDomainsRoute: typeof DashboardDomainsRoute
   DashboardJobsRoute: typeof DashboardJobsRoute
   DashboardProjectsRoute: typeof DashboardProjectsRouteWithChildren
+  DashboardSettingsRoute: typeof DashboardSettingsRouteWithChildren
   DashboardSourcesRoute: typeof DashboardSourcesRoute
   DashboardStorageRoute: typeof DashboardStorageRoute
   DashboardTemplatesRoute: typeof DashboardTemplatesRoute
+  DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardSettingsApiRoute: typeof DashboardSettingsApiRoute
-  DashboardSettingsBackupsRoute: typeof DashboardSettingsBackupsRoute
-  DashboardSettingsDnsRoute: typeof DashboardSettingsDnsRoute
-  DashboardSettingsMaintenanceRoute: typeof DashboardSettingsMaintenanceRoute
-  DashboardSettingsMigrationRoute: typeof DashboardSettingsMigrationRoute
-  DashboardSettingsOauthRoute: typeof DashboardSettingsOauthRoute
-  DashboardSettingsUpdatesRoute: typeof DashboardSettingsUpdatesRoute
-  DashboardSettingsUsersRoute: typeof DashboardSettingsUsersRoute
   DashboardProfileIndexRoute: typeof DashboardProfileIndexRoute
-  DashboardSettingsIndexRoute: typeof DashboardSettingsIndexRoute
   DashboardServicesServiceIdBuildRoute: typeof DashboardServicesServiceIdBuildRoute
   DashboardServicesServiceIdDeploymentsRoute: typeof DashboardServicesServiceIdDeploymentsRoute
   DashboardServicesServiceIdDomainsRoute: typeof DashboardServicesServiceIdDomainsRoute
@@ -992,25 +954,17 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAiRoute: DashboardAiRoute,
   DashboardAuditLogsRoute: DashboardAuditLogsRoute,
-  DashboardDatabasesRoute: DashboardDatabasesRouteWithChildren,
   DashboardDeploymentsRoute: DashboardDeploymentsRoute,
   DashboardDomainsRoute: DashboardDomainsRoute,
   DashboardJobsRoute: DashboardJobsRoute,
   DashboardProjectsRoute: DashboardProjectsRouteWithChildren,
+  DashboardSettingsRoute: DashboardSettingsRouteWithChildren,
   DashboardSourcesRoute: DashboardSourcesRoute,
   DashboardStorageRoute: DashboardStorageRoute,
   DashboardTemplatesRoute: DashboardTemplatesRoute,
+  DashboardUsersRoute: DashboardUsersRoute,
   DashboardIndexRoute: DashboardIndexRoute,
-  DashboardSettingsApiRoute: DashboardSettingsApiRoute,
-  DashboardSettingsBackupsRoute: DashboardSettingsBackupsRoute,
-  DashboardSettingsDnsRoute: DashboardSettingsDnsRoute,
-  DashboardSettingsMaintenanceRoute: DashboardSettingsMaintenanceRoute,
-  DashboardSettingsMigrationRoute: DashboardSettingsMigrationRoute,
-  DashboardSettingsOauthRoute: DashboardSettingsOauthRoute,
-  DashboardSettingsUpdatesRoute: DashboardSettingsUpdatesRoute,
-  DashboardSettingsUsersRoute: DashboardSettingsUsersRoute,
   DashboardProfileIndexRoute: DashboardProfileIndexRoute,
-  DashboardSettingsIndexRoute: DashboardSettingsIndexRoute,
   DashboardServicesServiceIdBuildRoute: DashboardServicesServiceIdBuildRoute,
   DashboardServicesServiceIdDeploymentsRoute:
     DashboardServicesServiceIdDeploymentsRoute,

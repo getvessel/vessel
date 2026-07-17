@@ -2,7 +2,6 @@ import {
   Bot,
   Cloud,
   Code,
-  Database,
   Download,
   Globe,
   HardDrive,
@@ -31,13 +30,12 @@ const navGroups: NavGroup[] = [
     title: 'Overview',
     items: [
       { title: 'Dashboard', url: '/', icon: LayoutDashboard, exact: true },
-      { title: 'Users', url: '/settings/users', icon: Users },
+      { title: 'Users', url: '/users', icon: Users },
     ],
   },
   {
     title: 'Resources',
     items: [
-      { title: 'Databases', url: '/databases', icon: Database },
       { title: 'Storage', url: '/storage', icon: HardDrive },
       { title: 'Domains', url: '/domains', icon: Globe },
     ],

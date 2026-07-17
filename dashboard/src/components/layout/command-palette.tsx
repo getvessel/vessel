@@ -3,7 +3,6 @@ import { Command } from 'cmdk';
 import {
   Bell,
   CornerDownLeft,
-  Database,
   FileClock,
   FileCog,
   FolderKanban,
@@ -40,12 +39,6 @@ const navigationItems = [
     description: 'Services and environments',
     to: '/projects',
     icon: FolderKanban,
-  },
-  {
-    label: 'Databases',
-    description: 'Persistent services',
-    to: '/databases',
-    icon: Database,
   },
   {
     label: 'Teams',
