@@ -62,17 +62,10 @@ export const useSetup = () => {
 
   return useMutation({
     mutationFn: (details: Parameters<typeof authService.setup>[0]) => authService.setup(details),
-    onSuccess: async (data) => {
-      if (!data?.token || !data?.user) {
-        toast.error('Setup failed: invalid response from server');
-        return;
-      }
-
-      authActions.setAuth(data.token, data.user);
+    onSuccess: async () => {
       queryClient.clear();
-      await router.navigate({ to: '/' });
-
-      toast.success('Setup completed! Welcome to Vessl.');
+      toast.success('Setup complete! Please sign in to continue.');
+      await router.navigate({ to: '/signin' });
     },
     onError: (error: Error) => {
       toast.error(error?.message || 'Setup failed. Please try again.');
