@@ -31,3 +31,4 @@ node_modules/
 .astro/
 
 data/
+tmp/

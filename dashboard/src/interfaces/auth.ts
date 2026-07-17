@@ -20,7 +20,7 @@ export interface RegisterCredentials extends AuthCredentials {
 }
 
 export interface SetupEnv {
-  jwtSecret: string;
+  jwtSecret?: string;
   dataDir: string;
   dashboardUrl: string;
   port: number;
