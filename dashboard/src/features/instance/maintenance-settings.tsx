@@ -89,14 +89,14 @@ export const MaintenancePage = () => {
           {Number(reclaimableGb) > 3 ? (
             <Badge
               variant="outline"
-              className="border-yellow-500/50 bg-yellow-500/10 px-3 py-1 font-bold text-[10px] text-yellow-500 uppercase tracking-widest"
+              className="border-destructive/50 bg-destructive/10 px-3 py-1 font-bold text-[10px] text-destructive uppercase tracking-widest"
             >
-              1 ISSUE
+              ATTENTION
             </Badge>
           ) : (
             <Badge
               variant="outline"
-              className="border-green-500/50 bg-green-500/10 px-3 py-1 font-bold text-[10px] text-green-500 uppercase tracking-widest"
+              className="border-primary/50 bg-primary/10 px-3 py-1 font-bold text-[10px] text-primary uppercase tracking-widest"
             >
               0 ISSUES
             </Badge>
@@ -112,7 +112,7 @@ export const MaintenancePage = () => {
       </div>
 
       {stats?.docker?.reclaimableGb && stats.docker.reclaimableGb > 3 ? (
-        <div className="flex w-full items-center gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 font-medium text-sm text-yellow-500">
+        <div className="flex w-full items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4 font-medium text-destructive text-sm">
           <AlertTriangle className="h-4 w-4" /> Docker has more than 3 GB reclaimable.
         </div>
       ) : null}

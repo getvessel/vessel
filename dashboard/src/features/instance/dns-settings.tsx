@@ -94,7 +94,7 @@ export const DnsSettings = () => {
             <img
               src={`/dns-providers/${activeProvider}.svg`}
               alt={activeProviderData?.name}
-              className="h-4 w-auto mix-blend-screen brightness-150 contrast-125 grayscale"
+              className="h-4 w-auto"
             />
             <span className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
               {activeProviderData?.name}
@@ -112,7 +112,7 @@ export const DnsSettings = () => {
               type="button"
               key={p.id}
               onClick={() => setActiveProvider(p.id)}
-              className={`group relative w-full cursor-pointer rounded-2xl border p-5 text-left transition-all duration-200 ${
+              className={`group relative w-full cursor-pointer rounded-2xl border p-6 text-left transition-all duration-200 ${
                 isActive
                   ? 'border-primary/50 bg-card/40 shadow-sm'
                   : 'border-border/50 bg-background/50 hover:border-border/80 hover:bg-card/40'
@@ -150,7 +150,7 @@ export const DnsSettings = () => {
       </div>
 
       {/* Active Content */}
-      <div className="mt-4 space-y-10 rounded-2xl border border-border/50 bg-card/40 p-8">
+      <div className="mt-4 space-y-10 rounded-2xl border border-border/50 bg-card/40 p-6">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border/50 bg-background/50">
             <img

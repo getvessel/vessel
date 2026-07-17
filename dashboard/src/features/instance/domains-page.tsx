@@ -41,8 +41,8 @@ export const DomainsPage = () => {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-[200px] w-full rounded-2xl" />
-        <Skeleton className="h-[300px] w-full rounded-2xl" />
+        <Skeleton className="h-50 w-full rounded-2xl" />
+        <Skeleton className="h-75 w-full rounded-2xl" />
       </div>
     );
   }
@@ -65,7 +65,7 @@ export const DomainsPage = () => {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Dashboard Domain */}
-        <div className="space-y-6 rounded-2xl border border-border/50 bg-card/40 p-8">
+        <div className="space-y-6 rounded-2xl border border-border/50 bg-card/40 p-6">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
               <Server className="h-5 w-5" />
@@ -100,7 +100,7 @@ export const DomainsPage = () => {
         </div>
 
         {/* Root Domain */}
-        <div className="space-y-6 rounded-2xl border border-border/50 bg-card/40 p-8">
+        <div className="space-y-6 rounded-2xl border border-border/50 bg-card/40 p-6">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
               <Globe className="h-5 w-5" />
@@ -121,7 +121,10 @@ export const DomainsPage = () => {
                 placeholder="apps.example.com"
                 value={formData.defaultWildcardDomain}
                 onChange={(e) =>
-                  setFormData({ ...formData, defaultWildcardDomain: e.target.value })
+                  setFormData({
+                    ...formData,
+                    defaultWildcardDomain: e.target.value,
+                  })
                 }
                 className="h-11 bg-background/50 font-mono"
               />

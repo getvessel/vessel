@@ -53,11 +53,7 @@ export const UpdatesPage = () => {
           {!isLoading && (
             <Badge
               variant="outline"
-              className={`rounded-md px-3 py-1 font-bold text-[10px] uppercase tracking-[0.15em] ${
-                hasUpdate
-                  ? 'border-primary/50 bg-primary/10 text-primary'
-                  : 'border-emerald-500/50 bg-emerald-500/10 text-emerald-500'
-              }`}
+              className={`rounded-md border border-primary/50 bg-primary/10 px-3 py-1 font-bold text-[10px] text-primary uppercase tracking-[0.15em]`}
             >
               {hasUpdate ? 'UPDATE AVAILABLE' : 'UP TO DATE'}
             </Badge>
@@ -101,9 +97,9 @@ export const UpdatesPage = () => {
 
       {/* Main Status Banner */}
       {!isLoading && (
-        <div className="flex flex-col items-center justify-center space-y-6 rounded-2xl border border-border/50 bg-card/40 p-16 text-center">
+        <div className="flex flex-col items-center justify-center space-y-6 rounded-2xl border border-border/50 bg-card/40 px-6 py-12 text-center">
           <div
-            className={`flex h-16 w-16 items-center justify-center rounded-2xl border ${hasUpdate ? 'border-primary/20 bg-primary/10 text-primary' : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-500'}`}
+            className={`flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary`}
           >
             {hasUpdate ? <Download className="h-8 w-8" /> : <CheckCircle className="h-8 w-8" />}
           </div>

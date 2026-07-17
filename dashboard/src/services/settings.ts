@@ -71,25 +71,27 @@ export const settingsService = {
     }
   },
 
-  getAISettings: async (): Promise<BaseResponse<any>> => {
+  getAISettings: async (): Promise<BaseResponse<Record<string, string>>> => {
     try {
-      return await apiClient.get<BaseResponse<any>>('/ai');
+      return await apiClient.get<BaseResponse<Record<string, string>>>('/ai');
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  updateAISettings: async (payload: Record<string, unknown>): Promise<BaseResponse<any>> => {
+  updateAISettings: async (
+    payload: Record<string, string>
+  ): Promise<BaseResponse<Record<string, string>>> => {
     try {
-      return await apiClient.put<BaseResponse<any>>('/ai', payload);
+      return await apiClient.put<BaseResponse<Record<string, string>>>('/ai', payload);
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  getNotificationSettings: async (): Promise<BaseResponse<any>> => {
+  getNotificationSettings: async (): Promise<BaseResponse<Record<string, unknown>>> => {
     try {
-      return await apiClient.get<BaseResponse<any>>('/notifications');
+      return await apiClient.get<BaseResponse<Record<string, unknown>>>('/notifications');
     } catch (error) {
       throw handleApiError(error);
     }
@@ -97,9 +99,9 @@ export const settingsService = {
 
   updateNotificationSettings: async (
     payload: Record<string, unknown>
-  ): Promise<BaseResponse<any>> => {
+  ): Promise<BaseResponse<Record<string, unknown>>> => {
     try {
-      return await apiClient.put<BaseResponse<any>>('/notifications', payload);
+      return await apiClient.put<BaseResponse<Record<string, unknown>>>('/notifications', payload);
     } catch (error) {
       throw handleApiError(error);
     }

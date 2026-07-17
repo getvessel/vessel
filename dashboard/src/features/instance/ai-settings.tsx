@@ -91,7 +91,7 @@ export function AISettings() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {PROVIDERS.map((provider) => {
           const isEditing = editingId === provider.id;
           const currentKey = settings?.data?.[provider.keyField] || '';
@@ -102,7 +102,7 @@ export function AISettings() {
             <button
               type="button"
               key={provider.id}
-              className="relative flex flex-col justify-between space-y-4 rounded-xl border border-border/50 bg-card/40 p-5 text-left transition-colors hover:border-border"
+              className="relative flex flex-col justify-between space-y-4 rounded-xl border border-border/50 bg-card/40 p-6 text-left transition-colors hover:border-border"
               onClick={() => {
                 if (!isEditing) setEditingId(provider.id);
               }}
