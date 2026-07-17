@@ -77,6 +77,14 @@ Every single feature from the **Aeroplane vs. Vessl Feature Gap Analysis** maps 
 | **16** | **System Maintenance & Cleanup**   | `src/features/instance/maintenance-settings.tsx`<br>`/routes/_shell/settings/maintenance.tsx` | **Maintenance Dashboard (`/settings/maintenance`):**<br>- **Storage Gauges:** Root FS disk %, Docker storage reclaimable MBs, Backup volume size.<br>- **Garbage Collection:** `Run Docker Cleanup Now` button (`POST /system/maintenance/cleanup`) running `docker system prune -af --volumes`.<br>- **Cron Config:** Schedule selector for automated background pruning (`Docker Cleanup Cron`).                                                                                                                                                                                                                                                                                                                                 |
 | **17** | **Railway Importer Specification** | `src/features/projects/railway-importer.tsx`<br>`/routes/_shell/import/railway.tsx`           | **Multi-Step Railway Import Wizard (`POST /import/railway`):**<br>1. **Token & Discovery:** Paste Railway Personal API Token (`Bearer <token>`), query GraphQL v2, select project.<br>2. **Service Classification Table:** Displays detected Git repos, Docker images, and database engines (Postgres, TimescaleDB, Redis, Mongo, ClickHouse).<br>3. **Configuration Checkboxes:** `Exclude RAILWAY_* variables` (default ON), `Recreate database engines` (creates local Vessl DBs), `Auto-deploy services`, and `Import database data` (runs automated `pg_dump`/`redis-cli` from public Railway URLs).                                                                                                                          |
 | **18** | **Control Plane Auto-Updates**     | `src/features/instance/update-settings.tsx`<br>`/routes/_shell/settings/updates.tsx`          | **Version Controller (`/settings/updates`):**<br>- **Version Card:** Shows `Current Version`, `Latest Version` (`GET /settings/updates/check`), and release notes.<br>- **Auto-Update Toggle:** Switch for `Auto Update Enabled` + `Update Check Cron` selector.<br>- **Manual Trigger:** `Deploy Update Now` button (`POST /settings/updates/deploy`) triggering `scripts/upgrade.sh` and graceful `vessld` container restart.                                                                                                                                                                                                                                                                                                    |
+| **19** | **Global Domain Management**       | `src/features/domains/domain-list.tsx`<br>`/routes/_shell/domains.tsx`                        | **Domains (`/domains`):** Centralized view of all custom domains mapped across services (`GET /domains`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| **20** | **Storage & S3 Buckets**           | `src/features/storage/storage-list.tsx`<br>`/routes/_shell/storage.tsx`                       | **Storage (`/storage`):** List all active storage buckets, view status, and manage their lifecycles (`GET /storage`, `POST /storage/:id/start`, `POST /storage/:id/stop`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| **21** | **Global Deployments View**        | `src/features/deployments/deployments-list.tsx`<br>`/routes/_shell/deployments.tsx`           | **Global Deployments (`/deployments`):** A centralized view of all active and historical builds across all projects and services.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **22** | **Background Jobs**                | `src/features/jobs/jobs-list.tsx`<br>`/routes/_shell/jobs.tsx`                                | **Jobs (`/jobs`):** View all background jobs and cron tasks across the platform (`GET /jobs`, `POST /jobs/:id/trigger`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| **23** | **Git Sources Integration**        | `src/features/instance/git-apps.tsx`<br>`/routes/_shell/sources.tsx`                          | **Sources (`/sources`):** Connect and manage Git providers (GitHub, GitLab, Bitbucket), OAuth, and webhooks (`/git/connect`, `/git/repos`, `/webhooks/*`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| **24** | **API Access (Tokens)**            | `src/features/profile/access-tokens.tsx`<br>`/routes/_shell/settings/api.tsx`                 | **Tokens (`/settings/api`):** Manage Personal Access Tokens (`/profile/tokens`) and Project-level Tokens (`/projects/:id/tokens`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| **25** | **AI Assistant**                   | `src/features/ai/ai-chat.tsx`<br>`/routes/_shell/ai.tsx`                                      | **AI (`/ai`):** Copilot interface for querying logs, managing infrastructure, and generating configurations using the Vessl AI backend context.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **26** | **Templates & One-Click Apps**     | `src/features/templates/template-list.tsx`<br>`/routes/_shell/templates.tsx`                  | **Templates (`/templates`):** Discover and deploy one-click apps from predefined templates (`/one-click`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 ---
 
@@ -103,6 +111,13 @@ src/routes/
 │   │   ├── railway.tsx                      # Railway Project Importer (`/import/railway`)
 │   │   └── vercel.tsx                       # Vercel Project Importer (`/import/vercel`)
 │   │
+│   ├── deployments.tsx                      # Global Deployments View (`/deployments`)
+│   ├── domains.tsx                          # Global Domains List (`/domains`)
+│   ├── storage.tsx                          # Global Storage Buckets (`/storage`)
+│   ├── ai.tsx                               # AI Copilot Interface (`/ai`)
+│   ├── templates.tsx                        # One-Click Apps & Storage Templates (`/templates`)
+│   ├── sources.tsx                          # Git Providers Integration (`/sources`)
+│   │
 │   ├── settings/                            # Super Admin & Instance Settings (`/settings/*`)
 │   │   ├── index.tsx                        # General Instance Configuration
 │   │   ├── dns.tsx                          # Cloudflare/Namecheap/Spaceship DNS Credentials
@@ -110,8 +125,8 @@ src/routes/
 │   │   ├── updates.tsx                      # Control Plane Version & Auto-Update Toggles
 │   │   ├── migration.tsx                    # AES-256 `.vessl` Bundle Export/Import
 │   │   ├── users.tsx                        # Instance-Wide User Management
+│   │   ├── api.tsx                          # API Access & Access Tokens Management
 │   │   ├── oauth.tsx                        # Global OAuth Providers (GitHub, Google)
-│   │   ├── git-apps.tsx                     # Global Git App Integrations (GitHub/GitLab/Bitbucket)
 │   │   └── backups.tsx                      # S3 Backup Destinations
 │   │
 │   ├── profile/                             # Current User Profile (`/profile`)
@@ -231,18 +246,43 @@ src/features/
 
 ---
 
-## 7. Implementation Roadmap & Next Steps
+## 7. Implementation Roadmap & Build Phases
 
-1. **Phase 1: Router & API Client Verification**
-   - Flesh out `src/lib/api-client.ts` and verify TanStack Query defaults (`staleTime`, retry behavior).
-   - Register all expanded routes (`onboarding.tsx`, `settings/*`, `import/*`, `databases/*`) inside `src/routes/` and run `npm run generate-routes`.
-2. **Phase 2: First-Run Setup Wizard (`/setup`)**
-   - Build out the existing `src/features/auth/setup-form.tsx` to handle fresh server installations cleanly.
-3. **Phase 3: Service Deep-Dive & Build Overrides**
-   - Upgrade `AppService` components to support `RuntimeMode` (`web`/`worker`), `StaticOutput`, and command overrides (`--install-cmd`, `--build-cmd`, `--start-cmd`).
-4. **Phase 4: Database Suite & SQL Studio**
-   - Build the engine selection grid (`TimescaleDB`, `ClickHouse`, etc.), `database-networking.tsx` (`ExternalDNS` + CDC toggle), `data-browser.tsx` (row editing), and the Monaco `sql-studio.tsx`.
-5. **Phase 5: Importers & Super Admin Settings**
-   - Implement `railway-importer.tsx`, `migration-settings.tsx` (`.vessl` tar.gz export/import), `dns-settings.tsx`, and `maintenance-settings.tsx` (`docker system prune`).
-6. **Phase 6: Biome Format & Verification**
-   - Ensure every created or modified file passes `npm run format:fix` (`biome check --write .`) with zero errors.
+We will build the dashboard in distinct phases to ensure stability, proper data-binding, and excellent UI/UX consistency across all domains.
+
+**Phase 1: Core Foundation & Shell (Routing & Layout)**
+
+- Scaffold the new `AppSidebar` and `Topbar` adhering to the new group structures (Overview, Resources, System & Settings).
+- Establish the `TanStack Router` configuration (`src/routes/`) to reflect the new layout (e.g. `/domains`, `/ai`, `/settings/dns`).
+- Setup the core `api-client.ts` to seamlessly intercept 401s and standardize JSON parsing.
+- Build the `Auth` & `Setup Wizard` views (`/login`, `/setup`).
+
+**Phase 2: Project & Service Management (The Bread & Butter)**
+
+- Implement the `Projects` overview and environment grid (`/projects`).
+- Build the `Services` domain (`/services/$serviceId/*`): metrics, build overrides, variables (`.env`), and deployment history.
+- Map the new `/deployments` global view to track all system-wide builds in real-time using `EventSource` (SSE).
+
+**Phase 3: Database & Storage Provisioning**
+
+- Create the Database Engine Selection UI (`Postgres`, `Redis`, `Mongo`, etc.).
+- Build out the DB dashboards (`/databases/$dbId/*`): connection strings, public networking (`ExternalDNS`), and data/table browser.
+- Implement `Storage` bucket management (`/storage`), fetching and controlling bucket lifecycle.
+
+**Phase 4: Integrations & AI**
+
+- Map out the `GitHub` integration screens (`/settings/github`), handling OAuth flows and repository syncing (`/git/repos`).
+- Develop the `Domains` & `DNS` system (`/domains`, `/settings/dns`), syncing custom domains automatically.
+- Build the `AI Assistant` interface (`/ai`) connected to Vessl's backend knowledge base for auto-generating Compose files and config.
+
+**Phase 5: Super Admin & Maintenance**
+
+- Create `Users` management (`/settings/users`) and API Tokens (`/settings/api`).
+- Build the `Maintenance` and `Updates` dashboards (`docker system prune`, `vessld` auto-updates).
+- Finalize the `Migration` bundle logic (`.vessl` export/import functionality).
+
+**Phase 6: Polish & Verification**
+
+- Strict Biome formatting (`npm run format:fix`) and type-checking across all components.
+- Audit all inputs and buttons to ensure minimalist "plain" design (no weird autofill backgrounds, sharp padding/margins).
+- Ensure all components are under 350 lines and correctly modularized in `src/features/`.

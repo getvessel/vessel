@@ -1,17 +1,21 @@
 import {
+  Bot,
   Cloud,
   Code,
   Database,
   Download,
-  FolderKanban,
+  Globe,
   HardDrive,
+  Key,
   LayoutDashboard,
   LayoutTemplate,
+  Network,
   PanelLeft,
+  RefreshCw,
   ScrollText,
   Settings,
-  Terminal,
   Users,
+  Wrench,
   X,
 } from 'lucide-react';
 import { NavItem, type NavItemProps } from './nav-item';
@@ -27,7 +31,8 @@ const navGroups: NavGroup[] = [
     title: 'Overview',
     items: [
       { title: 'Dashboard', url: '/', icon: LayoutDashboard, exact: true },
-      { title: 'Projects', url: '/projects', icon: FolderKanban },
+      { title: 'Users', url: '/settings/users', icon: Users },
+      { title: 'Deployments', url: '/deployments', icon: Cloud },
     ],
   },
   {
@@ -35,22 +40,25 @@ const navGroups: NavGroup[] = [
     items: [
       { title: 'Databases', url: '/databases', icon: Database },
       { title: 'Storage', url: '/storage', icon: HardDrive },
-      { title: 'Sources', url: '/sources', icon: Code },
+      { title: 'Domains', url: '/domains', icon: Globe },
     ],
   },
   {
     title: 'Discover',
     items: [
       { title: 'Templates', url: '/templates', icon: LayoutTemplate },
-      { title: 'Import', url: '/imports/railway', icon: Download },
+      { title: 'Sources', url: '/sources', icon: Code },
+      { title: 'AI', url: '/ai', icon: Bot },
     ],
   },
   {
-    title: 'System',
+    title: 'System & Settings',
     items: [
-      { title: 'Audit Logs', url: '/audit-logs', icon: ScrollText },
-      { title: 'Terminal', url: '/terminal', icon: Terminal },
-      { title: 'Users', url: '/settings/users', icon: Users },
+      { title: 'API Access', url: '/settings/api', icon: Key },
+      { title: 'DNS', url: '/settings/dns', icon: Network },
+      { title: 'Migration', url: '/settings/migration', icon: Download },
+      { title: 'Maintenance', url: '/settings/maintenance', icon: Wrench },
+      { title: 'Updates', url: '/settings/updates', icon: RefreshCw },
       { title: 'Settings', url: '/settings', icon: Settings, exact: true },
     ],
   },
