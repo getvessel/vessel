@@ -18,3 +18,4 @@ export { settingsService } from './settings';
 export { storageService } from './storage';
 export { systemService } from './system';
 export { vercelService } from './vercel';
+export * from './templates';

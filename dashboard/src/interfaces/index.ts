@@ -12,3 +12,4 @@ export * from './settings';
 export * from './storage';
 export * from './users';
 export * from './vercel';
+export * from './templates';

@@ -462,3 +462,173 @@ We will build the dashboard in distinct phases to ensure stability, proper data-
 - [ ] Audit all inputs and buttons to ensure minimalist "plain" design (no weird autofill backgrounds, sharp padding/margins).
 - [ ] Ensure all components are under 350 lines and correctly modularized in `src/features/`.
       export TEST_TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNvbG9tb25AdmVzc2wuZGV2IiwiZXhwIjoxNzg0NTU2MzM1LCJpYXQiOjE3ODQyOTcxMzUsImlzcyI6InZlc3NsLWF1dGgiLCJyb2xlIjoiYWRtaW4iLCJzdWIiOiJkNjhmNWJmZC01MWNjLTQ3MTMtOTk2ZS1jNzE0MGJjYmQzYjMiLCJ0b3RwRW5hYmxlZCI6ZmFsc2V9.qaYRN4Bw26wpuwrfw4kCtugRcKbx1RRdSvLty3QwhXA"
+
+## 8. Endpoint Wiring Status
+
+### Wired Endpoints
+
+- [x] `DELETE /apps/:id`
+- [x] `DELETE /backups/:id`
+- [x] `DELETE /databases/:id`
+- [x] `DELETE /databases/:id/data/:table`
+- [x] `DELETE /dns/:id`
+- [x] `DELETE /domains/:id`
+- [x] `DELETE /environments/:id`
+- [x] `DELETE /git/connect/:provider`
+- [x] `DELETE /jobs/:id`
+- [x] `DELETE /profile/tokens/:id`
+- [x] `DELETE /projects/:id`
+- [x] `DELETE /projects/:projectId/members/:id`
+- [x] `DELETE /projects/:projectId/tokens/:id`
+- [x] `DELETE /projects/:projectId/webhooks/:id`
+- [x] `DELETE /s3-destinations/:id`
+- [x] `DELETE /services/:serviceId/variables/:id`
+- [x] `DELETE /settings/git_apps/bitbucket/:id`
+- [x] `DELETE /settings/git_apps/github/:id`
+- [x] `DELETE /settings/git_apps/gitlab/:id`
+- [x] `DELETE /storage/:id`
+- [x] `DELETE /users/:id`
+- [x] `GET /ai`
+- [x] `GET /apps/:id`
+- [x] `GET /audit-logs`
+- [x] `GET /auth/oauth/:provider`
+- [x] `GET /auth/oauth/providers/enabled`
+- [x] `GET /backups`
+- [x] `GET /backups/:id`
+- [x] `GET /backups/:id/records`
+- [x] `GET /canvas/projects`
+- [x] `GET /databases`
+- [x] `GET /databases/:id`
+- [x] `GET /databases/:id/data/:table`
+- [x] `GET /databases/:id/schemas`
+- [x] `GET /deployments/:id/logs`
+- [x] `GET /dns`
+- [x] `GET /environments/:id/apps`
+- [x] `GET /environments/:id/canvas`
+- [x] `GET /git/status`
+- [x] `GET /jobs`
+- [x] `GET /jobs/:id`
+- [x] `GET /notifications`
+- [x] `GET /profile`
+- [x] `GET /profile/tokens`
+- [x] `GET /projects`
+- [x] `GET /projects/:id`
+- [x] `GET /projects/:id/apps`
+- [x] `GET /projects/:id/domains`
+- [x] `GET /projects/:id/env`
+- [x] `GET /projects/:id/environments`
+- [x] `GET /projects/:id/summary`
+- [x] `GET /projects/:projectId/members`
+- [x] `GET /projects/:projectId/tokens`
+- [x] `GET /projects/:projectId/webhooks`
+- [x] `GET /s3-destinations`
+- [x] `GET /services/:serviceId/deployments`
+- [x] `GET /services/:serviceId/metrics`
+- [x] `GET /services/:serviceId/serverless/code`
+- [x] `GET /services/:serviceId/variables`
+- [x] `GET /settings`
+- [x] `GET /settings/git_apps/bitbucket`
+- [x] `GET /settings/git_apps/bitbucket/:id`
+- [x] `GET /settings/git_apps/github`
+- [x] `GET /settings/git_apps/github/:id`
+- [x] `GET /settings/git_apps/gitlab`
+- [x] `GET /settings/git_apps/gitlab/:id`
+- [x] `GET /settings/oauth/providers`
+- [x] `GET /settings/updates/status`
+- [x] `GET /storage`
+- [x] `GET /storage/:id`
+- [x] `GET /system/public`
+- [x] `GET /system/setup-status`
+- [x] `GET /system/stats`
+- [x] `GET /users`
+- [x] `GET /vercel/projects`
+- [x] `GET /vercel/projects/:id/env`
+- [x] `POST /apps/:id/redeploy`
+- [x] `POST /apps/:id/restart`
+- [x] `POST /apps/:id/stop`
+- [x] `POST /auth/2fa/disable`
+- [x] `POST /auth/2fa/setup`
+- [x] `POST /auth/2fa/verify`
+- [x] `POST /auth/forgot-password`
+- [x] `POST /auth/logout`
+- [x] `POST /auth/reset-password`
+- [x] `POST /auth/signin`
+- [x] `POST /auth/signup`
+- [x] `POST /backups`
+- [x] `POST /backups/:id/restore`
+- [x] `POST /backups/:id/trigger`
+- [x] `POST /databases`
+- [x] `POST /databases/:id/data/:table`
+- [x] `POST /databases/:id/import`
+- [x] `POST /databases/:id/query`
+- [x] `POST /databases/:id/restart`
+- [x] `POST /databases/:id/start`
+- [x] `POST /databases/:id/stop`
+- [x] `POST /deployments/:id/rollback`
+- [x] `POST /dns`
+- [x] `POST /environments/:id/apps`
+- [x] `POST /git/connect`
+- [x] `POST /jobs`
+- [x] `POST /jobs/:id/trigger`
+- [x] `POST /profile/tokens`
+- [x] `POST /projects`
+- [x] `POST /projects/:id/deploy`
+- [x] `POST /projects/:id/domains`
+- [x] `POST /projects/:id/environments`
+- [x] `POST /projects/:projectId/members`
+- [x] `POST /projects/:projectId/tokens`
+- [x] `POST /projects/:projectId/webhooks`
+- [x] `POST /s3-destinations`
+- [x] `POST /services/:serviceId/deploy`
+- [x] `POST /services/:serviceId/serverless/code`
+- [x] `POST /services/:serviceId/variables`
+- [x] `POST /settings/git_apps/github/manifest-callback`
+- [x] `POST /settings/notifications/test`
+- [x] `POST /settings/updates/check`
+- [x] `POST /settings/updates/deploy`
+- [x] `POST /storage`
+- [x] `POST /storage/:id/start`
+- [x] `POST /storage/:id/stop`
+- [x] `POST /system/export`
+- [x] `POST /system/import`
+- [x] `POST /system/maintenance/cleanup`
+- [x] `POST /system/migration/railway/import`
+- [x] `POST /system/restart`
+- [x] `POST /system/setup`
+- [x] `POST /users/invite`
+- [x] `PUT /ai`
+- [x] `PUT /apps/:id`
+- [x] `PUT /databases/:id`
+- [x] `PUT /databases/:id/data/:table`
+- [x] `PUT /dns/:id`
+- [x] `PUT /notifications`
+- [x] `PUT /profile`
+- [x] `PUT /profile/password`
+- [x] `PUT /projects/:id/env`
+- [x] `PUT /services/:serviceId/variables/:id`
+- [x] `PUT /settings`
+- [x] `PUT /settings/git_apps/bitbucket`
+- [x] `PUT /settings/git_apps/github`
+- [x] `PUT /settings/git_apps/gitlab`
+- [x] `PUT /settings/oauth/providers`
+
+### Unwired Endpoints
+
+- [ ] `GET /auth/me`
+- [ ] `GET /auth/oauth/:provider/callback`
+- [x] `GET /git/repos`
+- [ ] `GET /mcp/sse`
+- [ ] `GET /oauth/vercel/callback`
+- [x] `GET /one-click`
+- [x] `GET /services/:serviceId/logs/historical`
+- [x] `GET /services/:serviceId/metrics/historical`
+- [x] `GET /system/migration/railway/projects`
+- [ ] `GET /ws/services/:id/terminal`
+- [ ] `GET /ws/terminal/:id`
+- [x] `POST /compose/deploy`
+- [x] `POST /deploy/archive`
+- [ ] `POST /mcp/messages`
+- [x] `POST /one-click/deploy`
+- [ ] `POST /webhooks/git/:projectId`
+- [ ] `POST /webhooks/git/services/:serviceId`
+- [ ] `POST /webhooks/github/services/:serviceId`
