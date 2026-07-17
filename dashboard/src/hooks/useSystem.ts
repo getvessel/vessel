@@ -11,9 +11,8 @@ export const useGetSystemStats = () => {
 };
 
 export const useExportSystem = () => {
-  return useQuery({
-    queryKey: ['system', 'export'],
-    queryFn: () => systemService.exportSystem(),
+  return useMutation({
+    mutationFn: (passphrase: string) => systemService.exportSystem(passphrase),
   });
 };
 

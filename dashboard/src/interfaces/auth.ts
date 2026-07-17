@@ -19,6 +19,23 @@ export interface RegisterCredentials extends AuthCredentials {
   name: string;
 }
 
+export interface SetupEnv {
+  jwtSecret: string;
+  dataDir: string;
+  dashboardUrl: string;
+  port: number;
+}
+
+export interface SetupCredentials extends RegisterCredentials {
+  env: SetupEnv;
+  defaultWildcardDomain?: string;
+  s3Skip?: boolean;
+  s3AccountId?: string;
+  s3Bucket?: string;
+  s3AccessKeyId?: string;
+  s3SecretAccessKey?: string;
+}
+
 export interface Setup2FAResponse {
   secret: string;
   qrCodeUrl: string;

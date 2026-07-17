@@ -131,6 +131,53 @@ export const apiClient = {
     return response.blob();
   },
 
+  async postBlob(endpoint: string, body?: unknown, options?: RequestInit): Promise<Blob> {
+    const url = `${API_BASE_URL}${endpoint}`;
+    const headers = new Headers(options?.headers || {});
+    if (!headers.has('Content-Type') && !(body instanceof FormData)) {
+      headers.set('Content-Type', 'application/json');
+    }
+    const token = authStore.state.token;
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    const csrfToken = getCookie('csrf_token');
+    if (csrfToken) {
+      headers.set('X-CSRF-Token', csrfToken);
+    }
+    const response = await fetch(url, {
+      ...options,
+      method: 'POST',
+      body: body instanceof FormData ? body : JSON.stringify(body),
+      headers,
+      credentials: 'include',
+    });
+
+    if (response.status === 401) {
+      authActions.logout();
+      if (
+        !window.location.pathname.startsWith('/signin') &&
+        !window.location.pathname.startsWith('/signup') &&
+        !window.location.pathname.startsWith('/forgot-password') &&
+        !window.location.pathname.startsWith('/reset-password') &&
+        !window.location.pathname.startsWith('/setup')
+      ) {
+        window.location.href = '/signin';
+      }
+      throw new ApiError(401, 'Session expired. Please log in again.');
+    }
+
+    if (!response.ok) {
+      const isJson = response.headers.get('content-type')?.includes('application/json');
+      const data = isJson ? await response.json() : await response.text();
+      const errorMessage =
+        data?.message || data?.error || response.statusText || 'An error occurred';
+      toast.error(errorMessage);
+      throw new ApiError(response.status, errorMessage, data);
+    }
+    return response.blob();
+  },
+
   post<T>(endpoint: string, body?: unknown, options?: RequestInit) {
     return this.fetch<T>(endpoint, {
       ...options,

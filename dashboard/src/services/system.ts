@@ -12,9 +12,9 @@ export const systemService = {
     }
   },
 
-  exportSystem: async (): Promise<Blob> => {
+  exportSystem: async (passphrase: string): Promise<Blob> => {
     try {
-      return await apiClient.getBlob('/system/export');
+      return await apiClient.postBlob('/system/export', { passphrase });
     } catch (error) {
       throw handleApiError(error);
     }

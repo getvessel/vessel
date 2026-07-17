@@ -1,5 +1,6 @@
 import { Check, CloudUpload, Database } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
 import {
   Dialog,
@@ -10,6 +11,7 @@ import {
 } from '#/components/ui/dialog';
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
+import { useImportSystem } from '#/hooks/useSystem';
 
 export const ImportModal = ({
   open,
@@ -19,6 +21,27 @@ export const ImportModal = ({
   onOpenChange: (open: boolean) => void;
 }) => {
   const [fileName, setFileName] = useState<string>('');
+  const [passphrase, setPassphrase] = useState<string>('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const { mutateAsync: importSystem, isPending } = useImportSystem();
+
+  const handleImport = async () => {
+    if (!selectedFile || !passphrase) return;
+    try {
+      const formData = new FormData();
+      formData.append('bundle', selectedFile);
+      formData.append('passphrase', passphrase);
+      await importSystem(formData);
+      toast.success('Successfully imported Vessl bundle!');
+      onOpenChange(false);
+      setFileName('');
+      setPassphrase('');
+      setSelectedFile(null);
+    } catch (_error) {
+      toast.error('Failed to import bundle.');
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -72,8 +95,13 @@ export const ImportModal = ({
                 accept=".vessl"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) setFileName(file.name);
-                  else setFileName('');
+                  if (file) {
+                    setFileName(file.name);
+                    setSelectedFile(file);
+                  } else {
+                    setFileName('');
+                    setSelectedFile(null);
+                  }
                 }}
                 className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
               />
@@ -89,6 +117,8 @@ export const ImportModal = ({
             <Input
               id="passphrase"
               type="password"
+              value={passphrase}
+              onChange={(e) => setPassphrase(e.target.value)}
               className="h-12 rounded-xl border-border/50 bg-background/80 px-4 text-sm transition-all duration-300 focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -102,6 +132,8 @@ export const ImportModal = ({
             variant="ghost"
             onClick={() => {
               setFileName('');
+              setPassphrase('');
+              setSelectedFile(null);
               onOpenChange(false);
             }}
             className="flex h-11 items-center gap-2 rounded-xl px-6 font-semibold text-muted-foreground text-xs uppercase tracking-widest hover:text-foreground"
@@ -110,9 +142,11 @@ export const ImportModal = ({
           </Button>
           <Button
             variant="outline"
+            onClick={handleImport}
+            disabled={isPending || !selectedFile || !passphrase}
             className="flex h-11 items-center gap-2 rounded-xl border-primary/20 bg-primary/10 px-6 font-semibold text-primary text-xs uppercase tracking-widest hover:bg-primary/20 hover:text-primary"
           >
-            <Check className="h-4 w-4" /> IMPORT
+            <Check className="h-4 w-4" /> {isPending ? 'IMPORTING...' : 'IMPORT'}
           </Button>
         </div>
       </DialogContent>

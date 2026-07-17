@@ -8,6 +8,7 @@ import type {
   RegisterResponse,
   ResetPasswordResponse,
   Setup2FAResponseType,
+  SetupCredentials,
   SetupResponse,
   Verify2FARequest,
   Verify2FAResponse,
@@ -34,7 +35,7 @@ export const authService = {
     }
   },
 
-  setup: async (details: RegisterCredentials): Promise<AuthResponse> => {
+  setup: async (details: SetupCredentials): Promise<AuthResponse> => {
     try {
       const response = await apiClient.post<SetupResponse>('/system/setup', details);
       return response.data;
