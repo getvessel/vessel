@@ -538,6 +538,95 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/backups/{id}/records": {
+            "get": {
+                "description": "ListRecords endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backups"
+                ],
+                "summary": "ListRecords endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/backups/{id}/records/{recordId}": {
+            "delete": {
+                "description": "Delete Backup Record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backups"
+                ],
+                "summary": "Delete Backup Record",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Backup ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Record ID",
+                        "name": "recordId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/backups/{id}/records/{recordId}/download": {
+            "get": {
+                "description": "Download Backup Record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "Backups"
+                ],
+                "summary": "Download Backup Record",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Backup ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Record ID",
+                        "name": "recordId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/backups/{id}/restore": {
             "post": {
                 "description": "Restore endpoint",
@@ -1612,22 +1701,6 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/oauth/vercel/callback": {
-            "get": {
-                "description": "Callback endpoint",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Callback endpoint",
-                "responses": {}
-            }
-        },
         "/one-click": {
             "get": {
                 "description": "Returns available one-click deployable applications",
@@ -2378,95 +2451,6 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/projects/{projectId}/webhooks": {
-            "get": {
-                "description": "ListWebhooks endpoint",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Projects"
-                ],
-                "summary": "ListWebhooks endpoint",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "projectId",
-                        "name": "projectId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {}
-            },
-            "post": {
-                "description": "CreateWebhook endpoint",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Projects"
-                ],
-                "summary": "CreateWebhook endpoint",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "projectId",
-                        "name": "projectId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Payload",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Webhook"
-                        }
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/projects/{projectId}/webhooks/{id}": {
-            "delete": {
-                "description": "DeleteWebhook endpoint",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Projects"
-                ],
-                "summary": "DeleteWebhook endpoint",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "projectId",
-                        "name": "projectId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {}
-            }
-        },
         "/s3-destinations": {
             "get": {
                 "description": "ListS3Destinations endpoint",
@@ -2480,6 +2464,31 @@ const docTemplate = `{
                     "Backups"
                 ],
                 "summary": "ListS3Destinations endpoint",
+                "responses": {}
+            },
+            "post": {
+                "description": "CreateS3Destination endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backups"
+                ],
+                "summary": "CreateS3Destination endpoint",
+                "parameters": [
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.S3Destination"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -2839,6 +2848,95 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/services/{serviceId}/webhooks": {
+            "get": {
+                "description": "ListWebhooks endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "ListWebhooks endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "serviceId",
+                        "name": "serviceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "description": "CreateWebhook endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "CreateWebhook endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "serviceId",
+                        "name": "serviceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Webhook"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/services/{serviceId}/webhooks/{id}": {
+            "delete": {
+                "description": "DeleteWebhook endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "DeleteWebhook endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "serviceId",
+                        "name": "serviceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/settings": {
             "put": {
                 "description": "UpdateSettings endpoint",
@@ -3103,71 +3201,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/system/migration/railway/import": {
-            "post": {
-                "description": "Imports a project from Railway",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System"
-                ],
-                "summary": "Import Railway Project",
-                "parameters": [
-                    {
-                        "description": "Import request",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.RailwayImportRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/system/migration/railway/projects": {
-            "get": {
-                "description": "Fetches projects from Railway API",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System"
-                ],
-                "summary": "List Railway Projects",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Railway Personal API Token",
-                        "name": "token",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
         "/system/public": {
             "get": {
                 "description": "Get public settings for the frontend (e.g., if registration is enabled)",
@@ -3306,47 +3339,6 @@ const docTemplate = `{
                         "description": "Items per page",
                         "name": "limit",
                         "in": "query"
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/vercel/projects": {
-            "get": {
-                "description": "ListProjects endpoint",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Projects"
-                ],
-                "summary": "ListProjects endpoint",
-                "responses": {}
-            }
-        },
-        "/vercel/projects/{id}/env": {
-            "get": {
-                "description": "GetProjectEnv endpoint",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Projects"
-                ],
-                "summary": "GetProjectEnv endpoint",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {}
@@ -3749,14 +3741,35 @@ const docTemplate = `{
         "models.BackupConfig": {
             "type": "object",
             "properties": {
+                "backupEnabled": {
+                    "type": "boolean"
+                },
                 "createdAt": {
                     "type": "string"
                 },
                 "databaseId": {
                     "type": "string"
                 },
+                "dbPassword": {
+                    "type": "string"
+                },
+                "dbUser": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "disableLocal": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "string"
+                },
+                "maxBackups": {
+                    "type": "integer"
+                },
+                "maxStorageGb": {
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -3770,11 +3783,20 @@ const docTemplate = `{
                 "s3DestinationId": {
                     "type": "string"
                 },
+                "s3Enabled": {
+                    "type": "boolean"
+                },
                 "schedule": {
                     "type": "string"
                 },
                 "status": {
                     "$ref": "#/definitions/models.BackupConfigStatus"
+                },
+                "timeout": {
+                    "type": "integer"
+                },
+                "timezone": {
+                    "type": "string"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -4270,26 +4292,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.RailwayImportRequest": {
-            "type": "object",
-            "properties": {
-                "excludeRailwayVars": {
-                    "type": "boolean"
-                },
-                "importData": {
-                    "type": "boolean"
-                },
-                "projectId": {
-                    "type": "string"
-                },
-                "recreateDatabases": {
-                    "type": "boolean"
-                },
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
         "models.RuntimeMode": {
             "type": "string",
             "enum": [
@@ -4579,7 +4581,7 @@ const docTemplate = `{
                 "includePrEnvironments": {
                     "type": "boolean"
                 },
-                "projectId": {
+                "serviceId": {
                     "type": "string"
                 },
                 "updatedAt": {

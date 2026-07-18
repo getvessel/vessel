@@ -29,8 +29,8 @@ func NewProjectSettingsService(r repositories.ProjectSettingsRepository, ur repo
 }
 
 func (s *ProjectSettingsService) CreateWebhook(ctx context.Context, w *models.Webhook) (*models.Webhook, error) {
-	if w == nil || w.ProjectID == "" || w.URL == "" {
-		return nil, errors.New("valid webhook with projectId and url required")
+	if w == nil || w.ServiceID == "" || w.URL == "" {
+		return nil, errors.New("valid webhook with serviceId and url required")
 	}
 	if w.ID == "" {
 		w.ID = uuid.New().String()
@@ -42,18 +42,18 @@ func (s *ProjectSettingsService) CreateWebhook(ctx context.Context, w *models.We
 	return w, nil
 }
 
-func (s *ProjectSettingsService) ListWebhooks(ctx context.Context, projectID string) ([]*models.Webhook, error) {
-	if projectID == "" {
-		return nil, errors.New("projectId required")
+func (s *ProjectSettingsService) ListWebhooks(ctx context.Context, serviceID string) ([]*models.Webhook, error) {
+	if serviceID == "" {
+		return nil, errors.New("serviceId required")
 	}
-	return s.repo.ListWebhooksByProject(ctx, projectID)
+	return s.repo.ListWebhooksByService(ctx, serviceID)
 }
 
-func (s *ProjectSettingsService) DeleteWebhook(ctx context.Context, id, projectID string) error {
-	if id == "" || projectID == "" {
-		return errors.New("id and projectId required")
+func (s *ProjectSettingsService) DeleteWebhook(ctx context.Context, id, serviceID string) error {
+	if id == "" || serviceID == "" {
+		return errors.New("id and serviceId required")
 	}
-	return s.repo.DeleteWebhook(ctx, id, projectID)
+	return s.repo.DeleteWebhook(ctx, id, serviceID)
 }
 
 func (s *ProjectSettingsService) CreateToken(ctx context.Context, t *models.ProjectToken) (*models.ProjectToken, string, error) {

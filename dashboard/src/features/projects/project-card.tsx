@@ -63,7 +63,7 @@ export const ProjectCard = ({ project }: { project: CanvasSummary }) => {
           </div>
         </div>
 
-        <div className="mt-6 flex-1 border-border/50 border-t pt-6">
+        <div className="mt-4 flex-1 border-border/50 border-t pt-4">
           {project.totalServices === 0 ? (
             <div className="flex h-[72px] items-center justify-center rounded-xl border border-border/50 border-dashed bg-background/30">
               <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">

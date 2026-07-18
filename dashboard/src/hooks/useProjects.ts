@@ -63,6 +63,7 @@ export const useSetVars = () => {
       projectsService.setVars(payload.id, payload.payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };

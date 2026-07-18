@@ -180,12 +180,26 @@ definitions:
     - AppServiceStatusError
   models.BackupConfig:
     properties:
+      backupEnabled:
+        type: boolean
       createdAt:
         type: string
       databaseId:
         type: string
+      dbPassword:
+        type: string
+      dbUser:
+        type: string
+      description:
+        type: string
+      disableLocal:
+        type: boolean
       id:
         type: string
+      maxBackups:
+        type: integer
+      maxStorageGb:
+        type: integer
       name:
         type: string
       projectId:
@@ -194,10 +208,16 @@ definitions:
         type: integer
       s3DestinationId:
         type: string
+      s3Enabled:
+        type: boolean
       schedule:
         type: string
       status:
         $ref: '#/definitions/models.BackupConfigStatus'
+      timeout:
+        type: integer
+      timezone:
+        type: string
       updatedAt:
         type: string
     type: object
@@ -538,19 +558,6 @@ definitions:
       updatedAt:
         type: string
     type: object
-  models.RailwayImportRequest:
-    properties:
-      excludeRailwayVars:
-        type: boolean
-      importData:
-        type: boolean
-      projectId:
-        type: string
-      recreateDatabases:
-        type: boolean
-      token:
-        type: string
-    type: object
   models.RuntimeMode:
     enum:
     - web
@@ -745,7 +752,7 @@ definitions:
         type: string
       includePrEnvironments:
         type: boolean
-      projectId:
+      serviceId:
         type: string
       updatedAt:
         type: string
@@ -1113,6 +1120,67 @@ paths:
       - application/json
       responses: {}
       summary: Get Backup
+      tags:
+      - Backups
+  /backups/{id}/records:
+    get:
+      consumes:
+      - application/json
+      description: ListRecords endpoint
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: ListRecords endpoint
+      tags:
+      - Backups
+  /backups/{id}/records/{recordId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Backup Record
+      parameters:
+      - description: Backup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Record ID
+        in: path
+        name: recordId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Delete Backup Record
+      tags:
+      - Backups
+  /backups/{id}/records/{recordId}/download:
+    get:
+      consumes:
+      - application/json
+      description: Download Backup Record
+      parameters:
+      - description: Backup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Record ID
+        in: path
+        name: recordId
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses: {}
+      summary: Download Backup Record
       tags:
       - Backups
   /backups/{id}/restore:
@@ -1848,17 +1916,6 @@ paths:
       summary: Run endpoint
       tags:
       - Jobs
-  /oauth/vercel/callback:
-    get:
-      consumes:
-      - application/json
-      description: Callback endpoint
-      produces:
-      - application/json
-      responses: {}
-      summary: Callback endpoint
-      tags:
-      - Auth
   /one-click:
     get:
       description: Returns available one-click deployable applications
@@ -2373,67 +2430,6 @@ paths:
       summary: DeleteToken endpoint
       tags:
       - Projects
-  /projects/{projectId}/webhooks:
-    get:
-      consumes:
-      - application/json
-      description: ListWebhooks endpoint
-      parameters:
-      - description: projectId
-        in: path
-        name: projectId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: ListWebhooks endpoint
-      tags:
-      - Projects
-    post:
-      consumes:
-      - application/json
-      description: CreateWebhook endpoint
-      parameters:
-      - description: projectId
-        in: path
-        name: projectId
-        required: true
-        type: string
-      - description: Payload
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/models.Webhook'
-      produces:
-      - application/json
-      responses: {}
-      summary: CreateWebhook endpoint
-      tags:
-      - Projects
-  /projects/{projectId}/webhooks/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: DeleteWebhook endpoint
-      parameters:
-      - description: projectId
-        in: path
-        name: projectId
-        required: true
-        type: string
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: DeleteWebhook endpoint
-      tags:
-      - Projects
   /s3-destinations:
     get:
       consumes:
@@ -2443,6 +2439,23 @@ paths:
       - application/json
       responses: {}
       summary: ListS3Destinations endpoint
+      tags:
+      - Backups
+    post:
+      consumes:
+      - application/json
+      description: CreateS3Destination endpoint
+      parameters:
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.S3Destination'
+      produces:
+      - application/json
+      responses: {}
+      summary: CreateS3Destination endpoint
       tags:
       - Backups
   /s3-destinations/{id}:
@@ -2688,6 +2701,67 @@ paths:
       summary: Update Service Variable
       tags:
       - AppServices
+  /services/{serviceId}/webhooks:
+    get:
+      consumes:
+      - application/json
+      description: ListWebhooks endpoint
+      parameters:
+      - description: serviceId
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: ListWebhooks endpoint
+      tags:
+      - Services
+    post:
+      consumes:
+      - application/json
+      description: CreateWebhook endpoint
+      parameters:
+      - description: serviceId
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      - description: Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Webhook'
+      produces:
+      - application/json
+      responses: {}
+      summary: CreateWebhook endpoint
+      tags:
+      - Services
+  /services/{serviceId}/webhooks/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: DeleteWebhook endpoint
+      parameters:
+      - description: serviceId
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: DeleteWebhook endpoint
+      tags:
+      - Services
   /settings:
     put:
       consumes:
@@ -2868,49 +2942,6 @@ paths:
       summary: Run system cleanup
       tags:
       - System
-  /system/migration/railway/import:
-    post:
-      consumes:
-      - application/json
-      description: Imports a project from Railway
-      parameters:
-      - description: Import request
-        in: body
-        name: req
-        required: true
-        schema:
-          $ref: '#/definitions/models.RailwayImportRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Import Railway Project
-      tags:
-      - System
-  /system/migration/railway/projects:
-    get:
-      description: Fetches projects from Railway API
-      parameters:
-      - description: Railway Personal API Token
-        in: query
-        name: token
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: List Railway Projects
-      tags:
-      - System
   /system/public:
     get:
       consumes:
@@ -3008,34 +3039,6 @@ paths:
       summary: ListUsers endpoint
       tags:
       - Users
-  /vercel/projects:
-    get:
-      consumes:
-      - application/json
-      description: ListProjects endpoint
-      produces:
-      - application/json
-      responses: {}
-      summary: ListProjects endpoint
-      tags:
-      - Projects
-  /vercel/projects/{id}/env:
-    get:
-      consumes:
-      - application/json
-      description: GetProjectEnv endpoint
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: GetProjectEnv endpoint
-      tags:
-      - Projects
   /webhooks/git/{projectId}:
     post:
       consumes:

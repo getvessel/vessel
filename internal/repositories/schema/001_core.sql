@@ -197,19 +197,14 @@ CREATE TABLE IF NOT EXISTS service_vars (
 			UNIQUE(service_id, key)
 		);
 
-CREATE TABLE IF NOT EXISTS project_webhooks (
+CREATE TABLE IF NOT EXISTS service_webhooks (
 			id TEXT PRIMARY KEY,
-			project_id TEXT NOT NULL,
-			provider TEXT DEFAULT 'github',
-			webhook_secret TEXT,
-			webhook_url TEXT,
-			auto_deploy BOOLEAN DEFAULT 1,
-			branch TEXT DEFAULT 'main',
-			created_at TEXT,
-			updated_at TEXT,
-			url TEXT DEFAULT '',
+			service_id TEXT NOT NULL,
+			url TEXT NOT NULL,
 			event_types TEXT DEFAULT '',
-			include_pr_environments BOOLEAN DEFAULT FALSE
+			include_pr_environments BOOLEAN DEFAULT FALSE,
+			created_at DATETIME,
+			updated_at DATETIME
 		);
 
 CREATE TABLE IF NOT EXISTS serverless_functions_code (

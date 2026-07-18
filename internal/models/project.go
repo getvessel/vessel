@@ -102,7 +102,7 @@ type (
 	VarsRequest       map[string]string
 	Webhook           struct {
 		ID                    string    `json:"id" db:"id"`
-		ProjectID             string    `json:"projectId" db:"project_id"`
+		ServiceID             string    `json:"serviceId" db:"service_id"`
 		URL                   string    `json:"url" db:"url"`
 		EventTypes            []string  `json:"eventTypes" db:"-"`
 		IncludePREnvironments bool      `json:"includePrEnvironments" db:"include_pr_environments"`

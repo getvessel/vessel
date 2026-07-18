@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { projectSettingsService } from '#/services/project-settings';
 
-export const useListWebhooks = (projectId: string) => {
+export const useListWebhooks = (serviceId: string) => {
   return useQuery({
-    queryKey: ['projectSettings', 'listWebhooks', projectId].filter(Boolean),
-    queryFn: () => projectSettingsService.listWebhooks(projectId),
+    queryKey: ['serviceSettings', 'listWebhooks', serviceId].filter(Boolean),
+    queryFn: () => projectSettingsService.listWebhooks(serviceId),
   });
 };
 
@@ -12,11 +12,11 @@ export const useCreateWebhook = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: {
-      projectId: string;
+      serviceId: string;
       payload: Parameters<typeof projectSettingsService.createWebhook>[1];
-    }) => projectSettingsService.createWebhook(payload.projectId, payload.payload),
+    }) => projectSettingsService.createWebhook(payload.serviceId, payload.payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projectSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['serviceSettings'] });
     },
   });
 };
@@ -24,10 +24,10 @@ export const useCreateWebhook = () => {
 export const useDeleteWebhook = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { projectId: string; id: string }) =>
-      projectSettingsService.deleteWebhook(payload.projectId, payload.id),
+    mutationFn: (payload: { serviceId: string; id: string }) =>
+      projectSettingsService.deleteWebhook(payload.serviceId, payload.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projectSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['serviceSettings'] });
     },
   });
 };

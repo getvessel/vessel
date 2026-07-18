@@ -21,17 +21,17 @@ func NewProjectSettingsHandler(s *services.ProjectSettingsService) *ProjectSetti
 
 // @Summary ListWebhooks endpoint
 // @Description ListWebhooks endpoint
-// @Tags Projects
+// @Tags Services
 // @Accept json
 // @Produce json
-// @Param projectId path string true "projectId"
-// @Router /projects/{projectId}/webhooks [get]
+// @Param serviceId path string true "serviceId"
+// @Router /services/{serviceId}/webhooks [get]
 func (h *ProjectSettingsHandler) ListWebhooks(c echo.Context) error {
-	projectID := c.Param("projectId")
-	if projectID == "" {
-		return utils.Error(c, http.StatusBadRequest, "missing projectId")
+	serviceID := c.Param("serviceId")
+	if serviceID == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing serviceId")
 	}
-	list, err := h.settingsService.ListWebhooks(c.Request().Context(), projectID)
+	list, err := h.settingsService.ListWebhooks(c.Request().Context(), serviceID)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
@@ -40,22 +40,22 @@ func (h *ProjectSettingsHandler) ListWebhooks(c echo.Context) error {
 
 // @Summary CreateWebhook endpoint
 // @Description CreateWebhook endpoint
-// @Tags Projects
+// @Tags Services
 // @Accept json
 // @Produce json
-// @Param projectId path string true "projectId"
+// @Param serviceId path string true "serviceId"
 // @Param request body models.Webhook true "Payload"
-// @Router /projects/{projectId}/webhooks [post]
+// @Router /services/{serviceId}/webhooks [post]
 func (h *ProjectSettingsHandler) CreateWebhook(c echo.Context) error {
-	projectID := c.Param("projectId")
-	if projectID == "" {
-		return utils.Error(c, http.StatusBadRequest, "missing projectId")
+	serviceID := c.Param("serviceId")
+	if serviceID == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing serviceId")
 	}
 	var req models.Webhook
 	if err := c.Bind(&req); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid payload")
 	}
-	req.ProjectID = projectID
+	req.ServiceID = serviceID
 	created, err := h.settingsService.CreateWebhook(c.Request().Context(), &req)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
@@ -65,19 +65,19 @@ func (h *ProjectSettingsHandler) CreateWebhook(c echo.Context) error {
 
 // @Summary DeleteWebhook endpoint
 // @Description DeleteWebhook endpoint
-// @Tags Projects
+// @Tags Services
 // @Accept json
 // @Produce json
-// @Param projectId path string true "projectId"
+// @Param serviceId path string true "serviceId"
 // @Param id path string true "id"
-// @Router /projects/{projectId}/webhooks/{id} [delete]
+// @Router /services/{serviceId}/webhooks/{id} [delete]
 func (h *ProjectSettingsHandler) DeleteWebhook(c echo.Context) error {
-	projectID := c.Param("projectId")
+	serviceID := c.Param("serviceId")
 	id := c.Param("id")
-	if projectID == "" || id == "" {
-		return utils.Error(c, http.StatusBadRequest, "missing projectId or id")
+	if serviceID == "" || id == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing serviceId or id")
 	}
-	if err := h.settingsService.DeleteWebhook(c.Request().Context(), id, projectID); err != nil {
+	if err := h.settingsService.DeleteWebhook(c.Request().Context(), id, serviceID); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)
