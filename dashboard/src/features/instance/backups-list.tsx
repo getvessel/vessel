@@ -161,7 +161,7 @@ export function BackupsList() {
 
       <Section icon={<Database className="h-4 w-4" />} title="Database Configuration">
         <Row label="UUID" description="The unique identifier for this backup configuration.">
-          <Input disabled value={config?.id || 'Pending...'} />
+          <Input disabled value={config?.id || 'Not configured yet (Save to generate)'} />
         </Row>
         <Row label="Name" description="A friendly name for this configuration.">
           <Input value={name} onChange={(e) => setName(e.target.value)} />
