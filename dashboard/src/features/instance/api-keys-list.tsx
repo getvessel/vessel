@@ -21,6 +21,7 @@ export function ApiKeysList() {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isNewKeyOpen, setIsNewKeyOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [newKeyPlain, setNewKeyPlain] = useState('');
   const [copied, setCopied] = useState(false);
 
@@ -76,12 +77,14 @@ export function ApiKeysList() {
     );
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = () => {
+    if (!deleteId) return;
     deleteToken.mutate(
-      { id },
+      { id: deleteId },
       {
         onSuccess: () => {
           toast.success('API key deleted');
+          setDeleteId(null);
         },
         onError: (err) => {
           toast.error(err.message || 'Failed to delete API key');
@@ -140,8 +143,7 @@ export function ApiKeysList() {
                 </div>
                 <Button
                   variant="outline"
-                  onClick={() => handleDelete(token.id)}
-                  disabled={deleteToken.isPending}
+                  onClick={() => setDeleteId(token.id)}
                   className="h-10 w-10 border-border/50 bg-transparent p-0 text-muted-foreground transition-colors hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -363,7 +365,7 @@ export function ApiKeysList() {
                 disabled={createToken.isPending}
                 className="h-12 rounded-xl border-primary/20 bg-primary/10 px-8 font-semibold text-primary text-xs uppercase tracking-widest hover:bg-primary/20 hover:text-primary"
               >
-                <Plus className="mr-2 h-4 w-4" />{' '}
+                <Check className="mr-2 h-4 w-4" />{' '}
                 {createToken.isPending ? 'CREATING...' : 'CREATE KEY'}
               </Button>
             </div>
@@ -443,6 +445,46 @@ export function ApiKeysList() {
                 </Button>
               </div>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-md [&>button]:hidden">
+          <div className="flex flex-col p-8 pb-6">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-destructive/20 bg-destructive/10">
+                  <Trash2 className="h-5 w-5 text-destructive" />
+                </div>
+                <div className="flex flex-col">
+                  <DialogTitle className="font-bold text-2xl text-foreground tracking-tight">
+                    Delete API Key
+                  </DialogTitle>
+                </div>
+              </div>
+            </div>
+            <p className="mt-4 text-muted-foreground text-sm">
+              Are you sure you want to delete this API key? Any applications or scripts using it
+              will immediately lose access. This action cannot be undone.
+            </p>
+          </div>
+          <div className="flex justify-end gap-3 p-8 pt-6">
+            <Button
+              variant="ghost"
+              onClick={() => setDeleteId(null)}
+              className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteToken.isPending}
+              className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {deleteToken.isPending ? 'Deleting...' : 'Delete Key'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

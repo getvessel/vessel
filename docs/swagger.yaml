@@ -107,16 +107,6 @@ definitions:
         type: string
       password:
         type: string
-      s3AccessKeyId:
-        type: string
-      s3AccountId:
-        type: string
-      s3Bucket:
-        type: string
-      s3SecretAccessKey:
-        type: string
-      s3Skip:
-        type: boolean
     type: object
   models.AddMemberRequest:
     properties:
@@ -208,8 +198,6 @@ definitions:
         type: string
       status:
         $ref: '#/definitions/models.BackupConfigStatus'
-      storageId:
-        type: string
       updatedAt:
         type: string
     type: object
@@ -579,6 +567,8 @@ definitions:
         type: string
       createdAt:
         type: string
+      description:
+        type: string
       endpoint:
         type: string
       id:
@@ -586,6 +576,8 @@ definitions:
       name:
         type: string
       projectId:
+        type: string
+      provider:
         type: string
       region:
         type: string
@@ -671,61 +663,6 @@ definitions:
       updatedAt:
         type: string
     type: object
-  models.Storage:
-    properties:
-      accessKey:
-        type: string
-      apiPort:
-        type: integer
-      bucketName:
-        type: string
-      consolePort:
-        type: integer
-      containerId:
-        type: string
-      createdAt:
-        type: string
-      environmentId:
-        type: string
-      externalDns:
-        type: string
-      id:
-        type: string
-      internalDns:
-        type: string
-      name:
-        type: string
-      projectId:
-        type: string
-      secretKey:
-        type: string
-      status:
-        $ref: '#/definitions/models.StorageStatus'
-      type:
-        $ref: '#/definitions/models.StorageType'
-      updatedAt:
-        type: string
-      volumePath:
-        type: string
-    type: object
-  models.StorageStatus:
-    enum:
-    - running
-    - stopped
-    - error
-    type: string
-    x-enum-varnames:
-    - StorageStatusRunning
-    - StorageStatusStopped
-    - StorageStatusError
-  models.StorageType:
-    enum:
-    - minio
-    - s3
-    type: string
-    x-enum-varnames:
-    - StorageTypeMinIO
-    - StorageTypeS3
   models.SystemStats:
     properties:
       cpu:
@@ -2769,23 +2706,6 @@ paths:
       summary: UpdateSettings endpoint
       tags:
       - Settings
-  /settings/git_apps/bitbucket/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: DeleteBitbucketApp endpoint
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: DeleteBitbucketApp endpoint
-      tags:
-      - Settings
   /settings/git_apps/github/manifest-callback:
     post:
       consumes:
@@ -2861,75 +2781,6 @@ paths:
       summary: DeployUpdate endpoint
       tags:
       - Settings
-  /storage:
-    post:
-      consumes:
-      - application/json
-      description: CreateStorage endpoint
-      parameters:
-      - description: Payload
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/models.Storage'
-      produces:
-      - application/json
-      responses: {}
-      summary: CreateStorage endpoint
-      tags:
-      - Storage
-  /storage/{id}:
-    get:
-      consumes:
-      - application/json
-      description: GetStorage endpoint
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: GetStorage endpoint
-      tags:
-      - Storage
-  /storage/{id}/start:
-    post:
-      consumes:
-      - application/json
-      description: StartStorage endpoint
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: StartStorage endpoint
-      tags:
-      - Storage
-  /storage/{id}/stop:
-    post:
-      consumes:
-      - application/json
-      description: StopStorage endpoint
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses: {}
-      summary: StopStorage endpoint
-      tags:
-      - Storage
   /system/export:
     post:
       consumes:

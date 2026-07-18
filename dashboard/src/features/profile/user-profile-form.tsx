@@ -1,4 +1,4 @@
-import { Loader2, Mail, User } from 'lucide-react';
+import { Check, Loader2, Mail, User } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
@@ -68,13 +68,17 @@ export function ProfileNameForm() {
           />
         </div>
 
-        <div className="flex justify-end border-border/50 border-t pt-4">
+        <div className="flex justify-end">
           <Button
             type="submit"
             size="sm"
             disabled={isLoading || updateProfile.isPending || name === profile?.data?.name}
           >
-            {updateProfile.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {updateProfile.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Check className="mr-2 h-4 w-4" />
+            )}
             Save Name
           </Button>
         </div>
@@ -156,13 +160,17 @@ export function ProfileEmailForm() {
             />
           </div>
 
-          <div className="flex justify-end border-border/50 border-t pt-4">
+          <div className="flex justify-end">
             <Button
               type="submit"
               size="sm"
               disabled={isLoading || requestEmailChange.isPending || email === profile?.data?.email}
             >
-              {requestEmailChange.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {requestEmailChange.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="mr-2 h-4 w-4" />
+              )}
               Update Email
             </Button>
           </div>
@@ -190,14 +198,23 @@ export function ProfileEmailForm() {
             </InputOTP>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOtpOpen(false)}>
+            <Button
+              variant="ghost"
+              onClick={() => setOtpOpen(false)}
+              className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
+            >
               Cancel
             </Button>
             <Button
               onClick={handleVerify}
               disabled={otp.length !== 6 || verifyEmailChange.isPending}
+              className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
             >
-              {verifyEmailChange.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {verifyEmailChange.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="mr-2 h-4 w-4" />
+              )}
               Verify & Update
             </Button>
           </DialogFooter>
@@ -281,13 +298,17 @@ export function ProfilePasswordForm() {
           </div>
         </div>
 
-        <div className="flex justify-end border-border/50 border-t pt-4">
+        <div className="flex justify-end">
           <Button
             type="submit"
             size="sm"
             disabled={changePassword.isPending || !oldPassword || !newPassword}
           >
-            {changePassword.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {changePassword.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Check className="mr-2 h-4 w-4" />
+            )}
             Update Password
           </Button>
         </div>

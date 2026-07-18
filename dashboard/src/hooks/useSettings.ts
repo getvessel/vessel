@@ -75,20 +75,19 @@ export const useGetNotifications = () => {
   });
 };
 
-export const useGetGitApps = (provider: string) => {
+export const useGetGitApps = () => {
   return useQuery({
-    queryKey: ['settings', 'getGitApps', provider].filter(Boolean),
-    queryFn: () => settingsService.getGitApps(provider),
+    queryKey: ['settings', 'getGitApps', 'github'],
+    queryFn: () => settingsService.getGitApps(),
   });
 };
 
 export const useSaveGitApp = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ provider, payload }: { provider: string; payload: Record<string, unknown> }) =>
-      settingsService.saveGitApp(provider, payload),
-    onSuccess: (_, { provider }) => {
-      queryClient.invalidateQueries({ queryKey: ['settings', 'getGitApps', provider] });
+    mutationFn: (payload: Record<string, unknown>) => settingsService.saveGitApp(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings', 'getGitApps', 'github'] });
     },
   });
 };
@@ -96,10 +95,9 @@ export const useSaveGitApp = () => {
 export const useDeleteGitApp = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ provider, id }: { provider: string; id: string }) =>
-      settingsService.deleteGitApp(provider, id),
-    onSuccess: (_, { provider }) => {
-      queryClient.invalidateQueries({ queryKey: ['settings', 'getGitApps', provider] });
+    mutationFn: (id: string) => settingsService.deleteGitApp(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings', 'getGitApps', 'github'] });
     },
   });
 };

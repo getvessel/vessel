@@ -81,8 +81,6 @@ func (a *engineAdapter) GetDatabase(id string) (*models.Database, error) {
 	return a.dbRepo.GetByID(context.Background(), id)
 }
 
-
-
 func (a *engineAdapter) ListJobs() ([]models.Job, error) {
 	return a.jobRepo.ListAll(context.Background())
 }

@@ -371,29 +371,7 @@ CREATE TABLE IF NOT EXISTS github_apps (
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);
 
-CREATE TABLE IF NOT EXISTS gitlab_apps (
-			id TEXT PRIMARY KEY,
-			name TEXT NOT NULL,
-			app_id TEXT NOT NULL,
-			app_secret TEXT NOT NULL,
-			webhook_secret TEXT NOT NULL,
-			api_url TEXT NOT NULL DEFAULT 'https://gitlab.com',
-			is_public BOOLEAN DEFAULT FALSE,
-			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);
 
-CREATE TABLE IF NOT EXISTS bitbucket_apps (
-			id TEXT PRIMARY KEY,
-			name TEXT NOT NULL,
-			owner TEXT NOT NULL,
-			client_id TEXT NOT NULL,
-			client_secret TEXT NOT NULL,
-			webhook_secret TEXT NOT NULL,
-			is_public BOOLEAN DEFAULT FALSE,
-			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-		);
 
 CREATE TABLE IF NOT EXISTS oauth_providers (
 			id TEXT PRIMARY KEY,

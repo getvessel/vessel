@@ -72,8 +72,6 @@ func buildDatabaseEnvVars(db *models.Database) map[string]string {
 	return vars
 }
 
-
-
 func (sl *ServiceLinker) GetLinkedEnvironmentVariables(ctx context.Context, projectID string) (map[string]string, error) {
 	envMap := make(map[string]string)
 	if projectID == "" {

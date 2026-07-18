@@ -173,16 +173,6 @@ func (s *Server) registerRoutes() {
 	apiGroup.PUT("/settings/git_apps/github", s.gitAppsHandler.SaveGithubApp, s.authGuard.RequireRole("admin"))
 	apiGroup.DELETE("/settings/git_apps/github/:id", s.gitAppsHandler.DeleteGithubApp, s.authGuard.RequireRole("admin"))
 
-	authGroup.GET("/settings/git_apps/gitlab", s.gitAppsHandler.ListGitlabApps)
-	authGroup.GET("/settings/git_apps/gitlab/:id", s.gitAppsHandler.GetGitlabApp)
-	apiGroup.PUT("/settings/git_apps/gitlab", s.gitAppsHandler.SaveGitlabApp, s.authGuard.RequireRole("admin"))
-	apiGroup.DELETE("/settings/git_apps/gitlab/:id", s.gitAppsHandler.DeleteGitlabApp, s.authGuard.RequireRole("admin"))
-
-	authGroup.GET("/settings/git_apps/bitbucket", s.gitAppsHandler.ListBitbucketApps)
-	authGroup.GET("/settings/git_apps/bitbucket/:id", s.gitAppsHandler.GetBitbucketApp)
-	apiGroup.PUT("/settings/git_apps/bitbucket", s.gitAppsHandler.SaveBitbucketApp, s.authGuard.RequireRole("admin"))
-	apiGroup.DELETE("/settings/git_apps/bitbucket/:id", s.gitAppsHandler.DeleteBitbucketApp, s.authGuard.RequireRole("admin"))
-
 	authGroup.GET("/oauth/vercel/callback", s.vercelHandler.Callback)
 	authGroup.GET("/vercel/projects", s.vercelHandler.ListProjects)
 	authGroup.GET("/vercel/projects/:id/env", s.vercelHandler.GetProjectEnv)

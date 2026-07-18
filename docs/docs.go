@@ -2866,31 +2866,6 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/settings/git_apps/bitbucket/{id}": {
-            "delete": {
-                "description": "DeleteBitbucketApp endpoint",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Settings"
-                ],
-                "summary": "DeleteBitbucketApp endpoint",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {}
-            }
-        },
         "/settings/git_apps/github/manifest-callback": {
             "post": {
                 "description": "ExchangeGithubManifestCode endpoint",
@@ -2999,108 +2974,6 @@ const docTemplate = `{
                     "Settings"
                 ],
                 "summary": "DeployUpdate endpoint",
-                "responses": {}
-            }
-        },
-        "/storage": {
-            "post": {
-                "description": "CreateStorage endpoint",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Storage"
-                ],
-                "summary": "CreateStorage endpoint",
-                "parameters": [
-                    {
-                        "description": "Payload",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Storage"
-                        }
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/storage/{id}": {
-            "get": {
-                "description": "GetStorage endpoint",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Storage"
-                ],
-                "summary": "GetStorage endpoint",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/storage/{id}/start": {
-            "post": {
-                "description": "StartStorage endpoint",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Storage"
-                ],
-                "summary": "StartStorage endpoint",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/storage/{id}/stop": {
-            "post": {
-                "description": "StopStorage endpoint",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Storage"
-                ],
-                "summary": "StopStorage endpoint",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {}
             }
         },
@@ -3768,21 +3641,6 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
-                },
-                "s3AccessKeyId": {
-                    "type": "string"
-                },
-                "s3AccountId": {
-                    "type": "string"
-                },
-                "s3Bucket": {
-                    "type": "string"
-                },
-                "s3SecretAccessKey": {
-                    "type": "string"
-                },
-                "s3Skip": {
-                    "type": "boolean"
                 }
             }
         },
@@ -3917,9 +3775,6 @@ const docTemplate = `{
                 },
                 "status": {
                     "$ref": "#/definitions/models.BackupConfigStatus"
-                },
-                "storageId": {
-                    "type": "string"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -4458,6 +4313,9 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "endpoint": {
                     "type": "string"
                 },
@@ -4468,6 +4326,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "projectId": {
+                    "type": "string"
+                },
+                "provider": {
                     "type": "string"
                 },
                 "region": {
@@ -4594,86 +4455,6 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
-        },
-        "models.Storage": {
-            "type": "object",
-            "properties": {
-                "accessKey": {
-                    "type": "string"
-                },
-                "apiPort": {
-                    "type": "integer"
-                },
-                "bucketName": {
-                    "type": "string"
-                },
-                "consolePort": {
-                    "type": "integer"
-                },
-                "containerId": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "environmentId": {
-                    "type": "string"
-                },
-                "externalDns": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "internalDns": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "projectId": {
-                    "type": "string"
-                },
-                "secretKey": {
-                    "type": "string"
-                },
-                "status": {
-                    "$ref": "#/definitions/models.StorageStatus"
-                },
-                "type": {
-                    "$ref": "#/definitions/models.StorageType"
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "volumePath": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.StorageStatus": {
-            "type": "string",
-            "enum": [
-                "running",
-                "stopped",
-                "error"
-            ],
-            "x-enum-varnames": [
-                "StorageStatusRunning",
-                "StorageStatusStopped",
-                "StorageStatusError"
-            ]
-        },
-        "models.StorageType": {
-            "type": "string",
-            "enum": [
-                "minio",
-                "s3"
-            ],
-            "x-enum-varnames": [
-                "StorageTypeMinIO",
-                "StorageTypeS3"
-            ]
         },
         "models.SystemStats": {
             "type": "object",

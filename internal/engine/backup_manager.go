@@ -214,7 +214,7 @@ func (bm *BackupManager) buildDumpCommand(cfg *models.BackupConfig) (string, []s
 		return containerName, []string{"sh", "-c", "echo 'Generic volume snapshot'"}, ".tar.gz", nil
 
 	}
-	
+
 	return "", nil, "", errors.New("backup config requires databaseId")
 }
 

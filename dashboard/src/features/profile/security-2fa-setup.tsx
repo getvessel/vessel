@@ -164,10 +164,18 @@ export function Security2FASetup() {
             </InputOTP>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setVerifyOpen(false)}>
+            <Button
+              variant="ghost"
+              onClick={() => setVerifyOpen(false)}
+              className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
+            >
               Cancel
             </Button>
-            <Button onClick={handleVerify} disabled={otp.length !== 6 || verify2FA.isPending}>
+            <Button
+              onClick={handleVerify}
+              disabled={otp.length !== 6 || verify2FA.isPending}
+              className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
+            >
               {verify2FA.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Verify & Enable
             </Button>
@@ -196,13 +204,18 @@ export function Security2FASetup() {
             </InputOTP>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDisableOpen(false)}>
+            <Button
+              variant="ghost"
+              onClick={() => setDisableOpen(false)}
+              className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
+            >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleDisable}
               disabled={otp.length !== 6 || disable2FA.isPending}
+              className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
             >
               {disable2FA.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Disable

@@ -122,8 +122,6 @@ export const ImportModal = ({
           </div>
         </div>
 
-        <div className="h-px w-full bg-border/50" />
-
         <div className="flex items-center justify-end gap-6 p-8 pt-6">
           <Button
             variant="ghost"
@@ -133,15 +131,14 @@ export const ImportModal = ({
               setSelectedFile(null);
               onOpenChange(false);
             }}
-            className="flex h-11 items-center gap-2 rounded-xl px-6 font-semibold text-muted-foreground text-xs uppercase tracking-widest hover:text-foreground"
+            className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
           >
-            CANCEL
+            Cancel
           </Button>
           <Button
-            variant="outline"
             onClick={handleImport}
             disabled={isPending || !selectedFile || !passphrase}
-            className="flex h-11 items-center gap-2 rounded-xl border-primary/20 bg-primary/10 px-6 font-semibold text-primary text-xs uppercase tracking-widest hover:bg-primary/20 hover:text-primary"
+            className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
           >
             <Check className="h-4 w-4" /> {isPending ? 'IMPORTING...' : 'IMPORT'}
           </Button>

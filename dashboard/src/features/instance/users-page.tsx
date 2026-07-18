@@ -1,3 +1,4 @@
+import { Check, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '#/components/ui/badge';
@@ -144,22 +145,21 @@ export const UsersPage = () => {
                 </div>
               </div>
 
-              <div className="h-px w-full bg-border/50" />
-
               <div className="flex items-center justify-end gap-6 p-8 pt-6">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setInviteOpen(false)}
-                  className="flex h-11 items-center gap-2 rounded-xl px-6 font-semibold text-muted-foreground text-xs uppercase tracking-widest hover:text-foreground"
+                  className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
                 >
-                  CANCEL
+                  Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={inviting}
-                  className="flex h-11 items-center gap-2 rounded-xl border-primary/20 bg-primary/10 px-6 font-semibold text-primary text-xs uppercase tracking-widest hover:bg-primary/20 hover:text-primary"
+                  className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
                 >
+                  <Check className="mr-2 h-4 w-4" />
                   {inviting ? 'INVITING...' : 'SEND INVITE'}
                 </Button>
               </div>
@@ -201,21 +201,21 @@ export const UsersPage = () => {
             </div>
           </div>
 
-          <div className="h-px w-full bg-border/50" />
-
           <div className="flex items-center justify-end gap-6 p-8 pt-6">
             <Button
               variant="ghost"
               onClick={() => setTarget(null)}
-              className="flex h-11 items-center gap-2 rounded-xl px-6 font-semibold text-muted-foreground text-xs uppercase tracking-widest hover:text-foreground"
+              className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
             >
-              CANCEL
+              Cancel
             </Button>
             <Button
               onClick={confirmDelete}
               disabled={deleting}
-              className="flex h-11 items-center gap-2 rounded-xl border-destructive/20 bg-destructive/10 px-6 font-semibold text-destructive text-xs uppercase tracking-widest hover:bg-destructive/20 hover:text-destructive"
+              variant="destructive"
+              className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
             >
+              <Trash2 className="mr-2 h-4 w-4" />
               {deleting ? 'REMOVING...' : 'REMOVE USER'}
             </Button>
           </div>

@@ -92,7 +92,7 @@ func (bm *BackupManager) buildRestoreCommand(cfg *models.BackupConfig) (string, 
 		return containerName, []string{"tar", "-xzf", "-", "-C", "/data"}, nil
 
 	}
-	
+
 	return "", nil, errors.New("backup config requires databaseId")
 }
 
