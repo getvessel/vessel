@@ -434,8 +434,6 @@ export const NotificationsSettings = () => {
           />
         </div>
       </Section>
-
-
     </div>
   );
 };

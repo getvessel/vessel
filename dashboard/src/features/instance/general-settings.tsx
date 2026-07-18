@@ -130,7 +130,11 @@ export const GeneralSettings = () => {
             Core instance configuration and network settings.
           </p>
         </div>
-        <Button onClick={handleSave} disabled={isPending} className="h-11 px-8 font-bold text-xs uppercase tracking-wider">
+        <Button
+          onClick={handleSave}
+          disabled={isPending}
+          className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
+        >
           <Check className="mr-2 h-4 w-4" />
           {isPending ? 'Saving…' : 'Save Changes'}
         </Button>

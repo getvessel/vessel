@@ -99,7 +99,9 @@ export const OAuthProvidersList = () => {
   const handleSaveAll = async () => {
     setSaving('all');
     try {
-      await Promise.all(PROVIDERS.map(p => save({ payload: form[p.id] as SaveOAuthProviderRequest })));
+      await Promise.all(
+        PROVIDERS.map((p) => save({ payload: form[p.id] as SaveOAuthProviderRequest }))
+      );
       toast.success('OAuth providers saved');
     } catch {
       toast.error('Failed to save OAuth providers');
@@ -142,7 +144,6 @@ export const OAuthProvidersList = () => {
 
       {PROVIDERS.map((provider) => {
         const state = form[provider.id] ?? {};
-        const isSaving = saving === provider.id && isPending;
         return (
           <div key={provider.id} className="rounded-xl border border-border/50 bg-card/40 p-6">
             <div className="mb-5 flex items-center justify-between">
@@ -172,7 +173,6 @@ export const OAuthProvidersList = () => {
                 </div>
               ))}
             </div>
-
           </div>
         );
       })}
