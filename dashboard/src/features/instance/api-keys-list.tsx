@@ -222,10 +222,7 @@ export function ApiKeysList() {
                 </div>
               </div>
               <DialogClose asChild>
-                <Button
-                  variant="ghost"
-                  className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
-                >
+                <Button className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground">
                   CLOSE
                 </Button>
               </DialogClose>
@@ -476,12 +473,7 @@ export function ApiKeysList() {
             >
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={deleteToken.isPending}
-              className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
-            >
+            <Button variant="destructive" onClick={handleDelete} disabled={deleteToken.isPending}>
               <Trash2 className="mr-2 h-4 w-4" />
               {deleteToken.isPending ? 'Deleting...' : 'Delete Key'}
             </Button>

@@ -280,7 +280,7 @@ export function GithubIntegration() {
               </div>
               <DialogClose asChild>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
                 >
                   CLOSE
@@ -335,7 +335,6 @@ export function GithubIntegration() {
                   </div>
                   <Button
                     asChild
-                    variant="outline"
                     className="h-10 gap-2 border-border/50 bg-background/50 font-bold text-xs uppercase tracking-widest hover:bg-background/80"
                   >
                     <a href="https://github.com/settings/apps/new" target="_blank" rel="noreferrer">
@@ -425,19 +424,10 @@ export function GithubIntegration() {
               </div>
 
               <div className="mt-8 flex justify-end gap-3 pt-6">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setIsEditing(false)}
-                  className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-background/50 hover:text-foreground"
-                >
+                <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={saveMutation.isPending}
-                  className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
-                >
+                <Button type="submit" disabled={saveMutation.isPending}>
                   <Check className="mr-2 h-4 w-4" />
                   {saveMutation.isPending ? 'Saving...' : 'Save Settings'}
                 </Button>
@@ -461,7 +451,7 @@ export function GithubIntegration() {
               </div>
               <DialogClose asChild>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
                 >
                   CLOSE
@@ -471,13 +461,7 @@ export function GithubIntegration() {
           </div>
 
           <div className="flex items-center justify-end gap-3 p-8 pt-6">
-            <Button
-              variant="ghost"
-              onClick={() => setDeletingApp(null)}
-              className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-background/50 hover:text-foreground"
-            >
-              Cancel
-            </Button>
+            <Button onClick={() => setDeletingApp(null)}>Cancel</Button>
             <Button
               onClick={(e) => {
                 e.preventDefault();
@@ -485,7 +469,6 @@ export function GithubIntegration() {
               }}
               disabled={deleteMutation.isPending}
               variant="destructive"
-              className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
             >
               <Trash className="mr-2 h-4 w-4" />
               {deleteMutation.isPending ? 'Removing...' : 'Remove App'}

@@ -198,17 +198,12 @@ export function ProfileEmailForm() {
             </InputOTP>
           </div>
           <DialogFooter>
-            <Button
-              variant="ghost"
-              onClick={() => setOtpOpen(false)}
-              className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
-            >
+            <Button variant="outline" onClick={() => setOtpOpen(false)}>
               Cancel
             </Button>
             <Button
               onClick={handleVerify}
               disabled={otp.length !== 6 || verifyEmailChange.isPending}
-              className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
             >
               {verifyEmailChange.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

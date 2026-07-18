@@ -132,11 +132,7 @@ export const OAuthProvidersList = () => {
             </code>
           </p>
         </div>
-        <Button
-          onClick={handleSaveAll}
-          disabled={saving === 'all' || isPending}
-          className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
-        >
+        <Button onClick={handleSaveAll} disabled={saving === 'all' || isPending}>
           <Check className="mr-2 h-4 w-4" />
           {saving === 'all' ? 'Saving…' : 'Save Changes'}
         </Button>
@@ -168,7 +164,7 @@ export const OAuthProvidersList = () => {
                     value={(state[f.key] as string) ?? ''}
                     onChange={(e) => set(provider.id, f.key, e.target.value)}
                     placeholder={f.placeholder}
-                    className="h-9 font-mono text-xs"
+                    className="font-mono text-xs"
                   />
                 </div>
               ))}

@@ -99,7 +99,7 @@ const Section = ({
         <Button
           size="sm"
           variant="outline"
-          className="h-8 text-xs"
+          className="text-xs"
           disabled={!enabled || testing}
           onClick={onTest}
         >
@@ -204,11 +204,7 @@ export const NotificationsSettings = () => {
               onCheckedChange={(v) => set('notificationAlerts', v)}
             />
           </div>
-          <Button
-            onClick={handleSave}
-            disabled={isPending}
-            className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
-          >
+          <Button onClick={handleSave} disabled={isPending}>
             <Check className="mr-2 h-4 w-4" />
             {isPending ? 'Saving…' : 'Save Changes'}
           </Button>
@@ -230,7 +226,7 @@ export const NotificationsSettings = () => {
             value={form.discordWebhookUrl ?? ''}
             onChange={(e) => set('discordWebhookUrl', e.target.value)}
             placeholder="https://discord.com/api/webhooks/..."
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -257,7 +253,7 @@ export const NotificationsSettings = () => {
             value={form.slackWebhookUrl ?? ''}
             onChange={(e) => set('slackWebhookUrl', e.target.value)}
             placeholder="https://hooks.slack.com/services/..."
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </div>
       </Section>
@@ -278,7 +274,7 @@ export const NotificationsSettings = () => {
               value={form.telegramBotToken ?? ''}
               onChange={(e) => set('telegramBotToken', e.target.value)}
               placeholder="1234567890:AAF..."
-              className="h-9 font-mono text-xs"
+              className="font-mono text-xs"
             />
           </div>
           <div className="space-y-2">
@@ -287,7 +283,7 @@ export const NotificationsSettings = () => {
               value={form.telegramChatId ?? ''}
               onChange={(e) => set('telegramChatId', e.target.value)}
               placeholder="-100..."
-              className="h-9 font-mono text-xs"
+              className="font-mono text-xs"
             />
           </div>
         </div>
@@ -309,7 +305,7 @@ export const NotificationsSettings = () => {
               value={form.smtpHost ?? ''}
               onChange={(e) => set('smtpHost', e.target.value)}
               placeholder="smtp.example.com"
-              className="h-9 font-mono text-xs"
+              className="font-mono text-xs"
             />
           </div>
           <div className="space-y-2">
@@ -319,7 +315,7 @@ export const NotificationsSettings = () => {
               value={form.smtpPort ?? 587}
               onChange={(e) => set('smtpPort', Number(e.target.value))}
               placeholder="587"
-              className="h-9 font-mono text-xs"
+              className="font-mono text-xs"
             />
           </div>
           <div className="space-y-2">
@@ -328,7 +324,7 @@ export const NotificationsSettings = () => {
               value={form.smtpUser ?? ''}
               onChange={(e) => set('smtpUser', e.target.value)}
               placeholder="user@example.com"
-              className="h-9 font-mono text-xs"
+              className="font-mono text-xs"
             />
           </div>
           <div className="space-y-2">
@@ -338,7 +334,7 @@ export const NotificationsSettings = () => {
               value={form.smtpPassword ?? ''}
               onChange={(e) => set('smtpPassword', e.target.value)}
               placeholder="••••••••"
-              className="h-9 font-mono text-xs"
+              className="font-mono text-xs"
             />
           </div>
           <div className="space-y-2">
@@ -347,7 +343,7 @@ export const NotificationsSettings = () => {
               value={form.smtpFromName ?? ''}
               onChange={(e) => set('smtpFromName', e.target.value)}
               placeholder="Vessl"
-              className="h-9 text-xs"
+              className="text-xs"
             />
           </div>
           <div className="space-y-2">
@@ -356,7 +352,7 @@ export const NotificationsSettings = () => {
               value={form.smtpFromAddress ?? ''}
               onChange={(e) => set('smtpFromAddress', e.target.value)}
               placeholder="noreply@example.com"
-              className="h-9 font-mono text-xs"
+              className="font-mono text-xs"
             />
           </div>
         </div>
@@ -378,7 +374,7 @@ export const NotificationsSettings = () => {
             value={form.resendApiKey ?? ''}
             onChange={(e) => set('resendApiKey', e.target.value)}
             placeholder="re_..."
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </div>
       </Section>
@@ -399,7 +395,7 @@ export const NotificationsSettings = () => {
               value={form.pushoverUserKey ?? ''}
               onChange={(e) => set('pushoverUserKey', e.target.value)}
               placeholder="u..."
-              className="h-9 font-mono text-xs"
+              className="font-mono text-xs"
             />
           </div>
           <div className="space-y-2">
@@ -409,7 +405,7 @@ export const NotificationsSettings = () => {
               value={form.pushoverApiToken ?? ''}
               onChange={(e) => set('pushoverApiToken', e.target.value)}
               placeholder="a..."
-              className="h-9 font-mono text-xs"
+              className="font-mono text-xs"
             />
           </div>
         </div>
@@ -430,7 +426,7 @@ export const NotificationsSettings = () => {
             value={form.genericWebhookUrl ?? ''}
             onChange={(e) => set('genericWebhookUrl', e.target.value)}
             placeholder="https://example.com/webhook"
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </div>
       </Section>

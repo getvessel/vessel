@@ -411,7 +411,7 @@ export const MaintenancePage = () => {
               </div>
               <DialogClose asChild>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
                 >
                   CLOSE
@@ -421,18 +421,8 @@ export const MaintenancePage = () => {
           </div>
 
           <div className="flex items-center justify-end gap-6 p-8 pt-6">
-            <Button
-              variant="ghost"
-              onClick={() => setConfirmCleanup(false)}
-              className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
-            >
-              CANCEL
-            </Button>
-            <Button
-              onClick={handleCleanup}
-              disabled={cleaning}
-              className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
-            >
+            <Button onClick={() => setConfirmCleanup(false)}>CANCEL</Button>
+            <Button onClick={handleCleanup} disabled={cleaning}>
               <Check className="mr-2 h-4 w-4" />
               {cleaning ? 'RUNNING...' : 'RUN CLEANUP'}
             </Button>
@@ -454,7 +444,7 @@ export const MaintenancePage = () => {
               </div>
               <DialogClose asChild>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
                 >
                   CLOSE
@@ -464,19 +454,8 @@ export const MaintenancePage = () => {
           </div>
 
           <div className="flex items-center justify-end gap-6 p-8 pt-6">
-            <Button
-              variant="ghost"
-              onClick={() => setConfirmRestart(false)}
-              className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
-            >
-              CANCEL
-            </Button>
-            <Button
-              onClick={handleRestart}
-              disabled={restarting}
-              variant="destructive"
-              className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
-            >
+            <Button onClick={() => setConfirmRestart(false)}>CANCEL</Button>
+            <Button onClick={handleRestart} disabled={restarting} variant="destructive">
               <RefreshCw className="mr-2 h-4 w-4" />
               {restarting ? 'RESTARTING...' : 'RESTART'}
             </Button>

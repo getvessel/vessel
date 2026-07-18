@@ -189,7 +189,7 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
           <div className="flex items-center justify-between pb-6">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={prevStep}
               disabled={currentStep === 1}
               className="flex h-11 items-center gap-2 rounded-xl px-6 font-semibold text-muted-foreground text-xs uppercase tracking-widest hover:text-foreground"
@@ -200,7 +200,6 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
             {currentStep < 3 ? (
               <Button
                 type="button"
-                variant="outline"
                 onClick={nextStep}
                 className="flex h-11 items-center gap-2 rounded-xl border-primary/20 bg-primary/10 px-6 font-semibold text-primary text-xs uppercase tracking-widest hover:bg-primary/20 hover:text-primary"
               >

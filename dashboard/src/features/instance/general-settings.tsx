@@ -130,11 +130,7 @@ export const GeneralSettings = () => {
             Core instance configuration and network settings.
           </p>
         </div>
-        <Button
-          onClick={handleSave}
-          disabled={isPending}
-          className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
-        >
+        <Button onClick={handleSave} disabled={isPending}>
           <Check className="mr-2 h-4 w-4" />
           {isPending ? 'Saving…' : 'Save Changes'}
         </Button>
@@ -154,7 +150,7 @@ export const GeneralSettings = () => {
             value={form.dashboardDomain ?? ''}
             onChange={(e) => set('dashboardDomain', e.target.value)}
             placeholder="pilot.example.com"
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </Row>
         <Row
@@ -165,7 +161,7 @@ export const GeneralSettings = () => {
             value={form.defaultWildcardDomain ?? ''}
             onChange={(e) => set('defaultWildcardDomain', e.target.value)}
             placeholder="apps.example.com"
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </Row>
       </Section>
@@ -176,7 +172,7 @@ export const GeneralSettings = () => {
             value={form.publicIpv4 ?? ''}
             onChange={(e) => set('publicIpv4', e.target.value)}
             placeholder="1.2.3.4"
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </Row>
         <Row label="Public IPv6" description="Server's public IPv6 address (optional).">
@@ -184,7 +180,7 @@ export const GeneralSettings = () => {
             value={form.publicIpv6 ?? ''}
             onChange={(e) => set('publicIpv6', e.target.value)}
             placeholder="2001:db8::1"
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </Row>
         <Row label="Traefik Wildcard IP" description="IP Traefik routes wildcard domains to.">
@@ -192,7 +188,7 @@ export const GeneralSettings = () => {
             value={form.traefikWildcardIp ?? ''}
             onChange={(e) => set('traefikWildcardIp', e.target.value)}
             placeholder="1.2.3.4"
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </Row>
         <Row
@@ -203,7 +199,7 @@ export const GeneralSettings = () => {
             value={form.ipAllowlist ?? ''}
             onChange={(e) => set('ipAllowlist', e.target.value)}
             placeholder="0.0.0.0/0"
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </Row>
       </Section>
@@ -226,7 +222,7 @@ export const GeneralSettings = () => {
             value={form.registrationDomainAllowlist ?? ''}
             onChange={(e) => set('registrationDomainAllowlist', e.target.value)}
             placeholder="example.com, company.org"
-            className="h-9 text-xs"
+            className="text-xs"
           />
         </Row>
         <Row
@@ -257,7 +253,7 @@ export const GeneralSettings = () => {
             onChange={(e) => set('concurrentBuilds', Number(e.target.value))}
             min={1}
             max={20}
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </Row>
         <Row
@@ -269,7 +265,7 @@ export const GeneralSettings = () => {
             value={form.deploymentTimeout}
             onChange={(e) => set('deploymentTimeout', Number(e.target.value))}
             min={60}
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </Row>
       </Section>
@@ -280,7 +276,7 @@ export const GeneralSettings = () => {
             value={form.serverTimezone ?? ''}
             onChange={(e) => set('serverTimezone', e.target.value)}
             placeholder="UTC"
-            className="h-9 font-mono text-xs"
+            className="font-mono text-xs"
           />
         </Row>
         <Row label="Telemetry" description="Send anonymous usage statistics to help improve Vessl.">

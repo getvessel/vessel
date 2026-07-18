@@ -63,7 +63,7 @@ export const ImportModal = ({
             </div>
             <DialogClose asChild>
               <Button
-                variant="ghost"
+                variant="outline"
                 className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
               >
                 CLOSE
@@ -124,22 +124,16 @@ export const ImportModal = ({
 
         <div className="flex items-center justify-end gap-6 p-8 pt-6">
           <Button
-            variant="ghost"
             onClick={() => {
               setFileName('');
               setPassphrase('');
               setSelectedFile(null);
               onOpenChange(false);
             }}
-            className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
           >
             Cancel
           </Button>
-          <Button
-            onClick={handleImport}
-            disabled={isPending || !selectedFile || !passphrase}
-            className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
-          >
+          <Button onClick={handleImport} disabled={isPending || !selectedFile || !passphrase}>
             <Check className="h-4 w-4" /> {isPending ? 'IMPORTING...' : 'IMPORT'}
           </Button>
         </div>

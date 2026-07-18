@@ -81,7 +81,7 @@ export function BackupsList() {
         <div className="flex shrink-0 flex-col items-end gap-4">
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
-              <Button className="h-11 px-8 font-bold text-xs uppercase tracking-wider">
+              <Button>
                 <Plus className="mr-2 h-4 w-4" />
                 Create Backup Config
               </Button>
@@ -130,19 +130,10 @@ export function BackupsList() {
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setIsCreateOpen(false)}
-                    className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
-                  >
+                  <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
                     Cancel
                   </Button>
-                  <Button
-                    type="submit"
-                    disabled={createBackup.isPending}
-                    className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
-                  >
+                  <Button type="submit" disabled={createBackup.isPending}>
                     <Check className="mr-2 h-4 w-4" />
                     {createBackup.isPending ? 'Creating...' : 'Create'}
                   </Button>
@@ -236,7 +227,7 @@ function RecordsDialog({ configId, configName }: { configId: string; configName:
                 Recent backup executions and artifacts.
               </p>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+            <Button variant="outline" size="icon" onClick={() => setIsOpen(false)}>
               <span className="sr-only">Close</span>
               <svg
                 width="15"
@@ -293,7 +284,7 @@ function RecordsDialog({ configId, configName }: { configId: string; configName:
                       </p>
                     </div>
                     {record.status === 'completed' && record.s3Url && (
-                      <Button variant="outline" size="sm" asChild>
+                      <Button size="sm" asChild>
                         <a href={record.s3Url} target="_blank" rel="noreferrer">
                           <Download className="mr-2 h-4 w-4" />
                           Download

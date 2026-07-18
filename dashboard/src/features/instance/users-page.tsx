@@ -37,7 +37,7 @@ const UserRow = ({ user, onDelete }: { user: User; onDelete: (u: User) => void }
     <div className="flex items-center gap-3">
       <Badge variant={roleVariant[user.role] ?? 'outline'}>{user.role}</Badge>
       <Button
-        variant="ghost"
+        variant="outline"
         size="sm"
         className="h-7 text-destructive hover:bg-destructive/10 hover:text-destructive"
         onClick={() => onDelete(user)}
@@ -113,7 +113,6 @@ export const UsersPage = () => {
                   </div>
                   <DialogClose asChild>
                     <Button
-                      variant="ghost"
                       type="button"
                       className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
                     >
@@ -146,19 +145,10 @@ export const UsersPage = () => {
               </div>
 
               <div className="flex items-center justify-end gap-6 p-8 pt-6">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setInviteOpen(false)}
-                  className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
-                >
+                <Button type="button" variant="ghost" onClick={() => setInviteOpen(false)}>
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={inviting}
-                  className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
-                >
+                <Button type="submit" disabled={inviting}>
                   <Check className="mr-2 h-4 w-4" />
                   {inviting ? 'INVITING...' : 'SEND INVITE'}
                 </Button>
@@ -192,7 +182,7 @@ export const UsersPage = () => {
               </div>
               <DialogClose asChild>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
                 >
                   CLOSE
@@ -202,19 +192,8 @@ export const UsersPage = () => {
           </div>
 
           <div className="flex items-center justify-end gap-6 p-8 pt-6">
-            <Button
-              variant="ghost"
-              onClick={() => setTarget(null)}
-              className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={confirmDelete}
-              disabled={deleting}
-              variant="destructive"
-              className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
-            >
+            <Button onClick={() => setTarget(null)}>Cancel</Button>
+            <Button onClick={confirmDelete} disabled={deleting} variant="destructive">
               <Trash2 className="mr-2 h-4 w-4" />
               {deleting ? 'REMOVING...' : 'REMOVE USER'}
             </Button>
