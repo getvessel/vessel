@@ -379,25 +379,22 @@ export const MaintenancePage = () => {
       </div>
 
       <Dialog open={confirmCleanup} onOpenChange={setConfirmCleanup}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-125 [&>button]:hidden">
-          <div className="flex flex-col p-6 pb-4">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[400px] [&>button]:hidden">
+          <div className="p-5">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+              <div className="flex flex-col">
+                <DialogTitle className="flex items-center gap-2 font-bold text-foreground text-xl tracking-tight">
                   <Trash2 className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex flex-col">
-                  <DialogTitle className="font-bold text-2xl text-foreground tracking-tight">
-                    Run Docker Cleanup
-                  </DialogTitle>
-                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                    THIS WILL REMOVE UNUSED IMAGES AND DANGLING VOLUMES.
-                  </DialogDescription>
-                </div>
+                  Run Docker Cleanup
+                </DialogTitle>
+                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                  <Trash2 className="h-3 w-3" />
+                  Removes unused images and volumes
+                </DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
                 >
                   CLOSE
@@ -406,36 +403,43 @@ export const MaintenancePage = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-6 p-6 pt-0">
-            <Button onClick={() => setConfirmCleanup(false)}>CANCEL</Button>
-            <Button onClick={handleCleanup} disabled={cleaning}>
-              <Check className="mr-2 h-4 w-4" />
-              {cleaning ? 'RUNNING...' : 'RUN CLEANUP'}
+          <div className="flex items-center justify-end gap-3 p-5 pt-0">
+            <Button
+              variant="ghost"
+              onClick={() => setConfirmCleanup(false)}
+              className="h-9 font-mono font-semibold text-[11px] uppercase tracking-wider"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCleanup}
+              disabled={cleaning}
+              className="h-9 gap-2 font-mono font-semibold text-[11px] uppercase tracking-wider"
+            >
+              <Check className="h-3.5 w-3.5" />
+              {cleaning ? 'Running...' : 'Run Cleanup'}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={confirmRestart} onOpenChange={setConfirmRestart}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-125 [&>button]:hidden">
-          <div className="flex flex-col p-6 pb-4">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[400px] [&>button]:hidden">
+          <div className="p-5">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-destructive/20 bg-destructive/10">
-                  <RefreshCw className="h-5 w-5 text-destructive" />
-                </div>
-                <div className="flex flex-col">
-                  <DialogTitle className="font-bold text-2xl text-destructive tracking-tight">
-                    Restart Daemon
-                  </DialogTitle>
-                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                    ALL SERVICES WILL BE BRIEFLY UNAVAILABLE.
-                  </DialogDescription>
-                </div>
+              <div className="flex flex-col">
+                <DialogTitle className="flex items-center gap-2 font-bold text-destructive text-xl tracking-tight">
+                  <RefreshCw className="h-5 w-5" />
+                  Restart Daemon
+                </DialogTitle>
+                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                  <RefreshCw className="h-3 w-3" />
+                  All services will be briefly unavailable
+                </DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
                 >
                   CLOSE
@@ -444,11 +448,22 @@ export const MaintenancePage = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-6 p-6 pt-0">
-            <Button onClick={() => setConfirmRestart(false)}>CANCEL</Button>
-            <Button onClick={handleRestart} disabled={restarting} variant="destructive">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              {restarting ? 'RESTARTING...' : 'RESTART'}
+          <div className="flex items-center justify-end gap-3 p-5 pt-0">
+            <Button
+              variant="ghost"
+              onClick={() => setConfirmRestart(false)}
+              className="h-9 font-mono font-semibold text-[11px] uppercase tracking-wider"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRestart}
+              disabled={restarting}
+              variant="destructive"
+              className="h-9 gap-2 font-mono font-semibold text-[11px] uppercase tracking-wider"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              {restarting ? 'Restarting...' : 'Restart'}
             </Button>
           </div>
         </DialogContent>

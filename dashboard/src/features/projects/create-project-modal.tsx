@@ -39,22 +39,19 @@ export function CreateProjectModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[500px] [&>button]:hidden">
+      <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-125 [&>button]:hidden">
         <form onSubmit={handleSubmit}>
-          <div className="flex flex-col p-6 pb-4">
+          <div className="p-5">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+              <div className="flex flex-col">
+                <DialogTitle className="flex items-center gap-2 font-bold text-xl tracking-tight">
                   <FolderKanban className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex flex-col">
-                  <DialogTitle className="font-bold text-2xl tracking-tight">
-                    New Project
-                  </DialogTitle>
-                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                    CREATE THE PROJECT FIRST, THEN ADD SERVICES INSIDE IT.
-                  </DialogDescription>
-                </div>
+                  New Project
+                </DialogTitle>
+                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                  <FolderKanban className="h-3 w-3" />
+                  Create the project first, then add services
+                </DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button
@@ -70,9 +67,9 @@ export function CreateProjectModal({
 
           <div className="h-px w-full bg-border/50" />
 
-          <div className="space-y-6 p-6">
-            <div className="space-y-3">
-              <Label className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+          <div className="space-y-5 p-5">
+            <div className="space-y-2.5">
+              <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
                 PROJECT NAME
               </Label>
               <Input
@@ -80,28 +77,38 @@ export function CreateProjectModal({
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="Acme platform"
-                className="h-12 rounded-xl border-border/50 bg-background/80 px-4 text-sm transition-all duration-300 focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                className="h-10 rounded-lg border-border/50 bg-background/80 px-3 text-sm transition-all duration-300 focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
               />
             </div>
-            <div className="space-y-3">
-              <Label className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+            <div className="space-y-2.5">
+              <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
                 DESCRIPTION
               </Label>
               <Input
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Internal tools and APIs"
-                className="h-12 rounded-xl border-border/50 bg-background/80 px-4 text-sm transition-all duration-300 focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                className="h-10 rounded-lg border-border/50 bg-background/80 px-3 text-sm transition-all duration-300 focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-6 p-6 pt-0">
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+          <div className="flex items-center justify-end gap-3 p-5 pt-0">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => onOpenChange(false)}
+              className="h-9 font-mono font-semibold text-[11px] uppercase tracking-wider"
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? 'CREATING...' : 'CREATE PROJECT'}
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="h-9 gap-2 font-mono font-semibold text-[11px] uppercase tracking-wider"
+            >
+              <FolderKanban className="h-3.5 w-3.5" />
+              {isPending ? 'Creating...' : 'Create Project'}
             </Button>
           </div>
         </form>

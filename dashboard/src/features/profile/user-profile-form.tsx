@@ -156,25 +156,22 @@ export function ProfileEmailForm() {
       </form>
 
       <Dialog open={otpOpen} onOpenChange={setOtpOpen}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-120 [&>button]:hidden">
-          <div className="flex flex-col p-6 pb-4">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[400px] [&>button]:hidden">
+          <div className="p-5">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+              <div className="flex flex-col">
+                <DialogTitle className="flex items-center gap-2 font-bold text-foreground text-xl tracking-tight">
                   <Mail className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex flex-col">
-                  <DialogTitle className="font-bold text-2xl tracking-tight">
-                    Verify Email Change
-                  </DialogTitle>
-                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                    WE'VE SENT A 6-DIGIT CODE TO YOUR NEW EMAIL.
-                  </DialogDescription>
-                </div>
+                  Verify Email Change
+                </DialogTitle>
+                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                  <Mail className="h-3 w-3" />
+                  Code sent to new email
+                </DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
                 >
                   CLOSE
@@ -183,7 +180,7 @@ export function ProfileEmailForm() {
             </div>
           </div>
           <div className="h-px w-full bg-border/50" />
-          <div className="flex flex-col items-center gap-4 p-6">
+          <div className="flex flex-col items-center gap-4 p-5">
             <InputOTP maxLength={6} value={otp} onChange={setOtp}>
               <InputOTPGroup>
                 <InputOTPSlot index={0} />
@@ -195,18 +192,23 @@ export function ProfileEmailForm() {
               </InputOTPGroup>
             </InputOTP>
           </div>
-          <div className="flex items-center justify-end gap-6 p-6 pt-0">
-            <Button variant="ghost" onClick={() => setOtpOpen(false)}>
+          <div className="flex items-center justify-end gap-3 p-5 pt-0">
+            <Button
+              variant="ghost"
+              onClick={() => setOtpOpen(false)}
+              className="h-9 font-mono font-semibold text-[11px] uppercase tracking-wider"
+            >
               Cancel
             </Button>
             <Button
               onClick={handleVerify}
               disabled={otp.length !== 6 || verifyEmailChange.isPending}
+              className="h-9 gap-2 font-mono font-semibold text-[11px] uppercase tracking-wider"
             >
               {verifyEmailChange.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <Check className="mr-2 h-4 w-4" />
+                <Check className="h-3.5 w-3.5" />
               )}
               Verify & Update
             </Button>

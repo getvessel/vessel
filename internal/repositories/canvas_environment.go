@@ -134,4 +134,3 @@ func (r *CanvasRepo) scanDatabases(ctx context.Context, query string, args ...an
 	}
 	return dbs, nil
 }
-

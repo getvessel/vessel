@@ -129,25 +129,22 @@ export function S3DestinationsList() {
               NEW DESTINATION
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
-            <div className="flex flex-col p-6 pb-4">
+          <DialogContent className="max-w-[600px] gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
+            <div className="p-5">
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+                <div className="flex flex-col">
+                  <DialogTitle className="flex items-center gap-2 font-bold text-foreground text-xl tracking-tight">
                     <Database className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex flex-col">
-                    <DialogTitle className="font-bold text-2xl tracking-tight">
-                      New S3 Storage
-                    </DialogTitle>
-                    <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                      CONNECT COMPATIBLE S3 STORAGE.
-                    </DialogDescription>
-                  </div>
+                    New S3 Storage
+                  </DialogTitle>
+                  <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                    <Database className="h-3 w-3" />
+                    Connect compatible S3 storage
+                  </DialogDescription>
                 </div>
                 <DialogClose asChild>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
                   >
                     CLOSE
@@ -156,8 +153,8 @@ export function S3DestinationsList() {
               </div>
             </div>
             <div className="h-px w-full bg-border/50" />
-            <div className="p-6">
-              <p className="mb-6 text-muted-foreground text-sm">
+            <div className="p-5">
+              <p className="mb-5 text-muted-foreground text-sm">
                 For more details, please visit the{' '}
                 <a
                   href="https://docs.vessl.dev"
@@ -170,10 +167,12 @@ export function S3DestinationsList() {
                 .
               </p>
               <form onSubmit={handleSave} className="space-y-5">
-                <div className="space-y-2">
-                  <Label className="font-medium text-muted-foreground text-sm">Provider</Label>
+                <div className="space-y-2.5">
+                  <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                    PROVIDER
+                  </Label>
                   <Select value={provider} onValueChange={handleProviderChange}>
-                    <SelectTrigger className="h-11 bg-background/50">
+                    <SelectTrigger className="h-10 bg-background/50 text-sm">
                       <SelectValue placeholder="Select provider" />
                     </SelectTrigger>
                     <SelectContent>
@@ -185,55 +184,57 @@ export function S3DestinationsList() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label className="font-medium text-muted-foreground text-sm">
-                      Name <span className="text-yellow-500">*</span>
+                  <div className="space-y-2.5">
+                    <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                      NAME <span className="text-yellow-500">*</span>
                     </Label>
                     <Input
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="h-11 bg-background/50 focus-visible:ring-yellow-500/50"
+                      className="h-10 bg-background/50 text-sm focus-visible:ring-yellow-500/50"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="font-medium text-muted-foreground text-sm">Description</Label>
+                  <div className="space-y-2.5">
+                    <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                      DESCRIPTION
+                    </Label>
                     <Input
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      className="h-11 bg-background/50 focus-visible:ring-yellow-500/50"
+                      className="h-10 bg-background/50 text-sm focus-visible:ring-yellow-500/50"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="font-medium text-muted-foreground text-sm">
-                    Endpoint <span className="text-yellow-500">*</span>
+                <div className="space-y-2.5">
+                  <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                    ENDPOINT <span className="text-yellow-500">*</span>
                   </Label>
                   <Input
                     required
                     value={endpoint}
                     onChange={(e) => setEndpoint(e.target.value)}
-                    className="h-11 bg-background/50 font-mono text-sm focus-visible:ring-yellow-500/50"
+                    className="h-10 bg-background/50 font-mono text-sm focus-visible:ring-yellow-500/50"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label className="font-medium text-muted-foreground text-sm">
-                      Bucket <span className="text-yellow-500">*</span>
+                  <div className="space-y-2.5">
+                    <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                      BUCKET <span className="text-yellow-500">*</span>
                     </Label>
                     <Input
                       required
                       value={bucket}
                       onChange={(e) => setBucket(e.target.value)}
-                      className="h-11 bg-background/50 font-mono focus-visible:ring-yellow-500/50"
+                      className="h-10 bg-background/50 font-mono text-sm focus-visible:ring-yellow-500/50"
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     <div className="flex items-center gap-1.5">
-                      <Label className="font-medium text-muted-foreground text-sm">
-                        Region <span className="text-yellow-500">*</span>
+                      <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                        REGION <span className="text-yellow-500">*</span>
                       </Label>
                       <Info className="h-3.5 w-3.5 text-yellow-500" />
                     </div>
@@ -241,15 +242,15 @@ export function S3DestinationsList() {
                       required
                       value={region}
                       onChange={(e) => setRegion(e.target.value)}
-                      className="h-11 bg-background/50 font-mono focus-visible:ring-yellow-500/50"
+                      className="h-10 bg-background/50 font-mono text-sm focus-visible:ring-yellow-500/50"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label className="font-medium text-muted-foreground text-sm">
-                      Access Key <span className="text-yellow-500">*</span>
+                  <div className="space-y-2.5">
+                    <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                      ACCESS KEY <span className="text-yellow-500">*</span>
                     </Label>
                     <div className="relative">
                       <Input
@@ -257,21 +258,21 @@ export function S3DestinationsList() {
                         type="password"
                         value={accessKeyId}
                         onChange={(e) => setAccessKeyId(e.target.value)}
-                        className="h-11 bg-background/50 pr-10 font-mono focus-visible:ring-yellow-500/50"
+                        className="h-10 bg-background/50 pr-10 font-mono text-sm focus-visible:ring-yellow-500/50"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="absolute top-0 right-0 h-11 w-11 text-muted-foreground"
+                        className="absolute top-0 right-0 h-10 w-10 text-muted-foreground"
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="font-medium text-muted-foreground text-sm">
-                      Secret Key <span className="text-yellow-500">*</span>
+                  <div className="space-y-2.5">
+                    <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                      SECRET KEY <span className="text-yellow-500">*</span>
                     </Label>
                     <div className="relative">
                       <Input
@@ -279,14 +280,14 @@ export function S3DestinationsList() {
                         type={showSecret ? 'text' : 'password'}
                         value={secretAccessKey}
                         onChange={(e) => setSecretAccessKey(e.target.value)}
-                        className="h-11 bg-background/50 pr-10 font-mono focus-visible:ring-yellow-500/50"
+                        className="h-10 bg-background/50 pr-10 font-mono text-sm focus-visible:ring-yellow-500/50"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
                         onClick={() => setShowSecret(!showSecret)}
-                        className="absolute top-0 right-0 h-11 w-11 text-muted-foreground"
+                        className="absolute top-0 right-0 h-10 w-10 text-muted-foreground"
                       >
                         {showSecret ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
@@ -294,13 +295,22 @@ export function S3DestinationsList() {
                   </div>
                 </div>
 
-                <div className="pt-2">
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setIsOpen(false)}
+                    className="h-9 font-mono font-semibold text-[11px] uppercase tracking-wider"
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     type="submit"
                     disabled={createS3Dest.isPending}
-                    className="h-11 w-full border border-border bg-card font-medium text-foreground text-sm transition-colors hover:bg-muted"
+                    className="h-9 gap-2 font-mono font-semibold text-[11px] uppercase tracking-wider"
                   >
-                    {createS3Dest.isPending ? 'Validating...' : 'Validate Connection & Continue'}
+                    <Plus className="h-3.5 w-3.5" />
+                    {createS3Dest.isPending ? 'Validating...' : 'Validate Connection'}
                   </Button>
                 </div>
               </form>
@@ -311,14 +321,20 @@ export function S3DestinationsList() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {list.length === 0 ? (
-          <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-border/50 border-dashed bg-card/20 py-16 text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Cloud className="h-6 w-6" />
+          <div className="col-span-full flex h-64 flex-col items-center justify-center rounded-xl border border-border border-dashed bg-card/40">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+              <Database className="h-5 w-5 text-primary" />
             </div>
-            <h3 className="font-medium text-lg">No destinations</h3>
-            <p className="mt-1 max-w-sm text-muted-foreground text-sm">
+            <h3 className="mt-4 font-bold text-foreground text-lg tracking-tight">
+              No destinations
+            </h3>
+            <p className="mt-1 max-w-sm text-center text-muted-foreground text-sm">
               Add an S3 destination to start backing up your databases remotely.
             </p>
+            <Button className="mt-6 gap-2" onClick={() => setIsOpen(true)}>
+              <Plus className="h-4 w-4" />
+              NEW DESTINATION
+            </Button>
           </div>
         ) : (
           list.map((dest) => (

@@ -253,12 +253,14 @@ export function GithubIntegration() {
           ))}
         </div>
       ) : (
-        <div className="rounded-xl border border-border border-dashed p-12 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <GithubIcon className="h-6 w-6" />
+        <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-border border-dashed bg-card/40">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+            <GithubIcon className="h-5 w-5 text-primary" />
           </div>
-          <h3 className="mt-4 font-bold text-lg">No GitHub Apps connected</h3>
-          <p className="mt-2 text-muted-foreground text-sm">
+          <h3 className="mt-4 font-bold text-foreground text-lg tracking-tight">
+            No GitHub Apps connected
+          </h3>
+          <p className="mt-1 max-w-sm text-center text-muted-foreground text-sm">
             Connect a GitHub App to deploy repositories and receive webhooks.
           </p>
           <Button
@@ -275,35 +277,35 @@ export function GithubIntegration() {
       )}
 
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-4xl [&>button]:hidden">
-          <div className="flex flex-col p-6 pb-4">
+        <DialogContent className="max-w-[800px] gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
+          <div className="p-5">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
-                  <GithubIcon className="h-6 w-6" />
-                </div>
-                <div className="flex flex-col">
-                  <DialogTitle className="font-bold text-2xl tracking-tight">
-                    {editingApp ? 'Edit GitHub App' : 'Connect GitHub App'}
-                  </DialogTitle>
-                </div>
+              <div className="flex flex-col">
+                <DialogTitle className="flex items-center gap-2 font-bold text-foreground text-xl tracking-tight">
+                  <GithubIcon className="h-5 w-5 text-primary" />
+                  {editingApp ? 'Edit GitHub App' : 'Connect GitHub App'}
+                </DialogTitle>
+                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                  <GithubIcon className="h-3 w-3" />
+                  Configure Github Integration
+                </DialogDescription>
               </div>
               <div className="flex items-center gap-3">
                 {!editingApp && (
                   <Button
                     asChild
-                    variant="outline"
-                    className="gap-2 border-primary/20 bg-primary/10 font-bold text-primary text-xs uppercase tracking-widest hover:bg-primary/20 hover:text-primary"
+                    variant="ghost"
+                    className="h-9 gap-2 font-mono font-semibold text-[11px] text-primary uppercase tracking-wider hover:text-primary"
                   >
                     <a href="https://github.com/settings/apps/new" target="_blank" rel="noreferrer">
-                      <ExternalLink className="h-4 w-4" />
-                      CREATE GITHUB APP
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      Create App
                     </a>
                   </Button>
                 )}
                 <DialogClose asChild>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
                   >
                     CLOSE
@@ -313,7 +315,9 @@ export function GithubIntegration() {
             </div>
           </div>
 
-          <div className="p-6 pt-0">
+          <div className="h-px w-full bg-border/50" />
+
+          <div className="p-5">
             {!editingApp && (
               <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
                 <div className="flex items-center justify-between">
@@ -432,19 +436,19 @@ export function GithubIntegration() {
               <div className="mt-8 flex justify-end gap-3 pt-6">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="ghost"
                   onClick={() => setIsEditing(false)}
-                  className="h-11 rounded-xl px-6 font-semibold text-xs uppercase tracking-widest transition-all"
+                  className="h-9 font-mono font-semibold text-[11px] uppercase tracking-wider"
                 >
-                  CANCEL
+                  Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={saveMutation.isPending}
-                  className="h-11 rounded-xl px-6 font-semibold text-xs uppercase tracking-widest transition-all"
+                  className="h-9 gap-2 font-mono font-semibold text-[11px] uppercase tracking-wider"
                 >
-                  <Check className="mr-2 h-4 w-4" />
-                  {saveMutation.isPending ? 'SAVING...' : 'SAVE SETTINGS'}
+                  <Check className="h-3.5 w-3.5" />
+                  {saveMutation.isPending ? 'Saving...' : 'Save Settings'}
                 </Button>
               </div>
             </form>
@@ -453,25 +457,22 @@ export function GithubIntegration() {
       </Dialog>
 
       <Dialog open={!!deletingApp} onOpenChange={(open) => !open && setDeletingApp(null)}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-125 [&>button]:hidden">
-          <div className="flex flex-col p-6 pb-4">
+        <DialogContent className="max-w-[400px] gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
+          <div className="p-5">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-destructive/20 bg-destructive/10">
-                  <Trash className="h-5 w-5 text-destructive" />
-                </div>
-                <div className="flex flex-col">
-                  <DialogTitle className="font-bold text-2xl text-destructive tracking-tight">
-                    Remove GitHub App
-                  </DialogTitle>
-                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                    THIS WILL BREAK EXISTING DEPLOYMENTS.
-                  </DialogDescription>
-                </div>
+              <div className="flex flex-col">
+                <DialogTitle className="flex items-center gap-2 font-bold text-destructive text-xl tracking-tight">
+                  <Trash className="h-5 w-5" />
+                  Remove GitHub App
+                </DialogTitle>
+                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                  <Trash className="h-3 w-3" />
+                  This will break existing deployments
+                </DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
                 >
                   CLOSE
@@ -480,8 +481,14 @@ export function GithubIntegration() {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 p-6 pt-0">
-            <Button onClick={() => setDeletingApp(null)}>Cancel</Button>
+          <div className="flex items-center justify-end gap-3 p-5 pt-0">
+            <Button
+              variant="ghost"
+              onClick={() => setDeletingApp(null)}
+              className="h-9 font-mono font-semibold text-[11px] uppercase tracking-wider"
+            >
+              Cancel
+            </Button>
             <Button
               onClick={(e) => {
                 e.preventDefault();
@@ -489,8 +496,9 @@ export function GithubIntegration() {
               }}
               disabled={deleteMutation.isPending}
               variant="destructive"
+              className="h-9 gap-2 font-mono font-semibold text-[11px] uppercase tracking-wider"
             >
-              <Trash className="mr-2 h-4 w-4" />
+              <Trash className="h-3.5 w-3.5" />
               {deleteMutation.isPending ? 'Removing...' : 'Remove App'}
             </Button>
           </div>

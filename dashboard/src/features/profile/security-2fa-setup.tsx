@@ -152,21 +152,18 @@ export function Security2FASetup() {
       </Section>
 
       <Dialog open={verifyOpen} onOpenChange={setVerifyOpen}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-120 [&>button]:hidden">
-          <div className="flex flex-col p-6 pb-4">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[400px] [&>button]:hidden">
+          <div className="p-5">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+              <div className="flex flex-col">
+                <DialogTitle className="flex items-center gap-2 font-bold text-foreground text-xl tracking-tight">
                   <ShieldCheck className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex flex-col">
-                  <DialogTitle className="font-bold text-2xl tracking-tight">
-                    Setup Two-Factor Auth
-                  </DialogTitle>
-                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                    SCAN QR CODE THEN ENTER THE 6-DIGIT CODE.
-                  </DialogDescription>
-                </div>
+                  Setup Two-Factor Auth
+                </DialogTitle>
+                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                  <ShieldCheck className="h-3 w-3" />
+                  Scan QR code & enter code
+                </DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button
@@ -182,11 +179,11 @@ export function Security2FASetup() {
 
           <div className="h-px w-full bg-border/50" />
 
-          <div className="flex flex-col items-center gap-6 p-6">
+          <div className="flex flex-col items-center gap-5 p-5">
             <QrCodeImage uri={qrCodeUri} />
 
             <div className="flex flex-col items-center gap-2">
-              <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+              <p className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
                 ENTER VERIFICATION CODE
               </p>
               <InputOTP maxLength={6} value={otp} onChange={setOtp}>
@@ -195,12 +192,24 @@ export function Security2FASetup() {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-6 p-6 pt-2">
-            <Button variant="ghost" onClick={() => setVerifyOpen(false)}>
+          <div className="flex items-center justify-end gap-3 p-5 pt-0">
+            <Button
+              variant="ghost"
+              onClick={() => setVerifyOpen(false)}
+              className="h-9 font-mono font-semibold text-[11px] uppercase tracking-wider"
+            >
               Cancel
             </Button>
-            <Button onClick={handleVerify} disabled={otp.length !== 6 || verify2FA.isPending}>
-              {verify2FA.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button
+              onClick={handleVerify}
+              disabled={otp.length !== 6 || verify2FA.isPending}
+              className="h-9 gap-2 font-mono font-semibold text-[11px] uppercase tracking-wider"
+            >
+              {verify2FA.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <ShieldCheck className="h-3.5 w-3.5" />
+              )}
               Verify & Enable
             </Button>
           </div>
@@ -208,21 +217,18 @@ export function Security2FASetup() {
       </Dialog>
 
       <Dialog open={disableOpen} onOpenChange={setDisableOpen}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-120 [&>button]:hidden">
-          <div className="flex flex-col p-6 pb-4">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[400px] [&>button]:hidden">
+          <div className="p-5">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-destructive/20 bg-destructive/10">
-                  <Trash2 className="h-5 w-5 text-destructive" />
-                </div>
-                <div className="flex flex-col">
-                  <DialogTitle className="font-bold text-2xl text-destructive tracking-tight">
-                    Disable Two-Factor Auth
-                  </DialogTitle>
-                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                    CONFIRM WITH YOUR AUTHENTICATOR APP CODE.
-                  </DialogDescription>
-                </div>
+              <div className="flex flex-col">
+                <DialogTitle className="flex items-center gap-2 font-bold text-destructive text-xl tracking-tight">
+                  <Trash2 className="h-5 w-5" />
+                  Disable Two-Factor Auth
+                </DialogTitle>
+                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                  <Trash2 className="h-3 w-3" />
+                  Confirm with authenticator app
+                </DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button
@@ -238,8 +244,8 @@ export function Security2FASetup() {
 
           <div className="h-px w-full bg-border/50" />
 
-          <div className="flex flex-col items-center gap-4 p-6">
-            <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+          <div className="flex flex-col items-center gap-4 p-5">
+            <p className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
               ENTER VERIFICATION CODE
             </p>
             <InputOTP maxLength={6} value={otp} onChange={setOtp}>
@@ -247,16 +253,25 @@ export function Security2FASetup() {
             </InputOTP>
           </div>
 
-          <div className="flex items-center justify-end gap-6 p-6 pt-2">
-            <Button variant="ghost" onClick={() => setDisableOpen(false)}>
+          <div className="flex items-center justify-end gap-3 p-5 pt-0">
+            <Button
+              variant="ghost"
+              onClick={() => setDisableOpen(false)}
+              className="h-9 font-mono font-semibold text-[11px] uppercase tracking-wider"
+            >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleDisable}
               disabled={otp.length !== 6 || disable2FA.isPending}
+              className="h-9 gap-2 font-mono font-semibold text-[11px] uppercase tracking-wider"
             >
-              {disable2FA.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {disable2FA.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Trash2 className="h-3.5 w-3.5" />
+              )}
               Disable 2FA
             </Button>
           </div>

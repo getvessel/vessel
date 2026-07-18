@@ -41,7 +41,7 @@ export const ProjectCard = ({
   if (mode === 'list') {
     return (
       <Link to={`/projects/$projectId`} params={{ projectId: project.id }} className="group block">
-        <div className="rounded-2xl border border-border/50 bg-card/40 p-6 shadow-sm transition-all hover:border-primary/50 hover:bg-card/80">
+        <div className="rounded-2xl border border-border/50 bg-card/40 p-6 transition-colors hover:border-primary/50 hover:bg-card/80">
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-3">
@@ -54,7 +54,13 @@ export const ProjectCard = ({
                   </div>
                 )}
               </div>
-              <div className="mt-2 flex items-center gap-2 font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
+              <p className="mt-2 font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
+                {project.totalServices} service{project.totalServices === 1 ? '' : 's'}
+              </p>
+            </div>
+
+            <div className="flex flex-col items-end justify-center">
+              <div className="flex items-center gap-2 font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
                 {project.defaultEnvironment ? (
                   <>
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
@@ -63,33 +69,15 @@ export const ProjectCard = ({
                 ) : (
                   <>
                     <div className="h-1.5 w-1.5 rounded-full bg-zinc-500/80"></div>
-                    <span>No environment</span>
+                    <span>No env</span>
                   </>
                 )}
                 <span className="opacity-50">•</span>
                 <span>
-                  {project.onlineServices}/{project.totalServices} services online
+                  {project.onlineServices}/{project.totalServices} online
                 </span>
               </div>
             </div>
-
-            {project.totalServices > 0 && (
-              <div className="flex items-center gap-1.5">
-                {project.serviceIcons?.slice(0, 3).map((icon, i) => (
-                  <div
-                    key={i}
-                    className="flex h-8 w-8 items-center justify-center rounded-md border border-border/40 bg-background shadow-sm"
-                  >
-                    {getIcon(icon)}
-                  </div>
-                ))}
-                {project.totalServices > 3 && (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border/40 bg-background font-mono text-[10px] text-muted-foreground shadow-sm">
-                    +{project.totalServices - 3}
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </div>
       </Link>
@@ -114,7 +102,7 @@ export const ProjectCard = ({
           <div className="mt-5">
             <div className="border border-border/40 bg-muted/20 p-2">
               <div
-                className="flex min-h-[140px] items-center justify-center bg-[#0d0d10]"
+                className="flex min-h-[140px] items-center justify-center bg-[#0d0d10] p-5"
                 style={{
                   backgroundImage:
                     'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0)',
@@ -130,7 +118,7 @@ export const ProjectCard = ({
                     {project.serviceIcons?.slice(0, 7).map((icon, i) => (
                       <div
                         key={i}
-                        className="flex h-10 w-10 items-center justify-center rounded-md border border-border/40 bg-background p-2.5 shadow-sm"
+                        className="flex h-10 w-10 items-center justify-center rounded-md border border-border/40 bg-background p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
                       >
                         {getIcon(icon)}
                       </div>

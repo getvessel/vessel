@@ -128,11 +128,18 @@ export function ApiKeysList() {
             </span>
           </div>
         ) : tokens.length === 0 ? (
-          <div className="flex items-center gap-3 rounded-2xl border border-border/50 bg-card/40 p-6">
-            <Key className="h-4 w-4 text-muted-foreground" />
-            <span className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-              NO API KEYS
-            </span>
+          <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-border border-dashed bg-card/40">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+              <Key className="h-5 w-5 text-primary" />
+            </div>
+            <h3 className="mt-4 font-bold text-foreground text-lg tracking-tight">No API keys</h3>
+            <p className="mt-1 max-w-sm text-center text-muted-foreground text-sm">
+              Create an API key to access Vessl programmatically.
+            </p>
+            <Button onClick={() => setIsCreateOpen(true)} className="mt-6 gap-2">
+              <Plus className="h-4 w-4" />
+              CREATE API KEY
+            </Button>
           </div>
         ) : (
           tokens.map((token) => (
@@ -214,20 +221,17 @@ export function ApiKeysList() {
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-2xl [&>button]:hidden">
-          <div className="flex flex-col p-6 pb-4">
+          <div className="p-5">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+              <div className="flex flex-col">
+                <DialogTitle className="flex items-center gap-2 font-bold text-xl tracking-tight">
                   <Key className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex flex-col">
-                  <DialogTitle className="font-bold text-2xl text-foreground tracking-tight">
-                    Create API key
-                  </DialogTitle>
-                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                    BEARER TOKEN ACCESS
-                  </DialogDescription>
-                </div>
+                  Create API key
+                </DialogTitle>
+                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                  <Key className="h-3 w-3" />
+                  Bearer token access
+                </DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground">
@@ -239,21 +243,21 @@ export function ApiKeysList() {
 
           <div className="h-px w-full bg-border/50" />
 
-          <div className="space-y-6 p-6">
-            <div className="space-y-3">
-              <Label className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+          <div className="space-y-5 p-5">
+            <div className="space-y-2.5">
+              <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
                 NAME
               </Label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Production deploys"
-                className="h-12 rounded-xl border-border/50 bg-background/50 px-4"
+                className="h-10 rounded-lg border-border/50 bg-background/50 px-3 text-sm"
               />
             </div>
 
-            <div className="space-y-3">
-              <Label className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+            <div className="space-y-2.5">
+              <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
                 ACCESS
               </Label>
               <div className="grid grid-cols-2 gap-4">
@@ -282,8 +286,8 @@ export function ApiKeysList() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <Label className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+            <div className="space-y-2.5">
+              <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
                 PROJECTS
               </Label>
               <div className="grid grid-cols-2 gap-4">
@@ -312,8 +316,8 @@ export function ApiKeysList() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <Label className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+            <div className="space-y-2.5">
+              <Label className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
                 EXPIRATION
               </Label>
               <div className="grid grid-cols-2 gap-4">
@@ -364,14 +368,21 @@ export function ApiKeysList() {
               </div>
             </div>
 
-            <div className="pt-2">
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <Button
+                onClick={() => setIsCreateOpen(false)}
+                variant="ghost"
+                className="h-9 font-mono font-semibold text-[11px] uppercase tracking-wider"
+              >
+                Cancel
+              </Button>
               <Button
                 onClick={handleCreate}
                 disabled={createToken.isPending}
-                className="h-12 rounded-xl border-primary/20 bg-primary/10 px-8 font-semibold text-primary text-xs uppercase tracking-widest hover:bg-primary/20 hover:text-primary"
+                className="h-9 gap-2 font-mono font-semibold text-[11px] uppercase tracking-wider"
               >
-                <Check className="mr-2 h-4 w-4" />{' '}
-                {createToken.isPending ? 'CREATING...' : 'CREATE KEY'}
+                <Check className="h-3.5 w-3.5" />
+                {createToken.isPending ? 'Creating...' : 'Create Key'}
               </Button>
             </div>
           </div>
@@ -380,20 +391,17 @@ export function ApiKeysList() {
 
       <Dialog open={isNewKeyOpen} onOpenChange={setIsNewKeyOpen}>
         <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-2xl [&>button]:hidden">
-          <div className="flex flex-col p-6 pb-4">
+          <div className="p-5">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+              <div className="flex flex-col">
+                <DialogTitle className="flex items-center gap-2 font-bold text-xl tracking-tight">
                   <Key className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex flex-col">
-                  <DialogTitle className="font-bold text-2xl text-foreground tracking-tight">
-                    New API key
-                  </DialogTitle>
-                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                    SHOWN ONLY ONCE
-                  </DialogDescription>
-                </div>
+                  New API key
+                </DialogTitle>
+                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                  <Key className="h-3 w-3" />
+                  Shown only once
+                </DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button
@@ -455,17 +463,13 @@ export function ApiKeysList() {
       </Dialog>
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-md [&>button]:hidden">
-          <div className="flex flex-col p-6 pb-4">
+          <div className="p-5">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-destructive/20 bg-destructive/10">
+              <div className="flex flex-col">
+                <DialogTitle className="flex items-center gap-2 font-bold text-foreground text-xl tracking-tight">
                   <Trash2 className="h-5 w-5 text-destructive" />
-                </div>
-                <div className="flex flex-col">
-                  <DialogTitle className="font-bold text-2xl text-foreground tracking-tight">
-                    Delete API Key
-                  </DialogTitle>
-                </div>
+                  Delete API Key
+                </DialogTitle>
               </div>
             </div>
             <p className="mt-4 text-muted-foreground text-sm">
@@ -473,16 +477,21 @@ export function ApiKeysList() {
               will immediately lose access. This action cannot be undone.
             </p>
           </div>
-          <div className="flex items-center justify-end gap-6 p-6 pt-0">
+          <div className="flex items-center justify-end gap-3 p-5 pt-0">
             <Button
               variant="ghost"
               onClick={() => setDeleteId(null)}
-              className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted"
+              className="h-9 font-mono font-semibold text-[11px] uppercase tracking-wider"
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={deleteToken.isPending}>
-              <Trash2 className="mr-2 h-4 w-4" />
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteToken.isPending}
+              className="h-9 gap-2 font-mono font-semibold text-[11px] uppercase tracking-wider"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
               {deleteToken.isPending ? 'Deleting...' : 'Delete Key'}
             </Button>
           </div>
