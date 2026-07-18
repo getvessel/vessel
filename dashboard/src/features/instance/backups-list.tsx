@@ -1,10 +1,11 @@
 import { format } from 'date-fns';
-import { Check, Database, Download, Play, Plus, RefreshCw, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { Check, Download, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+
 import { Badge } from '#/components/ui/badge';
 import { Button } from '#/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '#/components/ui/dialog';
+import { Checkbox } from '#/components/ui/checkbox';
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
 import { useCreate, useDelete, useList, useListRecords, useTrigger } from '#/hooks/useBackups';
@@ -12,19 +13,34 @@ import { useCreate, useDelete, useList, useListRecords, useTrigger } from '#/hoo
 export function BackupsList() {
   const { data: configsData, isLoading } = useList('global');
   const configs = configsData?.data || [];
+  const config = configs[0];
 
   const createBackup = useCreate();
-  const deleteBackup = useDelete();
   const triggerBackup = useTrigger();
+  const deleteBackup = useDelete();
 
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [name, setName] = useState('');
+  const { data: recordsData, isLoading: isLoadingRecords } = useListRecords(config?.id || '');
+  const records = recordsData?.data || [];
+
+  const [name, setName] = useState('vessl-db');
+  const [description, setDescription] = useState('Vessl database');
   const [schedule, setSchedule] = useState('0 0 * * *');
   const [retentionDays, setRetentionDays] = useState('7');
 
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (config) {
+      setName(config.name);
+      setSchedule(config.schedule);
+      setRetentionDays(config.retentionDays.toString());
+    }
+  }, [config]);
+
+  const handleSave = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     try {
+      if (config) {
+        await deleteBackup.mutateAsync({ id: config.id });
+      }
       await createBackup.mutateAsync({
         payload: {
           projectId: 'global',
@@ -33,29 +49,22 @@ export function BackupsList() {
           retentionDays: parseInt(retentionDays, 10),
         },
       });
-      toast.success('Backup configuration created');
-      setIsCreateOpen(false);
-      setName('');
+      toast.success('Backup configuration saved');
     } catch {
-      toast.error('Failed to create backup configuration');
+      toast.error('Failed to save backup configuration');
     }
   };
 
-  const handleTrigger = async (id: string) => {
+  const handleTrigger = async () => {
+    if (!config) {
+      toast.error('Please save the configuration first');
+      return;
+    }
     try {
-      await triggerBackup.mutateAsync({ id });
+      await triggerBackup.mutateAsync({ id: config.id });
       toast.success('Backup triggered successfully');
     } catch {
       toast.error('Failed to trigger backup');
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteBackup.mutateAsync({ id });
-      toast.success('Backup configuration deleted');
-    } catch {
-      toast.error('Failed to delete backup configuration');
     }
   };
 
@@ -64,240 +73,218 @@ export function BackupsList() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-6 pb-2 md:flex-row md:items-start">
-        <div className="flex-1 space-y-4">
-          <div className="space-y-1">
-            <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-              STORAGE & BACKUPS
-            </p>
-            <h1 className="font-bold text-3xl tracking-tight">System Backups</h1>
-          </div>
-          <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">
-            Manage your scheduled system backups, view history, and trigger manual backups.
-          </p>
+    <div className="flex flex-col gap-8 pb-12">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-4">
+          <h2 className="font-bold text-2xl tracking-tight">Backup</h2>
+          <Button
+            size="sm"
+            onClick={handleSave}
+            disabled={createBackup.isPending || deleteBackup.isPending}
+          >
+            <Check className="mr-2 h-4 w-4" />
+            {createBackup.isPending || deleteBackup.isPending ? 'Saving...' : 'Save'}
+          </Button>
         </div>
+        <p className="text-muted-foreground text-sm">Backup configuration for Vessl instance.</p>
+      </div>
 
-        <div className="flex shrink-0 flex-col items-end gap-4">
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Create Backup Config
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-md [&>button]:hidden">
-              <form onSubmit={handleCreate} className="flex flex-col gap-6 p-6">
-                <div>
-                  <h2 className="font-bold text-lg">New Backup Configuration</h2>
-                  <p className="text-muted-foreground text-sm">Schedule a recurring backup.</p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                      id="name"
-                      placeholder="e.g. Daily DB Backup"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="schedule">Cron Schedule</Label>
-                    <Input
-                      id="schedule"
-                      placeholder="0 0 * * *"
-                      value={schedule}
-                      onChange={(e) => setSchedule(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="retentionDays">Retention Days</Label>
-                    <Input
-                      id="retentionDays"
-                      type="number"
-                      min="1"
-                      value={retentionDays}
-                      onChange={(e) => setRetentionDays(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={createBackup.isPending}>
-                    <Check className="mr-2 h-4 w-4" />
-                    {createBackup.isPending ? 'Creating...' : 'Create'}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="space-y-2">
+          <Label>UUID</Label>
+          <Input disabled value={config?.id || 'Pending...'} />
+        </div>
+        <div className="space-y-2">
+          <Label>Name</Label>
+          <Input value={name} onChange={(e) => setName(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>Description</Label>
+          <Input value={description} onChange={(e) => setDescription(e.target.value)} />
         </div>
       </div>
 
-      <div className="grid gap-4">
-        {configs.length === 0 ? (
-          <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground">
-            No backup configurations found.
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label>User</Label>
+          <Input value="vessl" disabled />
+        </div>
+        <div className="space-y-2">
+          <Label>Password</Label>
+          <Input type="password" value="********" disabled />
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-col gap-4">
+        <div className="flex items-center gap-4">
+          <h3 className="font-bold text-xl">Scheduled Backup</h3>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSave}
+            disabled={createBackup.isPending || deleteBackup.isPending}
+          >
+            Save
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleTrigger}
+            disabled={triggerBackup.isPending || !config}
+          >
+            Backup Now
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Checkbox id="backup-enabled" defaultChecked />
+            <Label htmlFor="backup-enabled" className="cursor-pointer">
+              Backup Enabled
+            </Label>
           </div>
-        ) : (
-          configs.map((config) => (
-            <div
-              key={config.id}
-              className="group relative flex flex-col justify-between gap-4 overflow-hidden rounded-xl border border-border/50 bg-card/50 p-6 transition-all hover:border-border hover:bg-card md:flex-row md:items-center"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <Database className="h-5 w-5" />
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold">{config.name}</h3>
-                    <Badge variant="secondary" className="text-[10px]">
-                      {config.status}
-                    </Badge>
-                  </div>
-                  <p className="text-muted-foreground text-sm">
-                    Schedule:{' '}
-                    <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                      {config.schedule}
-                    </code>{' '}
-                    • Retains {config.retentionDays} days
-                  </p>
-                </div>
-              </div>
+          <div className="flex items-center gap-2">
+            <Checkbox id="s3-enabled" />
+            <Label htmlFor="s3-enabled" className="cursor-pointer">
+              S3 Enabled
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox id="disable-local" />
+            <Label htmlFor="disable-local" className="cursor-pointer">
+              Disable Local Backup
+            </Label>
+          </div>
+        </div>
+      </div>
 
-              <div className="flex items-center gap-2">
-                <RecordsDialog configId={config.id} configName={config.name} />
+      <div className="mt-4 flex flex-col gap-4">
+        <h3 className="font-bold text-xl">Settings</h3>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="space-y-2">
+            <Label>Frequency *</Label>
+            <Input value={schedule} onChange={(e) => setSchedule(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>Timezone *</Label>
+            <Input value="UTC" disabled />
+          </div>
+          <div className="space-y-2">
+            <Label>Timeout *</Label>
+            <Input value="3600" disabled />
+          </div>
+        </div>
+      </div>
 
-                <Button
+      <div className="mt-4 flex flex-col gap-4">
+        <h3 className="font-bold text-xl">Backup Retention Settings</h3>
+        <ul className="list-disc space-y-1 pl-5 text-muted-foreground text-sm">
+          <li>Setting a value to 0 means unlimited retention.</li>
+          <li>
+            The retention rules work independently - whichever limit is reached first will trigger
+            cleanup.
+          </li>
+        </ul>
+
+        <h4 className="mt-2 font-bold">Local Backup Retention</h4>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="space-y-2">
+            <Label>Number of backups to keep *</Label>
+            <Input value="0" disabled />
+          </div>
+          <div className="space-y-2">
+            <Label>Days to keep backups *</Label>
+            <Input value={retentionDays} onChange={(e) => setRetentionDays(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>Maximum storage (GB) *</Label>
+            <Input value="0" disabled />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8 flex flex-col gap-4">
+        <div className="flex items-center gap-4">
+          <h3 className="font-bold text-xl">Executions ({records.length})</h3>
+          <Button variant="outline" size="sm">
+            Cleanup Failed Backups
+          </Button>
+          <Button variant="destructive" size="sm">
+            Cleanup Deleted
+          </Button>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          {isLoadingRecords ? (
+            <div className="py-8 text-muted-foreground">Loading executions...</div>
+          ) : records.length === 0 ? (
+            <div className="py-8 text-muted-foreground">No executions yet.</div>
+          ) : (
+            records.map((record) => (
+              <div
+                key={record.id}
+                className="flex flex-col gap-3 rounded-lg border border-border bg-card/50 p-4"
+              >
+                <Badge
                   variant="outline"
-                  size="sm"
-                  onClick={() => handleTrigger(config.id)}
-                  disabled={triggerBackup.isPending}
+                  className={
+                    record.status === 'completed'
+                      ? 'w-fit border-green-500/20 bg-green-500/10 text-green-500'
+                      : record.status === 'failed'
+                        ? 'w-fit border-red-500/20 bg-red-500/10 text-red-500'
+                        : 'w-fit border-yellow-500/20 bg-yellow-500/10 text-yellow-500'
+                  }
                 >
-                  <Play className="mr-2 h-4 w-4" />
-                  Run Now
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  className="h-9 w-9 opacity-0 transition-opacity group-hover:opacity-100"
-                  onClick={() => handleDelete(config.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                  {record.status === 'completed'
+                    ? 'Success'
+                    : record.status === 'failed'
+                      ? 'Failed'
+                      : 'Running'}
+                </Badge>
+
+                <div className="text-muted-foreground text-sm">
+                  {record.startedAt
+                    ? format(new Date(record.startedAt), 'MMM d, HH:mm')
+                    : 'Unknown time'}{' '}
+                  • Database: vessl • Size: {(record.fileSizeBytes / 1024 / 1024).toFixed(2)} MB
+                  <br />
+                  Location: {record.filePath}
+                </div>
+
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-muted-foreground">Backup Availability:</span>
+                  <Badge
+                    variant="outline"
+                    className="gap-1 border-green-500/20 bg-green-500/10 text-green-500"
+                  >
+                    <Check className="h-3 w-3" /> Local Storage
+                  </Badge>
+                </div>
+
+                <div className="mt-1 flex items-center gap-2">
+                  <Button variant="outline" size="sm" asChild disabled={!record.s3Url}>
+                    {record.s3Url ? (
+                      <a href={record.s3Url} target="_blank" rel="noreferrer">
+                        <Download className="mr-2 h-4 w-4" />
+                        Download
+                      </a>
+                    ) : (
+                      <span>
+                        <Download className="mr-2 h-4 w-4" />
+                        Download
+                      </span>
+                    )}
+                  </Button>
+                  <Button variant="destructive" size="sm">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
     </div>
-  );
-}
-
-function RecordsDialog({ configId, configName }: { configId: string; configName: string }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const { data: recordsData, isLoading } = useListRecords(configId);
-  const records = recordsData?.data || [];
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <RefreshCw className="mr-2 h-4 w-4" />
-          History
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-3xl gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
-        <div className="flex flex-col gap-6 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="font-bold text-lg">{configName} History</h2>
-              <p className="text-muted-foreground text-sm">
-                Recent backup executions and artifacts.
-              </p>
-            </div>
-            <Button variant="outline" size="icon" onClick={() => setIsOpen(false)}>
-              <span className="sr-only">Close</span>
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 15 15"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-              >
-                <path
-                  d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z"
-                  fill="currentColor"
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-            </Button>
-          </div>
-
-          <div className="max-h-[60vh] overflow-y-auto pr-2">
-            {isLoading ? (
-              <div className="py-8 text-center text-muted-foreground">Loading records...</div>
-            ) : records.length === 0 ? (
-              <div className="py-8 text-center text-muted-foreground">No backup records yet.</div>
-            ) : (
-              <div className="space-y-3">
-                {records.map((record) => (
-                  <div
-                    key={record.id}
-                    className="flex items-center justify-between rounded-lg border border-border/50 bg-background/50 p-4"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm">
-                          {record.startedAt
-                            ? format(new Date(record.startedAt), 'MMM d, yyyy HH:mm:ss')
-                            : 'Unknown time'}
-                        </span>
-                        <Badge
-                          variant={
-                            record.status === 'completed'
-                              ? 'default'
-                              : record.status === 'failed'
-                                ? 'destructive'
-                                : 'secondary'
-                          }
-                          className="text-[10px]"
-                        >
-                          {record.status}
-                        </Badge>
-                      </div>
-                      <p className="text-muted-foreground text-xs">
-                        Size: {(record.fileSizeBytes / 1024 / 1024).toFixed(2)} MB
-                      </p>
-                    </div>
-                    {record.status === 'completed' && record.s3Url && (
-                      <Button size="sm" asChild>
-                        <a href={record.s3Url} target="_blank" rel="noreferrer">
-                          <Download className="mr-2 h-4 w-4" />
-                          Download
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }
