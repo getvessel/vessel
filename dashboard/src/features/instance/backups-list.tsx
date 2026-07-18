@@ -127,15 +127,10 @@ export function BackupsList() {
 
   return (
     <div className="space-y-6 pb-12">
-      <div className="flex flex-col justify-between gap-6 pb-2 md:flex-row md:items-start">
-        <div className="flex-1 space-y-4">
-          <div className="space-y-1">
-            <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-              INSTANCE SETTINGS
-            </p>
-            <h1 className="font-bold text-3xl tracking-tight">System Backups</h1>
-          </div>
-          <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-semibold text-lg">System Backups</h2>
+          <p className="text-muted-foreground text-sm">
             Backup configuration for the Vessl instance database.
           </p>
         </div>
@@ -143,18 +138,13 @@ export function BackupsList() {
         <div className="flex shrink-0 items-center gap-3">
           <Button
             variant="outline"
-            className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
             onClick={handleTrigger}
             disabled={triggerBackup.isPending || !config}
           >
             <Play className="mr-2 h-4 w-4" />
             Backup Now
           </Button>
-          <Button
-            className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
-            onClick={handleSave}
-            disabled={createBackup.isPending || deleteBackup.isPending}
-          >
+          <Button onClick={handleSave} disabled={createBackup.isPending || deleteBackup.isPending}>
             <Check className="mr-2 h-4 w-4" />
             {createBackup.isPending || deleteBackup.isPending ? 'Saving...' : 'Save Changes'}
           </Button>

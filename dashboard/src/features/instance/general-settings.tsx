@@ -142,7 +142,7 @@ export const GeneralSettings = () => {
             value={form.siteName ?? ''}
             onChange={(e) => set('siteName', e.target.value)}
             placeholder="Vessl"
-            className="h-9 text-sm"
+            className="text-sm"
           />
         </Row>
         <Row label="Dashboard Domain" description="The domain Vessl control panel is served from.">
