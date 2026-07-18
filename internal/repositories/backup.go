@@ -24,6 +24,7 @@ type BackupRepository interface {
 	GetRecordByID(ctx context.Context, id string) (*models.BackupRecord, error)
 	ListRecordsByConfig(ctx context.Context, backupConfigID string) ([]*models.BackupRecord, error)
 	UpdateRecord(ctx context.Context, rec *models.BackupRecord) error
+	DeleteRecord(ctx context.Context, id string) error
 }
 
 type BackupRepo struct {
@@ -248,4 +249,11 @@ func (r *BackupRepo) UpdateRecord(ctx context.Context, rec *models.BackupRecord)
 		return utils.NewNotFoundError("BackupRecord", rec.ID)
 	}
 	return nil
+}
+
+func (r *BackupRepo) DeleteRecord(ctx context.Context, id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	_, err := r.db.ExecContext(ctx, "DELETE FROM backup_records WHERE id=?", id)
+	return err
 }

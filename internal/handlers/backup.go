@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"path/filepath"
 
 	"github.com/labstack/echo/v4"
 
@@ -118,6 +119,7 @@ func (h *BackupHandler) Trigger(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param id path string true "id"
+// @Router /backups/{id}/records [get]
 func (h *BackupHandler) ListRecords(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -128,6 +130,51 @@ func (h *BackupHandler) ListRecords(c echo.Context) error {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 	return utils.Success(c, "Operation successful", recs)
+}
+
+// @Summary Download Backup Record
+// @Description Download Backup Record
+// @Tags Backups
+// @Accept json
+// @Produce application/octet-stream
+// @Param id path string true "Backup ID"
+// @Param recordId path string true "Record ID"
+// @Router /backups/{id}/records/{recordId}/download [get]
+func (h *BackupHandler) DownloadRecord(c echo.Context) error {
+	id := c.Param("id")
+	recordID := c.Param("recordId")
+	if id == "" || recordID == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing id or recordId parameter")
+	}
+	rec, err := h.backupService.GetRecord(c.Request().Context(), recordID)
+	if err != nil || rec == nil {
+		return utils.Error(c, http.StatusNotFound, "record not found")
+	}
+	if rec.FilePath == "" {
+		return utils.Error(c, http.StatusNotFound, "local backup file not available")
+	}
+	return c.Attachment(rec.FilePath, filepath.Base(rec.FilePath))
+}
+
+// @Summary Delete Backup Record
+// @Description Delete Backup Record
+// @Tags Backups
+// @Accept json
+// @Produce json
+// @Param id path string true "Backup ID"
+// @Param recordId path string true "Record ID"
+// @Router /backups/{id}/records/{recordId} [delete]
+func (h *BackupHandler) DeleteRecord(c echo.Context) error {
+	id := c.Param("id")
+	recordID := c.Param("recordId")
+	if id == "" || recordID == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing id or recordId parameter")
+	}
+	err := h.backupService.DeleteRecord(c.Request().Context(), recordID)
+	if err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+	return c.NoContent(http.StatusNoContent)
 }
 
 // @Summary Restore endpoint
@@ -173,6 +220,7 @@ func (h *BackupHandler) ListS3Destinations(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param request body models.S3Destination true "Payload"
+// @Router /s3-destinations [post]
 func (h *BackupHandler) CreateS3Destination(c echo.Context) error {
 	var dest models.S3Destination
 	if err := c.Bind(&dest); err != nil {

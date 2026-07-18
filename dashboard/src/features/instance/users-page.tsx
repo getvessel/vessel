@@ -1,7 +1,6 @@
 import { Check, Plus, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Badge } from '#/components/ui/badge';
 import { Button } from '#/components/ui/button';
 import {
   Dialog,
@@ -17,7 +16,7 @@ import { Skeleton } from '#/components/ui/skeleton';
 import { useDeleteUser, useInviteUser, useListUsers } from '#/hooks/useUsers';
 import type { User } from '#/interfaces/users';
 
-const roleVariant: Record<string, 'default' | 'secondary' | 'outline'> = {
+const _roleVariant: Record<string, 'default' | 'secondary' | 'outline'> = {
   admin: 'default',
   member: 'secondary',
   viewer: 'outline',

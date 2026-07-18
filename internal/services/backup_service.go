@@ -119,6 +119,23 @@ func (s *BackupService) ListRecordsByConfig(ctx context.Context, configID string
 	return s.backupRepo.ListRecordsByConfig(ctx, configID)
 }
 
+func (s *BackupService) GetRecord(ctx context.Context, recordID string) (*models.BackupRecord, error) {
+	if recordID == "" {
+		return nil, errors.New("record id required")
+	}
+	return s.backupRepo.GetRecordByID(ctx, recordID)
+}
+
+func (s *BackupService) DeleteRecord(ctx context.Context, recordID string) error {
+	if recordID == "" {
+		return errors.New("record id required")
+	}
+	if s.manager != nil {
+		s.manager.DeleteBackupRecord(ctx, recordID)
+	}
+	return s.backupRepo.DeleteRecord(ctx, recordID)
+}
+
 func (s *BackupService) RestoreBackup(ctx context.Context, recordID string) error {
 	if s.manager == nil {
 		return errors.New("backup manager not available")

@@ -34,7 +34,6 @@ export const UpdatesPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Section */}
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
@@ -95,7 +94,6 @@ export const UpdatesPage = () => {
         </div>
       </div>
 
-      {/* Main Status Banner */}
       {!isLoading && (
         <div className="flex flex-col items-center justify-center space-y-6 rounded-2xl border border-border/50 bg-card/40 px-6 py-12 text-center">
           <div

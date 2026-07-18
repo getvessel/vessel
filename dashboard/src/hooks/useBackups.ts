@@ -47,6 +47,17 @@ export const useTrigger = () => {
   });
 };
 
+export const useDeleteRecord = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { id: string; recordId: string }) =>
+      backupsService.deleteRecord(payload.id, payload.recordId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['backups'] });
+    },
+  });
+};
+
 export const useRestore = () => {
   const queryClient = useQueryClient();
   return useMutation({

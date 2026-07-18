@@ -1,4 +1,4 @@
-import { Check, Shield } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';

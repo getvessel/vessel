@@ -12,7 +12,7 @@ import {
 } from '#/components/ui/dialog';
 import { Input } from '#/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '#/components/ui/input-otp';
-import { Label } from '#/components/ui/label';
+import { Row, Section } from '#/components/ui/section';
 import {
   useChangePassword,
   useGetProfile,
@@ -43,32 +43,11 @@ export function ProfileNameForm() {
   };
 
   return (
-    <div className="space-y-6 rounded-2xl border border-border/50 bg-card/40 p-6">
-      <form onSubmit={handleSave} className="space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
-            <User className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="font-semibold text-lg">Profile Name</h2>
-            <p className="text-muted-foreground text-sm">Update your display name.</p>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="name" className="font-medium text-sm">
-            Full Name
-          </Label>
-          <Input
-            id="name"
-            placeholder="John Doe"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="h-9 max-w-md text-sm"
-          />
-        </div>
-
-        <div className="flex justify-end">
+    <form onSubmit={handleSave}>
+      <Section
+        icon={<User className="h-4 w-4" />}
+        title="Profile Name"
+        action={
           <Button
             type="submit"
             size="sm"
@@ -79,11 +58,21 @@ export function ProfileNameForm() {
             ) : (
               <Check className="mr-2 h-4 w-4" />
             )}
-            Save Name
+            Save Changes
           </Button>
-        </div>
-      </form>
-    </div>
+        }
+      >
+        <Row label="Full Name" description="Update your display name.">
+          <Input
+            id="name"
+            placeholder="John Doe"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="h-10 w-full"
+          />
+        </Row>
+      </Section>
+    </form>
   );
 }
 
@@ -132,35 +121,11 @@ export function ProfileEmailForm() {
 
   return (
     <>
-      <div className="space-y-6 rounded-2xl border border-border/50 bg-card/40 p-6">
-        <form onSubmit={handleRequest} className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
-              <Mail className="h-5 w-5" />
-            </div>
-            <div>
-              <h2 className="font-semibold text-lg">Email Address</h2>
-              <p className="text-muted-foreground text-sm">
-                Change the email address associated with your account.
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email" className="font-medium text-sm">
-              New Email Address
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="john@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="h-9 max-w-md text-sm"
-            />
-          </div>
-
-          <div className="flex justify-end">
+      <form onSubmit={handleRequest}>
+        <Section
+          icon={<Mail className="h-4 w-4" />}
+          title="Email Address"
+          action={
             <Button
               type="submit"
               size="sm"
@@ -171,11 +136,25 @@ export function ProfileEmailForm() {
               ) : (
                 <Check className="mr-2 h-4 w-4" />
               )}
-              Update Email
+              Save Changes
             </Button>
-          </div>
-        </form>
-      </div>
+          }
+        >
+          <Row
+            label="New Email Address"
+            description="Change the email address associated with your account."
+          >
+            <Input
+              id="email"
+              type="email"
+              placeholder="john@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-10 w-full"
+            />
+          </Row>
+        </Section>
+      </form>
 
       <Dialog open={otpOpen} onOpenChange={setOtpOpen}>
         <DialogContent>
@@ -240,60 +219,27 @@ export function ProfilePasswordForm() {
   };
 
   return (
-    <div className="space-y-6 rounded-2xl border border-border/50 bg-card/40 p-6">
-      <form onSubmit={handleSave} className="space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-5 w-5"
-            >
-              <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-          </div>
-          <div>
-            <h2 className="font-semibold text-lg">Change Password</h2>
-            <p className="text-muted-foreground text-sm">Update the password you use to sign in.</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="oldPassword" className="font-medium text-sm">
-              Current Password
-            </Label>
-            <Input
-              id="oldPassword"
-              type="password"
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-              className="h-9 text-sm"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="newPassword" className="font-medium text-sm">
-              New Password
-            </Label>
-            <Input
-              id="newPassword"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="h-9 text-sm"
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end">
+    <form onSubmit={handleSave}>
+      <Section
+        icon={
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-4 w-4"
+          >
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        }
+        title="Change Password"
+        action={
           <Button
             type="submit"
             size="sm"
@@ -304,10 +250,31 @@ export function ProfilePasswordForm() {
             ) : (
               <Check className="mr-2 h-4 w-4" />
             )}
-            Update Password
+            Save Changes
           </Button>
-        </div>
-      </form>
-    </div>
+        }
+      >
+        <Row label="Current Password" description="Update the password you use to sign in.">
+          <Input
+            id="oldPassword"
+            type="password"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            className="h-10 w-full"
+            placeholder="Current Password"
+          />
+        </Row>
+        <Row label="New Password">
+          <Input
+            id="newPassword"
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            className="h-10 w-full"
+            placeholder="New Password"
+          />
+        </Row>
+      </Section>
+    </form>
   );
 }

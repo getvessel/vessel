@@ -60,6 +60,14 @@ export const backupsService = {
     }
   },
 
+  deleteRecord: async (configId: string, recordId: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/backups/${configId}/records/${recordId}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   listRecords: async (id: string): Promise<ListBackupRecordsResponse> => {
     try {
       return await apiClient.get<ListBackupRecordsResponse>(`/backups/${id}/records`);

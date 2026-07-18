@@ -49,20 +49,17 @@ export const MaintenancePage = () => {
     }
   };
 
-  // Safe fallback values
   const usedPercent = stats?.disk.percent ? Number(stats.disk.percent.toFixed(1)) : 0;
   const freeGb = stats?.disk.freeGb ? stats.disk.freeGb.toFixed(1) : '0';
   const usedGb = stats?.disk.usedGb ? stats.disk.usedGb.toFixed(1) : '0';
   const totalGb = stats?.disk.totalGb ? stats.disk.totalGb.toFixed(1) : '0';
 
-  // Dynamic Docker stats
   const dockerPercent =
     stats?.disk?.totalGb && stats?.docker?.reclaimableGb
       ? Number(((stats.docker.reclaimableGb / stats.disk.totalGb) * 100).toFixed(1))
       : 0;
   const reclaimableGb = stats?.docker?.reclaimableGb ? stats.docker.reclaimableGb.toFixed(2) : '0';
 
-  // Extract just the numerical part for the build cache summary if possible
   const buildCacheReclaimableStr = stats?.docker?.buildCache?.reclaimable || '0';
   const buildCacheGb = parseFloat(buildCacheReclaimableStr)
     ? parseFloat(buildCacheReclaimableStr).toFixed(2)
@@ -70,7 +67,6 @@ export const MaintenancePage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header section */}
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
@@ -116,9 +112,7 @@ export const MaintenancePage = () => {
         </div>
       ) : null}
 
-      {/* Top Cards Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {/* Root Disk */}
         <div className="flex flex-col justify-between space-y-6 rounded-2xl border border-border/50 bg-card/40 p-6">
           <div className="flex items-center justify-between">
             <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
@@ -137,7 +131,6 @@ export const MaintenancePage = () => {
           </div>
         </div>
 
-        {/* Docker Cleanup */}
         <div className="flex flex-col justify-between space-y-6 rounded-2xl border border-border/50 bg-card/40 p-6">
           <div className="flex items-center justify-between">
             <p className="w-32 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
@@ -156,7 +149,6 @@ export const MaintenancePage = () => {
           </div>
         </div>
 
-        {/* Build Artifacts */}
         <div className="flex flex-col justify-between space-y-6 rounded-2xl border border-border/50 bg-card/40 p-6">
           <div className="flex items-center justify-between">
             <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
@@ -174,7 +166,6 @@ export const MaintenancePage = () => {
         </div>
       </div>
 
-      {/* Trend Charts */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="flex h-32 flex-col rounded-2xl border border-border/50 bg-card/40 p-6">
           <p className="mb-4 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
@@ -216,9 +207,7 @@ export const MaintenancePage = () => {
         </div>
       </div>
 
-      {/* Lower Section */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Docker Storage (Left) */}
         <div className="overflow-hidden rounded-2xl border border-border/50 bg-card/40 lg:col-span-2">
           <div className="flex items-center justify-between border-border/50 border-b p-6">
             <h3 className="font-bold text-xl">Docker storage</h3>
@@ -231,7 +220,6 @@ export const MaintenancePage = () => {
           </div>
 
           <div className="divide-y divide-border/50">
-            {/* Images */}
             <div className="grid grid-cols-3 items-center p-6">
               <div>
                 <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
@@ -254,7 +242,6 @@ export const MaintenancePage = () => {
                 </div>
               </div>
             </div>
-            {/* Containers */}
             <div className="grid grid-cols-3 items-center p-6">
               <div>
                 <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
@@ -279,7 +266,6 @@ export const MaintenancePage = () => {
                 </div>
               </div>
             </div>
-            {/* Local Volumes */}
             <div className="grid grid-cols-3 items-center p-6">
               <div>
                 <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
@@ -302,7 +288,6 @@ export const MaintenancePage = () => {
                 </div>
               </div>
             </div>
-            {/* Build Cache */}
             <div className="grid grid-cols-3 items-center p-6">
               <div>
                 <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
@@ -327,7 +312,6 @@ export const MaintenancePage = () => {
                 </div>
               </div>
             </div>
-            {/* Help text */}
             <div className="bg-background/30 p-6 text-muted-foreground text-xs">
               Docker can keep image layers listed as candidates after safe cleanup when running
               services still reference them.
@@ -335,7 +319,6 @@ export const MaintenancePage = () => {
           </div>
         </div>
 
-        {/* Cleanup Actions (Right) */}
         <div className="flex flex-col space-y-6 rounded-2xl border border-border/50 bg-card/40 p-6 lg:col-span-1">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
@@ -395,7 +378,6 @@ export const MaintenancePage = () => {
         </div>
       </div>
 
-      {/* Modals */}
       <Dialog open={confirmCleanup} onOpenChange={setConfirmCleanup}>
         <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-125 [&>button]:hidden">
           <div className="flex flex-col p-8 pb-6">

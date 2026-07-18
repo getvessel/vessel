@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '#/components/ui/dialog';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '#/components/ui/input-otp';
+import { Section } from '#/components/ui/section';
 import { useDisable2FA, useSetup2FA, useVerify2FA } from '#/hooks/useAuth';
 import { useGetProfile } from '#/hooks/useProfile';
 
@@ -81,61 +82,46 @@ export function Security2FASetup() {
 
   return (
     <>
-      <div className="space-y-6 rounded-2xl border border-border/50 bg-card/40 p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5"
-              >
-                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="font-semibold text-lg">Two-Factor Authentication</h2>
-              <p className="text-muted-foreground text-sm">
-                Add an extra layer of security to your account.
-              </p>
-            </div>
-          </div>
-          {isEnabled ? (
-            <Button
-              variant="destructive"
-              onClick={handleDisableClick}
-              className="h-11 font-bold text-xs uppercase tracking-wider"
-            >
-              DISABLE 2FA
+      <Section
+        icon={
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-4 w-4"
+          >
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        }
+        title="Two-Factor Authentication"
+        action={
+          isEnabled ? (
+            <Button variant="destructive" size="sm" onClick={handleDisableClick}>
+              Disable 2FA
             </Button>
           ) : (
-            <Button
-              onClick={handleEnableClick}
-              disabled={setup2FA.isPending}
-              className="h-11 bg-primary font-bold text-primary-foreground text-xs uppercase tracking-wider"
-            >
+            <Button size="sm" onClick={handleEnableClick} disabled={setup2FA.isPending}>
               {setup2FA.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              ENABLE 2FA
+              Enable 2FA
             </Button>
-          )}
-        </div>
-
-        <div className="space-y-4">
+          )
+        }
+      >
+        <div className="py-4">
           <p className="text-muted-foreground text-sm leading-relaxed">
             {isEnabled
               ? 'Two-factor authentication is currently enabled. You will need to enter a code from your authenticator app when signing in.'
               : 'Protect your account from unauthorized access by requiring a second authentication method in addition to your password.'}
           </p>
         </div>
-      </div>
+      </Section>
 
       <Dialog open={verifyOpen} onOpenChange={setVerifyOpen}>
         <DialogContent>

@@ -1,4 +1,4 @@
-import { CheckCircle2, Globe, Network } from 'lucide-react';
+import { CheckCircle2, Globe } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
@@ -24,7 +24,6 @@ export const DnsSettings = () => {
     namecheapApiKey: '',
     namecheapClientIp: '',
     spaceshipApiKey: '',
-    // Added for UI fidelity, not currently saved to backend
     cloudflareEmail: '',
     cloudflareZoneId: '',
     spaceshipApiSecret: '',
@@ -76,7 +75,6 @@ export const DnsSettings = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
@@ -104,7 +102,6 @@ export const DnsSettings = () => {
         </div>
       </div>
 
-      {/* Cards */}
       <div className="grid grid-cols-1 gap-6 pt-2 md:grid-cols-3">
         {providers.map((p) => {
           const isActive = activeProvider === p.id;
@@ -150,7 +147,6 @@ export const DnsSettings = () => {
         })}
       </div>
 
-      {/* Active Content */}
       <div className="mt-4 space-y-10 rounded-2xl border border-border/50 bg-card/40 p-6">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border/50 bg-background/50">

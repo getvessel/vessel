@@ -132,6 +132,8 @@ func (s *Server) registerRoutes() {
 	authGroup.POST("/backups/:id/trigger", s.backupHandler.Trigger)
 	authGroup.POST("/backups/:id/restore", s.backupHandler.Restore)
 	authGroup.GET("/backups/:id/records", s.backupHandler.ListRecords)
+	authGroup.GET("/backups/:id/records/:recordId/download", s.backupHandler.DownloadRecord)
+	authGroup.DELETE("/backups/:id/records/:recordId", s.backupHandler.DeleteRecord)
 	authGroup.GET("/s3-destinations", s.backupHandler.ListS3Destinations)
 	authGroup.POST("/s3-destinations", s.backupHandler.CreateS3Destination)
 	authGroup.DELETE("/s3-destinations/:id", s.backupHandler.DeleteS3Destination)

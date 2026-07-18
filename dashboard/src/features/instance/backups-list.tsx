@@ -6,41 +6,16 @@ import { toast } from 'sonner';
 import { Badge } from '#/components/ui/badge';
 import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
-import { Label } from '#/components/ui/label';
+import { Row, Section } from '#/components/ui/section';
 import { Switch } from '#/components/ui/switch';
-import { useCreate, useDelete, useList, useListRecords, useTrigger } from '#/hooks/useBackups';
-
-type SectionProps = {
-  icon: React.ReactNode;
-  title: string;
-  action?: React.ReactNode;
-  children: React.ReactNode;
-};
-const Section = ({ icon, title, action, children }: SectionProps) => (
-  <div className="rounded-xl border border-border/50 bg-card/40 p-6">
-    <div className="mb-4 flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          {icon}
-        </div>
-        <span className="font-semibold text-sm">{title}</span>
-      </div>
-      {action && <div className="flex shrink-0">{action}</div>}
-    </div>
-    <div className="divide-y divide-border/50">{children}</div>
-  </div>
-);
-
-type RowProps = { label: string; description?: string; children: React.ReactNode };
-const Row = ({ label, description, children }: RowProps) => (
-  <div className="flex flex-col gap-4 py-4 md:flex-row md:items-center md:justify-between">
-    <div className="flex-1 pr-4">
-      <Label className="font-medium text-sm">{label}</Label>
-      {description && <p className="mt-1 text-muted-foreground text-sm">{description}</p>}
-    </div>
-    <div className="flex w-full shrink-0 md:w-1/2 md:justify-end">{children}</div>
-  </div>
-);
+import {
+  useCreate,
+  useDelete,
+  useDeleteRecord,
+  useList,
+  useListRecords,
+  useTrigger,
+} from '#/hooks/useBackups';
 
 export function BackupsList() {
   const { data: configsData, isLoading } = useList('global');
@@ -50,6 +25,7 @@ export function BackupsList() {
   const createBackup = useCreate();
   const triggerBackup = useTrigger();
   const deleteBackup = useDelete();
+  const deleteRecord = useDeleteRecord();
 
   const { data: recordsData, isLoading: isLoadingRecords } = useListRecords(config?.id || '');
   const records = recordsData?.data || [];
@@ -135,12 +111,17 @@ export function BackupsList() {
 
   return (
     <div className="space-y-6 pb-12">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="font-semibold text-lg">System Backups</h2>
-          <p className="text-muted-foreground text-sm">
-            Backup configuration for the Vessl instance database.
-          </p>
+      <div className="mb-5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
+            <Database className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="font-bold text-xl">System Backups</h1>
+            <p className="text-muted-foreground text-sm">
+              Backup configuration for the Vessl instance database.
+            </p>
+          </div>
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
@@ -148,13 +129,18 @@ export function BackupsList() {
             variant="outline"
             onClick={handleTrigger}
             disabled={triggerBackup.isPending || !config}
+            className="flex h-11 items-center gap-2 rounded-xl border-border/50 bg-background/50 px-6 font-semibold text-foreground text-xs uppercase tracking-widest hover:bg-background"
           >
-            <Play className="mr-2 h-4 w-4" />
-            Backup Now
+            <Play className="h-4 w-4" />
+            {triggerBackup.isPending ? 'TRIGGERING...' : 'BACKUP NOW'}
           </Button>
-          <Button onClick={handleSave} disabled={createBackup.isPending || deleteBackup.isPending}>
-            <Check className="mr-2 h-4 w-4" />
-            {createBackup.isPending || deleteBackup.isPending ? 'Saving...' : 'Save Changes'}
+          <Button
+            onClick={handleSave}
+            disabled={createBackup.isPending || deleteBackup.isPending}
+            className="flex h-11 items-center gap-2 rounded-xl px-6 font-semibold text-xs uppercase tracking-widest transition-all"
+          >
+            <Check className="h-4 w-4" />
+            {createBackup.isPending || deleteBackup.isPending ? 'SAVING...' : 'SAVE CHANGES'}
           </Button>
         </div>
       </div>
@@ -229,16 +215,7 @@ export function BackupsList() {
         </Row>
       </Section>
 
-      <Section
-        icon={<History className="h-4 w-4" />}
-        title={`Executions (${records.length})`}
-        action={
-          <div className="flex items-center gap-3">
-            <Button variant="outline">Cleanup Failed Backups</Button>
-            <Button variant="destructive">Cleanup Deleted</Button>
-          </div>
-        }
-      >
+      <Section icon={<History className="h-4 w-4" />} title={`Executions (${records.length})`}>
         <div className="flex flex-col gap-4 py-4">
           <div className="flex flex-col gap-4">
             {isLoadingRecords ? (
@@ -288,11 +265,25 @@ export function BackupsList() {
                   </div>
 
                   <div className="mt-2 flex items-center gap-2">
-                    <Button variant="outline" size="sm" asChild disabled={!record.s3Url}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      disabled={!record.s3Url && !record.filePath}
+                    >
                       {record.s3Url ? (
                         <a href={record.s3Url} target="_blank" rel="noreferrer">
                           <Download className="mr-2 h-4 w-4" />
-                          Download
+                          Download S3
+                        </a>
+                      ) : record.filePath ? (
+                        <a
+                          href={`${import.meta.env.VITE_API_URL}/backups/${config?.id}/records/${record.id}/download`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Download Local
                         </a>
                       ) : (
                         <span>
@@ -301,9 +292,15 @@ export function BackupsList() {
                         </span>
                       )}
                     </Button>
-                    <Button variant="destructive" size="sm">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() =>
+                        deleteRecord.mutate({ id: config?.id || '', recordId: record.id })
+                      }
+                    >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
+                      {deleteRecord.isPending ? 'Deleting...' : 'Delete'}
                     </Button>
                   </div>
                 </div>
