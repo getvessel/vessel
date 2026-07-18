@@ -97,9 +97,13 @@ export const DomainsPage = () => {
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
-          <Button onClick={handleSaveAll} disabled={isPending}>
-            <Check className="mr-2 h-4 w-4" />
-            {isPending ? 'Saving...' : 'Save Changes'}
+          <Button
+            onClick={handleSaveAll}
+            disabled={isPending}
+            className="flex h-11 items-center gap-2 rounded-xl px-6 font-semibold text-xs uppercase tracking-widest transition-all"
+          >
+            <Check className="h-4 w-4" />
+            {isPending ? 'SAVING...' : 'SAVE CHANGES'}
           </Button>
         </div>
       </div>
