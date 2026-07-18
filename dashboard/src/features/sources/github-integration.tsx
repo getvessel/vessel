@@ -345,12 +345,10 @@ export function GithubIntegration() {
             )}
 
             {!editingApp && (
-              <div className="relative mt-8 flex flex-col items-center justify-center space-y-4">
-                <div className="relative flex w-full justify-center border-border/50 border-t">
-                  <span className="absolute -top-3 bg-card px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">
-                    OR ENTER MANUALLY
-                  </span>
-                </div>
+              <div className="relative mt-12 mb-8 flex w-full justify-center border-border/50 border-t">
+                <span className="absolute -top-3 bg-card px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">
+                  OR ENTER MANUALLY
+                </span>
               </div>
             )}
 
@@ -432,12 +430,21 @@ export function GithubIntegration() {
               </div>
 
               <div className="mt-8 flex justify-end gap-3 pt-6">
-                <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
-                  Cancel
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditing(false)}
+                  className="h-11 rounded-xl px-6 font-semibold text-xs uppercase tracking-widest transition-all"
+                >
+                  CANCEL
                 </Button>
-                <Button type="submit" disabled={saveMutation.isPending}>
+                <Button
+                  type="submit"
+                  disabled={saveMutation.isPending}
+                  className="h-11 rounded-xl px-6 font-semibold text-xs uppercase tracking-widest transition-all"
+                >
                   <Check className="mr-2 h-4 w-4" />
-                  {saveMutation.isPending ? 'Saving...' : 'Save Settings'}
+                  {saveMutation.isPending ? 'SAVING...' : 'SAVE SETTINGS'}
                 </Button>
               </div>
             </form>

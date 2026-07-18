@@ -115,7 +115,7 @@ export function ApiKeysList() {
           </p>
           <Button
             onClick={() => setIsCreateOpen(true)}
-            className="h-11 rounded-xl border-primary/20 bg-primary/10 px-6 font-semibold text-primary text-xs uppercase tracking-widest hover:bg-primary/20 hover:text-primary"
+            className="h-11 rounded-xl px-6 font-semibold text-xs uppercase tracking-widest transition-all"
           >
             <Plus className="mr-2 h-4 w-4" /> CREATE API KEY
           </Button>
