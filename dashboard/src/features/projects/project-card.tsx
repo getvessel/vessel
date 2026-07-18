@@ -31,122 +31,67 @@ const getIcon = (iconName: string) => {
   return IconMap[iconName.toLowerCase()] || <Box className="h-5 w-5 text-primary" />;
 };
 
-export const ProjectCard = ({
-  project,
-  mode = 'grid',
-}: {
-  project: CanvasSummary;
-  mode?: 'grid' | 'list';
-}) => {
-  if (mode === 'list') {
-    return (
-      <Link to={`/projects/$projectId`} params={{ projectId: project.id }} className="group block">
-        <div className="rounded-2xl border border-border/50 bg-card/40 p-6 transition-colors hover:border-primary/50 hover:bg-card/80">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-3">
-                <h3 className="font-bold text-foreground text-xl transition-colors group-hover:text-primary">
-                  {project.name}
-                </h3>
-                {project.defaultEnvironment && (
-                  <div className="rounded border border-primary/30 bg-primary/10 px-2 py-0.5 font-bold text-[10px] text-primary uppercase tracking-widest">
-                    {project.defaultEnvironment.name}
-                  </div>
-                )}
-              </div>
-              <p className="mt-2 font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
-                {project.totalServices} service{project.totalServices === 1 ? '' : 's'}
-              </p>
+export const ProjectCard = ({ project }: { project: CanvasSummary }) => {
+  return (
+    <Link
+      to={`/projects/$projectId`}
+      params={{ projectId: project.id }}
+      className="group block h-full"
+    >
+      <div className="flex h-full flex-col rounded-2xl border border-border/50 bg-card/40 p-5 transition-colors hover:border-primary/50 hover:bg-card/80">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="font-bold text-foreground text-lg transition-colors group-hover:text-primary">
+              {project.name}
+            </h3>
+            <div className="mt-1 flex items-center gap-2 font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
+              {project.defaultEnvironment ? (
+                <>
+                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
+                  <span>{project.defaultEnvironment.name}</span>
+                </>
+              ) : (
+                <>
+                  <div className="h-1.5 w-1.5 rounded-full bg-zinc-500/80"></div>
+                  <span>No Environment</span>
+                </>
+              )}
             </div>
-
-            <div className="flex flex-col items-end justify-center">
-              <div className="flex items-center gap-2 font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
-                {project.defaultEnvironment ? (
-                  <>
-                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
-                    <span>Production</span>
-                  </>
-                ) : (
-                  <>
-                    <div className="h-1.5 w-1.5 rounded-full bg-zinc-500/80"></div>
-                    <span>No env</span>
-                  </>
-                )}
-                <span className="opacity-50">•</span>
-                <span>
-                  {project.onlineServices}/{project.totalServices} online
-                </span>
-              </div>
-            </div>
+          </div>
+          <div className="rounded border border-primary/30 bg-primary/10 px-2 py-0.5 font-bold text-[10px] text-primary uppercase tracking-widest">
+            {project.onlineServices}/{project.totalServices} ONLINE
           </div>
         </div>
-      </Link>
-    );
-  }
 
-  return (
-    <Link to={`/projects/$projectId`} params={{ projectId: project.id }} className="group block">
-      <div className="relative overflow-hidden border border-border/40 bg-card/60 p-5 text-left shadow-sm transition-colors hover:border-primary/50 hover:bg-card">
-        <div className="relative z-10">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <h2 className="truncate font-semibold text-[15px] transition-colors group-hover:text-primary">
-                {project.name}
-              </h2>
+        <div className="mt-6 flex-1 border-border/50 border-t pt-6">
+          {project.totalServices === 0 ? (
+            <div className="flex h-[72px] items-center justify-center rounded-xl border border-border/50 border-dashed bg-background/30">
+              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
+                No services attached
+              </span>
             </div>
-            <span className="shrink-0 border border-border/50 bg-background px-2.5 py-1 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
-              {project.totalServices} service{project.totalServices !== 1 ? 's' : ''}
-            </span>
-          </div>
-
-          <div className="mt-5">
-            <div className="border border-border/40 bg-muted/20 p-2">
-              <div
-                className="flex min-h-[140px] items-center justify-center bg-[#0d0d10] p-5"
-                style={{
-                  backgroundImage:
-                    'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0)',
-                  backgroundSize: '16px 16px',
-                }}
-              >
-                {project.totalServices === 0 ? (
-                  <div className="flex h-full min-h-[140px] items-center justify-center text-muted-foreground text-xs">
-                    No services yet.
+          ) : (
+            <div className="flex flex-col gap-3">
+              <span className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
+                Attached Services
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {project.serviceIcons?.slice(0, 5).map((icon, i) => (
+                  <div
+                    key={i}
+                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-border/50 bg-background/50 shadow-sm transition-colors group-hover:border-primary/30"
+                  >
+                    {getIcon(icon)}
                   </div>
-                ) : (
-                  <div className="flex max-w-[11.5rem] flex-wrap items-center justify-center gap-2">
-                    {project.serviceIcons?.slice(0, 7).map((icon, i) => (
-                      <div
-                        key={i}
-                        className="flex h-10 w-10 items-center justify-center rounded-md border border-border/40 bg-background p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
-                      >
-                        {getIcon(icon)}
-                      </div>
-                    ))}
+                ))}
+                {project.totalServices > 5 && (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border/50 bg-background/50 font-mono text-[10px] text-muted-foreground shadow-sm">
+                    +{project.totalServices - 5}
                   </div>
                 )}
               </div>
             </div>
-          </div>
-
-          <div className="mt-5 flex items-center gap-2 text-[13px] text-muted-foreground">
-            {project.defaultEnvironment && (
-              <>
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
-                <span>{project.defaultEnvironment.name}</span>
-                <span className="px-1 opacity-40">•</span>
-              </>
-            )}
-            {!project.defaultEnvironment && project.totalServices > 0 && (
-              <>
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
-                <span className="pr-1 opacity-40">•</span>
-              </>
-            )}
-            <span>
-              {project.onlineServices}/{project.totalServices} services online
-            </span>
-          </div>
+          )}
         </div>
       </div>
     </Link>

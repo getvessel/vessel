@@ -31,6 +31,7 @@ export const useCreateApp = () => {
     }) => appsService.createApp(payload.environmentId, payload.payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apps'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -44,6 +45,7 @@ export const useUpdateApp = () => {
     }) => appsService.updateApp(payload.appId, payload.payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apps'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -54,6 +56,7 @@ export const useDeleteApp = () => {
     mutationFn: (payload: { appId: string }) => appsService.deleteApp(payload.appId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apps'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };

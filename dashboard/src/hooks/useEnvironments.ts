@@ -15,6 +15,7 @@ export const useCreateEnvironment = () => {
       environmentsService.createEnvironment(payload.projectId, payload.name),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['environments'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -26,6 +27,7 @@ export const useDeleteEnvironment = () => {
       environmentsService.deleteEnvironment(payload.environmentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['environments'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };

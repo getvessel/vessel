@@ -22,6 +22,7 @@ export const useCreateDatabase = () => {
       databasesService.createDatabase(payload.payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['databases'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -32,6 +33,7 @@ export const useDeleteDatabase = () => {
     mutationFn: (payload: { id: string }) => databasesService.deleteDatabase(payload.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['databases'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };

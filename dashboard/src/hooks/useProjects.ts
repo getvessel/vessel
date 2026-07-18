@@ -22,6 +22,7 @@ export const useCreateProject = () => {
       projectsService.createProject(payload.payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -32,6 +33,7 @@ export const useDeleteProject = () => {
     mutationFn: (payload: { id: string }) => projectsService.deleteProject(payload.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -42,6 +44,7 @@ export const useDeployProject = () => {
     mutationFn: (payload: { id: string }) => projectsService.deployProject(payload.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
