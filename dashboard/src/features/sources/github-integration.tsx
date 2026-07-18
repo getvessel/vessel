@@ -288,14 +288,28 @@ export function GithubIntegration() {
                   </DialogTitle>
                 </div>
               </div>
-              <DialogClose asChild>
-                <Button
-                  variant="outline"
-                  className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
-                >
-                  CLOSE
-                </Button>
-              </DialogClose>
+              <div className="flex items-center gap-3">
+                {!editingApp && (
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="gap-2 border-primary/20 bg-primary/10 font-bold text-primary text-xs uppercase tracking-widest hover:bg-primary/20 hover:text-primary"
+                  >
+                    <a href="https://github.com/settings/apps/new" target="_blank" rel="noreferrer">
+                      <ExternalLink className="h-4 w-4" />
+                      CREATE GITHUB APP
+                    </a>
+                  </Button>
+                )}
+                <DialogClose asChild>
+                  <Button
+                    variant="outline"
+                    className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
+                  >
+                    CLOSE
+                  </Button>
+                </DialogClose>
+              </div>
             </div>
           </div>
 
@@ -336,12 +350,6 @@ export function GithubIntegration() {
                   <span className="absolute -top-3 bg-card px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">
                     OR ENTER MANUALLY
                   </span>
-                </div>
-
-                <div className="mt-6 flex w-full items-center justify-between">
-                  <div className="text-muted-foreground text-sm leading-relaxed">
-                    Already created an app? Enter your credentials below.
-                  </div>
                 </div>
               </div>
             )}
