@@ -1,4 +1,4 @@
-import { Loader2, ShieldCheck } from 'lucide-react';
+import { Loader2, ShieldCheck, Trash2 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -153,15 +153,20 @@ export function Security2FASetup() {
 
       <Dialog open={verifyOpen} onOpenChange={setVerifyOpen}>
         <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-120 [&>button]:hidden">
-          <div className="flex flex-col p-8 pb-6">
+          <div className="flex flex-col p-6 pb-4">
             <div className="flex items-start justify-between">
-              <div className="flex flex-col">
-                <DialogTitle className="font-bold text-2xl tracking-tight">
-                  Setup Two-Factor Auth
-                </DialogTitle>
-                <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                  SCAN QR CODE THEN ENTER THE 6-DIGIT CODE.
-                </DialogDescription>
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+                  <ShieldCheck className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex flex-col">
+                  <DialogTitle className="font-bold text-2xl tracking-tight">
+                    Setup Two-Factor Auth
+                  </DialogTitle>
+                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+                    SCAN QR CODE THEN ENTER THE 6-DIGIT CODE.
+                  </DialogDescription>
+                </div>
               </div>
               <DialogClose asChild>
                 <Button
@@ -177,7 +182,7 @@ export function Security2FASetup() {
 
           <div className="h-px w-full bg-border/50" />
 
-          <div className="flex flex-col items-center gap-6 p-8">
+          <div className="flex flex-col items-center gap-6 p-6">
             <QrCodeImage uri={qrCodeUri} />
 
             <div className="flex flex-col items-center gap-2">
@@ -190,7 +195,7 @@ export function Security2FASetup() {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-6 p-8 pt-2">
+          <div className="flex items-center justify-end gap-6 p-6 pt-2">
             <Button variant="ghost" onClick={() => setVerifyOpen(false)}>
               Cancel
             </Button>
@@ -204,15 +209,20 @@ export function Security2FASetup() {
 
       <Dialog open={disableOpen} onOpenChange={setDisableOpen}>
         <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-120 [&>button]:hidden">
-          <div className="flex flex-col p-8 pb-6">
+          <div className="flex flex-col p-6 pb-4">
             <div className="flex items-start justify-between">
-              <div className="flex flex-col">
-                <DialogTitle className="font-bold text-2xl text-destructive tracking-tight">
-                  Disable Two-Factor Auth
-                </DialogTitle>
-                <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                  CONFIRM WITH YOUR AUTHENTICATOR APP CODE.
-                </DialogDescription>
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-destructive/20 bg-destructive/10">
+                  <Trash2 className="h-5 w-5 text-destructive" />
+                </div>
+                <div className="flex flex-col">
+                  <DialogTitle className="font-bold text-2xl text-destructive tracking-tight">
+                    Disable Two-Factor Auth
+                  </DialogTitle>
+                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+                    CONFIRM WITH YOUR AUTHENTICATOR APP CODE.
+                  </DialogDescription>
+                </div>
               </div>
               <DialogClose asChild>
                 <Button
@@ -228,7 +238,7 @@ export function Security2FASetup() {
 
           <div className="h-px w-full bg-border/50" />
 
-          <div className="flex flex-col items-center gap-4 p-8">
+          <div className="flex flex-col items-center gap-4 p-6">
             <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
               ENTER VERIFICATION CODE
             </p>
@@ -237,7 +247,7 @@ export function Security2FASetup() {
             </InputOTP>
           </div>
 
-          <div className="flex items-center justify-end gap-6 p-8 pt-2">
+          <div className="flex items-center justify-end gap-6 p-6 pt-2">
             <Button variant="ghost" onClick={() => setDisableOpen(false)}>
               Cancel
             </Button>

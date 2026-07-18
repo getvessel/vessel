@@ -1,3 +1,4 @@
+import { FolderKanban } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
@@ -40,13 +41,20 @@ export function CreateProjectModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[500px] [&>button]:hidden">
         <form onSubmit={handleSubmit}>
-          <div className="flex flex-col p-8 pb-6">
+          <div className="flex flex-col p-6 pb-4">
             <div className="flex items-start justify-between">
-              <div className="flex flex-col">
-                <DialogTitle className="font-bold text-2xl tracking-tight">New Project</DialogTitle>
-                <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                  CREATE THE PROJECT FIRST, THEN ADD SERVICES INSIDE IT.
-                </DialogDescription>
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+                  <FolderKanban className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex flex-col">
+                  <DialogTitle className="font-bold text-2xl tracking-tight">
+                    New Project
+                  </DialogTitle>
+                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+                    CREATE THE PROJECT FIRST, THEN ADD SERVICES INSIDE IT.
+                  </DialogDescription>
+                </div>
               </div>
               <DialogClose asChild>
                 <Button
@@ -62,7 +70,7 @@ export function CreateProjectModal({
 
           <div className="h-px w-full bg-border/50" />
 
-          <div className="space-y-6 p-8">
+          <div className="space-y-6 p-6">
             <div className="space-y-3">
               <Label className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
                 PROJECT NAME
@@ -88,7 +96,7 @@ export function CreateProjectModal({
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-6 p-8 pt-6">
+          <div className="flex items-center justify-end gap-6 p-6 pt-0">
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>

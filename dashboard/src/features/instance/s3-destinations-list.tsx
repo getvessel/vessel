@@ -1,8 +1,15 @@
-import { Cloud, Database, Eye, EyeOff, Info, MoreVertical, Plus, Trash, X } from 'lucide-react';
+import { Cloud, Database, Eye, EyeOff, Info, MoreVertical, Plus, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '#/components/ui/dialog';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '#/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -123,17 +130,32 @@ export function S3DestinationsList() {
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
-            <div className="flex items-center justify-between border-border/50 border-b px-6 py-4">
-              <DialogTitle className="font-semibold text-lg">New S3 Storage</DialogTitle>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-full"
-                onClick={() => setIsOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+            <div className="flex flex-col p-6 pb-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+                    <Database className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex flex-col">
+                    <DialogTitle className="font-bold text-2xl tracking-tight">
+                      New S3 Storage
+                    </DialogTitle>
+                    <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+                      CONNECT COMPATIBLE S3 STORAGE.
+                    </DialogDescription>
+                  </div>
+                </div>
+                <DialogClose asChild>
+                  <Button
+                    variant="outline"
+                    className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
+                  >
+                    CLOSE
+                  </Button>
+                </DialogClose>
+              </div>
             </div>
+            <div className="h-px w-full bg-border/50" />
             <div className="p-6">
               <p className="mb-6 text-muted-foreground text-sm">
                 For more details, please visit the{' '}

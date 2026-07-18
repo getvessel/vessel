@@ -276,7 +276,7 @@ export function GithubIntegration() {
 
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-4xl [&>button]:hidden">
-          <div className="flex flex-col p-8 pb-6">
+          <div className="flex flex-col p-6 pb-4">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
@@ -313,7 +313,7 @@ export function GithubIntegration() {
             </div>
           </div>
 
-          <div className="p-8 pt-0">
+          <div className="p-6 pt-0">
             {!editingApp && (
               <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
                 <div className="flex items-center justify-between">
@@ -425,7 +425,7 @@ export function GithubIntegration() {
                   placeholder="-----BEGIN RSA PRIVATE KEY-----"
                   value={privateKey}
                   onChange={(e) => setPrivateKey(e.target.value)}
-                  className="min-h-[160px] bg-background/50 font-mono"
+                  className="min-h-40 bg-background/50 font-mono"
                 />
               </div>
 
@@ -453,16 +453,21 @@ export function GithubIntegration() {
       </Dialog>
 
       <Dialog open={!!deletingApp} onOpenChange={(open) => !open && setDeletingApp(null)}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[500px] [&>button]:hidden">
-          <div className="flex flex-col p-8 pb-6">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-125 [&>button]:hidden">
+          <div className="flex flex-col p-6 pb-4">
             <div className="flex items-start justify-between">
-              <div className="flex flex-col">
-                <DialogTitle className="font-bold text-2xl text-destructive tracking-tight">
-                  Remove GitHub App
-                </DialogTitle>
-                <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                  THIS WILL BREAK EXISTING DEPLOYMENTS.
-                </DialogDescription>
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-destructive/20 bg-destructive/10">
+                  <Trash className="h-5 w-5 text-destructive" />
+                </div>
+                <div className="flex flex-col">
+                  <DialogTitle className="font-bold text-2xl text-destructive tracking-tight">
+                    Remove GitHub App
+                  </DialogTitle>
+                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+                    THIS WILL BREAK EXISTING DEPLOYMENTS.
+                  </DialogDescription>
+                </div>
               </div>
               <DialogClose asChild>
                 <Button
@@ -475,7 +480,7 @@ export function GithubIntegration() {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 p-8 pt-6">
+          <div className="flex items-center justify-end gap-3 p-6 pt-0">
             <Button onClick={() => setDeletingApp(null)}>Cancel</Button>
             <Button
               onClick={(e) => {

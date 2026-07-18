@@ -4,10 +4,9 @@ import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from '#/components/ui/dialog';
 import { Input } from '#/components/ui/input';
@@ -157,14 +156,34 @@ export function ProfileEmailForm() {
       </form>
 
       <Dialog open={otpOpen} onOpenChange={setOtpOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Verify Email Change</DialogTitle>
-            <DialogDescription>
-              We've sent a 6-digit verification code to your new email. Enter it below.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-center py-6">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-120 [&>button]:hidden">
+          <div className="flex flex-col p-6 pb-4">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+                  <Mail className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex flex-col">
+                  <DialogTitle className="font-bold text-2xl tracking-tight">
+                    Verify Email Change
+                  </DialogTitle>
+                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+                    WE'VE SENT A 6-DIGIT CODE TO YOUR NEW EMAIL.
+                  </DialogDescription>
+                </div>
+              </div>
+              <DialogClose asChild>
+                <Button
+                  variant="outline"
+                  className="font-medium text-foreground/80 text-sm hover:bg-transparent hover:text-foreground"
+                >
+                  CLOSE
+                </Button>
+              </DialogClose>
+            </div>
+          </div>
+          <div className="h-px w-full bg-border/50" />
+          <div className="flex flex-col items-center gap-4 p-6">
             <InputOTP maxLength={6} value={otp} onChange={setOtp}>
               <InputOTPGroup>
                 <InputOTPSlot index={0} />
@@ -176,8 +195,8 @@ export function ProfileEmailForm() {
               </InputOTPGroup>
             </InputOTP>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOtpOpen(false)}>
+          <div className="flex items-center justify-end gap-6 p-6 pt-0">
+            <Button variant="ghost" onClick={() => setOtpOpen(false)}>
               Cancel
             </Button>
             <Button
@@ -191,7 +210,7 @@ export function ProfileEmailForm() {
               )}
               Verify & Update
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </>

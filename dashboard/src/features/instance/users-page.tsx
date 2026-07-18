@@ -1,4 +1,4 @@
-import { Check, Plus, Trash2, Users } from 'lucide-react';
+import { Check, Mail, Plus, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
@@ -98,17 +98,22 @@ export const UsersPage = () => {
               INVITE USER
             </Button>
           </DialogTrigger>
-          <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[500px] [&>button]:hidden">
+          <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-125 [&>button]:hidden">
             <form onSubmit={handleInvite}>
-              <div className="flex flex-col p-8 pb-6">
+              <div className="flex flex-col p-6 pb-4">
                 <div className="flex items-start justify-between">
-                  <div className="flex flex-col">
-                    <DialogTitle className="font-bold text-2xl tracking-tight">
-                      Invite User
-                    </DialogTitle>
-                    <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                      SEND AN EMAIL INVITATION TO A NEW USER.
-                    </DialogDescription>
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+                      <Mail className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex flex-col">
+                      <DialogTitle className="font-bold text-2xl tracking-tight">
+                        Invite User
+                      </DialogTitle>
+                      <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+                        SEND AN EMAIL INVITATION TO A NEW USER.
+                      </DialogDescription>
+                    </div>
                   </div>
                   <DialogClose asChild>
                     <Button
@@ -123,7 +128,7 @@ export const UsersPage = () => {
 
               <div className="h-px w-full bg-border/50" />
 
-              <div className="p-8">
+              <div className="p-6">
                 <div className="space-y-3">
                   <Label
                     htmlFor="email"
@@ -143,7 +148,7 @@ export const UsersPage = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-6 p-8 pt-6">
+              <div className="flex items-center justify-end gap-6 p-6 pt-0">
                 <Button type="button" variant="ghost" onClick={() => setInviteOpen(false)}>
                   Cancel
                 </Button>
@@ -159,7 +164,7 @@ export const UsersPage = () => {
 
       <div className="grid grid-cols-1 gap-6">
         {isLoading &&
-          [1, 2, 3].map((i) => <Skeleton key={i} className="h-[120px] w-full rounded-2xl" />)}
+          [1, 2, 3].map((i) => <Skeleton key={i} className="h-30 w-full rounded-2xl" />)}
         {!isLoading && users.length === 0 && (
           <div className="flex items-center gap-3 rounded-2xl border border-border/50 bg-card/40 p-6">
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -174,16 +179,21 @@ export const UsersPage = () => {
       </div>
 
       <Dialog open={!!target} onOpenChange={(o) => !o && setTarget(null)}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[500px] [&>button]:hidden">
-          <div className="flex flex-col p-8 pb-6">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-125 [&>button]:hidden">
+          <div className="flex flex-col p-6 pb-4">
             <div className="flex items-start justify-between">
-              <div className="flex flex-col">
-                <DialogTitle className="font-bold text-2xl text-destructive tracking-tight">
-                  Remove User
-                </DialogTitle>
-                <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
-                  THIS WILL PERMANENTLY REMOVE {target?.email}.
-                </DialogDescription>
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-destructive/20 bg-destructive/10">
+                  <Trash2 className="h-5 w-5 text-destructive" />
+                </div>
+                <div className="flex flex-col">
+                  <DialogTitle className="font-bold text-2xl text-destructive tracking-tight">
+                    Remove User
+                  </DialogTitle>
+                  <DialogDescription className="mt-1 font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
+                    THIS WILL PERMANENTLY REMOVE {target?.email}.
+                  </DialogDescription>
+                </div>
               </div>
               <DialogClose asChild>
                 <Button
@@ -196,7 +206,7 @@ export const UsersPage = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-6 p-8 pt-6">
+          <div className="flex items-center justify-end gap-6 p-6 pt-0">
             <Button onClick={() => setTarget(null)}>Cancel</Button>
             <Button onClick={confirmDelete} disabled={deleting} variant="destructive">
               <Trash2 className="mr-2 h-4 w-4" />

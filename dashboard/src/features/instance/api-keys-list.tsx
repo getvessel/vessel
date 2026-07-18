@@ -214,7 +214,7 @@ export function ApiKeysList() {
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-2xl [&>button]:hidden">
-          <div className="flex flex-col p-8 pb-6">
+          <div className="flex flex-col p-6 pb-4">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
@@ -239,7 +239,7 @@ export function ApiKeysList() {
 
           <div className="h-px w-full bg-border/50" />
 
-          <div className="space-y-8 p-8">
+          <div className="space-y-6 p-6">
             <div className="space-y-3">
               <Label className="font-bold text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
                 NAME
@@ -380,7 +380,7 @@ export function ApiKeysList() {
 
       <Dialog open={isNewKeyOpen} onOpenChange={setIsNewKeyOpen}>
         <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-2xl [&>button]:hidden">
-          <div className="flex flex-col p-8 pb-6">
+          <div className="flex flex-col p-6 pb-4">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
@@ -408,7 +408,7 @@ export function ApiKeysList() {
 
           <div className="h-px w-full bg-border/50" />
 
-          <div className="p-8">
+          <div className="p-6">
             <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
               <div className="mb-4 flex items-start justify-between">
                 <div className="flex items-center gap-2">
@@ -455,7 +455,7 @@ export function ApiKeysList() {
       </Dialog>
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-md [&>button]:hidden">
-          <div className="flex flex-col p-8 pb-6">
+          <div className="flex flex-col p-6 pb-4">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-destructive/20 bg-destructive/10">
@@ -473,7 +473,7 @@ export function ApiKeysList() {
               will immediately lose access. This action cannot be undone.
             </p>
           </div>
-          <div className="flex justify-end gap-3 p-8 pt-6">
+          <div className="flex items-center justify-end gap-6 p-6 pt-0">
             <Button
               variant="ghost"
               onClick={() => setDeleteId(null)}

@@ -46,11 +46,11 @@ export const ImportModal = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-187.5 [&>button]:hidden">
-        <div className="flex flex-col p-8 pb-6">
+        <div className="flex flex-col p-6 pb-4">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
-                <Database className="h-6 w-6 text-primary" />
+                <Database className="h-5 w-5 text-primary" />
               </div>
               <div className="flex flex-col">
                 <DialogTitle className="font-bold text-2xl tracking-tight">
@@ -74,7 +74,7 @@ export const ImportModal = ({
 
         <div className="h-px w-full bg-border/50" />
 
-        <div className="grid grid-cols-1 gap-6 p-8 md:grid-cols-2 md:gap-8">
+        <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2 md:gap-8">
           <div className="space-y-3">
             <Label
               htmlFor="migrationBundle"
@@ -122,8 +122,9 @@ export const ImportModal = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-6 p-8 pt-6">
+        <div className="flex items-center justify-end gap-6 p-6 pt-0">
           <Button
+            variant="ghost"
             onClick={() => {
               setFileName('');
               setPassphrase('');
@@ -134,7 +135,7 @@ export const ImportModal = ({
             Cancel
           </Button>
           <Button onClick={handleImport} disabled={isPending || !selectedFile || !passphrase}>
-            <Check className="h-4 w-4" /> {isPending ? 'IMPORTING...' : 'IMPORT'}
+            <Check className="mr-2 h-4 w-4" /> {isPending ? 'IMPORTING...' : 'IMPORT'}
           </Button>
         </div>
       </DialogContent>
