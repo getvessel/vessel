@@ -1,4 +1,4 @@
-import { Check, Trash2 } from 'lucide-react';
+import { Check, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '#/components/ui/badge';
@@ -86,12 +86,17 @@ export const UsersPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="font-semibold text-lg">Users</h2>
-          <p className="text-muted-foreground text-sm">
-            Manage who has access to this Vessl instance.
-          </p>
+      <div className="mb-5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Users className="h-4.5 w-4.5" />
+          </div>
+          <div>
+            <h1 className="font-bold text-xl">Users</h1>
+            <p className="text-muted-foreground text-sm">
+              Manage who has access to this Vessl instance.
+            </p>
+          </div>
         </div>
         <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
           <DialogTrigger asChild>

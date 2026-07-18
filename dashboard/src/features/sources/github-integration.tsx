@@ -164,8 +164,18 @@ export function GithubIntegration() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="font-bold text-lg">Connected GitHub Apps</h2>
+      <div className="mb-5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <GithubIcon className="h-4.5 w-4.5" />
+          </div>
+          <div>
+            <h1 className="font-bold text-xl">Connected GitHub Apps</h1>
+            <p className="text-muted-foreground text-sm">
+              Connect GitHub Apps to automatically deploy pushed commits.
+            </p>
+          </div>
+        </div>
         <Button
           className="gap-2"
           onClick={() => {
