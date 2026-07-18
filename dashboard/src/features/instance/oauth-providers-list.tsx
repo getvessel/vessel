@@ -51,7 +51,7 @@ const PROVIDERS: ProviderConfig[] = [
     ],
   },
   {
-    id: 'azuread',
+    id: 'microsoft',
     name: 'Microsoft',
     fields: [
       {

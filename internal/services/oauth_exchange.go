@@ -86,7 +86,7 @@ var providerConfigs = map[string]oauthConfig{
 		TokenURLBuilder: func(p *models.OAuthProviderConfig) string { return "https://oauth2.googleapis.com/token" },
 		UserURLBuilder:  func(p *models.OAuthProviderConfig) string { return "https://openidconnect.googleapis.com/v1/userinfo" },
 	},
-	"azuread": {
+	"microsoft": {
 		AuthURLBuilder: func(p *models.OAuthProviderConfig, state string) string {
 			tenant := p.Tenant
 			if tenant == "" {
