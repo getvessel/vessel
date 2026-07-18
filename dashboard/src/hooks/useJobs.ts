@@ -22,6 +22,7 @@ export const useCreateJob = () => {
       jobsService.createJob(payload.payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -32,6 +33,7 @@ export const useDeleteJob = () => {
     mutationFn: (payload: { id: string }) => jobsService.deleteJob(payload.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -42,6 +44,7 @@ export const useTriggerJob = () => {
     mutationFn: (payload: { id: string }) => jobsService.triggerJob(payload.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };

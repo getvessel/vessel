@@ -44,6 +44,7 @@ export const useStartDatabase = () => {
     mutationFn: (payload: { id: string }) => databasesService.startDatabase(payload.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['databases'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -54,6 +55,7 @@ export const useStopDatabase = () => {
     mutationFn: (payload: { id: string }) => databasesService.stopDatabase(payload.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['databases'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -64,6 +66,7 @@ export const useRestartDatabase = () => {
     mutationFn: (payload: { id: string }) => databasesService.restartDatabase(payload.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['databases'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };

@@ -67,6 +67,7 @@ export const useStopApp = () => {
     mutationFn: (payload: { appId: string }) => appsService.stopApp(payload.appId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apps'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -77,6 +78,7 @@ export const useRedeployApp = () => {
     mutationFn: (payload: { appId: string }) => appsService.redeployApp(payload.appId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apps'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -87,6 +89,7 @@ export const useRestartApp = () => {
     mutationFn: (payload: { appId: string }) => appsService.restartApp(payload.appId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apps'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };

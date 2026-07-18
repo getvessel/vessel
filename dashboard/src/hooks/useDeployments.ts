@@ -17,6 +17,7 @@ export const useTrigger = () => {
     }) => deploymentsService.trigger(payload.serviceId, payload.payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deployments'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
@@ -28,6 +29,7 @@ export const useRollback = () => {
       deploymentsService.rollback(payload.deploymentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deployments'] });
+      queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
