@@ -1,4 +1,4 @@
-import { Clock, Cpu, Globe, Info, Lock } from 'lucide-react';
+import { Check, Clock, Cpu, Globe, Info, Lock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
@@ -130,7 +130,8 @@ export const GeneralSettings = () => {
             Core instance configuration and network settings.
           </p>
         </div>
-        <Button size="sm" onClick={handleSave} disabled={isPending}>
+        <Button onClick={handleSave} disabled={isPending} className="h-11 px-8 font-bold text-xs uppercase tracking-wider">
+          <Check className="mr-2 h-4 w-4" />
           {isPending ? 'Saving…' : 'Save Changes'}
         </Button>
       </div>

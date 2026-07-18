@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
@@ -95,13 +96,13 @@ export const OAuthProvidersList = () => {
     setForm((f) => ({ ...f, [providerId]: { ...f[providerId], [key]: value } }));
   };
 
-  const handleSave = async (providerId: string) => {
-    setSaving(providerId);
+  const handleSaveAll = async () => {
+    setSaving('all');
     try {
-      await save({ payload: form[providerId] as SaveOAuthProviderRequest });
-      toast.success(`${PROVIDERS.find((p) => p.id === providerId)?.name} OAuth saved`);
+      await Promise.all(PROVIDERS.map(p => save({ payload: form[p.id] as SaveOAuthProviderRequest })));
+      toast.success('OAuth providers saved');
     } catch {
-      toast.error('Failed to save OAuth provider');
+      toast.error('Failed to save OAuth providers');
     } finally {
       setSaving(null);
     }
@@ -119,14 +120,24 @@ export const OAuthProvidersList = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="font-semibold text-lg">OAuth Providers</h2>
-        <p className="text-muted-foreground text-sm">
-          Enable OAuth login for users. The redirect URI is{' '}
-          <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
-            {window.location.origin}/api/auth/oauth/[provider]/callback
-          </code>
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-semibold text-lg">OAuth Providers</h2>
+          <p className="text-muted-foreground text-sm">
+            Enable OAuth login for users. The redirect URI is{' '}
+            <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
+              {window.location.origin}/api/auth/oauth/[provider]/callback
+            </code>
+          </p>
+        </div>
+        <Button
+          onClick={handleSaveAll}
+          disabled={saving === 'all' || isPending}
+          className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
+        >
+          <Check className="mr-2 h-4 w-4" />
+          {saving === 'all' ? 'Saving…' : 'Save Changes'}
+        </Button>
       </div>
 
       {PROVIDERS.map((provider) => {
@@ -162,16 +173,6 @@ export const OAuthProvidersList = () => {
               ))}
             </div>
 
-            <div className="mt-4 flex justify-end">
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={isSaving}
-                onClick={() => handleSave(provider.id)}
-              >
-                {isSaving ? 'Saving…' : 'Save'}
-              </Button>
-            </div>
           </div>
         );
       })}

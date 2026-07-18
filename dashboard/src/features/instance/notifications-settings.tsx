@@ -1,4 +1,4 @@
-import { Bell, Mail, MessageSquare, Phone, Send, Webhook, Zap } from 'lucide-react';
+import { Bell, Check, Mail, MessageSquare, Phone, Send, Webhook, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
@@ -196,12 +196,22 @@ export const NotificationsSettings = () => {
             Configure where Vessl sends alerts for deployments, errors, and system events.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground text-sm">Global alerts</span>
-          <Switch
-            checked={form.notificationAlerts}
-            onCheckedChange={(v) => set('notificationAlerts', v)}
-          />
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground text-sm">Global alerts</span>
+            <Switch
+              checked={form.notificationAlerts}
+              onCheckedChange={(v) => set('notificationAlerts', v)}
+            />
+          </div>
+          <Button
+            onClick={handleSave}
+            disabled={isPending}
+            className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
+          >
+            <Check className="mr-2 h-4 w-4" />
+            {isPending ? 'Saving…' : 'Save Changes'}
+          </Button>
         </div>
       </div>
 
@@ -425,11 +435,7 @@ export const NotificationsSettings = () => {
         </div>
       </Section>
 
-      <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={isPending} size="sm">
-          {isPending ? 'Saving…' : 'Save Notification Settings'}
-        </Button>
-      </div>
+
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { Database, Download, Play, RefreshCw, Trash2 } from 'lucide-react';
+import { Check, Database, Download, Play, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '#/components/ui/badge';
@@ -82,6 +82,7 @@ export function BackupsList() {
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button className="h-11 px-8 font-bold text-xs uppercase tracking-wider">
+                <Plus className="mr-2 h-4 w-4" />
                 Create Backup Config
               </Button>
             </DialogTrigger>
@@ -129,10 +130,20 @@ export function BackupsList() {
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4">
-                  <Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setIsCreateOpen(false)}
+                    className="h-11 px-8 font-bold text-muted-foreground text-xs uppercase tracking-wider hover:bg-muted hover:text-foreground"
+                  >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={createBackup.isPending}>
+                  <Button
+                    type="submit"
+                    disabled={createBackup.isPending}
+                    className="h-11 px-8 font-bold text-xs uppercase tracking-wider"
+                  >
+                    <Check className="mr-2 h-4 w-4" />
                     {createBackup.isPending ? 'Creating...' : 'Create'}
                   </Button>
                 </div>
