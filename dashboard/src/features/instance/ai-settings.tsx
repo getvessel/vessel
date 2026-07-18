@@ -184,7 +184,7 @@ export function AISettings() {
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleSetDefault(provider.id);
+                    handleSetDefault(isDefault ? 'none' : provider.id);
                   }}
                   className="flex h-8 w-8 items-center justify-center rounded-md border border-border/50 bg-background/50 text-muted-foreground hover:text-foreground"
                 >
@@ -202,7 +202,7 @@ export function AISettings() {
                     type="password"
                     placeholder="sk-..."
                     defaultValue={currentKey}
-                    className="h-8 bg-background/50 font-mono text-xs"
+                    className="h-10 font-mono text-sm"
                     onBlur={(e) => {
                       if (e.target.value !== currentKey) {
                         handleUpdateKey(provider.keyField, e.target.value);

@@ -50,19 +50,6 @@ export function MigrationSettings() {
               </p>
             </div>
           </div>
-
-          <Button
-            type="submit"
-            disabled={isExporting || !passphrase || passphrasesMismatch}
-            className="flex h-11 items-center gap-2 rounded-xl px-6 font-semibold text-xs uppercase tracking-widest transition-all"
-          >
-            {isExporting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4" />
-            )}
-            {isExporting ? 'EXPORTING...' : 'DOWNLOAD BUNDLE'}
-          </Button>
         </div>
 
         <div className="flex items-start gap-3 rounded-xl border border-blue-500/20 bg-blue-500/10 p-4">
@@ -78,7 +65,24 @@ export function MigrationSettings() {
           </div>
         </div>
 
-        <Section icon={<ArrowRightLeft className="h-4 w-4" />} title="Export Instance Bundle">
+        <Section
+          icon={<ArrowRightLeft className="h-4 w-4" />}
+          title="Export Instance Bundle"
+          action={
+            <Button
+              type="submit"
+              size="sm"
+              disabled={isExporting || !passphrase || passphrasesMismatch}
+            >
+              {isExporting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              {isExporting ? 'Exporting...' : 'Download Bundle'}
+            </Button>
+          }
+        >
           <Row
             label="Migration Passphrase"
             description="Used to encrypt the exported bundle. Store it somewhere safe."

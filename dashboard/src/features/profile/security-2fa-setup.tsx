@@ -1,23 +1,19 @@
-import QRCode from "qrcode";
-import { Loader2, ShieldCheck } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { Button } from "#/components/ui/button";
+import { Loader2, ShieldCheck } from 'lucide-react';
+import QRCode from 'qrcode';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from '#/components/ui/button';
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "#/components/ui/dialog";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "#/components/ui/input-otp";
-import { Section } from "#/components/ui/section";
-import { useDisable2FA, useSetup2FA, useVerify2FA } from "#/hooks/useAuth";
-import { useGetProfile } from "#/hooks/useProfile";
+} from '#/components/ui/dialog';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '#/components/ui/input-otp';
+import { Section } from '#/components/ui/section';
+import { useDisable2FA, useSetup2FA, useVerify2FA } from '#/hooks/useAuth';
+import { useGetProfile } from '#/hooks/useProfile';
 
 function OtpSlots() {
   const indices = [0, 1, 2, 3, 4, 5] as const;
@@ -35,17 +31,17 @@ function OtpSlots() {
 }
 
 function QrCodeImage({ uri }: { uri: string }) {
-  const [dataUrl, setDataUrl] = useState("");
+  const [dataUrl, setDataUrl] = useState('');
 
   useEffect(() => {
     if (!uri) return;
     QRCode.toDataURL(uri, {
       width: 200,
       margin: 1,
-      color: { dark: "#000000", light: "#ffffff" },
+      color: { dark: '#000000', light: '#ffffff' },
     })
       .then(setDataUrl)
-      .catch(() => setDataUrl(""));
+      .catch(() => setDataUrl(''));
   }, [uri]);
 
   if (!dataUrl) {
@@ -70,18 +66,18 @@ export function Security2FASetup() {
   const verify2FA = useVerify2FA();
   const disable2FA = useDisable2FA();
 
-  const [qrCodeUri, setQrCodeUri] = useState("");
+  const [qrCodeUri, setQrCodeUri] = useState('');
   const [verifyOpen, setVerifyOpen] = useState(false);
   const [disableOpen, setDisableOpen] = useState(false);
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState('');
 
   const isEnabled = profile?.data?.totpEnabled;
 
   const handleEnableClick = () => {
     setup2FA.mutate(undefined, {
       onSuccess: (res) => {
-        setQrCodeUri(res.data?.qrCodeUri ?? "");
-        setOtp("");
+        setQrCodeUri(res.data?.qrCodeUri ?? '');
+        setOtp('');
         setVerifyOpen(true);
       },
       onError: (err) => toast.error(err.message),
@@ -89,7 +85,7 @@ export function Security2FASetup() {
   };
 
   const handleDisableClick = () => {
-    setOtp("");
+    setOtp('');
     setDisableOpen(true);
   };
 
@@ -99,11 +95,11 @@ export function Security2FASetup() {
       {
         onSuccess: () => {
           setVerifyOpen(false);
-          setQrCodeUri("");
-          toast.success("Two-factor authentication enabled successfully.");
+          setQrCodeUri('');
+          toast.success('Two-factor authentication enabled successfully.');
         },
         onError: (err) => toast.error(err.message),
-      },
+      }
     );
   };
 
@@ -113,10 +109,10 @@ export function Security2FASetup() {
       {
         onSuccess: () => {
           setDisableOpen(false);
-          toast.success("Two-factor authentication disabled.");
+          toast.success('Two-factor authentication disabled.');
         },
         onError: (err) => toast.error(err.message),
-      },
+      }
     );
   };
 
@@ -135,22 +131,12 @@ export function Security2FASetup() {
         title="Two-Factor Authentication"
         action={
           isEnabled ? (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDisableClick}
-            >
+            <Button variant="destructive" size="sm" onClick={handleDisableClick}>
               Disable 2FA
             </Button>
           ) : (
-            <Button
-              size="sm"
-              onClick={handleEnableClick}
-              disabled={setup2FA.isPending}
-            >
-              {setup2FA.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+            <Button size="sm" onClick={handleEnableClick} disabled={setup2FA.isPending}>
+              {setup2FA.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Enable 2FA
             </Button>
           )
@@ -159,8 +145,8 @@ export function Security2FASetup() {
         <div className="py-4">
           <p className="text-muted-foreground text-sm leading-relaxed">
             {isEnabled
-              ? "Two-factor authentication is currently enabled. You will need to enter a code from your authenticator app when signing in."
-              : "Protect your account from unauthorized access by requiring a second authentication method in addition to your password."}
+              ? 'Two-factor authentication is currently enabled. You will need to enter a code from your authenticator app when signing in.'
+              : 'Protect your account from unauthorized access by requiring a second authentication method in addition to your password.'}
           </p>
         </div>
       </Section>
@@ -208,13 +194,8 @@ export function Security2FASetup() {
             <Button variant="ghost" onClick={() => setVerifyOpen(false)}>
               Cancel
             </Button>
-            <Button
-              onClick={handleVerify}
-              disabled={otp.length !== 6 || verify2FA.isPending}
-            >
-              {verify2FA.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+            <Button onClick={handleVerify} disabled={otp.length !== 6 || verify2FA.isPending}>
+              {verify2FA.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Verify & Enable
             </Button>
           </div>
@@ -265,9 +246,7 @@ export function Security2FASetup() {
               onClick={handleDisable}
               disabled={otp.length !== 6 || disable2FA.isPending}
             >
-              {disable2FA.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+              {disable2FA.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Disable 2FA
             </Button>
           </div>
