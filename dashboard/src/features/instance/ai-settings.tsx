@@ -1,79 +1,79 @@
-import { Brain, Check, ChevronDown, Star } from "lucide-react";
-import { useState } from "react";
+import { Brain, Check, ChevronDown, Star } from 'lucide-react';
+import { useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "#/components/ui/dropdown-menu";
-import { Input } from "#/components/ui/input";
-import { useGetAISettings, useUpdateAISettings } from "#/hooks/useSettings";
-import { aiProviderCatalog } from "#/lib/ai-providers";
+} from '#/components/ui/dropdown-menu';
+import { Input } from '#/components/ui/input';
+import { useGetAISettings, useUpdateAISettings } from '#/hooks/useSettings';
+import { aiProviderCatalog } from '#/lib/ai-providers';
 
 const PROVIDERS = [
   {
-    id: "openai",
-    name: "OpenAI",
-    models: aiProviderCatalog.find((c) => c.id === "openai")?.models || [],
-    icon: "/ai-providers/openai.svg",
-    keyField: "openAIKey" as const,
-    modelField: "openAIModel" as const,
+    id: 'openai',
+    name: 'OpenAI',
+    models: aiProviderCatalog.find((c) => c.id === 'openai')?.models || [],
+    icon: '/ai-providers/openai.svg',
+    keyField: 'openAIKey' as const,
+    modelField: 'openAIModel' as const,
   },
   {
-    id: "anthropic",
-    name: "Anthropic",
-    models: aiProviderCatalog.find((c) => c.id === "anthropic")?.models || [],
-    icon: "/ai-providers/anthropic.svg",
-    keyField: "anthropicKey" as const,
-    modelField: "anthropicModel" as const,
+    id: 'anthropic',
+    name: 'Anthropic',
+    models: aiProviderCatalog.find((c) => c.id === 'anthropic')?.models || [],
+    icon: '/ai-providers/anthropic.svg',
+    keyField: 'anthropicKey' as const,
+    modelField: 'anthropicModel' as const,
   },
   {
-    id: "google",
-    name: "Google",
-    models: aiProviderCatalog.find((c) => c.id === "google")?.models || [],
-    icon: "/ai-providers/google.svg",
-    keyField: "googleKey" as const,
-    modelField: "googleModel" as const,
+    id: 'google',
+    name: 'Google',
+    models: aiProviderCatalog.find((c) => c.id === 'google')?.models || [],
+    icon: '/ai-providers/google.svg',
+    keyField: 'googleKey' as const,
+    modelField: 'googleModel' as const,
   },
   {
-    id: "mistral",
-    name: "Mistral",
-    models: aiProviderCatalog.find((c) => c.id === "mistral")?.models || [],
-    icon: "/ai-providers/mistral.svg",
-    keyField: "mistralKey" as const,
-    modelField: "mistralModel" as const,
+    id: 'mistral',
+    name: 'Mistral',
+    models: aiProviderCatalog.find((c) => c.id === 'mistral')?.models || [],
+    icon: '/ai-providers/mistral.svg',
+    keyField: 'mistralKey' as const,
+    modelField: 'mistralModel' as const,
   },
   {
-    id: "groq",
-    name: "Groq",
-    models: aiProviderCatalog.find((c) => c.id === "groq")?.models || [],
-    icon: "/ai-providers/groq.svg",
-    keyField: "groqKey" as const,
-    modelField: "groqModel" as const,
+    id: 'groq',
+    name: 'Groq',
+    models: aiProviderCatalog.find((c) => c.id === 'groq')?.models || [],
+    icon: '/ai-providers/groq.svg',
+    keyField: 'groqKey' as const,
+    modelField: 'groqModel' as const,
   },
   {
-    id: "deepseek",
-    name: "DeepSeek",
-    models: aiProviderCatalog.find((c) => c.id === "deepseek")?.models || [],
-    icon: "/ai-providers/deepseek.svg",
-    keyField: "deepSeekKey" as const,
-    modelField: "deepSeekModel" as const,
+    id: 'deepseek',
+    name: 'DeepSeek',
+    models: aiProviderCatalog.find((c) => c.id === 'deepseek')?.models || [],
+    icon: '/ai-providers/deepseek.svg',
+    keyField: 'deepSeekKey' as const,
+    modelField: 'deepSeekModel' as const,
   },
   {
-    id: "xai",
-    name: "xAI",
-    models: aiProviderCatalog.find((c) => c.id === "xai")?.models || [],
-    icon: "/ai-providers/xai.svg",
-    keyField: "xaiKey" as const,
-    modelField: "xaiModel" as const,
+    id: 'xai',
+    name: 'xAI',
+    models: aiProviderCatalog.find((c) => c.id === 'xai')?.models || [],
+    icon: '/ai-providers/xai.svg',
+    keyField: 'xaiKey' as const,
+    modelField: 'xaiModel' as const,
   },
   {
-    id: "moonshot",
-    name: "Moonshot",
-    models: aiProviderCatalog.find((c) => c.id === "moonshot")?.models || [],
-    icon: "/ai-providers/moonshot.svg",
-    keyField: "moonshotKey" as const,
-    modelField: "moonshotModel" as const,
+    id: 'moonshot',
+    name: 'Moonshot',
+    models: aiProviderCatalog.find((c) => c.id === 'moonshot')?.models || [],
+    icon: '/ai-providers/moonshot.svg',
+    keyField: 'moonshotKey' as const,
+    modelField: 'moonshotModel' as const,
   },
 ] as const;
 
@@ -82,7 +82,7 @@ export function AISettings() {
   const updateSettings = useUpdateAISettings();
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const defaultProvider = (settings?.data?.defaultProvider as string) || "none";
+  const defaultProvider = (settings?.data?.defaultProvider as string) || 'none';
 
   const handleSetDefault = (id: string) => {
     updateSettings.mutate({ defaultProvider: id });
@@ -102,8 +102,7 @@ export function AISettings() {
           <div>
             <h1 className="font-bold text-xl">AI</h1>
             <p className="text-muted-foreground text-sm">
-              Configure built-in AI models and providers for your Vessl
-              instance.
+              Configure built-in AI models and providers for your Vessl instance.
             </p>
           </div>
         </div>
@@ -117,12 +116,9 @@ export function AISettings() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {PROVIDERS.map((provider) => {
           const isDefault = defaultProvider === provider.id;
-          const currentKey =
-            (settings?.data?.[provider.keyField] as string) || "";
+          const currentKey = (settings?.data?.[provider.keyField] as string) || '';
           const currentModel =
-            (settings?.data?.[provider.modelField] as string) ||
-            provider.models[0]?.id ||
-            "";
+            (settings?.data?.[provider.modelField] as string) || provider.models[0]?.id || '';
           const isSet = currentKey.length > 0;
           const isEditing = editingId === provider.id;
 
@@ -145,9 +141,7 @@ export function AISettings() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="font-semibold text-sm leading-none">
-                      {provider.name}
-                    </h3>
+                    <h3 className="font-semibold text-sm leading-none">{provider.name}</h3>
                     <div className="flex items-center text-muted-foreground">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -157,9 +151,8 @@ export function AISettings() {
                             onClick={(e) => e.stopPropagation()}
                           >
                             <span className="truncate">
-                              {provider.models.find(
-                                (m) => m.id === currentModel,
-                              )?.name || currentModel}
+                              {provider.models.find((m) => m.id === currentModel)?.name ||
+                                currentModel}
                             </span>
                             <ChevronDown className="h-3 w-3 shrink-0" />
                           </button>
@@ -168,15 +161,11 @@ export function AISettings() {
                           {provider.models.map((m) => (
                             <DropdownMenuItem
                               key={m.id}
-                              onSelect={() =>
-                                handleUpdateKey(provider.modelField, m.id)
-                              }
+                              onSelect={() => handleUpdateKey(provider.modelField, m.id)}
                               className="flex cursor-pointer items-center justify-between py-2"
                             >
                               <div className="flex flex-col">
-                                <span className="font-medium text-sm">
-                                  {m.name}
-                                </span>
+                                <span className="font-medium text-sm">{m.name}</span>
                                 <span className="font-mono text-[10px] text-muted-foreground">
                                   {m.id}
                                 </span>
@@ -200,7 +189,7 @@ export function AISettings() {
                   className="flex h-8 w-8 items-center justify-center rounded-md border border-border/50 bg-background/50 text-muted-foreground hover:text-foreground"
                 >
                   <Star
-                    className={`h-4 w-4 ${isDefault ? "fill-foreground text-foreground" : ""}`}
+                    className={`h-4 w-4 ${isDefault ? 'fill-foreground text-foreground' : ''}`}
                   />
                 </button>
               </div>
@@ -223,7 +212,7 @@ export function AISettings() {
                       }
                     }}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") {
+                      if (e.key === 'Enter') {
                         e.currentTarget.blur();
                       }
                     }}
