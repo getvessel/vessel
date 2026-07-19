@@ -18,6 +18,19 @@ export const templatesService = {
     }
   },
 
+  listExampleApps: async (): Promise<
+    { id: string; name: string; description: string; repo: string; icon?: string }[]
+  > => {
+    try {
+      const response = await apiClient.get<{
+        data: { id: string; name: string; description: string; repo: string; icon?: string }[];
+      }>('/examples');
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   deployOneClickApp: async (payload: OneClickDeployRequest): Promise<OneClickDeployResponse> => {
     try {
       return await apiClient.post<OneClickDeployResponse>('/one-click/deploy', payload);

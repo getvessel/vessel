@@ -192,6 +192,8 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	metricsHandler := handlers.NewMetricsHandler(metricsService)
 	logHandler := handlers.NewLogHandler(logService)
 	auditLogHandler := handlers.NewAuditLogHandler(auditService)
+	exampleService := services.NewExampleService()
+	exampleHandler := handlers.NewExampleHandler(exampleService)
 	authLimiter := middleware.NewRateLimiter(10, time.Minute)
 	otpLimiter := middleware.NewRateLimiter(5, time.Minute)
 
@@ -243,6 +245,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		metricsHandler:         metricsHandler,
 		logHandler:             logHandler,
 		auditLogHandler:        auditLogHandler,
+		exampleHandler:         exampleHandler,
 	}
 
 	if srv.deployer != nil {

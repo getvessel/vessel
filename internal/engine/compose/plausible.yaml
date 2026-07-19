@@ -12,4 +12,4 @@ services:
     image: postgres:16-alpine
     restart: always
     environment:
-      POSTGRES_DB: plausible
+      - POSTGRES_DB=plausible
