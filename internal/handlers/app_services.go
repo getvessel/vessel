@@ -360,6 +360,9 @@ func (h *AppHandler) CreateWebhook(c echo.Context) error {
 	if err != nil || !parsedURL.IsAbs() || (parsedURL.Scheme != "http" && parsedURL.Scheme != "https") {
 		return utils.Error(c, http.StatusBadRequest, "invalid webhook url: must be an absolute http/https url")
 	}
+	if parsedURL.Hostname() == "" {
+		return utils.Error(c, http.StatusBadRequest, "invalid webhook url: must have a host")
+	}
 	for _, et := range req.EventTypes {
 		if strings.Contains(et, ",") {
 			return utils.Error(c, http.StatusBadRequest, "event type cannot contain commas")

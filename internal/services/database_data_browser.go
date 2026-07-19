@@ -45,9 +45,14 @@ func getPostgresSchemas(db *models.Database) ([]models.TableSchema, error) {
 	var tableNames []string
 	for rows.Next() {
 		var t string
-		if err := rows.Scan(&t); err == nil {
-			tableNames = append(tableNames, t)
+		if err := rows.Scan(&t); err != nil {
+			return nil, fmt.Errorf("failed to scan table name row: %w", err)
 		}
+		tableNames = append(tableNames, t)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("table rows iteration error: %w", err)
 	}
 
 	colRows, err := conn.Query("SELECT table_name, column_name, data_type, is_nullable FROM information_schema.columns WHERE table_schema='public'")
@@ -59,14 +64,19 @@ func getPostgresSchemas(db *models.Database) ([]models.TableSchema, error) {
 	schemaMap := make(map[string][]models.ColumnSchema)
 	for colRows.Next() {
 		var tName, cName, cType, cNullable string
-		if err := colRows.Scan(&tName, &cName, &cType, &cNullable); err == nil {
-			schemaMap[tName] = append(schemaMap[tName], models.ColumnSchema{
-				Name:       cName,
-				Type:       cType,
-				IsNullable: cNullable == "YES",
-				IsPrimary:  false, // Keeping it simple for v1
-			})
+		if err := colRows.Scan(&tName, &cName, &cType, &cNullable); err != nil {
+			return nil, fmt.Errorf("failed to scan column row: %w", err)
 		}
+		schemaMap[tName] = append(schemaMap[tName], models.ColumnSchema{
+			Name:       cName,
+			Type:       cType,
+			IsNullable: cNullable == "YES",
+			IsPrimary:  false, // Keeping it simple for v1
+		})
+	}
+
+	if err := colRows.Err(); err != nil {
+		return nil, fmt.Errorf("column rows iteration error: %w", err)
 	}
 
 	var schemas []models.TableSchema
@@ -101,9 +111,14 @@ func getMySQLSchemas(db *models.Database) ([]models.TableSchema, error) {
 	var tableNames []string
 	for rows.Next() {
 		var t string
-		if err := rows.Scan(&t); err == nil {
-			tableNames = append(tableNames, t)
+		if err := rows.Scan(&t); err != nil {
+			return nil, fmt.Errorf("failed to scan table name row: %w", err)
 		}
+		tableNames = append(tableNames, t)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("table rows iteration error: %w", err)
 	}
 
 	colRows, err := conn.Query("SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_KEY FROM information_schema.columns WHERE table_schema=?", db.DatabaseName)
@@ -115,14 +130,19 @@ func getMySQLSchemas(db *models.Database) ([]models.TableSchema, error) {
 	schemaMap := make(map[string][]models.ColumnSchema)
 	for colRows.Next() {
 		var tName, cField, cType, cNull, cKey string
-		if err := colRows.Scan(&tName, &cField, &cType, &cNull, &cKey); err == nil {
-			schemaMap[tName] = append(schemaMap[tName], models.ColumnSchema{
-				Name:       cField,
-				Type:       cType,
-				IsNullable: cNull == "YES",
-				IsPrimary:  cKey == "PRI",
-			})
+		if err := colRows.Scan(&tName, &cField, &cType, &cNull, &cKey); err != nil {
+			return nil, fmt.Errorf("failed to scan column row: %w", err)
 		}
+		schemaMap[tName] = append(schemaMap[tName], models.ColumnSchema{
+			Name:       cField,
+			Type:       cType,
+			IsNullable: cNull == "YES",
+			IsPrimary:  cKey == "PRI",
+		})
+	}
+
+	if err := colRows.Err(); err != nil {
+		return nil, fmt.Errorf("column rows iteration error: %w", err)
 	}
 
 	var schemas []models.TableSchema

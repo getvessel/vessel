@@ -36,8 +36,11 @@ func (m *mockAppRepo) Update(ctx context.Context, svc *models.AppService) error 
 	m.updateCalled = true
 	return m.updateErr
 }
-func (m *mockAppRepo) Delete(ctx context.Context, id string) error                { return nil }
-func (m *mockAppRepo) CreateWebhook(ctx context.Context, w *models.Webhook) error { return m.createErr }
+func (m *mockAppRepo) Delete(ctx context.Context, id string) error { return nil }
+func (m *mockAppRepo) CreateWebhook(ctx context.Context, w *models.Webhook) error {
+	m.createCalled = true
+	return m.createErr
+}
 func (m *mockAppRepo) ListWebhooksByService(ctx context.Context, serviceID string) ([]*models.Webhook, error) {
 	return nil, nil
 }

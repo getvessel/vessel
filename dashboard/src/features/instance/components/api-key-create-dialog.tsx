@@ -12,6 +12,7 @@ import {
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
 import { useCreateToken } from '#/hooks/useProfile';
+import type { CreatePATRequest } from '#/interfaces/users';
 
 interface ApiKeyCreateDialogProps {
   open: boolean;
@@ -33,26 +34,28 @@ export function ApiKeyCreateDialog({ open, onOpenChange, onSuccess }: ApiKeyCrea
       return;
     }
 
-    let expiresAt: string | undefined;
+    if (projectScope === 'specific') {
+      toast.error('Select at least one project or choose "All projects"');
+      return;
+    }
+
+    const payload: CreatePATRequest = {
+      name,
+      accessLevel,
+      projectScope,
+      allowedProjects: [],
+    };
     if (expirationDays !== null) {
       const date = new Date();
       date.setDate(date.getDate() + expirationDays);
-      expiresAt = date.toISOString();
+      payload.expiresAt = date.toISOString();
     }
 
     createToken.mutate(
-      {
-        payload: {
-          name,
-          accessLevel,
-          projectScope,
-          allowedProjects: [],
-          expiresAt,
-        },
-      },
+      { payload },
       {
         onSuccess: (data) => {
-          onSuccess(data.plain);
+          onSuccess(data.data.plain);
           setName('');
           setAccessLevel('read');
           setProjectScope('all');

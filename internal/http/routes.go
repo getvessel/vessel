@@ -49,7 +49,7 @@ func (s *Server) registerAuthRoutes(apiGroup, authGroup *echo.Group) {
 	apiGroup.GET("/auth/oauth/:provider/callback", s.oauthHandler.OAuthCallback)
 	authGroup.POST("/auth/2fa/setup", s.oauthHandler.Setup2FA)
 	authGroup.POST("/auth/2fa/verify", s.oauthHandler.Verify2FA)
-	authGroup.POST("/auth/2fa/disable", s.oauthHandler.Disable2FA)
+	authGroup.POST("/auth/2fa/disable", s.oauthHandler.Disable2FA, s.otpRateLimiter.Middleware)
 }
 
 func (s *Server) registerSystemRoutes(apiGroup, authGroup *echo.Group) {

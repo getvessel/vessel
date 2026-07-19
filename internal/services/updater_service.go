@@ -176,7 +176,7 @@ func (u *UpdaterService) DeployUpdate(ctx context.Context) error {
 
 	targetVersion := settingsCfg.LatestVersion
 
-	if !regexp.MustCompile(`^v?\d+\.\d+\.\d+(-\w+)?$`).MatchString(targetVersion) {
+	if !regexp.MustCompile(`^v?\d+\.\d+\.\d+(-[\w.]+)?$`).MatchString(targetVersion) {
 		return fmt.Errorf("invalid target version format: %s", targetVersion)
 	}
 

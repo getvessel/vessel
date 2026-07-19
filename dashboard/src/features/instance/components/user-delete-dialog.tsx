@@ -24,10 +24,9 @@ export function UserDeleteDialog({ target, onClose }: UserDeleteDialogProps) {
     try {
       await deleteUser(target.id);
       toast.success(`${target.name} removed`);
+      onClose();
     } catch {
       toast.error('Failed to remove user');
-    } finally {
-      onClose();
     }
   };
 

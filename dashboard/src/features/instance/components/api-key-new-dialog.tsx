@@ -14,20 +14,36 @@ interface ApiKeyNewDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   newKeyPlain: string;
+  onClose: () => void;
 }
 
-export function ApiKeyNewDialog({ open, onOpenChange, newKeyPlain }: ApiKeyNewDialogProps) {
+export function ApiKeyNewDialog({
+  open,
+  onOpenChange,
+  newKeyPlain,
+  onClose,
+}: ApiKeyNewDialogProps) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(newKeyPlain);
-    setCopied(true);
-    toast.success('API key copied to clipboard');
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(newKeyPlain);
+      setCopied(true);
+      toast.success('API key copied to clipboard');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Failed to copy to clipboard');
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        if (!o) onClose();
+        onOpenChange(o);
+      }}
+    >
       <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-2xl [&>button]:hidden">
         <div className="px-5 pt-5 pb-4">
           <div className="flex items-start justify-between">

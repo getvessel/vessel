@@ -3,6 +3,7 @@ package handlers
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -181,7 +182,10 @@ func (h *OAuthHandler) Disable2FA(c echo.Context) error {
 		return utils.Error(c, http.StatusBadRequest, "missing passcode")
 	}
 	if err := h.oauthService.Validate2FA(c.Request().Context(), userID, payload.Passcode); err != nil {
-		return utils.Error(c, http.StatusUnauthorized, err.Error())
+		if errors.Is(err, services.ErrInvalidPasscode) {
+			return utils.Error(c, http.StatusUnauthorized, err.Error())
+		}
+		return utils.Error(c, http.StatusInternalServerError, "failed to validate 2fa")
 	}
 	if err := h.oauthService.Disable2FA(c.Request().Context(), userID); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())

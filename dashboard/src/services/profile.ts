@@ -6,7 +6,11 @@ import type {
   UpdateProfileRequest,
   VerifyEmailChangeRequest,
 } from '#/interfaces/profile';
-import type { CreatePATRequest, CreatePATResponse, PersonalAccessToken } from '#/interfaces/users';
+import type {
+  CreatePATRequest,
+  CreatePATResponseType,
+  PersonalAccessToken,
+} from '#/interfaces/users';
 import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
 
@@ -62,9 +66,9 @@ export const profileService = {
     }
   },
 
-  createToken: async (payload: CreatePATRequest): Promise<CreatePATResponse> => {
+  createToken: async (payload: CreatePATRequest): Promise<CreatePATResponseType> => {
     try {
-      return await apiClient.post<CreatePATResponse>('/profile/tokens', payload);
+      return await apiClient.post<CreatePATResponseType>('/profile/tokens', payload);
     } catch (error) {
       throw handleApiError(error);
     }

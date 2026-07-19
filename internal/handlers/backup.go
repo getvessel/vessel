@@ -75,7 +75,7 @@ func (h *BackupHandler) Update(c echo.Context) error {
 	if err != nil || existing == nil {
 		var notFoundErr *utils.NotFoundError
 		if err != nil && !errors.As(err, &notFoundErr) {
-			return utils.Error(c, http.StatusInternalServerError, err.Error())
+			return utils.Error(c, http.StatusInternalServerError, "failed to get backup config")
 		}
 		return utils.Error(c, http.StatusNotFound, "backup config not found")
 	}
@@ -178,7 +178,7 @@ func (h *BackupHandler) Get(c echo.Context) error {
 	if err != nil || cfg == nil {
 		var notFoundErr *utils.NotFoundError
 		if err != nil && !errors.As(err, &notFoundErr) {
-			return utils.Error(c, http.StatusInternalServerError, err.Error())
+			return utils.Error(c, http.StatusInternalServerError, "failed to get backup config")
 		}
 		return utils.Error(c, http.StatusNotFound, "backup config not found")
 	}
@@ -258,11 +258,23 @@ func (h *BackupHandler) DownloadRecord(c echo.Context) error {
 		return utils.Error(c, http.StatusBadRequest, "missing id or recordId parameter")
 	}
 	rec, err := h.backupService.GetRecord(c.Request().Context(), recordID)
-	if err != nil || rec == nil {
+	if err != nil {
+		var notFound *utils.NotFoundError
+		if !errors.As(err, &notFound) {
+			return utils.Error(c, http.StatusInternalServerError, "failed to get backup record")
+		}
+		return utils.Error(c, http.StatusNotFound, "record not found")
+	}
+	if rec == nil {
 		return utils.Error(c, http.StatusNotFound, "record not found")
 	}
 	if rec.BackupConfigID != id {
 		return utils.Error(c, http.StatusNotFound, "record not found")
+	}
+	if tokenProjID, ok := c.Get("project_id").(string); ok && tokenProjID != "" {
+		if tokenProjID != rec.ProjectID {
+			return utils.Error(c, http.StatusForbidden, "permission denied for this project")
+		}
 	}
 	if rec.FilePath == "" {
 		return utils.Error(c, http.StatusNotFound, "local backup file not available")
@@ -285,11 +297,23 @@ func (h *BackupHandler) DeleteRecord(c echo.Context) error {
 		return utils.Error(c, http.StatusBadRequest, "missing id or recordId parameter")
 	}
 	rec, err := h.backupService.GetRecord(c.Request().Context(), recordID)
-	if err != nil || rec == nil {
+	if err != nil {
+		var notFound *utils.NotFoundError
+		if !errors.As(err, &notFound) {
+			return utils.Error(c, http.StatusInternalServerError, "failed to get backup record")
+		}
+		return utils.Error(c, http.StatusNotFound, "record not found")
+	}
+	if rec == nil {
 		return utils.Error(c, http.StatusNotFound, "record not found")
 	}
 	if rec.BackupConfigID != id {
 		return utils.Error(c, http.StatusNotFound, "record not found")
+	}
+	if tokenProjID, ok := c.Get("project_id").(string); ok && tokenProjID != "" {
+		if tokenProjID != rec.ProjectID {
+			return utils.Error(c, http.StatusForbidden, "permission denied for this project")
+		}
 	}
 	if err := h.backupService.DeleteRecord(c.Request().Context(), recordID); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())

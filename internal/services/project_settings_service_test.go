@@ -49,6 +49,9 @@ func TestCreateWebhook(t *testing.T) {
 		if res.CreatedAt.IsZero() {
 			t.Error("expected CreatedAt to be set")
 		}
+		if !repo.createCalled {
+			t.Error("expected CreateWebhook to be called")
+		}
 	})
 
 	t.Run("repo error", func(t *testing.T) {
