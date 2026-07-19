@@ -1,7 +1,7 @@
 import { Loader2 } from 'lucide-react';
 import { useListByService } from '#/hooks/useDeployments';
 
-export function ServiceDeployments({ app }: { app: any }) {
+export function ServiceDeployments({ app }: { app: Record<string, unknown> }) {
   const { data, isLoading } = useListByService(app.id);
 
   if (isLoading) {
@@ -17,7 +17,7 @@ export function ServiceDeployments({ app }: { app: any }) {
         <p className="text-gray-500 text-sm">No deployments found.</p>
       ) : (
         <div className="space-y-2">
-          {deployments.map((dep: any) => (
+          {deployments.map((dep: Record<string, unknown>) => (
             <div key={dep.id} className="rounded border p-2 text-sm">
               <span className="font-medium">{dep.status}</span> -{' '}
               {dep.commitMessage || 'Manual deployment'}

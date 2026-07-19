@@ -29,9 +29,6 @@ func NewBackupHandler(s *services.BackupService) *BackupHandler {
 // @Router /backups [get]
 func (h *BackupHandler) List(c echo.Context) error {
 	projectID := c.QueryParam("projectId")
-	if projectID == "" {
-		return utils.Error(c, http.StatusBadRequest, "missing projectId query parameter")
-	}
 	list, err := h.backupService.ListConfigsByProject(c.Request().Context(), projectID)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
@@ -348,9 +345,6 @@ func (h *BackupHandler) Restore(c echo.Context) error {
 // @Router /s3-destinations [get]
 func (h *BackupHandler) ListS3Destinations(c echo.Context) error {
 	projectID := c.QueryParam("projectId")
-	if projectID == "" {
-		return utils.Error(c, http.StatusBadRequest, "missing projectId query parameter")
-	}
 	list, err := h.backupService.ListS3Destinations(c.Request().Context(), projectID)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())

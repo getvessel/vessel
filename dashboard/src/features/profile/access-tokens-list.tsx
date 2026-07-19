@@ -47,7 +47,9 @@ export function AccessTokensList() {
       });
       // Depending on the API, the token itself might be returned here
       // For security, it's typically only returned once
-      setCreatedToken((res as any)?.data?.token || 'token-created-successfully');
+      setCreatedToken(
+        (res as Record<string, unknown>)?.data?.token || 'token-created-successfully'
+      );
     } catch (error) {
       console.error('Failed to create token', error);
     }
@@ -100,7 +102,7 @@ export function AccessTokensList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tokens.map((token: any) => (
+              {tokens.map((token: Record<string, unknown>) => (
                 <TableRow key={token.id}>
                   <TableCell className="font-medium">{token.name}</TableCell>
                   <TableCell>{new Date(token.createdAt).toLocaleString()}</TableCell>

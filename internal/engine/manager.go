@@ -25,7 +25,8 @@ func NewTemplateManager() (*TemplateManager, error) {
 
 	err := fs.WalkDir(templateFiles, "compose", mgr.walkDir)
 	if err != nil {
-		return nil, err
+		fmt.Printf("warning: template manager WalkDir error: %v\n", err)
+		// Return mgr anyway so we don't return nil
 	}
 
 	return mgr, nil
@@ -46,7 +47,8 @@ func (m *TemplateManager) walkDir(path string, d fs.DirEntry, err error) error {
 
 	var tmpl ComposeTemplate
 	if err := yaml.Unmarshal(data, &tmpl); err != nil {
-		return fmt.Errorf("failed to parse template %s: %w", path, err)
+		fmt.Printf("warning: failed to parse template %s: %v\n", path, err)
+		return nil // skip bad files instead of failing everything
 	}
 
 	id := strings.TrimSuffix(d.Name(), ".yaml")
@@ -55,6 +57,9 @@ func (m *TemplateManager) walkDir(path string, d fs.DirEntry, err error) error {
 }
 
 func (m *TemplateManager) GetTemplate(id string) (ComposeTemplate, error) {
+	if m == nil || m.templates == nil {
+		return ComposeTemplate{}, utils.NewNotFoundError("Template", id)
+	}
 	tmpl, exists := m.templates[id]
 	if !exists {
 		return ComposeTemplate{}, utils.NewNotFoundError("Template", id)
@@ -63,6 +68,9 @@ func (m *TemplateManager) GetTemplate(id string) (ComposeTemplate, error) {
 }
 
 func (m *TemplateManager) ListTemplates() []string {
+	if m == nil || m.templates == nil {
+		return []string{}
+	}
 	list := make([]string, 0, len(m.templates))
 	for id := range m.templates {
 		list = append(list, id)

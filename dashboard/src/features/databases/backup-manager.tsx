@@ -1,7 +1,7 @@
 import { Loader2 } from 'lucide-react';
 import { useList } from '#/hooks/useBackups';
 
-export function BackupManager({ database }: { database: any }) {
+export function BackupManager({ database }: { database: Record<string, unknown> }) {
   const { data, isLoading } = useList(database.projectId);
 
   if (isLoading) {

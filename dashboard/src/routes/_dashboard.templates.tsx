@@ -57,7 +57,7 @@ function TemplatesPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {templates.map((template: any) => (
+              {templates.map((template: Record<string, unknown>) => (
                 <Card key={template.id}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -94,7 +94,7 @@ function TemplatesPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {examples.map((example: any) => (
+              {examples.map((example: Record<string, unknown>) => (
                 <Card key={example.id}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">

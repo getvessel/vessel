@@ -48,9 +48,6 @@ func (h *DNSHandler) Create(c echo.Context) error {
 // @Router /dns [get]
 func (h *DNSHandler) List(c echo.Context) error {
 	domain := c.QueryParam("domain")
-	if domain == "" {
-		return utils.Error(c, http.StatusBadRequest, "domain query parameter is required")
-	}
 
 	records, err := h.dnsService.ListByDomain(c.Request().Context(), domain)
 	if err != nil {

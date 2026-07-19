@@ -5,9 +5,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"vessl.dev/vessl/internal/utils"
-
+	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/services"
+	"vessl.dev/vessl/internal/utils"
 )
 
 type CanvasHandler struct {

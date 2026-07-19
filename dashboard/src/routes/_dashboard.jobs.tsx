@@ -57,7 +57,7 @@ function JobsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">All Projects</SelectItem>
-                {projects.map((project: any) => (
+                {projects.map((project: Record<string, unknown>) => (
                   <SelectItem key={project.id} value={project.id}>
                     {project.name}
                   </SelectItem>

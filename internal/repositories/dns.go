@@ -69,7 +69,12 @@ func (r *DNSRepo) ListByDomain(_ context.Context, domainName string) ([]*models.
 	defer r.mu.Unlock()
 
 	var list []*models.DNSRecord
-	err := r.db.Select(&list, `SELECT * FROM dns_records WHERE domain_name = ? ORDER BY created_at ASC`, domainName)
+	var err error
+	if domainName == "" {
+		err = r.db.Select(&list, `SELECT * FROM dns_records ORDER BY created_at ASC`)
+	} else {
+		err = r.db.Select(&list, `SELECT * FROM dns_records WHERE domain_name = ? ORDER BY created_at ASC`, domainName)
+	}
 	if err != nil {
 		return nil, err
 	}

@@ -79,8 +79,13 @@ func (r *JobRepo) ListAll(_ context.Context) ([]models.Job, error) {
 
 func (r *JobRepo) ListByProject(_ context.Context, projectID string) ([]models.Job, error) {
 	var jobs []models.Job
-	err := r.db.Select(&jobs, `SELECT id, project_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at
+	var err error
+	if projectID == "" {
+		err = r.db.Select(&jobs, `SELECT id, project_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at FROM jobs ORDER BY created_at ASC`)
+	} else {
+		err = r.db.Select(&jobs, `SELECT id, project_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at
 		FROM jobs WHERE project_id = ? ORDER BY created_at ASC`, projectID)
+	}
 	if err != nil {
 		return nil, err
 	}

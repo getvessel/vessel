@@ -86,7 +86,7 @@ export function DeploymentRow({ deployment, onViewLogs }: DeploymentRowProps) {
           <button
             type="button"
             className="font-medium text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-            onClick={() => onViewLogs && onViewLogs(deployment.id)}
+            onClick={() => onViewLogs?.(deployment.id)}
           >
             View Logs
           </button>

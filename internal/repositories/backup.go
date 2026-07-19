@@ -205,8 +205,14 @@ func (r *BackupRepo) ListConfigsByProject(ctx context.Context, projectID string)
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var list []*models.BackupConfig
-	err := r.db.SelectContext(ctx, &list, `SELECT id, project_id, COALESCE(database_id, '') as database_id, COALESCE(s3_destination_id, '') as s3_destination_id, name, COALESCE(description, '') as description, COALESCE(db_user, '') as db_user, COALESCE(db_password, '') as db_password, backup_enabled, s3_enabled, disable_local, schedule, COALESCE(timezone, 'UTC') as timezone, timeout, retention_days, max_backups, max_storage_gb, status, created_at, updated_at
+	var err error
+	if projectID == "" {
+		err = r.db.SelectContext(ctx, &list, `SELECT id, project_id, COALESCE(database_id, '') as database_id, COALESCE(s3_destination_id, '') as s3_destination_id, name, COALESCE(description, '') as description, COALESCE(db_user, '') as db_user, COALESCE(db_password, '') as db_password, backup_enabled, s3_enabled, disable_local, schedule, COALESCE(timezone, 'UTC') as timezone, timeout, retention_days, max_backups, max_storage_gb, status, created_at, updated_at
+		FROM backup_configs ORDER BY created_at DESC`)
+	} else {
+		err = r.db.SelectContext(ctx, &list, `SELECT id, project_id, COALESCE(database_id, '') as database_id, COALESCE(s3_destination_id, '') as s3_destination_id, name, COALESCE(description, '') as description, COALESCE(db_user, '') as db_user, COALESCE(db_password, '') as db_password, backup_enabled, s3_enabled, disable_local, schedule, COALESCE(timezone, 'UTC') as timezone, timeout, retention_days, max_backups, max_storage_gb, status, created_at, updated_at
 		FROM backup_configs WHERE project_id = ? ORDER BY created_at DESC`, projectID)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to list backup configs: %w", err)
 	}

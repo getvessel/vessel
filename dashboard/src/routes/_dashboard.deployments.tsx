@@ -71,7 +71,7 @@ function DeploymentsPage() {
                 <SelectValue placeholder="Select Project" />
               </SelectTrigger>
               <SelectContent>
-                {projects.map((project: any) => (
+                {projects.map((project: Record<string, unknown>) => (
                   <SelectItem key={project.id} value={project.id}>
                     {project.name}
                   </SelectItem>
@@ -88,7 +88,7 @@ function DeploymentsPage() {
                 <SelectValue placeholder="Select App" />
               </SelectTrigger>
               <SelectContent>
-                {apps.map((app: any) => (
+                {apps.map((app: Record<string, unknown>) => (
                   <SelectItem key={app.id} value={app.id}>
                     {app.name}
                   </SelectItem>
@@ -124,7 +124,7 @@ function DeploymentsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {deployments.map((deployment: any) => (
+                {deployments.map((deployment: Record<string, unknown>) => (
                   <TableRow key={deployment.id}>
                     <TableCell className="font-medium">{deployment.status}</TableCell>
                     <TableCell>{deployment.branch || '-'}</TableCell>

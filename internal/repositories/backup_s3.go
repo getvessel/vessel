@@ -52,8 +52,14 @@ func (r *S3DestinationRepo) ListS3Destinations(ctx context.Context, projectID st
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var list []*models.S3Destination
-	err := r.db.SelectContext(ctx, &list, `SELECT id, project_id, name, COALESCE(description, '') as description, COALESCE(provider, '') as provider, endpoint, bucket, COALESCE(region, '') as region, COALESCE(access_key_id, '') as access_key_id, COALESCE(secret_access_key, '') as secret_access_key, created_at
+	var err error
+	if projectID == "" {
+		err = r.db.SelectContext(ctx, &list, `SELECT id, project_id, name, COALESCE(description, '') as description, COALESCE(provider, '') as provider, endpoint, bucket, COALESCE(region, '') as region, COALESCE(access_key_id, '') as access_key_id, COALESCE(secret_access_key, '') as secret_access_key, created_at
+		FROM s3_destinations ORDER BY created_at DESC`)
+	} else {
+		err = r.db.SelectContext(ctx, &list, `SELECT id, project_id, name, COALESCE(description, '') as description, COALESCE(provider, '') as provider, endpoint, bucket, COALESCE(region, '') as region, COALESCE(access_key_id, '') as access_key_id, COALESCE(secret_access_key, '') as secret_access_key, created_at
 		FROM s3_destinations WHERE project_id = ? ORDER BY created_at DESC`, projectID)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to list s3 destinations: %w", err)
 	}

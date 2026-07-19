@@ -94,9 +94,6 @@ func (h *GitHandler) ListRepos(c echo.Context) error {
 		return utils.Error(c, http.StatusUnauthorized, "unauthorized")
 	}
 	provider := c.QueryParam("provider")
-	if provider == "" {
-		return utils.Error(c, http.StatusBadRequest, "missing provider query parameter")
-	}
 	repos, err := h.gitService.ListRepositories(c.Request().Context(), userID, provider)
 	if err != nil {
 		return utils.Error(c, http.StatusBadRequest, err.Error())

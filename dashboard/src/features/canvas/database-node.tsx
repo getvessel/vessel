@@ -1,6 +1,6 @@
 import { Handle, Position } from '@xyflow/react';
 
-export function DatabaseNode({ data }: { data: any }) {
+export function DatabaseNode({ data }: { data: Record<string, unknown> }) {
   return (
     <div className="rounded-md border-2 border-green-500 bg-white px-4 py-2 shadow-md">
       <div className="flex items-center">

@@ -28,7 +28,7 @@ export function SmartLinkerDrawer({
   // Fetch available databases or services to link variables from
   const { data: linkableResources, isLoading } = useQuery({
     queryKey: ['project-resources', projectId],
-    queryFn: () => apiClient.get<any[]>(`/projects/${projectId}/resources`),
+    queryFn: () => apiClient.get<Record<string, unknown>[]>(`/projects/${projectId}/resources`),
   });
 
   return (

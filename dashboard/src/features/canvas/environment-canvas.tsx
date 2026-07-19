@@ -23,7 +23,7 @@ const nodeTypes = {
   database: DatabaseNode,
 };
 
-export function EnvironmentCanvas({ envData }: { envData: any }) {
+export function EnvironmentCanvas({ envData }: { envData: Record<string, unknown> }) {
   const { nodes, edges, setNodes, setEdges } = useCanvasSync(envData);
 
   const onNodesChange = useCallback(

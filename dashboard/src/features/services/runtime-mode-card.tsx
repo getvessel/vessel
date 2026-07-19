@@ -24,7 +24,7 @@ export function RuntimeModeCard({ serviceId, initialData }: RuntimeModeCardProps
   const [internalPort, setInternalPort] = useState(initialData?.internalPort || 3000);
 
   const updateMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: Record<string, unknown>) => {
       return apiClient.put(`/services/${serviceId}/runtime`, data);
     },
     onSuccess: () => {
