@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/services"
 	"vessl.dev/vessl/internal/utils"
 )
@@ -17,6 +18,24 @@ func NewNotificationSettingsHandler(s *services.NotificationSettingsService) *No
 	return &NotificationSettingsHandler{notifSettingsService: s}
 }
 
+func maskNotificationSecrets(s *models.NotificationSettings) {
+	if s.SMTPPassword != "" {
+		s.SMTPPassword = "********"
+	}
+	if s.ResendAPIKey != "" {
+		s.ResendAPIKey = "********"
+	}
+	if s.TelegramBotToken != "" {
+		s.TelegramBotToken = "********"
+	}
+	if s.PushoverAPIToken != "" {
+		s.PushoverAPIToken = "********"
+	}
+	if s.SlackWebhookURL != "" {
+		s.SlackWebhookURL = "********"
+	}
+}
+
 func (h *NotificationSettingsHandler) GetNotificationSettings(c echo.Context) error {
 	s, err := h.notifSettingsService.GetNotificationSettings(c.Request().Context())
 	if err != nil {
@@ -24,22 +43,7 @@ func (h *NotificationSettingsHandler) GetNotificationSettings(c echo.Context) er
 	}
 
 	masked := *s
-	if masked.SMTPPassword != "" {
-		masked.SMTPPassword = "********"
-	}
-	if masked.ResendAPIKey != "" {
-		masked.ResendAPIKey = "********"
-	}
-	if masked.TelegramBotToken != "" {
-		masked.TelegramBotToken = "********"
-	}
-	if masked.PushoverAPIToken != "" {
-		masked.PushoverAPIToken = "********"
-	}
-	if masked.SlackWebhookURL != "" {
-		masked.SlackWebhookURL = "********"
-	}
-
+	maskNotificationSecrets(&masked)
 	return utils.Success(c, "Operation successful", masked)
 }
 
@@ -79,21 +83,6 @@ func (h *NotificationSettingsHandler) UpdateNotificationSettings(c echo.Context)
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 
-	if existing.SMTPPassword != "" {
-		existing.SMTPPassword = "********"
-	}
-	if existing.ResendAPIKey != "" {
-		existing.ResendAPIKey = "********"
-	}
-	if existing.TelegramBotToken != "" {
-		existing.TelegramBotToken = "********"
-	}
-	if existing.PushoverAPIToken != "" {
-		existing.PushoverAPIToken = "********"
-	}
-	if existing.SlackWebhookURL != "" {
-		existing.SlackWebhookURL = "********"
-	}
-
+	maskNotificationSecrets(existing)
 	return utils.Success(c, "Notification settings updated successfully", existing)
 }

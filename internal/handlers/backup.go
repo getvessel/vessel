@@ -261,6 +261,9 @@ func (h *BackupHandler) DownloadRecord(c echo.Context) error {
 	if err != nil || rec == nil {
 		return utils.Error(c, http.StatusNotFound, "record not found")
 	}
+	if rec.BackupConfigID != id {
+		return utils.Error(c, http.StatusNotFound, "record not found")
+	}
 	if rec.FilePath == "" {
 		return utils.Error(c, http.StatusNotFound, "local backup file not available")
 	}
@@ -281,8 +284,14 @@ func (h *BackupHandler) DeleteRecord(c echo.Context) error {
 	if id == "" || recordID == "" {
 		return utils.Error(c, http.StatusBadRequest, "missing id or recordId parameter")
 	}
-	err := h.backupService.DeleteRecord(c.Request().Context(), recordID)
-	if err != nil {
+	rec, err := h.backupService.GetRecord(c.Request().Context(), recordID)
+	if err != nil || rec == nil {
+		return utils.Error(c, http.StatusNotFound, "record not found")
+	}
+	if rec.BackupConfigID != id {
+		return utils.Error(c, http.StatusNotFound, "record not found")
+	}
+	if err := h.backupService.DeleteRecord(c.Request().Context(), recordID); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)

@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, ShieldCheck, Trash2 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
@@ -62,6 +63,7 @@ function QrCodeImage({ uri }: { uri: string }) {
 export function Security2FASetup() {
   const { data: profile, isLoading } = useGetProfile();
 
+  const queryClient = useQueryClient();
   const setup2FA = useSetup2FA();
   const verify2FA = useVerify2FA();
   const disable2FA = useDisable2FA();
@@ -96,6 +98,7 @@ export function Security2FASetup() {
         onSuccess: () => {
           setVerifyOpen(false);
           setQrCodeUri('');
+          queryClient.invalidateQueries({ queryKey: ['profile'] });
           toast.success('Two-factor authentication enabled successfully.');
         },
         onError: (err) => toast.error(err.message),
@@ -109,6 +112,7 @@ export function Security2FASetup() {
       {
         onSuccess: () => {
           setDisableOpen(false);
+          queryClient.invalidateQueries({ queryKey: ['profile'] });
           toast.success('Two-factor authentication disabled.');
         },
         onError: (err) => toast.error(err.message),
@@ -152,7 +156,7 @@ export function Security2FASetup() {
       </Section>
 
       <Dialog open={verifyOpen} onOpenChange={setVerifyOpen}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[400px] [&>button]:hidden">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-100 [&>button]:hidden">
           <div className="px-5 pt-5 pb-4">
             <div className="flex items-start justify-between">
               <div className="flex flex-col">
@@ -217,7 +221,7 @@ export function Security2FASetup() {
       </Dialog>
 
       <Dialog open={disableOpen} onOpenChange={setDisableOpen}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[400px] [&>button]:hidden">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-100 [&>button]:hidden">
           <div className="px-5 pt-5 pb-4">
             <div className="flex items-start justify-between">
               <div className="flex flex-col">

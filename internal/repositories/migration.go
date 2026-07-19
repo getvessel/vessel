@@ -113,10 +113,17 @@ func ensureMigrationsTable(db *sql.DB) error {
 		return err
 	}
 
-	if len(files) > 0 {
+	var baselineFiles []string
+	for _, f := range files {
+		if strings.HasPrefix(f, "001_") || strings.HasPrefix(f, "002_") {
+			baselineFiles = append(baselineFiles, f)
+		}
+	}
+
+	if len(baselineFiles) > 0 {
 		var placeholders []string
 		var args []any
-		for _, file := range files {
+		for _, file := range baselineFiles {
 			placeholders = append(placeholders, "(?)")
 			args = append(args, file)
 		}

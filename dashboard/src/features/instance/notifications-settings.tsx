@@ -271,6 +271,7 @@ export const NotificationsSettings = () => {
           <div className="space-y-2">
             <Label className="text-xs">Bot Token</Label>
             <Input
+              type="password"
               value={form.telegramBotToken ?? ''}
               onChange={(e) => set('telegramBotToken', e.target.value)}
               placeholder="1234567890:AAF..."

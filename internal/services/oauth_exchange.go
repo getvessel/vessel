@@ -165,12 +165,17 @@ var providerConfigs = map[string]oauthConfig{
 	},
 }
 
+func normalizeProviderName(name string) string {
+	n := strings.ToLower(name)
+	if n == "azuread" {
+		return "microsoft"
+	}
+	return n
+}
+
 func ExchangeCode(p *models.OAuthProviderConfig, code string) (string, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
-	providerName := strings.ToLower(p.ProviderName)
-	if providerName == "azuread" {
-		providerName = "microsoft"
-	}
+	providerName := normalizeProviderName(p.ProviderName)
 	cfg, ok := providerConfigs[providerName]
 	if !ok || (cfg.ExchangeFunc == nil && cfg.TokenURLBuilder == nil) {
 		return "", fmt.Errorf("unsupported oauth provider for exchange: %s", p.ProviderName)
@@ -182,10 +187,7 @@ func GetAuthorizationURL(p *models.OAuthProviderConfig, state string) (string, e
 	if !p.Enabled || p.ClientID == "" {
 		return "", fmt.Errorf("oauth provider %s is not enabled or configured", p.ProviderName)
 	}
-	providerName := strings.ToLower(p.ProviderName)
-	if providerName == "azuread" {
-		providerName = "microsoft"
-	}
+	providerName := normalizeProviderName(p.ProviderName)
 	cfg, ok := providerConfigs[providerName]
 	if !ok || cfg.AuthURLBuilder == nil {
 		return "", fmt.Errorf("unsupported oauth provider: %s", p.ProviderName)

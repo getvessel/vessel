@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/utils"
 
 	"vessl.dev/vessl/internal/services"
@@ -21,6 +22,18 @@ func NewSettingsHandler(s *services.SettingsService, ns *services.NotificationSe
 	return &SettingsHandler{settingsService: s, notifSettingsService: ns}
 }
 
+func maskSettingsSecrets(s *models.ServerSettings) {
+	if s.CloudflareAPIToken != "" {
+		s.CloudflareAPIToken = "********"
+	}
+	if s.NamecheapAPIKey != "" {
+		s.NamecheapAPIKey = "********"
+	}
+	if s.SpaceshipAPIKey != "" {
+		s.SpaceshipAPIKey = "********"
+	}
+}
+
 // @Summary GetSettings endpoint
 // @Description GetSettings endpoint
 // @Tags Settings
@@ -33,16 +46,7 @@ func (h *SettingsHandler) GetSettings(c echo.Context) error {
 	}
 
 	masked := *s
-	if masked.CloudflareAPIToken != "" {
-		masked.CloudflareAPIToken = "********"
-	}
-	if masked.NamecheapAPIKey != "" {
-		masked.NamecheapAPIKey = "********"
-	}
-	if masked.SpaceshipAPIKey != "" {
-		masked.SpaceshipAPIKey = "********"
-	}
-
+	maskSettingsSecrets(&masked)
 	return utils.Success(c, "Operation successful", masked)
 }
 
@@ -109,15 +113,6 @@ func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 
-	if existing.CloudflareAPIToken != "" {
-		existing.CloudflareAPIToken = "********"
-	}
-	if existing.NamecheapAPIKey != "" {
-		existing.NamecheapAPIKey = "********"
-	}
-	if existing.SpaceshipAPIKey != "" {
-		existing.SpaceshipAPIKey = "********"
-	}
-
+	maskSettingsSecrets(existing)
 	return utils.Success(c, "Operation successful", existing)
 }

@@ -34,8 +34,7 @@ function DashboardIndex() {
             variant="outline"
             className="gap-2"
             onClick={() => {
-              const event = new KeyboardEvent('keydown', { key: 'k', metaKey: true });
-              document.dispatchEvent(event);
+              window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
             }}
           >
             <SearchIcon className="h-4 w-4" />

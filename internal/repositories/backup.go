@@ -112,8 +112,8 @@ func (r *BackupRepo) CreateConfig(ctx context.Context, cfg *models.BackupConfig)
 	if cfg.Timeout == 0 {
 		cfg.Timeout = 3600
 	}
-	if cfg.RetentionDays <= 0 {
-		cfg.RetentionDays = 7
+	if cfg.RetentionDays < 0 {
+		cfg.RetentionDays = 0
 	}
 	if cfg.DbPassword != "" && r.vault != nil {
 		enc, err := r.vault.Encrypt(cfg.DbPassword)

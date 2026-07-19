@@ -2,7 +2,9 @@ package services
 
 import (
 	"context"
+	"database/sql"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -58,7 +60,10 @@ func (s *OAuthService) SaveProvider(ctx context.Context, p *models.OAuthProvider
 	if p == nil || p.ProviderName == "" {
 		return errors.New("valid provider required")
 	}
-	existing, _ := s.oauthRepo.GetProvider(ctx, p.ProviderName)
+	existing, err := s.oauthRepo.GetProvider(ctx, p.ProviderName)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("failed to get provider: %w", err)
+	}
 	if existing != nil {
 		if p.ID == "" {
 			p.ID = existing.ID
@@ -174,6 +179,20 @@ func (s *OAuthService) Verify2FA(ctx context.Context, userID, passcode string) e
 		s.pendingRecovery.Delete(userID)
 	}
 	return err
+}
+
+func (s *OAuthService) Validate2FA(ctx context.Context, userID, passcode string) error {
+	secret, _, err := s.oauthRepo.GetUserTOTPSecret(ctx, userID)
+	if err != nil {
+		return errors.New("failed to get totp secret")
+	}
+	if secret == "" {
+		return errors.New("2fa is not enabled")
+	}
+	if !ValidateTOTP(secret, passcode) {
+		return errors.New("invalid passcode")
+	}
+	return nil
 }
 
 func (s *OAuthService) Disable2FA(ctx context.Context, userID string) error {

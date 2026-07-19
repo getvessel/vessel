@@ -53,8 +53,8 @@ export function S3DestinationsList() {
       setEndpoint('https://<account_id>.r2.cloudflarestorage.com');
       setRegion('auto');
     } else if (value === 's3') {
-      setEndpoint('https://s3.<region>.amazonaws.com');
       setRegion('us-east-1');
+      setEndpoint('https://s3.us-east-1.amazonaws.com');
     } else {
       setEndpoint('');
       setRegion('');

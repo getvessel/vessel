@@ -32,11 +32,7 @@ export const templatesService = {
       formData.append('projectId', projectId);
       formData.append('file', file);
 
-      return await apiClient.post<ComposeDeployResponse>('/compose/deploy', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      return await apiClient.post<ComposeDeployResponse>('/compose/deploy', formData);
     } catch (error) {
       throw handleApiError(error);
     }
@@ -50,11 +46,7 @@ export const templatesService = {
       }
       formData.append('file', file);
 
-      return await apiClient.post<ArchiveDeployResponse>('/deploy/archive', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      return await apiClient.post<ArchiveDeployResponse>('/deploy/archive', formData);
     } catch (error) {
       throw handleApiError(error);
     }

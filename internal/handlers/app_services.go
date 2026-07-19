@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -309,7 +310,7 @@ func (h *AppHandler) ListWebhooks(c echo.Context) error {
 	if err != nil || existing == nil {
 		var notFoundErr *utils.NotFoundError
 		if err != nil && !errors.As(err, &notFoundErr) {
-			return utils.Error(c, http.StatusInternalServerError, err.Error())
+			return utils.Error(c, http.StatusInternalServerError, "failed to look up app service")
 		}
 		return utils.Error(c, http.StatusNotFound, "app service not found")
 	}
@@ -340,7 +341,7 @@ func (h *AppHandler) CreateWebhook(c echo.Context) error {
 	if err != nil || existing == nil {
 		var notFoundErr *utils.NotFoundError
 		if err != nil && !errors.As(err, &notFoundErr) {
-			return utils.Error(c, http.StatusInternalServerError, err.Error())
+			return utils.Error(c, http.StatusInternalServerError, "failed to look up app service")
 		}
 		return utils.Error(c, http.StatusNotFound, "app service not found")
 	}
@@ -351,8 +352,13 @@ func (h *AppHandler) CreateWebhook(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid payload")
 	}
+	req.URL = strings.TrimSpace(req.URL)
 	if req.URL == "" {
 		return utils.Error(c, http.StatusBadRequest, "missing url")
+	}
+	parsedURL, err := url.Parse(req.URL)
+	if err != nil || !parsedURL.IsAbs() || (parsedURL.Scheme != "http" && parsedURL.Scheme != "https") {
+		return utils.Error(c, http.StatusBadRequest, "invalid webhook url: must be an absolute http/https url")
 	}
 	for _, et := range req.EventTypes {
 		if strings.Contains(et, ",") {
@@ -390,7 +396,7 @@ func (h *AppHandler) DeleteWebhook(c echo.Context) error {
 	if err != nil || existing == nil {
 		var notFoundErr *utils.NotFoundError
 		if err != nil && !errors.As(err, &notFoundErr) {
-			return utils.Error(c, http.StatusInternalServerError, err.Error())
+			return utils.Error(c, http.StatusInternalServerError, "failed to look up app service")
 		}
 		return utils.Error(c, http.StatusNotFound, "app service not found")
 	}

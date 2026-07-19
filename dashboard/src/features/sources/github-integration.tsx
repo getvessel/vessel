@@ -104,9 +104,9 @@ export function GithubIntegration() {
       appId,
       clientId,
       name: appSlug,
-      clientSecret: accessToken === '********' ? editingApp?.clientSecret : accessToken,
-      webhookSecret: webhookSecret === '********' ? editingApp?.webhookSecret : webhookSecret,
-      privateKey: privateKey === '********' ? editingApp?.privateKey : privateKey,
+      ...(accessToken !== '********' ? { clientSecret: accessToken } : {}),
+      ...(webhookSecret !== '********' ? { webhookSecret } : {}),
+      ...(privateKey !== '********' ? { privateKey } : {}),
     };
 
     saveMutation.mutate(payload, {
@@ -277,7 +277,7 @@ export function GithubIntegration() {
       )}
 
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent className="max-w-[800px] gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
+        <DialogContent className="max-w-200 gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
           <div className="px-5 pt-5 pb-4">
             <div className="flex items-start justify-between">
               <div className="flex flex-col">
@@ -360,7 +360,7 @@ export function GithubIntegration() {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label className="font-bold text-[10px] text-muted-foreground uppercase tracking-widest">
-                    GITHUB_ACCESS_TOKEN
+                    GITHUB_CLIENT_SECRET
                   </Label>
                   <Input
                     type="password"
@@ -457,7 +457,7 @@ export function GithubIntegration() {
       </Dialog>
 
       <Dialog open={!!deletingApp} onOpenChange={(open) => !open && setDeletingApp(null)}>
-        <DialogContent className="max-w-[400px] gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
+        <DialogContent className="max-w-100 gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
           <div className="p-5">
             <div className="flex items-start justify-between">
               <div className="flex flex-col">
