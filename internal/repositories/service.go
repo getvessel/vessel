@@ -182,8 +182,8 @@ func (r *AppServiceRepo) CreateWebhook(ctx context.Context, w *models.Webhook) e
 }
 
 func (r *AppServiceRepo) ListWebhooksByService(ctx context.Context, serviceID string) ([]*models.Webhook, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 	rows, err := r.db.QueryContext(ctx,
 		`SELECT id, service_id, url, event_types, include_pr_environments, created_at, updated_at
 		 FROM service_webhooks WHERE service_id = ? ORDER BY created_at DESC`, serviceID)
@@ -220,7 +220,7 @@ func (r *AppServiceRepo) DeleteWebhook(ctx context.Context, id, serviceID string
 	}
 	n, _ := res.RowsAffected()
 	if n == 0 {
-		return fmt.Errorf("webhook not found")
+		return utils.NewNotFoundError("Webhook", id)
 	}
 	return nil
 }

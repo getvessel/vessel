@@ -77,22 +77,37 @@ export const OAuthProvidersList = () => {
   const isInitialized = React.useRef(false);
 
   useEffect(() => {
-    if (data?.data && !isInitialized.current) {
-      isInitialized.current = true;
-      const initial: ProviderState = {};
-      for (const p of PROVIDERS) {
-        const existing = data.data.find((d) => d.providerName === p.id);
-        initial[p.id] = {
-          id: existing?.id,
-          providerName: p.id,
-          clientId: existing?.clientId ?? '',
-          clientSecret: existing?.clientId ? '********' : '',
-          baseUrl: existing?.baseUrl ?? '',
-          tenant: existing?.tenant ?? '',
-          enabled: existing?.enabled ?? false,
-        };
+    if (data?.data) {
+      if (!isInitialized.current) {
+        isInitialized.current = true;
+        const initial: ProviderState = {};
+        for (const p of PROVIDERS) {
+          const existing = data.data.find((d) => d.providerName === p.id);
+          initial[p.id] = {
+            id: existing?.id,
+            providerName: p.id,
+            clientId: existing?.clientId ?? '',
+            clientSecret: existing?.clientSecret ? '********' : '',
+            baseUrl: existing?.baseUrl ?? '',
+            tenant: existing?.tenant ?? '',
+            enabled: existing?.enabled ?? false,
+          };
+        }
+        setForm(initial);
+      } else {
+        setForm((f) => {
+          const next = { ...f };
+          let changed = false;
+          for (const p of PROVIDERS) {
+            const existing = data.data.find((d) => d.providerName === p.id);
+            if (existing?.id && next[p.id]?.id !== existing.id) {
+              next[p.id] = { ...next[p.id], id: existing.id };
+              changed = true;
+            }
+          }
+          return changed ? next : f;
+        });
       }
-      setForm(initial);
     }
   }, [data]);
 

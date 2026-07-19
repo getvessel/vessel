@@ -1135,7 +1135,13 @@ paths:
         type: string
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.BackupRecord'
+            type: array
       summary: ListRecords endpoint
       tags:
       - Backups
@@ -1157,7 +1163,9 @@ paths:
         type: string
       produces:
       - application/json
-      responses: {}
+      responses:
+        "204":
+          description: No Content
       summary: Delete Backup Record
       tags:
       - Backups
@@ -1179,7 +1187,11 @@ paths:
         type: string
       produces:
       - application/octet-stream
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
       summary: Download Backup Record
       tags:
       - Backups
@@ -2701,15 +2713,15 @@ paths:
       summary: Update Service Variable
       tags:
       - AppServices
-  /services/{serviceId}/webhooks:
+  /apps/{id}/webhooks:
     get:
       consumes:
       - application/json
       description: ListWebhooks endpoint
       parameters:
-      - description: serviceId
+      - description: id
         in: path
-        name: serviceId
+        name: id
         required: true
         type: string
       produces:
@@ -2717,15 +2729,15 @@ paths:
       responses: {}
       summary: ListWebhooks endpoint
       tags:
-      - Services
+      - AppServices
     post:
       consumes:
       - application/json
       description: CreateWebhook endpoint
       parameters:
-      - description: serviceId
+      - description: id
         in: path
-        name: serviceId
+        name: id
         required: true
         type: string
       - description: Payload
@@ -2739,21 +2751,21 @@ paths:
       responses: {}
       summary: CreateWebhook endpoint
       tags:
-      - Services
-  /services/{serviceId}/webhooks/{id}:
+      - AppServices
+  /apps/{id}/webhooks/{webhookId}:
     delete:
       consumes:
       - application/json
       description: DeleteWebhook endpoint
       parameters:
-      - description: serviceId
-        in: path
-        name: serviceId
-        required: true
-        type: string
       - description: id
         in: path
         name: id
+        required: true
+        type: string
+      - description: webhookId
+        in: path
+        name: webhookId
         required: true
         type: string
       produces:
@@ -2761,7 +2773,7 @@ paths:
       responses: {}
       summary: DeleteWebhook endpoint
       tags:
-      - Services
+      - AppServices
   /settings:
     put:
       consumes:

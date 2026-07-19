@@ -1,5 +1,5 @@
 import { Brain, Check, ChevronDown, Star } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -82,14 +82,26 @@ export function AISettings() {
   const updateSettings = useUpdateAISettings();
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  const pendingSettings = React.useRef<Record<string, unknown> | null>(null);
+
+  React.useEffect(() => {
+    if (settings?.data && !updateSettings.isPending) {
+      pendingSettings.current = settings.data;
+    }
+  }, [settings?.data, updateSettings.isPending]);
+
   const defaultProvider = (settings?.data?.defaultProvider as string) || 'none';
 
   const handleSetDefault = (id: string) => {
-    updateSettings.mutate({ ...settings?.data, defaultProvider: id });
+    const next = { ...(pendingSettings.current || settings?.data), defaultProvider: id };
+    pendingSettings.current = next;
+    updateSettings.mutate(next);
   };
 
   const handleUpdateKey = (keyField: string, value: string) => {
-    updateSettings.mutate({ ...settings?.data, [keyField]: value });
+    const next = { ...(pendingSettings.current || settings?.data), [keyField]: value };
+    pendingSettings.current = next;
+    updateSettings.mutate(next);
   };
 
   return (

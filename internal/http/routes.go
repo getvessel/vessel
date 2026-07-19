@@ -126,6 +126,7 @@ func (s *Server) registerRoutes() {
 	authGroup.GET("/backups", s.backupHandler.List)
 	authGroup.POST("/backups", s.backupHandler.Create)
 	authGroup.GET("/backups/:id", s.backupHandler.Get)
+	authGroup.PUT("/backups/:id", s.backupHandler.Update, s.authGuard.RequireScope("backup:write"))
 	authGroup.DELETE("/backups/:id", s.backupHandler.Delete)
 	authGroup.POST("/backups/:id/trigger", s.backupHandler.Trigger)
 	authGroup.POST("/backups/:id/restore", s.backupHandler.Restore)

@@ -29,12 +29,13 @@ type BackupRepository interface {
 }
 
 type BackupRepo struct {
-	db *sqlx.DB
-	mu sync.Mutex
+	db    *sqlx.DB
+	mu    sync.Mutex
+	vault *utils.Vault
 }
 
-func NewBackupRepo(db *sql.DB) *BackupRepo {
-	return &BackupRepo{db: sqlx.NewDb(db, "sqlite")}
+func NewBackupRepo(db *sql.DB, v *utils.Vault) *BackupRepo {
+	return &BackupRepo{db: sqlx.NewDb(db, "sqlite"), vault: v}
 }
 
 func (r *BackupRepo) EnsureTables() error {
@@ -111,6 +112,14 @@ func (r *BackupRepo) CreateConfig(ctx context.Context, cfg *models.BackupConfig)
 	if cfg.Timeout == 0 {
 		cfg.Timeout = 3600
 	}
+	if cfg.RetentionDays <= 0 {
+		cfg.RetentionDays = 7
+	}
+	if cfg.DbPassword != "" && r.vault != nil {
+		if enc, err := r.vault.Encrypt(cfg.DbPassword); err == nil {
+			cfg.DbPassword = enc
+		}
+	}
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	_, err := r.db.ExecContext(ctx, `INSERT INTO backup_configs (id, project_id, database_id, s3_destination_id, name, description, db_user, db_password, backup_enabled, s3_enabled, disable_local, schedule, timezone, timeout, retention_days, max_backups, max_storage_gb, status, created_at, updated_at)
@@ -134,23 +143,49 @@ func (r *BackupRepo) GetConfigByID(ctx context.Context, id string) (*models.Back
 	if err != nil {
 		return nil, fmt.Errorf("failed to get backup config %s: %w", id, err)
 	}
+	if cfg.DbPassword != "" && r.vault != nil {
+		if dec, err := r.vault.Decrypt(cfg.DbPassword); err == nil {
+			cfg.DbPassword = dec
+		}
+	}
 	return &cfg, nil
 }
 
 func (r *BackupRepo) UpdateConfig(ctx context.Context, cfg *models.BackupConfig) error {
 	cfg.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+
+	if cfg.DbPassword != "" && cfg.DbPassword != "********" && r.vault != nil {
+		if enc, err := r.vault.Encrypt(cfg.DbPassword); err == nil {
+			cfg.DbPassword = enc
+		}
+	}
+
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	if cfg.DbPassword == "********" || cfg.DbPassword == "" {
-		_, err := r.db.ExecContext(ctx, `UPDATE backup_configs SET name=?, description=?, db_user=?, backup_enabled=?, s3_enabled=?, disable_local=?, schedule=?, timezone=?, timeout=?, retention_days=?, max_backups=?, max_storage_gb=?, updated_at=? WHERE id=?`,
-			cfg.Name, cfg.Description, cfg.DbUser, cfg.BackupEnabled, cfg.S3Enabled, cfg.DisableLocal, cfg.Schedule, cfg.Timezone, cfg.Timeout, cfg.RetentionDays, cfg.MaxBackups, cfg.MaxStorageGB, cfg.UpdatedAt, cfg.ID)
-		return err
+		res, err := r.db.ExecContext(ctx, `UPDATE backup_configs SET database_id=?, s3_destination_id=?, name=?, description=?, db_user=?, backup_enabled=?, s3_enabled=?, disable_local=?, schedule=?, timezone=?, timeout=?, retention_days=?, max_backups=?, max_storage_gb=?, updated_at=? WHERE id=?`,
+			cfg.DatabaseID, cfg.S3DestinationID, cfg.Name, cfg.Description, cfg.DbUser, cfg.BackupEnabled, cfg.S3Enabled, cfg.DisableLocal, cfg.Schedule, cfg.Timezone, cfg.Timeout, cfg.RetentionDays, cfg.MaxBackups, cfg.MaxStorageGB, cfg.UpdatedAt, cfg.ID)
+		if err != nil {
+			return err
+		}
+		affected, _ := res.RowsAffected()
+		if affected == 0 {
+			return utils.NewNotFoundError("BackupConfig", cfg.ID)
+		}
+		return nil
 	}
 
-	_, err := r.db.ExecContext(ctx, `UPDATE backup_configs SET name=?, description=?, db_user=?, db_password=?, backup_enabled=?, s3_enabled=?, disable_local=?, schedule=?, timezone=?, timeout=?, retention_days=?, max_backups=?, max_storage_gb=?, updated_at=? WHERE id=?`,
-		cfg.Name, cfg.Description, cfg.DbUser, cfg.DbPassword, cfg.BackupEnabled, cfg.S3Enabled, cfg.DisableLocal, cfg.Schedule, cfg.Timezone, cfg.Timeout, cfg.RetentionDays, cfg.MaxBackups, cfg.MaxStorageGB, cfg.UpdatedAt, cfg.ID)
-	return err
+	res, err := r.db.ExecContext(ctx, `UPDATE backup_configs SET database_id=?, s3_destination_id=?, name=?, description=?, db_user=?, db_password=?, backup_enabled=?, s3_enabled=?, disable_local=?, schedule=?, timezone=?, timeout=?, retention_days=?, max_backups=?, max_storage_gb=?, updated_at=? WHERE id=?`,
+		cfg.DatabaseID, cfg.S3DestinationID, cfg.Name, cfg.Description, cfg.DbUser, cfg.DbPassword, cfg.BackupEnabled, cfg.S3Enabled, cfg.DisableLocal, cfg.Schedule, cfg.Timezone, cfg.Timeout, cfg.RetentionDays, cfg.MaxBackups, cfg.MaxStorageGB, cfg.UpdatedAt, cfg.ID)
+	if err != nil {
+		return err
+	}
+	affected, _ := res.RowsAffected()
+	if affected == 0 {
+		return utils.NewNotFoundError("BackupConfig", cfg.ID)
+	}
+	return nil
 }
 
 func (r *BackupRepo) ListConfigsByProject(ctx context.Context, projectID string) ([]*models.BackupConfig, error) {
@@ -164,6 +199,15 @@ func (r *BackupRepo) ListConfigsByProject(ctx context.Context, projectID string)
 	}
 	if list == nil {
 		list = make([]*models.BackupConfig, 0)
+	}
+	if r.vault != nil {
+		for _, cfg := range list {
+			if cfg.DbPassword != "" {
+				if dec, err := r.vault.Decrypt(cfg.DbPassword); err == nil {
+					cfg.DbPassword = dec
+				}
+			}
+		}
 	}
 	return list, nil
 }
@@ -179,6 +223,15 @@ func (r *BackupRepo) ListAllActiveConfigs(ctx context.Context) ([]*models.Backup
 	}
 	if list == nil {
 		list = make([]*models.BackupConfig, 0)
+	}
+	if r.vault != nil {
+		for _, cfg := range list {
+			if cfg.DbPassword != "" {
+				if dec, err := r.vault.Decrypt(cfg.DbPassword); err == nil {
+					cfg.DbPassword = dec
+				}
+			}
+		}
 	}
 	return list, nil
 }

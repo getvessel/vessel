@@ -69,15 +69,70 @@ func (h *BackupHandler) Create(c echo.Context) error {
 // @Router /backups/{id} [put]
 func (h *BackupHandler) Update(c echo.Context) error {
 	id := c.Param("id")
-	var cfg models.BackupConfig
-	if err := c.Bind(&cfg); err != nil {
+
+	existing, err := h.backupService.GetConfig(c.Request().Context(), id)
+	if err != nil || existing == nil {
+		return utils.Error(c, http.StatusNotFound, "backup config not found")
+	}
+
+	if tokenProjID, ok := c.Get("project_id").(string); ok && tokenProjID != "" {
+		if tokenProjID != existing.ProjectID {
+			return utils.Error(c, http.StatusForbidden, "permission denied for this project")
+		}
+	}
+
+	var req models.BackupConfig
+	if err := c.Bind(&req); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid payload")
 	}
-	cfg.ID = id
-	if err := h.backupService.UpdateConfig(c.Request().Context(), &cfg); err != nil {
+
+	if req.Name != "" {
+		existing.Name = req.Name
+	}
+	if req.Description != "" {
+		existing.Description = req.Description
+	}
+	if req.DbUser != "" {
+		existing.DbUser = req.DbUser
+	}
+	if req.DbPassword != "" {
+		existing.DbPassword = req.DbPassword
+	}
+	if req.Schedule != "" {
+		existing.Schedule = req.Schedule
+	}
+	if req.Timezone != "" {
+		existing.Timezone = req.Timezone
+	}
+	if req.Timeout != 0 {
+		existing.Timeout = req.Timeout
+	}
+	if req.RetentionDays != 0 {
+		existing.RetentionDays = req.RetentionDays
+	}
+	if req.MaxBackups != 0 {
+		existing.MaxBackups = req.MaxBackups
+	}
+	if req.MaxStorageGB != 0 {
+		existing.MaxStorageGB = req.MaxStorageGB
+	}
+	if req.S3DestinationID != "" {
+		existing.S3DestinationID = req.S3DestinationID
+	}
+	if req.DatabaseID != "" {
+		existing.DatabaseID = req.DatabaseID
+	}
+
+	existing.BackupEnabled = req.BackupEnabled
+	existing.S3Enabled = req.S3Enabled
+	existing.DisableLocal = req.DisableLocal
+
+	if err := h.backupService.UpdateConfig(c.Request().Context(), existing); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
-	return utils.Success(c, "Updated successfully", cfg)
+
+	existing.DbPassword = "********"
+	return utils.Success(c, "Updated successfully", existing)
 }
 
 // @Summary Get Backup

@@ -86,7 +86,7 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
       num: 2,
       label: 'Runtime',
       title: 'Runtime environment',
-      description: 'Configure the deployment runtime settings. These are written to .env.local.',
+      description: 'Configure the deployment runtime settings. These are written to .env',
       icon: Settings,
     },
     {
@@ -171,7 +171,7 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
             }
           }}
         >
-          <div className="mb-6 min-h-[350px] rounded-xl border border-border/50 bg-card/40 p-6 shadow-xl backdrop-blur-xl">
+          <div className="mb-6 min-h-87.5 rounded-xl border border-border/50 bg-card/40 p-6 shadow-xl backdrop-blur-xl">
             <div className="mb-6">
               <p className="mb-3 font-bold text-primary text-xs uppercase tracking-widest">
                 STEP 0{currentStep}

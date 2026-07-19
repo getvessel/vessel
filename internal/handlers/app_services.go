@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 
@@ -30,6 +32,13 @@ func NewAppHandler(s *services.AppService, ps *services.ProjectService, d *engin
 }
 
 func (h *AppHandler) verifyProjectOwnership(c echo.Context, projectID string) error {
+	user := middleware.GetUserClaimsFromContext(c.Request().Context())
+	if user != nil && user.Role == "api" {
+		tokenProjectID, ok := c.Get("project_id").(string)
+		if ok && tokenProjectID != projectID {
+			return utils.Error(c, http.StatusForbidden, "token does not have access to this project")
+		}
+	}
 	_, err := h.projectService.GetProject(c.Request().Context(), projectID)
 	if err != nil {
 		return utils.Error(c, http.StatusNotFound, "project not found")
@@ -298,6 +307,10 @@ func (h *AppHandler) ListWebhooks(c echo.Context) error {
 	}
 	existing, err := h.appService.GetAppService(c.Request().Context(), serviceID)
 	if err != nil || existing == nil {
+		var notFoundErr *utils.NotFoundError
+		if err != nil && !errors.As(err, &notFoundErr) {
+			return utils.Error(c, http.StatusInternalServerError, err.Error())
+		}
 		return utils.Error(c, http.StatusNotFound, "app service not found")
 	}
 	if err := h.verifyProjectOwnership(c, existing.ProjectID); err != nil {
@@ -325,17 +338,34 @@ func (h *AppHandler) CreateWebhook(c echo.Context) error {
 	}
 	existing, err := h.appService.GetAppService(c.Request().Context(), serviceID)
 	if err != nil || existing == nil {
+		var notFoundErr *utils.NotFoundError
+		if err != nil && !errors.As(err, &notFoundErr) {
+			return utils.Error(c, http.StatusInternalServerError, err.Error())
+		}
 		return utils.Error(c, http.StatusNotFound, "app service not found")
 	}
 	if err := h.verifyProjectOwnership(c, existing.ProjectID); err != nil {
 		return err
 	}
-	var req models.Webhook
+	var req models.CreateWebhookRequest
 	if err := c.Bind(&req); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid payload")
 	}
-	req.ServiceID = serviceID
-	created, err := h.appService.CreateWebhook(c.Request().Context(), &req)
+	if req.URL == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing url")
+	}
+	for _, et := range req.EventTypes {
+		if strings.Contains(et, ",") {
+			return utils.Error(c, http.StatusBadRequest, "event type cannot contain commas")
+		}
+	}
+	webhook := models.Webhook{
+		ServiceID:             serviceID,
+		URL:                   req.URL,
+		EventTypes:            req.EventTypes,
+		IncludePREnvironments: req.IncludePREnvironments,
+	}
+	created, err := h.appService.CreateWebhook(c.Request().Context(), &webhook)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
@@ -358,6 +388,10 @@ func (h *AppHandler) DeleteWebhook(c echo.Context) error {
 	}
 	existing, err := h.appService.GetAppService(c.Request().Context(), serviceID)
 	if err != nil || existing == nil {
+		var notFoundErr *utils.NotFoundError
+		if err != nil && !errors.As(err, &notFoundErr) {
+			return utils.Error(c, http.StatusInternalServerError, err.Error())
+		}
 		return utils.Error(c, http.StatusNotFound, "app service not found")
 	}
 	if err := h.verifyProjectOwnership(c, existing.ProjectID); err != nil {

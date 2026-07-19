@@ -21,8 +21,10 @@ export const useCreateDatabase = () => {
     mutationFn: (payload: { payload: Parameters<typeof databasesService.createDatabase>[0] }) =>
       databasesService.createDatabase(payload.payload),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['databases'] });
-      await queryClient.invalidateQueries({ queryKey: ['canvas'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['databases'] }),
+        queryClient.invalidateQueries({ queryKey: ['canvas'] }),
+      ]);
     },
   });
 };
@@ -32,8 +34,10 @@ export const useDeleteDatabase = () => {
   return useMutation({
     mutationFn: (payload: { id: string }) => databasesService.deleteDatabase(payload.id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['databases'] });
-      await queryClient.invalidateQueries({ queryKey: ['canvas'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['databases'] }),
+        queryClient.invalidateQueries({ queryKey: ['canvas'] }),
+      ]);
     },
   });
 };
@@ -43,8 +47,10 @@ export const useStartDatabase = () => {
   return useMutation({
     mutationFn: (payload: { id: string }) => databasesService.startDatabase(payload.id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['databases'] });
-      await queryClient.invalidateQueries({ queryKey: ['canvas'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['databases'] }),
+        queryClient.invalidateQueries({ queryKey: ['canvas'] }),
+      ]);
     },
   });
 };
@@ -54,8 +60,10 @@ export const useStopDatabase = () => {
   return useMutation({
     mutationFn: (payload: { id: string }) => databasesService.stopDatabase(payload.id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['databases'] });
-      await queryClient.invalidateQueries({ queryKey: ['canvas'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['databases'] }),
+        queryClient.invalidateQueries({ queryKey: ['canvas'] }),
+      ]);
     },
   });
 };
@@ -65,8 +73,10 @@ export const useRestartDatabase = () => {
   return useMutation({
     mutationFn: (payload: { id: string }) => databasesService.restartDatabase(payload.id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['databases'] });
-      await queryClient.invalidateQueries({ queryKey: ['canvas'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['databases'] }),
+        queryClient.invalidateQueries({ queryKey: ['canvas'] }),
+      ]);
     },
   });
 };
@@ -158,10 +168,10 @@ export const useImportDatabase = () => {
       payload: Parameters<typeof databasesService.importDatabase>[1];
     }) => databasesService.importDatabase(payload.id, payload.payload),
     onSuccess: async (_, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['databases', 'getSchemas', variables.id] });
-      await queryClient.invalidateQueries({
-        queryKey: ['databases', 'getTableData', variables.id],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['databases', 'getSchemas', variables.id] }),
+        queryClient.invalidateQueries({ queryKey: ['databases', 'getTableData', variables.id] }),
+      ]);
     },
   });
 };

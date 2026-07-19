@@ -52,11 +52,20 @@ func (s *BackupService) CreateConfig(ctx context.Context, cfg *models.BackupConf
 }
 
 func (s *BackupService) UpdateConfig(ctx context.Context, cfg *models.BackupConfig) error {
+	if cfg == nil {
+		return errors.New("valid backup config required")
+	}
 	if cfg.Timeout == 0 {
 		cfg.Timeout = 3600
 	}
 	cfg.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-	return s.backupRepo.UpdateConfig(ctx, cfg)
+	if err := s.backupRepo.UpdateConfig(ctx, cfg); err != nil {
+		return err
+	}
+	if s.manager != nil {
+		_ = s.manager.RegisterBackup(cfg)
+	}
+	return nil
 }
 
 func (s *BackupService) GetConfig(ctx context.Context, id string) (*models.BackupConfig, error) {

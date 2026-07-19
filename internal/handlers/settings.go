@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/labstack/echo/v4"
 
@@ -13,6 +14,7 @@ import (
 type SettingsHandler struct {
 	settingsService      *services.SettingsService
 	notifSettingsService *services.NotificationSettingsService
+	mu                   sync.Mutex
 }
 
 func NewSettingsHandler(s *services.SettingsService, ns *services.NotificationSettingsService) *SettingsHandler {
@@ -78,6 +80,9 @@ func (h *SettingsHandler) GetPublicSettings(c echo.Context) error {
 // @Param request body models.ServerSettings true "Payload"
 // @Router /settings [put]
 func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	existing, err := h.settingsService.GetSettings(c.Request().Context())
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, "failed to fetch existing settings")
@@ -104,5 +109,16 @@ func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
 	if err := h.settingsService.UpdateSettings(c.Request().Context(), existing); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
+
+	if existing.CloudflareAPIToken != "" {
+		existing.CloudflareAPIToken = "********"
+	}
+	if existing.NamecheapAPIKey != "" {
+		existing.NamecheapAPIKey = "********"
+	}
+	if existing.SpaceshipAPIKey != "" {
+		existing.SpaceshipAPIKey = "********"
+	}
+
 	return utils.Success(c, "Operation successful", existing)
 }

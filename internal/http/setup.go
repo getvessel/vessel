@@ -70,7 +70,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	aiRepo := repositories.NewAISettingsRepo(db)
 	envVarRepo := repositories.NewEnvRepo(db, v)
 	jobRepo := repositories.NewJobRepo(db)
-	backupRepo := repositories.NewBackupRepo(db)
+	backupRepo := repositories.NewBackupRepo(db, v)
 	s3DestinationRepo := repositories.NewS3DestinationRepo(db)
 	serverlessRepository := repositories.NewServerlessRepository(db)
 	projectSettingsRepo := repositories.NewProjectSettingsRepo(db)

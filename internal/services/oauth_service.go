@@ -58,7 +58,18 @@ func (s *OAuthService) SaveProvider(ctx context.Context, p *models.OAuthProvider
 	if p == nil || p.ProviderName == "" {
 		return errors.New("valid provider required")
 	}
-	if p.ID == "" {
+	existing, _ := s.oauthRepo.GetProvider(ctx, p.ProviderName)
+	if existing != nil {
+		if p.ID == "" {
+			p.ID = existing.ID
+		}
+		if p.ClientSecret == "" {
+			p.ClientSecret = existing.ClientSecret
+		}
+		if p.CreatedAt.IsZero() {
+			p.CreatedAt = existing.CreatedAt
+		}
+	} else if p.ID == "" {
 		p.ID = uuid.New().String()
 	}
 	now := time.Now()
@@ -132,7 +143,8 @@ func (s *OAuthService) Setup2FA(ctx context.Context, userID, email string) (*mod
 	s.pendingRecovery.Store(userID, recoveryCodes)
 
 	return &models.TwoFASetupResponse{
-		QRCodeURI: GenerateTOTPQRUri(email, secret),
+		QRCodeURI:     GenerateTOTPQRUri(email, secret),
+		RecoveryCodes: recoveryCodes,
 	}, nil
 }
 
@@ -147,8 +159,14 @@ func (s *OAuthService) Verify2FA(ctx context.Context, userID, passcode string) e
 		return errors.New("invalid 6-digit totp verification code")
 	}
 
-	recoveryAny, _ := s.pendingRecovery.Load(userID)
-	recoveryCodes := recoveryAny.([]string)
+	recoveryAny, ok := s.pendingRecovery.Load(userID)
+	if !ok {
+		return errors.New("recovery codes missing")
+	}
+	recoveryCodes, ok := recoveryAny.([]string)
+	if !ok {
+		return errors.New("invalid recovery codes format")
+	}
 
 	err := s.oauthRepo.UpdateUserTOTP(ctx, userID, true, secret, recoveryCodes)
 	if err == nil {
