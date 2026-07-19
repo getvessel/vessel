@@ -46,7 +46,9 @@ func (s *BackupService) CreateConfig(ctx context.Context, cfg *models.BackupConf
 		return err
 	}
 	if s.manager != nil {
-		_ = s.manager.RegisterBackup(cfg)
+		if err := s.manager.RegisterBackup(cfg); err != nil {
+			return fmt.Errorf("failed to register backup config: %w", err)
+		}
 	}
 	return nil
 }
@@ -63,7 +65,9 @@ func (s *BackupService) UpdateConfig(ctx context.Context, cfg *models.BackupConf
 		return err
 	}
 	if s.manager != nil {
-		_ = s.manager.RegisterBackup(cfg)
+		if err := s.manager.RegisterBackup(cfg); err != nil {
+			return fmt.Errorf("failed to register updated backup config: %w", err)
+		}
 	}
 	return nil
 }

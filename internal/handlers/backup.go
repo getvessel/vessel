@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"path/filepath"
 
@@ -72,6 +73,10 @@ func (h *BackupHandler) Update(c echo.Context) error {
 
 	existing, err := h.backupService.GetConfig(c.Request().Context(), id)
 	if err != nil || existing == nil {
+		var notFoundErr *utils.NotFoundError
+		if err != nil && !errors.As(err, &notFoundErr) {
+			return utils.Error(c, http.StatusInternalServerError, err.Error())
+		}
 		return utils.Error(c, http.StatusNotFound, "backup config not found")
 	}
 
@@ -81,7 +86,23 @@ func (h *BackupHandler) Update(c echo.Context) error {
 		}
 	}
 
-	var req models.BackupConfig
+	var req struct {
+		Name            string `json:"name"`
+		Description     string `json:"description"`
+		DbUser          string `json:"dbUser"`
+		DbPassword      string `json:"dbPassword"`
+		Schedule        string `json:"schedule"`
+		Timezone        string `json:"timezone"`
+		Timeout         int    `json:"timeout"`
+		RetentionDays   int    `json:"retentionDays"`
+		MaxBackups      int    `json:"maxBackups"`
+		MaxStorageGB    int    `json:"maxStorageGB"`
+		S3DestinationID string `json:"s3DestinationId"`
+		DatabaseID      string `json:"databaseId"`
+		BackupEnabled   *bool  `json:"backupEnabled"`
+		S3Enabled       *bool  `json:"s3Enabled"`
+		DisableLocal    *bool  `json:"disableLocal"`
+	}
 	if err := c.Bind(&req); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid payload")
 	}
@@ -123,9 +144,15 @@ func (h *BackupHandler) Update(c echo.Context) error {
 		existing.DatabaseID = req.DatabaseID
 	}
 
-	existing.BackupEnabled = req.BackupEnabled
-	existing.S3Enabled = req.S3Enabled
-	existing.DisableLocal = req.DisableLocal
+	if req.BackupEnabled != nil {
+		existing.BackupEnabled = *req.BackupEnabled
+	}
+	if req.S3Enabled != nil {
+		existing.S3Enabled = *req.S3Enabled
+	}
+	if req.DisableLocal != nil {
+		existing.DisableLocal = *req.DisableLocal
+	}
 
 	if err := h.backupService.UpdateConfig(c.Request().Context(), existing); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
@@ -149,6 +176,10 @@ func (h *BackupHandler) Get(c echo.Context) error {
 	}
 	cfg, err := h.backupService.GetConfig(c.Request().Context(), id)
 	if err != nil || cfg == nil {
+		var notFoundErr *utils.NotFoundError
+		if err != nil && !errors.As(err, &notFoundErr) {
+			return utils.Error(c, http.StatusInternalServerError, err.Error())
+		}
 		return utils.Error(c, http.StatusNotFound, "backup config not found")
 	}
 	cfg.DbPassword = "********"

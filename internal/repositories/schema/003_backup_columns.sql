@@ -1,7 +1,5 @@
 -- Add missing columns to backup_configs and s3_destinations
 
-BEGIN;
-
 ALTER TABLE backup_configs ADD COLUMN description TEXT;
 ALTER TABLE backup_configs ADD COLUMN db_user TEXT;
 ALTER TABLE backup_configs ADD COLUMN db_password TEXT;
@@ -15,5 +13,3 @@ ALTER TABLE backup_configs ADD COLUMN max_storage_gb INTEGER DEFAULT 0;
 
 ALTER TABLE s3_destinations ADD COLUMN description TEXT DEFAULT '';
 ALTER TABLE s3_destinations ADD COLUMN provider TEXT DEFAULT 's3';
-
-COMMIT;

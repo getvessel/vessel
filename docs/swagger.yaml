@@ -178,6 +178,25 @@ definitions:
     - AppServiceStatusStopped
     - AppServiceStatusRunning
     - AppServiceStatusError
+  models.BackupRecord:
+    type: object
+    properties:
+      id:
+        type: string
+      configId:
+        type: string
+      backupType:
+        type: string
+      status:
+        type: string
+      sizeMb:
+        type: number
+      createdAt:
+        type: string
+      completedAt:
+        type: string
+      errorMessage:
+        type: string
   models.BackupConfig:
     properties:
       backupEnabled:
@@ -1139,9 +1158,20 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.BackupRecord'
-            type: array
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/models.BackupRecord'
+                type: array
+              executionTime:
+                type: number
+              message:
+                type: string
+              path:
+                type: string
+              status:
+                type: string
+            type: object
       summary: ListRecords endpoint
       tags:
       - Backups

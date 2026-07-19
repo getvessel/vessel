@@ -31,10 +31,10 @@ type BackupRepository interface {
 type BackupRepo struct {
 	db    *sqlx.DB
 	mu    sync.Mutex
-	vault *utils.Vault
+	vault Vault
 }
 
-func NewBackupRepo(db *sql.DB, v *utils.Vault) *BackupRepo {
+func NewBackupRepo(db *sql.DB, v Vault) *BackupRepo {
 	return &BackupRepo{db: sqlx.NewDb(db, "sqlite"), vault: v}
 }
 
@@ -116,9 +116,11 @@ func (r *BackupRepo) CreateConfig(ctx context.Context, cfg *models.BackupConfig)
 		cfg.RetentionDays = 7
 	}
 	if cfg.DbPassword != "" && r.vault != nil {
-		if enc, err := r.vault.Encrypt(cfg.DbPassword); err == nil {
-			cfg.DbPassword = enc
+		enc, err := r.vault.Encrypt(cfg.DbPassword)
+		if err != nil {
+			return fmt.Errorf("failed to encrypt db password: %w", err)
 		}
+		cfg.DbPassword = enc
 	}
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -128,6 +130,7 @@ func (r *BackupRepo) CreateConfig(ctx context.Context, cfg *models.BackupConfig)
 	if err != nil {
 		return fmt.Errorf("failed to create backup config: %w", err)
 	}
+	cfg.DbPassword = "********"
 	return nil
 }
 
@@ -144,9 +147,11 @@ func (r *BackupRepo) GetConfigByID(ctx context.Context, id string) (*models.Back
 		return nil, fmt.Errorf("failed to get backup config %s: %w", id, err)
 	}
 	if cfg.DbPassword != "" && r.vault != nil {
-		if dec, err := r.vault.Decrypt(cfg.DbPassword); err == nil {
-			cfg.DbPassword = dec
+		dec, err := r.vault.Decrypt(cfg.DbPassword)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decrypt db password: %w", err)
 		}
+		cfg.DbPassword = dec
 	}
 	return &cfg, nil
 }
@@ -155,9 +160,11 @@ func (r *BackupRepo) UpdateConfig(ctx context.Context, cfg *models.BackupConfig)
 	cfg.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
 
 	if cfg.DbPassword != "" && cfg.DbPassword != "********" && r.vault != nil {
-		if enc, err := r.vault.Encrypt(cfg.DbPassword); err == nil {
-			cfg.DbPassword = enc
+		enc, err := r.vault.Encrypt(cfg.DbPassword)
+		if err != nil {
+			return fmt.Errorf("failed to encrypt db password: %w", err)
 		}
+		cfg.DbPassword = enc
 	}
 
 	r.mu.Lock()
@@ -169,7 +176,10 @@ func (r *BackupRepo) UpdateConfig(ctx context.Context, cfg *models.BackupConfig)
 		if err != nil {
 			return err
 		}
-		affected, _ := res.RowsAffected()
+		affected, err := res.RowsAffected()
+		if err != nil {
+			return fmt.Errorf("failed to get rows affected: %w", err)
+		}
 		if affected == 0 {
 			return utils.NewNotFoundError("BackupConfig", cfg.ID)
 		}
@@ -181,7 +191,10 @@ func (r *BackupRepo) UpdateConfig(ctx context.Context, cfg *models.BackupConfig)
 	if err != nil {
 		return err
 	}
-	affected, _ := res.RowsAffected()
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
 	if affected == 0 {
 		return utils.NewNotFoundError("BackupConfig", cfg.ID)
 	}
@@ -203,9 +216,11 @@ func (r *BackupRepo) ListConfigsByProject(ctx context.Context, projectID string)
 	if r.vault != nil {
 		for _, cfg := range list {
 			if cfg.DbPassword != "" {
-				if dec, err := r.vault.Decrypt(cfg.DbPassword); err == nil {
-					cfg.DbPassword = dec
+				dec, err := r.vault.Decrypt(cfg.DbPassword)
+				if err != nil {
+					return nil, fmt.Errorf("failed to decrypt db password: %w", err)
 				}
+				cfg.DbPassword = dec
 			}
 		}
 	}
@@ -227,9 +242,11 @@ func (r *BackupRepo) ListAllActiveConfigs(ctx context.Context) ([]*models.Backup
 	if r.vault != nil {
 		for _, cfg := range list {
 			if cfg.DbPassword != "" {
-				if dec, err := r.vault.Decrypt(cfg.DbPassword); err == nil {
-					cfg.DbPassword = dec
+				dec, err := r.vault.Decrypt(cfg.DbPassword)
+				if err != nil {
+					return nil, fmt.Errorf("failed to decrypt db password: %w", err)
 				}
+				cfg.DbPassword = dec
 			}
 		}
 	}

@@ -1,8 +1,8 @@
 import { Globe } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { useGetSettings, useUpdateSettings } from '#/hooks/useSettings';
 import { Skeleton } from '#/components/ui/skeleton';
+import { useGetSettings, useUpdateSettings } from '#/hooks/useSettings';
 import { DnsProviderForm } from './components/dns-provider-form';
 
 const providers = [
@@ -63,8 +63,8 @@ export const DnsSettings = () => {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-[200px] w-full rounded-2xl" />
-        <Skeleton className="h-[300px] w-full rounded-2xl" />
+        <Skeleton className="h-50 w-full rounded-2xl" />
+        <Skeleton className="h-75 w-full rounded-2xl" />
       </div>
     );
   }
@@ -125,7 +125,7 @@ export const DnsSettings = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-[15px]">{p.name}</h3>
-                    <p className="mt-1 max-w-[120px] text-[9px] text-muted-foreground/70 uppercase leading-relaxed tracking-[0.15em]">
+                    <p className="mt-1 max-w-30 text-[9px] text-muted-foreground/70 uppercase leading-relaxed tracking-[0.15em]">
                       {p.sub}
                     </p>
                   </div>

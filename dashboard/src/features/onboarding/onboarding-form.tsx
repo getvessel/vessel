@@ -86,7 +86,7 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
       num: 2,
       label: 'Runtime',
       title: 'Runtime environment',
-      description: 'Configure the deployment runtime settings. These are written to .env',
+      description: 'Configure the deployment runtime settings. These are written to .env.local.',
       icon: Settings,
     },
     {

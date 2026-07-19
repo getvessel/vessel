@@ -37,12 +37,23 @@ func RunMigrations(db *sql.DB) error {
 			return fmt.Errorf("failed to read schema file %s: %w", file, err)
 		}
 
-		if _, err := db.Exec(string(content)); err != nil {
+		tx, err := db.Begin()
+		if err != nil {
+			return fmt.Errorf("failed to begin transaction for %s: %w", file, err)
+		}
+
+		if _, err := tx.Exec(string(content)); err != nil {
+			tx.Rollback()
 			return fmt.Errorf("migration failed for %s: %w", file, err)
 		}
 
-		if _, err := db.Exec("INSERT INTO schema_migrations (filename) VALUES (?)", file); err != nil {
+		if _, err := tx.Exec("INSERT INTO schema_migrations (filename) VALUES (?)", file); err != nil {
+			tx.Rollback()
 			return fmt.Errorf("failed to record migration %s: %w", file, err)
+		}
+
+		if err := tx.Commit(); err != nil {
+			return fmt.Errorf("failed to commit migration %s: %w", file, err)
 		}
 
 		slog.Info("applied migration", "file", file)
