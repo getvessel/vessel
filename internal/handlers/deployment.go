@@ -17,13 +17,15 @@ type DeploymentHandler struct {
 	deploymentService *services.DeploymentService
 	appService        *services.AppService
 	auditService      *services.AuditService
+	aiAnalysis        *services.AIAnalysisService
 }
 
-func NewDeploymentHandler(ds *services.DeploymentService, as *services.AppService, audit *services.AuditService) *DeploymentHandler {
+func NewDeploymentHandler(ds *services.DeploymentService, as *services.AppService, audit *services.AuditService, aiAnalysis *services.AIAnalysisService) *DeploymentHandler {
 	return &DeploymentHandler{
 		deploymentService: ds,
 		appService:        as,
 		auditService:      audit,
+		aiAnalysis:        aiAnalysis,
 	}
 }
 
@@ -203,4 +205,25 @@ func (h *DeploymentHandler) GetMetrics(c echo.Context) error {
 		},
 	}
 	return utils.Success(c, "Operation successful", metrics)
+}
+
+// @Summary Explain Deployment Failure
+// @Description Analyzes build logs with AI to explain why a deployment failed
+// @Tags Deployments
+// @Accept json
+// @Produce json
+// @Param id path string true "Deployment ID"
+// @Router /deployments/{id}/explain [get]
+func (h *DeploymentHandler) ExplainFailure(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing id parameter")
+	}
+
+	explanation, err := h.aiAnalysis.ExplainDeploymentFailure(c.Request().Context(), id)
+	if err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+
+	return utils.Success(c, "AI Analysis completed", explanation)
 }

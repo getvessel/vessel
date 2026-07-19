@@ -1,4 +1,5 @@
 import type {
+  ExplainDeploymentResponse,
   GetDeploymentLogsResponse,
   GetDiagnosticsResponse,
   GetServiceMetricsResponse,
@@ -64,6 +65,14 @@ export const deploymentsService = {
       return await apiClient.post<GetDiagnosticsResponse>(
         `/deployments/${deploymentId}/diagnostics`
       );
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  explainFailure: async (deploymentId: string): Promise<ExplainDeploymentResponse> => {
+    try {
+      return await apiClient.get<ExplainDeploymentResponse>(`/deployments/${deploymentId}/explain`);
     } catch (error) {
       throw handleApiError(error);
     }

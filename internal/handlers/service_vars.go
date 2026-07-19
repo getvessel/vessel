@@ -14,10 +14,11 @@ import (
 type ServiceVarHandler struct {
 	appService   *services.AppService
 	auditService *services.AuditService
+	envSugg      *services.EnvSuggestionService
 }
 
-func NewServiceVarHandler(s *services.AppService, audit *services.AuditService) *ServiceVarHandler {
-	return &ServiceVarHandler{appService: s, auditService: audit}
+func NewServiceVarHandler(s *services.AppService, audit *services.AuditService, envSugg *services.EnvSuggestionService) *ServiceVarHandler {
+	return &ServiceVarHandler{appService: s, auditService: audit, envSugg: envSugg}
 }
 
 // @Summary List Service Variables
@@ -121,6 +122,7 @@ func (h *ServiceVarHandler) Update(c echo.Context) error {
 // @Param id path string true "Variable ID"
 // @Router /services/{serviceId}/variables/{id} [delete]
 func (h *ServiceVarHandler) Delete(c echo.Context) error {
+	serviceID := c.Param("serviceId")
 	id := c.Param("id")
 	if err := h.appService.DeleteVariable(c.Request().Context(), id); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
@@ -129,10 +131,39 @@ func (h *ServiceVarHandler) Delete(c echo.Context) error {
 	h.auditService.LogAction(c.Request().Context(), services.AuditActionOpts{
 		UserID:    "system",
 		Action:    "service_var.delete",
-		Resource:  id,
+		Resource:  serviceID,
 		IPAddress: c.RealIP(),
-		Details:   nil,
+		Details: map[string]string{
+			"variableId": id,
+		},
 	})
 
-	return c.NoContent(http.StatusNoContent)
+	return utils.Success(c, "Deleted successfully", nil)
+}
+
+// @Summary Suggest Service Variables
+// @Description Scan repository for .env.example and suggest variables
+// @Tags AppServices
+// @Accept json
+// @Produce json
+// @Param serviceId path string true "Service ID"
+// @Router /services/{serviceId}/env-suggestions [get]
+func (h *ServiceVarHandler) Suggest(c echo.Context) error {
+	serviceID := c.Param("serviceId")
+	svc, err := h.appService.GetAppService(c.Request().Context(), serviceID)
+	if err != nil || svc == nil {
+		return utils.Error(c, http.StatusNotFound, "service not found")
+	}
+
+	if svc.RepositoryURL == "" {
+		return utils.Success(c, "No repository attached", []interface{}{})
+	}
+
+	suggestions, err := h.envSugg.SuggestEnvVars(c.Request().Context(), svc.RepositoryURL, svc.Branch, svc.RootDirectory)
+	if err != nil {
+		// Just return empty array if we can't scan, maybe it's not a github repo or lacks permissions
+		return utils.Success(c, "No suggestions available", []interface{}{})
+	}
+
+	return utils.Success(c, "Suggestions loaded", suggestions)
 }

@@ -205,3 +205,13 @@ export type ListJobsResponse = BaseResponse<Job[]>;
 export type GetJobResponse = BaseResponse<Job>;
 export type CreateJobResponse = BaseResponse<Job>;
 export type ListPRPreviewsResponse = BaseResponse<PRPreview[]>;
+
+export interface DeploymentFailureExplanation {
+  summary: string;
+  cause: string;
+  suggestedFix: string;
+  confidence: 'low' | 'medium' | 'high';
+  commands: string[];
+  relatedLogLines: string[];
+}
+export type ExplainDeploymentResponse = BaseResponse<DeploymentFailureExplanation>;

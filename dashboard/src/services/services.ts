@@ -16,6 +16,14 @@ export const serviceVarsService = {
     }
   },
 
+  getEnvSuggestions: async (serviceId: string): Promise<BaseResponse<any[]>> => {
+    try {
+      return await apiClient.get<BaseResponse<any[]>>(`/services/${serviceId}/env-suggestions`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   create: async (
     serviceId: string,
     payload: CreateServiceVarRequest
