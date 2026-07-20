@@ -17,21 +17,21 @@ import {
   TableHeader,
   TableRow,
 } from '#/components/ui/table';
-import { useListJobs } from '#/hooks/useJobs';
 import { useListProjects } from '#/hooks/useProjects';
+import { useListScheduledTasks } from '#/hooks/useScheduledTasks';
 
-export const Route = createFileRoute('/_dashboard/jobs')({
-  component: JobsPage,
+export const Route = createFileRoute('/_dashboard/scheduled-tasks')({
+  component: ScheduledTasksPage,
 });
 
-function JobsPage() {
+function ScheduledTasksPage() {
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
 
   const { data: projectsResponse, isLoading: isLoadingProjects } = useListProjects();
   const projects = projectsResponse?.data?.records || [];
 
-  const { data: jobsResponse, isLoading: isLoadingJobs } = useListJobs();
-  const jobs = jobsResponse?.data || [];
+  const { data: tasksResponse, isLoading: isLoadingTasks } = useListScheduledTasks();
+  const tasks = tasksResponse?.data || [];
 
   return (
     <div className="space-y-6">
@@ -41,7 +41,7 @@ function JobsPage() {
             <Calendar className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="font-bold text-xl">Cron Jobs</h1>
+            <h1 className="font-bold text-xl">Scheduled Tasks</h1>
             <p className="text-muted-foreground text-sm">Manage and monitor scheduled tasks.</p>
           </div>
         </div>
@@ -49,7 +49,7 @@ function JobsPage() {
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle>All Jobs</CardTitle>
+          <CardTitle>All Scheduled Tasks</CardTitle>
           <div className="w-[200px]">
             <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
               <SelectTrigger>
@@ -67,14 +67,14 @@ function JobsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoadingProjects || isLoadingJobs ? (
+          {isLoadingProjects || isLoadingTasks ? (
             <div className="flex justify-center p-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
-          ) : jobs.length === 0 ? (
+          ) : tasks.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
               <Calendar className="mb-4 h-8 w-8 opacity-20" />
-              <p>No jobs found.</p>
+              <p>No scheduled tasks found.</p>
             </div>
           ) : (
             <Table>
@@ -88,14 +88,14 @@ function JobsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {jobs.map((job) => (
-                  <TableRow key={job.id}>
-                    <TableCell className="font-medium">{job.name}</TableCell>
-                    <TableCell>{job.schedule}</TableCell>
-                    <TableCell className="font-mono text-xs">{job.command}</TableCell>
-                    <TableCell>{job.status}</TableCell>
+                {tasks.map((task) => (
+                  <TableRow key={task.id}>
+                    <TableCell className="font-medium">{task.name}</TableCell>
+                    <TableCell>{task.schedule}</TableCell>
+                    <TableCell className="font-mono text-xs">{task.command}</TableCell>
+                    <TableCell>{task.status}</TableCell>
                     <TableCell>
-                      {job.lastRunAt ? new Date(job.lastRunAt).toLocaleString() : 'Never'}
+                      {task.lastRunAt ? new Date(task.lastRunAt).toLocaleString() : 'Never'}
                     </TableCell>
                   </TableRow>
                 ))}

@@ -3,8 +3,8 @@ import type { CreateJobRequest, Job } from '#/interfaces/deployment';
 import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
 
-export const jobsService = {
-  listJobs: async (): Promise<BaseResponse<Job[]>> => {
+export const scheduledTasksService = {
+  listScheduledTasks: async (): Promise<BaseResponse<Job[]>> => {
     try {
       return await apiClient.get<BaseResponse<Job[]>>(`/scheduled-tasks`);
     } catch (error) {
@@ -12,7 +12,7 @@ export const jobsService = {
     }
   },
 
-  getJob: async (id: string): Promise<BaseResponse<Job>> => {
+  getScheduledTask: async (id: string): Promise<BaseResponse<Job>> => {
     try {
       return await apiClient.get<BaseResponse<Job>>(`/scheduled-tasks/${id}`);
     } catch (error) {
@@ -20,7 +20,7 @@ export const jobsService = {
     }
   },
 
-  createJob: async (payload: CreateJobRequest): Promise<BaseResponse<Job>> => {
+  createScheduledTask: async (payload: CreateJobRequest): Promise<BaseResponse<Job>> => {
     try {
       return await apiClient.post<BaseResponse<Job>>('/scheduled-tasks', payload);
     } catch (error) {
@@ -28,7 +28,7 @@ export const jobsService = {
     }
   },
 
-  deleteJob: async (id: string): Promise<void> => {
+  deleteScheduledTask: async (id: string): Promise<void> => {
     try {
       await apiClient.delete(`/scheduled-tasks/${id}`);
     } catch (error) {
@@ -36,7 +36,7 @@ export const jobsService = {
     }
   },
 
-  triggerJob: async (id: string): Promise<void> => {
+  triggerScheduledTask: async (id: string): Promise<void> => {
     try {
       await apiClient.post(`/scheduled-tasks/${id}/trigger`);
     } catch (error) {

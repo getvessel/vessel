@@ -18,7 +18,7 @@ import {
 import { useGetApp } from '#/hooks/useApps';
 import { apiClient } from '#/lib/apiClient';
 
-export const Route = createFileRoute('/_dashboard/services/$serviceId/jobs')({
+export const Route = createFileRoute('/_dashboard/services/$serviceId/scheduled-tasks')({
   component: ServiceJobsRoute,
 });
 

@@ -46,7 +46,7 @@ function ServiceLayoutRoute() {
     { name: 'Build Settings', href: `/services/${serviceId}/build`, icon: Wrench },
     { name: 'Deployments', href: `/services/${serviceId}/deployments`, icon: Activity },
     { name: 'Webhooks', href: `/services/${serviceId}/webhooks`, icon: Webhook },
-    { name: 'Scheduled Tasks', href: `/services/${serviceId}/jobs`, icon: Calendar },
+    { name: 'Scheduled Tasks', href: `/services/${serviceId}/scheduled-tasks`, icon: Calendar },
     { name: 'Storage', href: `/services/${serviceId}/volumes`, icon: HardDrive },
     { name: 'Domains', href: `/services/${serviceId}/domains`, icon: Globe },
     { name: 'Variables', href: `/services/${serviceId}/variables`, icon: Variable },

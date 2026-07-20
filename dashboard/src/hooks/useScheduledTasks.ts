@@ -1,49 +1,50 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { jobsService } from '#/services/jobs';
+import { scheduledTasksService } from '#/services/scheduled-tasks';
 
-export const useListJobs = () => {
+export const useListScheduledTasks = () => {
   return useQuery({
-    queryKey: ['jobs'],
-    queryFn: () => jobsService.listJobs(),
+    queryKey: ['scheduled-tasks'],
+    queryFn: () => scheduledTasksService.listScheduledTasks(),
   });
 };
 
-export const useGetJob = (id: string) => {
+export const useGetScheduledTask = (id: string) => {
   return useQuery({
-    queryKey: ['jobs', 'getJob', id].filter(Boolean),
-    queryFn: () => jobsService.getJob(id),
+    queryKey: ['scheduled-tasks', 'getScheduledTask', id].filter(Boolean),
+    queryFn: () => scheduledTasksService.getScheduledTask(id),
   });
 };
 
-export const useCreateJob = () => {
+export const useCreateScheduledTask = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { payload: Parameters<typeof jobsService.createJob>[0] }) =>
-      jobsService.createJob(payload.payload),
+    mutationFn: (payload: {
+      payload: Parameters<typeof scheduledTasksService.createScheduledTask>[0];
+    }) => scheduledTasksService.createScheduledTask(payload.payload),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      await queryClient.invalidateQueries({ queryKey: ['scheduled-tasks'] });
       await queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
 
-export const useDeleteJob = () => {
+export const useDeleteScheduledTask = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { id: string }) => jobsService.deleteJob(payload.id),
+    mutationFn: (payload: { id: string }) => scheduledTasksService.deleteScheduledTask(payload.id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      await queryClient.invalidateQueries({ queryKey: ['scheduled-tasks'] });
       await queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
 };
 
-export const useTriggerJob = () => {
+export const useTriggerScheduledTask = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { id: string }) => jobsService.triggerJob(payload.id),
+    mutationFn: (payload: { id: string }) => scheduledTasksService.triggerScheduledTask(payload.id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      await queryClient.invalidateQueries({ queryKey: ['scheduled-tasks'] });
       await queryClient.invalidateQueries({ queryKey: ['canvas'] });
     },
   });
