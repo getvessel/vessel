@@ -1,9 +1,9 @@
 import type { BaseResponse } from '#/interfaces/base';
 import type {
   CreateServiceVarRequest,
+  EnvExampleVariableSuggestion,
   UpdateServiceVarRequest,
   Variable,
-  EnvExampleVariableSuggestion,
 } from '#/interfaces/deployment';
 import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
@@ -17,9 +17,13 @@ export const serviceVarsService = {
     }
   },
 
-  getEnvSuggestions: async (serviceId: string): Promise<BaseResponse<EnvExampleVariableSuggestion[]>> => {
+  getEnvSuggestions: async (
+    serviceId: string
+  ): Promise<BaseResponse<EnvExampleVariableSuggestion[]>> => {
     try {
-      return await apiClient.get<BaseResponse<EnvExampleVariableSuggestion[]>>(`/services/${serviceId}/env-suggestions`);
+      return await apiClient.get<BaseResponse<EnvExampleVariableSuggestion[]>>(
+        `/services/${serviceId}/env-suggestions`
+      );
     } catch (error) {
       throw handleApiError(error);
     }
