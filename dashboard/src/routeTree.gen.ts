@@ -45,6 +45,7 @@ import { Route as DashboardServicesServiceIdBuildRouteImport } from './routes/_d
 import { Route as DashboardServicesServiceIdDangerRouteImport } from './routes/_dashboard.services/$serviceId.danger'
 import { Route as DashboardServicesServiceIdDeploymentsRouteImport } from './routes/_dashboard.services/$serviceId.deployments'
 import { Route as DashboardServicesServiceIdDomainsRouteImport } from './routes/_dashboard.services/$serviceId.domains'
+import { Route as DashboardServicesServiceIdMetricsRouteImport } from './routes/_dashboard.services/$serviceId.metrics'
 import { Route as DashboardServicesServiceIdScheduledTasksRouteImport } from './routes/_dashboard.services/$serviceId.scheduled-tasks'
 import { Route as DashboardServicesServiceIdServerlessRouteImport } from './routes/_dashboard.services/$serviceId.serverless'
 import { Route as DashboardServicesServiceIdTerminalRouteImport } from './routes/_dashboard.services/$serviceId.terminal'
@@ -242,6 +243,12 @@ const DashboardServicesServiceIdDomainsRoute =
     path: '/domains',
     getParentRoute: () => DashboardServicesServiceIdRoute,
   } as any)
+const DashboardServicesServiceIdMetricsRoute =
+  DashboardServicesServiceIdMetricsRouteImport.update({
+    id: '/metrics',
+    path: '/metrics',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
 const DashboardServicesServiceIdScheduledTasksRoute =
   DashboardServicesServiceIdScheduledTasksRouteImport.update({
     id: '/scheduled-tasks',
@@ -312,6 +319,7 @@ export interface FileRoutesByFullPath {
   '/services/$serviceId/danger': typeof DashboardServicesServiceIdDangerRoute
   '/services/$serviceId/deployments': typeof DashboardServicesServiceIdDeploymentsRoute
   '/services/$serviceId/domains': typeof DashboardServicesServiceIdDomainsRoute
+  '/services/$serviceId/metrics': typeof DashboardServicesServiceIdMetricsRoute
   '/services/$serviceId/scheduled-tasks': typeof DashboardServicesServiceIdScheduledTasksRoute
   '/services/$serviceId/serverless': typeof DashboardServicesServiceIdServerlessRoute
   '/services/$serviceId/terminal': typeof DashboardServicesServiceIdTerminalRoute
@@ -353,6 +361,7 @@ export interface FileRoutesByTo {
   '/services/$serviceId/danger': typeof DashboardServicesServiceIdDangerRoute
   '/services/$serviceId/deployments': typeof DashboardServicesServiceIdDeploymentsRoute
   '/services/$serviceId/domains': typeof DashboardServicesServiceIdDomainsRoute
+  '/services/$serviceId/metrics': typeof DashboardServicesServiceIdMetricsRoute
   '/services/$serviceId/scheduled-tasks': typeof DashboardServicesServiceIdScheduledTasksRoute
   '/services/$serviceId/serverless': typeof DashboardServicesServiceIdServerlessRoute
   '/services/$serviceId/terminal': typeof DashboardServicesServiceIdTerminalRoute
@@ -398,6 +407,7 @@ export interface FileRoutesById {
   '/_dashboard/services/$serviceId/danger': typeof DashboardServicesServiceIdDangerRoute
   '/_dashboard/services/$serviceId/deployments': typeof DashboardServicesServiceIdDeploymentsRoute
   '/_dashboard/services/$serviceId/domains': typeof DashboardServicesServiceIdDomainsRoute
+  '/_dashboard/services/$serviceId/metrics': typeof DashboardServicesServiceIdMetricsRoute
   '/_dashboard/services/$serviceId/scheduled-tasks': typeof DashboardServicesServiceIdScheduledTasksRoute
   '/_dashboard/services/$serviceId/serverless': typeof DashboardServicesServiceIdServerlessRoute
   '/_dashboard/services/$serviceId/terminal': typeof DashboardServicesServiceIdTerminalRoute
@@ -442,6 +452,7 @@ export interface FileRouteTypes {
     | '/services/$serviceId/danger'
     | '/services/$serviceId/deployments'
     | '/services/$serviceId/domains'
+    | '/services/$serviceId/metrics'
     | '/services/$serviceId/scheduled-tasks'
     | '/services/$serviceId/serverless'
     | '/services/$serviceId/terminal'
@@ -483,6 +494,7 @@ export interface FileRouteTypes {
     | '/services/$serviceId/danger'
     | '/services/$serviceId/deployments'
     | '/services/$serviceId/domains'
+    | '/services/$serviceId/metrics'
     | '/services/$serviceId/scheduled-tasks'
     | '/services/$serviceId/serverless'
     | '/services/$serviceId/terminal'
@@ -527,6 +539,7 @@ export interface FileRouteTypes {
     | '/_dashboard/services/$serviceId/danger'
     | '/_dashboard/services/$serviceId/deployments'
     | '/_dashboard/services/$serviceId/domains'
+    | '/_dashboard/services/$serviceId/metrics'
     | '/_dashboard/services/$serviceId/scheduled-tasks'
     | '/_dashboard/services/$serviceId/serverless'
     | '/_dashboard/services/$serviceId/terminal'
@@ -798,6 +811,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardServicesServiceIdDomainsRouteImport
       parentRoute: typeof DashboardServicesServiceIdRoute
     }
+    '/_dashboard/services/$serviceId/metrics': {
+      id: '/_dashboard/services/$serviceId/metrics'
+      path: '/metrics'
+      fullPath: '/services/$serviceId/metrics'
+      preLoaderRoute: typeof DashboardServicesServiceIdMetricsRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
     '/_dashboard/services/$serviceId/scheduled-tasks': {
       id: '/_dashboard/services/$serviceId/scheduled-tasks'
       path: '/scheduled-tasks'
@@ -864,6 +884,7 @@ interface DashboardServicesServiceIdRouteChildren {
   DashboardServicesServiceIdDangerRoute: typeof DashboardServicesServiceIdDangerRoute
   DashboardServicesServiceIdDeploymentsRoute: typeof DashboardServicesServiceIdDeploymentsRoute
   DashboardServicesServiceIdDomainsRoute: typeof DashboardServicesServiceIdDomainsRoute
+  DashboardServicesServiceIdMetricsRoute: typeof DashboardServicesServiceIdMetricsRoute
   DashboardServicesServiceIdScheduledTasksRoute: typeof DashboardServicesServiceIdScheduledTasksRoute
   DashboardServicesServiceIdServerlessRoute: typeof DashboardServicesServiceIdServerlessRoute
   DashboardServicesServiceIdTerminalRoute: typeof DashboardServicesServiceIdTerminalRoute
@@ -882,6 +903,8 @@ const DashboardServicesServiceIdRouteChildren: DashboardServicesServiceIdRouteCh
       DashboardServicesServiceIdDeploymentsRoute,
     DashboardServicesServiceIdDomainsRoute:
       DashboardServicesServiceIdDomainsRoute,
+    DashboardServicesServiceIdMetricsRoute:
+      DashboardServicesServiceIdMetricsRoute,
     DashboardServicesServiceIdScheduledTasksRoute:
       DashboardServicesServiceIdScheduledTasksRoute,
     DashboardServicesServiceIdServerlessRoute:

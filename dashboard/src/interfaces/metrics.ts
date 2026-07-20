@@ -1,6 +1,6 @@
 export interface MetricResult {
   metric: Record<string, string>;
-  values: [number, string][]; // TSDB usually returns [timestamp_in_seconds_or_ms, value_as_string]
+  values: [number, string][];
 }
 
 export interface MetricData {
@@ -11,4 +11,6 @@ export interface MetricData {
 export interface GetHistoricalMetricsResponse {
   cpu: MetricData;
   memory: MetricData;
+  network_rx: MetricData;
+  network_tx: MetricData;
 }
