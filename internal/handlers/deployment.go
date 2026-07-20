@@ -18,14 +18,16 @@ type DeploymentHandler struct {
 	appService        *services.AppService
 	auditService      *services.AuditService
 	aiAnalysis        *services.AIAnalysisService
+	prPreviewService  *services.PRPreviewService
 }
 
-func NewDeploymentHandler(ds *services.DeploymentService, as *services.AppService, audit *services.AuditService, aiAnalysis *services.AIAnalysisService) *DeploymentHandler {
+func NewDeploymentHandler(ds *services.DeploymentService, as *services.AppService, audit *services.AuditService, aiAnalysis *services.AIAnalysisService, prp *services.PRPreviewService) *DeploymentHandler {
 	return &DeploymentHandler{
 		deploymentService: ds,
 		appService:        as,
 		auditService:      audit,
 		aiAnalysis:        aiAnalysis,
+		prPreviewService:  prp,
 	}
 }
 
@@ -226,4 +228,25 @@ func (h *DeploymentHandler) ExplainFailure(c echo.Context) error {
 	}
 
 	return utils.Success(c, "AI Analysis completed", explanation)
+}
+
+// @Summary List PR Previews
+// @Description List active PR previews for a service
+// @Tags Deployments
+// @Accept json
+// @Produce json
+// @Param serviceId path string true "serviceId"
+// @Router /services/{serviceId}/previews [get]
+func (h *DeploymentHandler) ListPRPreviews(c echo.Context) error {
+	serviceID := c.Param("serviceId")
+	if serviceID == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing serviceId parameter")
+	}
+
+	previews, err := h.prPreviewService.ListByApp(c.Request().Context(), serviceID)
+	if err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+
+	return utils.Success(c, "Operation successful", previews)
 }

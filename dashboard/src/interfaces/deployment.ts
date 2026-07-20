@@ -55,6 +55,7 @@ export interface AppService {
   updatedAt: string;
   cpuLimit?: number;
   memoryLimit?: number;
+  enablePRPreviews: boolean;
 }
 
 export interface Deployment {

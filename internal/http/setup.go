@@ -161,7 +161,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	terminalHandler := handlers.NewTerminalHandler(dockerClient, tokenService, appService)
 	projectHandler := handlers.NewProjectHandler(projectService, projectSettingsService)
 	environmentHandler := handlers.NewEnvironmentHandler(environmentService)
-	deploymentHandler := handlers.NewDeploymentHandler(deploymentService, appService, auditService, aiAnalysisService)
+	deploymentHandler := handlers.NewDeploymentHandler(deploymentService, appService, auditService, aiAnalysisService, prPreviewService)
 	serviceVarHandler := handlers.NewServiceVarHandler(appService, auditService, envSuggestionService)
 	projectSettingsHandler := handlers.NewProjectSettingsHandler(projectSettingsService)
 	backupHandler := handlers.NewBackupHandler(backupService)

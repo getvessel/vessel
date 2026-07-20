@@ -6,6 +6,7 @@ import {
   BarChart2,
   Calendar,
   Code,
+  GitPullRequest,
   Globe,
   HardDrive,
   Loader2,
@@ -54,6 +55,7 @@ function ServiceLayoutRoute() {
     { name: 'Variables', href: `/services/${serviceId}/variables`, icon: Variable },
     { name: 'Terminal', href: `/services/${serviceId}/terminal`, icon: Terminal },
     { name: 'Serverless Editor', href: `/services/${serviceId}/serverless`, icon: Code },
+    { name: 'PR Previews', href: `/services/${serviceId}/previews`, icon: GitPullRequest },
     { name: 'Danger Zone', href: `/services/${serviceId}/danger`, icon: AlertTriangle },
   ];
 

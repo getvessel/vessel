@@ -109,32 +109,33 @@ const (
 )
 
 type AppService struct {
-	ID              string           `json:"id" db:"id"`
-	ProjectID       string           `json:"projectId" db:"project_id"`
-	EnvironmentID   string           `json:"environmentId" db:"environment_id"`
-	Name            string           `json:"name" db:"name"`
-	RepositoryURL   string           `json:"repositoryUrl" db:"repository_url"`
-	ImageRef        string           `json:"imageRef,omitempty" db:"image_ref"`
-	Branch          string           `json:"branch" db:"branch"`
-	RootDirectory   string           `json:"rootDirectory" db:"root_directory"`
-	RuntimeMode     RuntimeMode      `json:"runtimeMode" db:"runtime_mode"`
-	InstallCommand  string           `json:"installCommand" db:"install_command"`
-	BuildCommand    string           `json:"buildCommand" db:"build_command"`
-	StartCommand    string           `json:"startCommand" db:"start_command"`
-	DockerfilePath  string           `json:"dockerfilePath" db:"dockerfile_path"`
-	BuildEngine     BuildEngine      `json:"buildEngine" db:"build_engine"`
-	InternalPort    int              `json:"internalPort" db:"internal_port"`
-	Domain          string           `json:"domain" db:"domain"`
-	StaticOutput    string           `json:"staticOutput" db:"static_output"`
-	DeployToken     string           `json:"deployToken,omitempty" db:"deploy_token"`
-	HealthCheckPath string           `json:"healthCheckPath" db:"health_check_path"`
-	ContainerID     string           `json:"containerId" db:"container_id"`
-	Status          AppServiceStatus `json:"status" db:"status"`
-	Replicas        int              `json:"replicas" db:"replicas"`
-	CPULimit        float64          `json:"cpuLimit,omitempty" db:"cpu_limit"`
-	MemoryLimit     int              `json:"memoryLimit,omitempty" db:"memory_limit"`
-	CreatedAt       time.Time        `json:"createdAt" db:"created_at"`
-	UpdatedAt       time.Time        `json:"updatedAt" db:"updated_at"`
+	ID               string           `json:"id" db:"id"`
+	ProjectID        string           `json:"projectId" db:"project_id"`
+	EnvironmentID    string           `json:"environmentId" db:"environment_id"`
+	Name             string           `json:"name" db:"name"`
+	RepositoryURL    string           `json:"repositoryUrl" db:"repository_url"`
+	ImageRef         string           `json:"imageRef,omitempty" db:"image_ref"`
+	Branch           string           `json:"branch" db:"branch"`
+	RootDirectory    string           `json:"rootDirectory" db:"root_directory"`
+	RuntimeMode      RuntimeMode      `json:"runtimeMode" db:"runtime_mode"`
+	InstallCommand   string           `json:"installCommand" db:"install_command"`
+	BuildCommand     string           `json:"buildCommand" db:"build_command"`
+	StartCommand     string           `json:"startCommand" db:"start_command"`
+	DockerfilePath   string           `json:"dockerfilePath" db:"dockerfile_path"`
+	BuildEngine      BuildEngine      `json:"buildEngine" db:"build_engine"`
+	InternalPort     int              `json:"internalPort" db:"internal_port"`
+	Domain           string           `json:"domain" db:"domain"`
+	StaticOutput     string           `json:"staticOutput" db:"static_output"`
+	DeployToken      string           `json:"deployToken,omitempty" db:"deploy_token"`
+	HealthCheckPath  string           `json:"healthCheckPath" db:"health_check_path"`
+	ContainerID      string           `json:"containerId" db:"container_id"`
+	Status           AppServiceStatus `json:"status" db:"status"`
+	Replicas         int              `json:"replicas" db:"replicas"`
+	CPULimit         float64          `json:"cpuLimit,omitempty" db:"cpu_limit"`
+	MemoryLimit      int              `json:"memoryLimit,omitempty" db:"memory_limit"`
+	CreatedAt        time.Time        `json:"createdAt" db:"created_at"`
+	UpdatedAt        time.Time        `json:"updatedAt" db:"updated_at"`
+	EnablePRPreviews bool             `json:"enablePRPreviews" db:"enable_pr_previews"`
 
 	Volumes []ServiceVolume `json:"volumes,omitempty" db:"-"`
 }

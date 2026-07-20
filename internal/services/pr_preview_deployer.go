@@ -41,6 +41,10 @@ func NewPRPreviewService(
 	}
 }
 
+func (s *PRPreviewService) ListByApp(ctx context.Context, appID string) ([]*models.PRPreview, error) {
+	return s.repo.GetByApp(ctx, appID)
+}
+
 type DeployPRPreviewOpts struct {
 	AppID      string
 	PRNumber   int

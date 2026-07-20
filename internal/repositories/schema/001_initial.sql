@@ -138,6 +138,7 @@ CREATE TABLE IF NOT EXISTS app_services (
 			restart_policy TEXT DEFAULT 'on_failure',
 			teardown_timeout INTEGER DEFAULT 30,
 			serverless BOOLEAN DEFAULT 0,
+			enable_pr_previews BOOLEAN DEFAULT 0,
 			cron_schedule TEXT DEFAULT '',
 			health_check_path TEXT DEFAULT '/',
 			status TEXT DEFAULT 'building',

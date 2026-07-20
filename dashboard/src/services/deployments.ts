@@ -4,6 +4,7 @@ import type {
   GetDiagnosticsResponse,
   GetServiceMetricsResponse,
   ListDeploymentsResponse,
+  ListPRPreviewsResponse,
   RollbackDeploymentResponse,
   TriggerDeploymentRequest,
   TriggerDeploymentResponse,
@@ -15,6 +16,14 @@ export const deploymentsService = {
   listByService: async (serviceId: string): Promise<ListDeploymentsResponse> => {
     try {
       return await apiClient.get<ListDeploymentsResponse>(`/services/${serviceId}/deployments`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  listPRPreviews: async (serviceId: string): Promise<ListPRPreviewsResponse> => {
+    try {
+      return await apiClient.get<ListPRPreviewsResponse>(`/services/${serviceId}/previews`);
     } catch (error) {
       throw handleApiError(error);
     }

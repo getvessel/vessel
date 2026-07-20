@@ -156,6 +156,7 @@ func (s *Server) registerAppRoutes(apiGroup, authGroup *echo.Group) {
 
 func (s *Server) registerDeploymentRoutes(authGroup *echo.Group) {
 	authGroup.GET("/services/:serviceId/deployments", s.deploymentHandler.ListServiceDeployments)
+	authGroup.GET("/services/:serviceId/previews", s.deploymentHandler.ListPRPreviews)
 	authGroup.POST("/services/:serviceId/deploy", s.deploymentHandler.Trigger)
 	authGroup.POST("/deployments/:id/rollback", s.deploymentHandler.Rollback)
 	authGroup.GET("/deployments/:id/logs", s.deploymentHandler.GetLogs, s.authGuard.RequireScope("logs:read"))
