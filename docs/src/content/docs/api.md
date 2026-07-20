@@ -77,6 +77,11 @@ curl -H "Authorization: Bearer vpt_xxx" \
 | GET    | `/api/apps/:id`              | Get service details          |
 | PUT    | `/api/apps/:id`              | Update a service             |
 | DELETE | `/api/apps/:id`              | Delete a service             |
+| POST   | `/api/apps/:id/stop`         | Stop service                 |
+| POST   | `/api/apps/:id/restart`      | Restart service              |
+| POST   | `/api/apps/:id/redeploy`     | Redeploy service             |
+| GET    | `/api/services/:serviceId/serverless/code` | Get serverless function code |
+| POST   | `/api/services/:serviceId/serverless/code` | Save serverless function code |
 
 ### Deployments
 
@@ -87,7 +92,6 @@ curl -H "Authorization: Bearer vpt_xxx" \
 | POST   | `/api/deployments/:id/rollback`        | Rollback deployment |
 | GET    | `/api/deployments/:id/logs`            | Get deployment logs |
 | GET    | `/api/services/:serviceId/metrics`     | Get service metrics |
-| POST   | `/api/deployments/:id/diagnostics`     | AI diagnostics      |
 
 ### Databases
 
@@ -131,6 +135,17 @@ curl -H "Authorization: Bearer vpt_xxx" \
 | POST   | `/api/projects/:id/domains` | Add a domain    |
 | DELETE | `/api/domains/:id`          | Remove a domain |
 
+### Webhooks & Volumes
+
+| Method | Path                                   | Description               |
+| ------ | -------------------------------------- | ------------------------- |
+| GET    | `/api/apps/:id/webhooks`               | List app webhooks         |
+| POST   | `/api/apps/:id/webhooks`               | Create an app webhook     |
+| DELETE | `/api/apps/:id/webhooks/:webhookId`    | Delete a webhook          |
+| GET    | `/api/apps/:id/volumes`                | List app storage volumes  |
+| POST   | `/api/apps/:id/volumes`                | Create an app volume      |
+| DELETE | `/api/apps/:id/volumes/:volumeId`      | Delete an app volume      |
+
 
 
 ### Backups
@@ -143,6 +158,24 @@ curl -H "Authorization: Bearer vpt_xxx" \
 | DELETE | `/api/backups/:id`         | Delete backup config |
 | POST   | `/api/backups/:id/trigger` | Trigger backup       |
 | GET    | `/api/backups/:id/records` | List backup records  |
+| GET    | `/api/s3-destinations`     | List S3 destinations |
+| POST   | `/api/s3-destinations`     | Create S3 destination|
+| DELETE | `/api/s3-destinations/:id` | Delete S3 destination|
+
+### Miscellaneous & Integrations
+
+| Method | Path                            | Description                    |
+| ------ | ------------------------------- | ------------------------------ |
+| POST   | `/api/compose/deploy`           | Deploy Docker Compose stack    |
+| POST   | `/api/deploy/archive`           | Deploy from ZIP archive        |
+| POST   | `/api/one-click/deploy`         | Deploy one-click template      |
+| GET    | `/api/dns`                      | List DNS records               |
+| POST   | `/api/dns`                      | Create DNS record              |
+| GET    | `/api/scheduled-tasks`          | List scheduled tasks           |
+| POST   | `/api/scheduled-tasks`          | Create scheduled task (cron)   |
+| POST   | `/api/git/connect`              | Connect a Git provider         |
+| GET    | `/api/canvas/projects`          | Get architecture canvas data   |
+| GET    | `/api/audit-logs`               | List instance audit logs       |
 
 ### Settings
 
@@ -151,6 +184,9 @@ curl -H "Authorization: Bearer vpt_xxx" \
 | GET    | `/api/settings`         | Get server settings    |
 | PUT    | `/api/settings`         | Update server settings |
 | GET    | `/api/system/public`    | Get public settings    |
+| GET    | `/api/ai`               | Get AI config settings |
+| PUT    | `/api/ai`               | Update AI settings     |
+| POST   | `/api/ai/diagnose`      | Run AI Log Diagnosis   |
 | POST   | `/api/settings/license` | Activate license       |
 
 ### Real-Time

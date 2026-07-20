@@ -75,3 +75,13 @@ Database container replacement can interrupt connections, so schedule database d
 Deployment logs show clone, build, image pull, runtime, Traefik, and health check output. Runtime logs show output from the running container after deployment.
 
 When a deployment fails, start with the deployment log. If the service started but did not answer on the configured port, compare the app logs with the service internal port setting.
+
+### AI Log Diagnosis
+
+If a deployment fails, Vessl provides an **AI Diagnose** button next to the deployment logs. By clicking this, Vessl will:
+
+1. Extract the most relevant log excerpts.
+2. Send them to your configured AI provider (e.g., OpenAI, Groq, Mistral).
+3. Return a plain-English explanation of the failure and actionable steps to fix it.
+
+Make sure an instance admin has configured an AI provider in **Settings → AI Configuration**.

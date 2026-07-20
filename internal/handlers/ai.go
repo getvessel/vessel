@@ -53,14 +53,14 @@ func (h *AISettingsHandler) DiagnoseLogs(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Invalid request")
 	}
 
-	mockDiagnosis := `I analyzed your logs. 
-Based on the output provided, here is what I found:
-1. No critical errors detected in the last few lines.
-2. If there are connection issues, ensure your application is listening on the correct port (0.0.0.0 instead of 127.0.0.1).
-3. Check your environment variables to ensure all database connections and secret keys are set correctly.
+	if req.Prompt == "" {
+		return c.String(http.StatusBadRequest, "Prompt is required")
+	}
 
-To fix this, you might need to adjust your build command or start script in the configuration.
-`
+	diagnosis, err := h.aiSettingsService.DiagnoseLogs(c.Request().Context(), req.Prompt)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
 
-	return c.String(http.StatusOK, mockDiagnosis)
+	return c.String(http.StatusOK, diagnosis)
 }

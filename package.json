@@ -13,7 +13,6 @@
     "dev:dashboard": "npm --workspace=dashboard run dev",
     "dev:web": "npm --workspace=web run dev",
     "dev:docs": "npm --workspace=docs run dev",
-    "generate:api-docs": "go run github.com/swaggo/swag/cmd/swag@latest init -g cmd/vessld/main.go -o ./docs",
     "build:dashboard": "npm --workspace=dashboard run build",
     "build:web": "npm --workspace=web run build",
     "build:all": "npm run build:dashboard && npm run build:web",
