@@ -3,7 +3,7 @@ import { SearchAddon } from '@xterm/addon-search';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { Terminal } from '@xterm/xterm';
 import { env } from '#/env';
-import { useAuthStore } from '#/stores/authStore';
+
 import '@xterm/xterm/css/xterm.css';
 import { useEffect, useRef, useState } from 'react';
 
@@ -48,16 +48,21 @@ export function WebTerminal({ serviceId }: WebTerminalProps) {
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsHost = env.VITE_API_URL.replace(/^http(s?):\/\//, '');
-    const wsUrl = `${protocol}//${wsHost}/api/services/${serviceId}/terminal?token=${useAuthStore.getState().token || ''}`;
+    const wsUrl = `${protocol}//${wsHost}/ws/services/${serviceId}/terminal`;
 
     const socket = new WebSocket(wsUrl);
+    socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
       term.writeln('\x1b[32mConnected to terminal.\x1b[0m');
     };
 
     socket.onmessage = (event) => {
-      term.write(event.data);
+      if (event.data instanceof ArrayBuffer) {
+        term.write(new Uint8Array(event.data));
+      } else {
+        term.write(event.data);
+      }
     };
 
     socket.onclose = () => {

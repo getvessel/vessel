@@ -126,7 +126,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	canvasService := services.NewCanvasService(canvasRepo)
 	gitService := services.NewGitService(gitRepo)
 	statsMonitor := engine.NewStatsMonitor(dockerClient)
-	deploymentService := services.NewDeploymentService(deployRepo, appRepo, projectRepo, deployer, gitService, statsMonitor)
+	deploymentService := services.NewDeploymentService(deployRepo, appRepo, projectRepo, deployer, gitService, statsMonitor, volumeRepo)
 	aiAnalysisService := services.NewAIAnalysisService(deployRepo, appRepo, aiRepo)
 
 	autoscaler := engine.NewAutoscalerWorker(appRepo, statsMonitor, deploymentService)
@@ -161,7 +161,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	terminalHandler := handlers.NewTerminalHandler(dockerClient, tokenService, appService)
 	projectHandler := handlers.NewProjectHandler(projectService, projectSettingsService)
 	environmentHandler := handlers.NewEnvironmentHandler(environmentService)
-	deploymentHandler := handlers.NewDeploymentHandler(deploymentService, appService, auditService, aiAnalysisService, prPreviewService)
+	deploymentHandler := handlers.NewDeploymentHandler(deploymentService, appService, auditService, aiAnalysisService, prPreviewService, projectService)
 	serviceVarHandler := handlers.NewServiceVarHandler(appService, auditService, envSuggestionService)
 	projectSettingsHandler := handlers.NewProjectSettingsHandler(projectSettingsService)
 	backupHandler := handlers.NewBackupHandler(backupService)

@@ -65,7 +65,7 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, opts ContainerRun
 
 	if opts.HealthCheckPath != "" {
 		config.Healthcheck = &container.HealthConfig{
-			Test:     []string{"CMD-SHELL", fmt.Sprintf("curl -f http://localhost:%d%s || exit 1", opts.InternalPort, opts.HealthCheckPath)},
+			Test:     []string{"CMD-SHELL", fmt.Sprintf("wget -q --spider http://localhost:%d%s || curl -f http://localhost:%d%s || exit 1", opts.InternalPort, opts.HealthCheckPath, opts.InternalPort, opts.HealthCheckPath)},
 			Interval: 10 * time.Second,
 			Timeout:  5 * time.Second,
 			Retries:  3,
@@ -82,6 +82,9 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, opts ContainerRun
 	var binds []string
 	if len(opts.Volumes) > 0 {
 		for _, v := range opts.Volumes {
+			if err := validateHostPath(v.HostPath); err != nil {
+				return "", fmt.Errorf("invalid volume host path %s: %w", v.HostPath, err)
+			}
 			binds = append(binds, fmt.Sprintf("%s:%s", v.HostPath, v.ContainerPath))
 		}
 	}
@@ -199,6 +202,19 @@ func (c *ContainerManager) CleanupOrphanedContainers(ctx context.Context, prefix
 				break
 			}
 		}
+	}
+	return nil
+}
+
+func validateHostPath(path string) error {
+	forbidden := []string{"/var/run/docker.sock", "/proc", "/sys", "/etc", "/root", "/boot"}
+	for _, f := range forbidden {
+		if strings.Contains(path, f) {
+			return fmt.Errorf("forbidden path")
+		}
+	}
+	if !strings.HasPrefix(path, "/data/vessl/") {
+		return fmt.Errorf("must start with /data/vessl/")
 	}
 	return nil
 }

@@ -154,11 +154,11 @@ func (h *WebhookHandler) HandleGitHubWebhook(c echo.Context) error {
 		if err != nil || appSvc == nil {
 			return utils.Error(c, http.StatusNotFound, "service not found")
 		}
-		if !appSvc.EnablePRPreviews {
-			return utils.Success(c, "PR previews are disabled for this service", nil)
-		}
 		switch payload.Action {
 		case "opened", "synchronize", "reopened":
+			if !appSvc.EnablePRPreviews {
+				return utils.Success(c, "PR previews are disabled for this service", nil)
+			}
 			h.deployPRPreviewAsync(serviceID, payload)
 			return utils.Accepted(c, "Deploying PR preview", nil)
 		case "closed":

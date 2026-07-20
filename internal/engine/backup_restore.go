@@ -31,18 +31,34 @@ func (bm *BackupManager) RestoreBackup(ctx context.Context, recordID string) err
 	}
 
 	var data []byte
+	var fetchErr error
 	if rec.FilePath != "" {
-		data, err = os.ReadFile(rec.FilePath)
-		if err != nil {
-			if rec.S3URL != "" && cfg.S3DestinationID != "" {
-				data = []byte("-- Simulated download from " + rec.S3URL)
-			} else {
-				return fmt.Errorf("failed to read backup file and no S3 backup available: %w", err)
-			}
+		data, fetchErr = os.ReadFile(rec.FilePath)
+	}
+
+	if (rec.FilePath == "" || fetchErr != nil) && rec.S3URL != "" && cfg.S3DestinationID != "" {
+		dest, err := bm.store.GetS3Destination(cfg.S3DestinationID)
+		if err != nil || dest == nil {
+			return fmt.Errorf("failed to retrieve S3 destination for restore: %w", err)
 		}
-	} else if rec.S3URL != "" {
-		data = []byte("-- Simulated download from " + rec.S3URL)
-	} else {
+
+		prefix := fmt.Sprintf("s3://%s/", dest.Bucket)
+		key := strings.TrimPrefix(rec.S3URL, prefix)
+
+		resp, err := signedS3Request(ctx, dest, "GET", key, nil, "")
+		if err != nil {
+			return fmt.Errorf("failed to download backup from S3: %w", err)
+		}
+		defer resp.Body.Close()
+
+		data, err = io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("failed to read downloaded S3 backup: %w", err)
+		}
+	} else if len(data) == 0 {
+		if fetchErr != nil {
+			return fmt.Errorf("failed to read local backup file: %w", fetchErr)
+		}
 		return errors.New("no file path or S3 URL available for restore")
 	}
 

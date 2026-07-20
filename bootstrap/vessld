@@ -18,7 +18,11 @@ if [ ! -f "$VESSL_DIR/docker-compose.yml" ] && [ ! -f "./docker-compose.yml" ] &
 fi
 
 if [ ! -f "$VESSL_DIR/docker-compose.yml" ]; then
-  VESSL_DIR="."
+  if [ -f "./docker-compose.yml" ]; then
+    VESSL_DIR="."
+  elif [ -f "./docker/docker-compose.yml" ]; then
+    VESSL_DIR="./docker"
+  fi
 fi
 
 exec_in_container() {

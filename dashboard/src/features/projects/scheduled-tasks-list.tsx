@@ -7,7 +7,7 @@ import {
 } from '#/hooks/useScheduledTasks';
 
 export function ScheduledTasksList() {
-  const { data: tasksRes, isLoading } = useListScheduledTasks();
+  const { data: tasksRes, isLoading } = useListScheduledTasks('');
   const triggerTask = useTriggerScheduledTask();
   const deleteTask = useDeleteScheduledTask();
 

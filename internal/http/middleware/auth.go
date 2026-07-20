@@ -221,6 +221,13 @@ func (g *AuthGuard) RequireProjectRole(minPermission models.MemberPermission) ec
 				return utils.Error(c, http.StatusBadRequest, "missing project id")
 			}
 
+			if userClaims.Role == "api" {
+				if c.Get("project_id") != projectID {
+					return utils.Error(c, http.StatusForbidden, "api token not authorized for this project")
+				}
+				return next(c)
+			}
+
 			if g.ProjectMembers == nil {
 				return utils.Error(c, http.StatusInternalServerError, "project members provider not configured")
 			}

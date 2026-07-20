@@ -4,9 +4,9 @@ import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
 
 export const scheduledTasksService = {
-  listScheduledTasks: async (): Promise<BaseResponse<Job[]>> => {
+  listScheduledTasks: async (serviceId: string): Promise<BaseResponse<Job[]>> => {
     try {
-      return await apiClient.get<BaseResponse<Job[]>>(`/scheduled-tasks`);
+      return await apiClient.get<BaseResponse<Job[]>>(`/scheduled-tasks?serviceId=${serviceId}`);
     } catch (error) {
       throw handleApiError(error);
     }

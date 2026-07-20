@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -88,6 +89,54 @@ func sendToDrain(drain *models.LogDrain, serviceName, logLine string) {
 	}
 }
 
+func isSafeIP(ip net.IP) bool {
+	if ip.IsLoopback() || ip.IsPrivate() || ip.IsUnspecified() {
+		return false
+	}
+	if ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() {
+		return false
+	}
+	return true
+}
+
+var safeHTTPClient = &http.Client{
+	Timeout: 5 * time.Second,
+	Transport: &http.Transport{
+		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+			host, port, err := net.SplitHostPort(addr)
+			if err != nil {
+				return nil, err
+			}
+			ips, err := net.DefaultResolver.LookupIPAddr(ctx, host)
+			if err != nil {
+				return nil, err
+			}
+			if len(ips) == 0 {
+				return nil, fmt.Errorf("no IP addresses found for %s", host)
+			}
+
+			var safeIP net.IP
+			for _, ip := range ips {
+				if isSafeIP(ip.IP) {
+					safeIP = ip.IP
+					break
+				}
+			}
+
+			if safeIP == nil {
+				return nil, fmt.Errorf("SSRF prevention: blocked connection to internal/private IP for host %s", host)
+			}
+
+			safeAddr := net.JoinHostPort(safeIP.String(), port)
+			dialer := &net.Dialer{
+				Timeout:   5 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}
+			return dialer.DialContext(ctx, network, safeAddr)
+		},
+	},
+}
+
 func sendHTTP(url, token string, payload interface{}) {
 	data, err := json.Marshal(payload)
 	if err != nil {
@@ -104,8 +153,7 @@ func sendHTTP(url, token string, payload interface{}) {
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
 
-	client := &http.Client{Timeout: 5 * time.Second}
-	resp, err := client.Do(req)
+	resp, err := safeHTTPClient.Do(req)
 	if err != nil {
 		return
 	}

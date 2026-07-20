@@ -45,7 +45,7 @@ export function LogDrainsCard({ serviceId }: { serviceId: string }) {
         appId: serviceId,
         payload: {
           drainType,
-          endpoint,
+          endpointUrl: endpoint,
           authToken: authToken || undefined,
         },
       });
@@ -98,7 +98,7 @@ export function LogDrainsCard({ serviceId }: { serviceId: string }) {
                   <SelectContent>
                     <SelectItem value="webhook">Custom Webhook</SelectItem>
                     <SelectItem value="axiom">Axiom</SelectItem>
-                    <SelectItem value="newrelic">New Relic</SelectItem>
+                    <SelectItem value="new_relic">New Relic</SelectItem>
                     <SelectItem value="datadog">Datadog</SelectItem>
                   </SelectContent>
                 </Select>
@@ -161,7 +161,7 @@ export function LogDrainsCard({ serviceId }: { serviceId: string }) {
                   className="grid grid-cols-[1fr_2fr_1fr_auto] items-center gap-4 p-4 text-sm"
                 >
                   <div className="font-medium capitalize">{drain.drainType}</div>
-                  <div className="truncate text-muted-foreground">{drain.endpoint}</div>
+                  <div className="truncate text-muted-foreground">{drain.endpointUrl}</div>
                   <div className="text-muted-foreground">
                     {format(new Date(drain.createdAt), 'MMM d, yyyy')}
                   </div>

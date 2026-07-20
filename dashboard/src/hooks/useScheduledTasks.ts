@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { scheduledTasksService } from '#/services/scheduled-tasks';
 
-export const useListScheduledTasks = () => {
+export const useListScheduledTasks = (serviceId: string) => {
   return useQuery({
-    queryKey: ['scheduled-tasks'],
-    queryFn: () => scheduledTasksService.listScheduledTasks(),
+    queryKey: ['scheduled-tasks', serviceId],
+    queryFn: () => scheduledTasksService.listScheduledTasks(serviceId),
   });
 };
 

@@ -25,7 +25,9 @@ export function RuntimeModeCard({ serviceId, initialData }: RuntimeModeCardProps
 
   const updateMutation = useMutation({
     mutationFn: async (data: Record<string, unknown>) => {
-      return apiClient.put(`/services/${serviceId}/runtime`, data);
+      const appRes = await apiClient.get<any>(`/apps/${serviceId}`);
+      const app = appRes.data?.data || appRes.data;
+      return apiClient.put(`/apps/${serviceId}`, { ...app, ...data });
     },
     onSuccess: () => {
       toast.success('Runtime mode updated');

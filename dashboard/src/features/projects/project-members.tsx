@@ -19,10 +19,20 @@ import {
   TableHeader,
   TableRow,
 } from '#/components/ui/table';
+import { useGetProfile } from '#/hooks/useProfile';
 import { useAddMember, useListMembers, useRemoveMember } from '#/hooks/useProjectSettings';
 
 export function ProjectMembers({ projectId }: { projectId: string }) {
   const { data: members, isLoading } = useListMembers(projectId);
+  const { data: profile } = useGetProfile();
+  
+  const currentUserRole =
+    members?.data?.find(
+      (m: any) => m.email === profile?.data?.email || m.user_id === profile?.data?.id
+    )?.permission || 'member';
+
+  const canManage = currentUserRole === 'owner' || currentUserRole === 'admin';
+
   const { mutateAsync: addMember, isPending: isAdding } = useAddMember();
   const { mutateAsync: removeMember, isPending: isRemoving } = useRemoveMember();
 
@@ -65,40 +75,42 @@ export function ProjectMembers({ projectId }: { projectId: string }) {
         </p>
       </div>
 
-      <form onSubmit={handleAdd} className="flex items-end gap-4 rounded-lg border bg-gray-50 p-4">
-        <div className="flex-1 space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="colleague@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className="w-48 space-y-2">
-          <Label htmlFor="permission">Role</Label>
-          <Select value={permission} onValueChange={setPermission}>
-            <SelectTrigger id="permission">
-              <SelectValue placeholder="Select role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="owner">Owner</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
-              <SelectItem value="member">Member</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <Button type="submit" disabled={isAdding}>
-          {isAdding ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Plus className="mr-2 h-4 w-4" />
-          )}
-          Add Member
-        </Button>
-      </form>
+      {canManage && (
+        <form onSubmit={handleAdd} className="flex items-end gap-4 rounded-lg border bg-gray-50 p-4">
+          <div className="flex-1 space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="colleague@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="w-48 space-y-2">
+            <Label htmlFor="permission">Role</Label>
+            <Select value={permission} onValueChange={setPermission}>
+              <SelectTrigger id="permission">
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="owner">Owner</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="member">Member</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button type="submit" disabled={isAdding}>
+            {isAdding ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="mr-2 h-4 w-4" />
+            )}
+            Add Member
+          </Button>
+        </form>
+      )}
 
       <div className="rounded-md border">
         <Table>
@@ -130,15 +142,17 @@ export function ProjectMembers({ projectId }: { projectId: string }) {
                   <TableCell className="capitalize">{member.permission}</TableCell>
                   <TableCell>{new Date(member.created_at).toLocaleDateString()}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => handleRemove(member.user_id)}
-                      disabled={isRemoving}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {canManage && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                        onClick={() => handleRemove(member.user_id)}
+                        disabled={isRemoving}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))

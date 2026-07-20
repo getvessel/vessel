@@ -49,8 +49,12 @@ export function RowEditorModal({
 
   const saveRow = useMutation({
     mutationFn: async (data: Record<string, string>) => {
-      // POST /databases/:id/data/:table for both insert and update (upsert or simple insert if we don't have PKEY)
-      // Real implementation would probably use a PUT for update, but PLAN.md says `POST /databases/:id/data/:table` for Add Row.
+      if (isEditing && initialData) {
+        return apiClient.put(`/databases/${databaseId}/data/${tableName}`, {
+          keys: initialData,
+          data: data,
+        });
+      }
       return apiClient.post(`/databases/${databaseId}/data/${tableName}`, data);
     },
     onSuccess: () => {

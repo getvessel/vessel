@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query';
 import { Copy, Globe, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -7,7 +6,6 @@ import { Button } from '#/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#/components/ui/card';
 import { Input } from '#/components/ui/input';
 import { Switch } from '#/components/ui/switch';
-import { apiClient } from '#/lib/apiClient';
 
 interface DatabaseNetworkingProps {
   database: {
@@ -15,10 +13,10 @@ interface DatabaseNetworkingProps {
     isPublic: boolean;
     publicEndpoint?: string;
   };
-  onUpdate: () => void;
 }
 
-export function DatabaseNetworking({ database, onUpdate }: DatabaseNetworkingProps) {
+export function DatabaseNetworking({ database }: DatabaseNetworkingProps) {
+  /*
   const togglePublicAccess = useMutation({
     mutationFn: async (isPublic: boolean) => {
       return apiClient.put(`/databases/${database.id}`, { isPublic });
@@ -31,6 +29,7 @@ export function DatabaseNetworking({ database, onUpdate }: DatabaseNetworkingPro
       toast.error(error.message || 'Failed to update networking settings');
     },
   });
+*/
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -56,12 +55,13 @@ export function DatabaseNetworking({ database, onUpdate }: DatabaseNetworkingPro
               Allow external connections via ExternalDNS
             </p>
           </div>
-          <Switch
-            checked={database.isPublic}
-            onCheckedChange={(checked) => togglePublicAccess.mutate(checked)}
-            disabled={togglePublicAccess.isPending}
-          />
+          <Switch checked={database.isPublic} disabled={true} />
         </div>
+        {!database.publicEndpoint && (
+          <p className="text-muted-foreground text-sm">
+            Public access requires configuring an External DNS.
+          </p>
+        )}
 
         {database.isPublic && database.publicEndpoint && (
           <div className="space-y-4 rounded-lg border bg-muted/50 p-4">

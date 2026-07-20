@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"vessl.dev/vessl/dashboard"
+	"vessl.dev/vessl/internal/models"
 )
 
 func (s *Server) registerRoutes() {
@@ -75,9 +76,10 @@ func (s *Server) registerProjectRoutes(apiGroup, authGroup *echo.Group) {
 
 	// Project-specific routes that require membership
 	projectAuth := s.authGuard.RequireProjectRole("")
+	projectAuthAdmin := s.authGuard.RequireProjectRole(models.MemberPermissionAdmin)
 
 	authGroup.GET("/projects/:id", s.projectHandler.GetProject, projectAuth)
-	authGroup.DELETE("/projects/:id", s.projectHandler.DeleteProject, projectAuth)
+	authGroup.DELETE("/projects/:id", s.projectHandler.DeleteProject, projectAuthAdmin)
 
 	authGroup.GET("/services/:id/domains", s.domainHandler.ListByService)
 	authGroup.POST("/services/:id/domains", s.domainHandler.Create)
@@ -94,8 +96,8 @@ func (s *Server) registerProjectRoutes(apiGroup, authGroup *echo.Group) {
 	authGroup.DELETE("/projects/:projectId/tokens/:id", s.projectSettingsHandler.DeleteToken, projectAuth, s.authGuard.RequireScope("env:write"))
 
 	authGroup.GET("/projects/:projectId/members", s.projectSettingsHandler.ListMembers, projectAuth)
-	authGroup.POST("/projects/:projectId/members", s.projectSettingsHandler.AddMember, projectAuth)
-	authGroup.DELETE("/projects/:projectId/members/:id", s.projectSettingsHandler.RemoveMember, projectAuth)
+	authGroup.POST("/projects/:projectId/members", s.projectSettingsHandler.AddMember, projectAuthAdmin)
+	authGroup.DELETE("/projects/:projectId/members/:id", s.projectSettingsHandler.RemoveMember, projectAuthAdmin)
 }
 
 func (s *Server) registerDatabaseRoutes(authGroup *echo.Group) {

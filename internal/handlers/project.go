@@ -54,11 +54,15 @@ func (h *ProjectHandler) CreateProject(c echo.Context) error {
 
 	userClaims, ok := c.Get("user").(*models.UserClaims)
 	if ok && userClaims != nil {
-		_, _ = h.projectSettingsService.AddMemberByEmail(c.Request().Context(), services.AddMemberOpts{
+		_, err := h.projectSettingsService.AddMemberByEmail(c.Request().Context(), services.AddMemberOpts{
 			ProjectID:  p.ID,
 			Email:      userClaims.Email,
 			Permission: models.MemberPermissionOwner,
 		})
+		if err != nil {
+			_ = h.projectService.DeleteProject(c.Request().Context(), p.ID)
+			return utils.Error(c, http.StatusInternalServerError, "failed to set project owner")
+		}
 
 		telemetry.Track(userClaims.Email, "project_created", map[string]interface{}{
 			"project_id": p.ID,

@@ -29,9 +29,7 @@ class ComposeService {
     const blob = new Blob([composeContent], { type: 'text/yaml' });
     formData.append('file', blob, 'docker-compose.yml');
 
-    const response = await apiClient.post<{ data: any }>('/compose/deploy', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const response = await apiClient.post<{ data: any }>('/compose/deploy', formData);
     return response.data;
   }
 }

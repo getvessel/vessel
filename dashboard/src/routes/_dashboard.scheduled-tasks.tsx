@@ -30,7 +30,7 @@ function ScheduledTasksPage() {
   const { data: projectsResponse, isLoading: isLoadingProjects } = useListProjects();
   const projects = projectsResponse?.data?.records || [];
 
-  const { data: tasksResponse, isLoading: isLoadingTasks } = useListScheduledTasks();
+  const { data: tasksResponse, isLoading: isLoadingTasks } = useListScheduledTasks('');
   const tasks = tasksResponse?.data || [];
 
   return (

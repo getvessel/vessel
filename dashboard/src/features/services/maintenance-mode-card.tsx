@@ -2,12 +2,12 @@ import { Loader2, Wrench } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#/components/ui/card';
 import { Switch } from '#/components/ui/switch';
-import { useGetApp, useRestartApp, useUpdateApp } from '#/hooks/useApps';
+import { useGetApp, useRedeployApp, useUpdateApp } from '#/hooks/useApps';
 
 export function MaintenanceModeCard({ serviceId }: { serviceId: string }) {
   const { data: appData, isLoading } = useGetApp(serviceId);
   const updateApp = useUpdateApp();
-  const restartApp = useRestartApp();
+  const redeployApp = useRedeployApp();
 
   if (isLoading) {
     return (
@@ -28,9 +28,9 @@ export function MaintenanceModeCard({ serviceId }: { serviceId: string }) {
         appId: serviceId,
         payload: { ...app, maintenanceMode: checked },
       });
-      toast.success('Maintenance mode updated. Restarting service to apply changes...');
-      await restartApp.mutateAsync({ appId: serviceId });
-      toast.success('Service restarted successfully');
+      toast.success('Maintenance mode updated. Redeploying service to apply changes...');
+      await redeployApp.mutateAsync({ appId: serviceId });
+      toast.success('Service redeployment started successfully');
     } catch (_error) {
       toast.error('Failed to update maintenance mode');
     }
@@ -59,7 +59,7 @@ export function MaintenanceModeCard({ serviceId }: { serviceId: string }) {
           <Switch
             checked={!!app.maintenanceMode}
             onCheckedChange={handleToggle}
-            disabled={updateApp.isPending || restartApp.isPending}
+            disabled={updateApp.isPending || redeployApp.isPending}
           />
         </div>
       </CardContent>

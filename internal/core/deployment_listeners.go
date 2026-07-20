@@ -37,6 +37,10 @@ func (l *DeploymentListeners) UpdateAuditLog(e DeploymentCompleted) {
 
 func (l *DeploymentListeners) TriggerWebhook(e DeploymentCompleted) {
 	slog.Info("triggering webhook", "projectID", e.ProjectID)
+	// TODO: Webhook dispatch is incomplete. We save rows to service_webhooks
+	// but there is no mechanism here to fetch them via AppServiceRepository
+	// and perform the actual HTTP POST requests. Needs a full HTTP client
+	// implementation with retries and signature headers.
 }
 
 func (l *DeploymentListeners) Register() {

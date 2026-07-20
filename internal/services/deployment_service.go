@@ -24,6 +24,7 @@ type DeploymentService struct {
 	deployer     *engine.Deployer
 	gitService   *GitService
 	statsMonitor *engine.StatsMonitor
+	volumeRepo   repositories.ServiceVolumeRepository
 }
 
 func NewDeploymentService(
@@ -33,6 +34,7 @@ func NewDeploymentService(
 	d *engine.Deployer,
 	gs *GitService,
 	sm *engine.StatsMonitor,
+	vr repositories.ServiceVolumeRepository,
 ) *DeploymentService {
 	return &DeploymentService{
 		repo:         r,
@@ -41,6 +43,7 @@ func NewDeploymentService(
 		deployer:     d,
 		gitService:   gs,
 		statsMonitor: sm,
+		volumeRepo:   vr,
 	}
 }
 
@@ -113,6 +116,11 @@ func (s *DeploymentService) ExecuteDeploymentAsync(d *models.Deployment) {
 		if err != nil {
 			_ = s.UpdateStatus(bgCtx, DeployStatusOpts{ID: d.ID, Status: models.DeploymentStatusFailed, BuildLogs: fmt.Sprintf("Failed to get app service: %v\n", err), ContainerID: ""})
 			return
+		}
+
+		volumes, err := s.volumeRepo.ListByService(bgCtx, app.ID)
+		if err == nil {
+			app.Volumes = volumes
 		}
 
 		if app.ImageRef != "" {

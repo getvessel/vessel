@@ -9,6 +9,7 @@ import (
 
 	"vessl.dev/vessl/internal/utils"
 
+	"vessl.dev/vessl/internal/http/middleware"
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/services"
 )
@@ -19,16 +20,42 @@ type DeploymentHandler struct {
 	auditService      *services.AuditService
 	aiAnalysis        *services.AIAnalysisService
 	prPreviewService  *services.PRPreviewService
+	projectService    *services.ProjectService
 }
 
-func NewDeploymentHandler(ds *services.DeploymentService, as *services.AppService, audit *services.AuditService, aiAnalysis *services.AIAnalysisService, prp *services.PRPreviewService) *DeploymentHandler {
+func NewDeploymentHandler(ds *services.DeploymentService, as *services.AppService, audit *services.AuditService, aiAnalysis *services.AIAnalysisService, prp *services.PRPreviewService, ps *services.ProjectService) *DeploymentHandler {
 	return &DeploymentHandler{
 		deploymentService: ds,
 		appService:        as,
 		auditService:      audit,
 		aiAnalysis:        aiAnalysis,
 		prPreviewService:  prp,
+		projectService:    ps,
 	}
+}
+
+func (h *DeploymentHandler) verifyProjectOwnership(c echo.Context, projectID string) error {
+	user := middleware.GetUserClaimsFromContext(c.Request().Context())
+	if user == nil {
+		return utils.Error(c, http.StatusUnauthorized, "unauthorized")
+	}
+
+	if user.Role == "api" {
+		tokenProjectID, ok := c.Get("project_id").(string)
+		if ok && tokenProjectID != projectID {
+			return utils.Error(c, http.StatusForbidden, "token does not have access to this project")
+		}
+	}
+
+	project, err := h.projectService.GetProject(c.Request().Context(), projectID)
+	if err != nil || project == nil {
+		return utils.Error(c, http.StatusNotFound, "project not found")
+	}
+
+	if !h.projectService.IsMemberOrOwner(c.Request().Context(), projectID, user.UserID, user.Role) {
+		return utils.Error(c, http.StatusForbidden, "access denied")
+	}
+	return nil
 }
 
 func (h *DeploymentHandler) ListServiceDeployments(c echo.Context) error {
@@ -176,6 +203,14 @@ func (h *DeploymentHandler) ExplainFailure(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
 		return utils.Error(c, http.StatusBadRequest, "missing id parameter")
+	}
+	dep, err := h.deploymentService.GetDeployment(c.Request().Context(), id)
+	if err != nil || dep == nil {
+		return utils.Error(c, http.StatusNotFound, "deployment not found")
+	}
+
+	if err := h.verifyProjectOwnership(c, dep.ProjectID); err != nil {
+		return err
 	}
 
 	explanation, err := h.aiAnalysis.ExplainDeploymentFailure(c.Request().Context(), id)

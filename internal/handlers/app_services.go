@@ -65,6 +65,9 @@ func (h *AppHandler) Create(c echo.Context) error {
 	if req.Name == "" {
 		return utils.Error(c, http.StatusBadRequest, "app service name is required")
 	}
+	if req.HealthCheckPath != "" && !isValidHealthCheckPath(req.HealthCheckPath) {
+		return utils.Error(c, http.StatusBadRequest, "invalid health check path")
+	}
 	if err := h.verifyProjectOwnership(c, req.ProjectID); err != nil {
 		return err
 	}
@@ -161,6 +164,9 @@ func (h *AppHandler) Update(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid payload")
 	}
+	if req.HealthCheckPath != "" && !isValidHealthCheckPath(req.HealthCheckPath) {
+		return utils.Error(c, http.StatusBadRequest, "invalid health check path")
+	}
 	existing.Name = req.Name
 	existing.RepositoryURL = req.RepositoryURL
 	existing.Branch = req.Branch
@@ -181,6 +187,7 @@ func (h *AppHandler) Update(c echo.Context) error {
 	existing.MemoryLimit = req.MemoryLimit
 	existing.DeployToken = req.DeployToken
 	existing.MaintenanceMode = req.MaintenanceMode
+	existing.EnablePRPreviews = req.EnablePRPreviews
 	if err := h.appService.UpdateAppService(c.Request().Context(), existing); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
@@ -321,4 +328,19 @@ func (h *AppHandler) DeleteLogDrain(c echo.Context) error {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)
+}
+
+func isValidHealthCheckPath(path string) bool {
+	if path == "" {
+		return true
+	}
+	if path[0] != '/' {
+		return false
+	}
+	for _, ch := range path {
+		if !((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || ch == '/' || ch == '-' || ch == '_' || ch == '.' || ch == '?' || ch == '=' || ch == '&') {
+			return false
+		}
+	}
+	return true
 }

@@ -46,7 +46,7 @@ export function AccessTokensList() {
           allowedProjects: [],
         },
       });
-      setCreatedToken((res as any)?.data?.plain || 'token-created-successfully');
+      setCreatedToken((res as any)?.data?.token || 'token-created-successfully');
     } catch (error) {
       console.error('Failed to create token', error);
     }
