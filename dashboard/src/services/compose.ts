@@ -1,7 +1,7 @@
-import { apiClient } from '#/lib/apiClient';
+import type { CreateDatabaseRequest } from '#/interfaces/database';
 
 import type { CreateAppServiceRequest } from '#/interfaces/deployment';
-import type { CreateDatabaseRequest } from '#/interfaces/database';
+import { apiClient } from '#/lib/apiClient';
 
 export interface ComposeAnalyzeRequest {
   projectId: string;
