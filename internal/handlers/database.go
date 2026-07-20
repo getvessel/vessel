@@ -23,9 +23,18 @@ func NewDatabaseHandler(s *services.DatabaseService, ps *services.ProjectService
 }
 
 func (h *DatabaseHandler) verifyProjectOwnership(c echo.Context, projectID string) error {
-	_, err := h.projectService.GetProject(c.Request().Context(), projectID)
-	if err != nil {
+	user := middleware.GetUserClaimsFromContext(c.Request().Context())
+	if user == nil {
+		return utils.Error(c, http.StatusUnauthorized, "unauthorized")
+	}
+
+	project, err := h.projectService.GetProject(c.Request().Context(), projectID)
+	if err != nil || project == nil {
 		return utils.Error(c, http.StatusNotFound, "project not found")
+	}
+
+	if !h.projectService.IsMemberOrOwner(c.Request().Context(), projectID, user.UserID, user.Role) {
+		return utils.Error(c, http.StatusForbidden, "access denied")
 	}
 	return nil
 }

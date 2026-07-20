@@ -104,7 +104,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	backupManager := engine.NewBackupManager(dockerClient, httpEngineAdapter, "")
 	_ = backupManager.Start()
 
-	projectService := services.NewProjectService(projectRepo, environmentRepo, appRepo, serviceVarRepo, settingsRepo)
+	projectService := services.NewProjectService(projectRepo, environmentRepo, appRepo, serviceVarRepo, settingsRepo, projectSettingsRepo)
 	appService := services.NewAppService(appRepo, serviceVarRepo, volumeRepo)
 	databaseService := services.NewDatabaseService(dbRepo, databaseDeployer)
 	tokenService, err := services.NewTokenService()

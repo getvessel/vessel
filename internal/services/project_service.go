@@ -19,15 +19,17 @@ type ProjectService struct {
 	appRepo        repositories.AppServiceRepository
 	serviceVarRepo repositories.ServiceVarRepository
 	settingsRepo   repositories.SettingsRepository
+	membersRepo    repositories.ProjectSettingsRepository
 }
 
-func NewProjectService(pr repositories.ProjectRepository, er repositories.EnvironmentRepository, ar repositories.AppServiceRepository, svr repositories.ServiceVarRepository, sr repositories.SettingsRepository) *ProjectService {
+func NewProjectService(pr repositories.ProjectRepository, er repositories.EnvironmentRepository, ar repositories.AppServiceRepository, svr repositories.ServiceVarRepository, sr repositories.SettingsRepository, mr repositories.ProjectSettingsRepository) *ProjectService {
 	return &ProjectService{
 		projectRepo:    pr,
 		envRepo:        er,
 		appRepo:        ar,
 		serviceVarRepo: svr,
 		settingsRepo:   sr,
+		membersRepo:    mr,
 	}
 }
 
@@ -76,6 +78,17 @@ func (s *ProjectService) GetProject(ctx context.Context, id string) (*models.Pro
 		return nil, errors.New("project id is required")
 	}
 	return s.projectRepo.Get(ctx, id)
+}
+
+func (s *ProjectService) IsMemberOrOwner(ctx context.Context, projectID, userID string, userRole models.UserRole) bool {
+	if userRole == models.UserRoleOwner || userRole == models.UserRoleAdmin {
+		return true
+	}
+	member, err := s.membersRepo.GetMember(ctx, projectID, userID)
+	if err != nil || member == nil {
+		return false
+	}
+	return member.Status == models.MemberStatusAccepted
 }
 
 func (s *ProjectService) ListProjects(ctx context.Context, limit, offset int) ([]models.ProjectConfig, int, error) {

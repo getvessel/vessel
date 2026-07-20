@@ -34,15 +34,24 @@ func NewAppHandler(s *services.AppService, ps *services.ProjectService, d *engin
 
 func (h *AppHandler) verifyProjectOwnership(c echo.Context, projectID string) error {
 	user := middleware.GetUserClaimsFromContext(c.Request().Context())
-	if user != nil && user.Role == "api" {
+	if user == nil {
+		return utils.Error(c, http.StatusUnauthorized, "unauthorized")
+	}
+
+	if user.Role == "api" {
 		tokenProjectID, ok := c.Get("project_id").(string)
 		if ok && tokenProjectID != projectID {
 			return utils.Error(c, http.StatusForbidden, "token does not have access to this project")
 		}
 	}
-	_, err := h.projectService.GetProject(c.Request().Context(), projectID)
-	if err != nil {
+
+	project, err := h.projectService.GetProject(c.Request().Context(), projectID)
+	if err != nil || project == nil {
 		return utils.Error(c, http.StatusNotFound, "project not found")
+	}
+
+	if !h.projectService.IsMemberOrOwner(c.Request().Context(), projectID, user.UserID, user.Role) {
+		return utils.Error(c, http.StatusForbidden, "access denied")
 	}
 	return nil
 }
