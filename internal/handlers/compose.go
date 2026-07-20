@@ -9,35 +9,61 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"vessl.dev/vessl/internal/engine"
 	"vessl.dev/vessl/internal/http/middleware"
+	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/repositories"
 	"vessl.dev/vessl/internal/services"
 	"vessl.dev/vessl/internal/utils"
 )
 
 type ComposeHandler struct {
-	composeDeployer *engine.ComposeDeployer
 	projectService  *services.ProjectService
 	appService      *services.AppService
+	databaseService *services.DatabaseService
 	envRepo         repositories.EnvironmentRepository
 	appRepo         repositories.AppServiceRepository
+	composeParser   *services.ComposeParserService
 }
 
 func NewComposeHandler(
-	cd *engine.ComposeDeployer,
 	ps *services.ProjectService,
 	as *services.AppService,
+	ds *services.DatabaseService,
 	er repositories.EnvironmentRepository,
 	ar repositories.AppServiceRepository,
+	cp *services.ComposeParserService,
 ) *ComposeHandler {
 	return &ComposeHandler{
-		composeDeployer: cd,
 		projectService:  ps,
 		appService:      as,
+		databaseService: ds,
 		envRepo:         er,
 		appRepo:         ar,
+		composeParser:   cp,
 	}
+}
+
+type ComposeAnalyzeRequest struct {
+	ComposeContent string `json:"composeContent"`
+	ProjectID      string `json:"projectId"`
+}
+
+func (h *ComposeHandler) Analyze(c echo.Context) error {
+	var req ComposeAnalyzeRequest
+	if err := c.Bind(&req); err != nil {
+		return utils.Error(c, http.StatusBadRequest, "invalid request")
+	}
+
+	if req.ComposeContent == "" {
+		return utils.Error(c, http.StatusBadRequest, "compose content is required")
+	}
+
+	result, err := h.composeParser.Parse([]byte(req.ComposeContent), req.ProjectID)
+	if err != nil {
+		return utils.Error(c, http.StatusBadRequest, "failed to parse docker-compose: "+err.Error())
+	}
+
+	return utils.Success(c, "Compose analyzed", result)
 }
 
 type ComposeDeployRequest struct {
@@ -92,13 +118,62 @@ func (h *ComposeHandler) Deploy(c echo.Context) error {
 	}
 	dst.Close()
 
-	services, err := h.composeDeployer.Deploy(c.Request().Context(), tmpPath, projectID)
+	// Parse the compose file
+	composeBytes, err := os.ReadFile(tmpPath)
+	if err != nil {
+		return utils.Error(c, http.StatusInternalServerError, "failed to read parsed file")
+	}
+
+	result, err := h.composeParser.Parse(composeBytes, projectID)
 	if err != nil {
 		return utils.Error(c, http.StatusBadRequest, "compose deploy failed: "+err.Error())
 	}
 
+	// Create databases first
+	var createdCount int
+	for _, dbReq := range result.Databases {
+		db := &models.Database{
+			ProjectID:    dbReq.ProjectID,
+			Name:         dbReq.Name,
+			Engine:       dbReq.Engine,
+			Version:      dbReq.Version,
+			Port:         dbReq.Port,
+			Username:     dbReq.Username,
+			Password:     dbReq.Password,
+			DatabaseName: dbReq.DatabaseName,
+		}
+		_, err := h.databaseService.CreateDatabase(c.Request().Context(), db)
+		if err != nil {
+			return utils.Error(c, http.StatusInternalServerError, "failed to create database "+dbReq.Name+": "+err.Error())
+		}
+		createdCount++
+	}
+
+	// Create app services
+	for _, appReq := range result.AppServices {
+		app := &models.AppService{
+			ProjectID:      appReq.ProjectID,
+			Name:           appReq.Name,
+			RuntimeMode:    appReq.RuntimeMode,
+			DockerfilePath: appReq.DockerfilePath,
+			InstallCommand: appReq.InstallCommand,
+			BuildCommand:   appReq.BuildCommand,
+			StartCommand:   appReq.StartCommand,
+			RepositoryURL:  appReq.RepositoryURL,
+			ImageRef:       appReq.ImageRef,
+		}
+		if appReq.BuildEngine != "" {
+			app.BuildEngine = models.BuildEngine(appReq.BuildEngine)
+		}
+
+		_, err := h.appService.CreateAppService(c.Request().Context(), app)
+		if err != nil {
+			return utils.Error(c, http.StatusInternalServerError, "failed to create app service "+app.Name+": "+err.Error())
+		}
+		createdCount++
+	}
+
 	return utils.Success(c, "Compose file deployed", map[string]any{
-		"services": services,
-		"count":    len(services),
+		"count": createdCount,
 	})
 }

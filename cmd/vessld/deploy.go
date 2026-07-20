@@ -287,15 +287,7 @@ func performDeployment(deployer *engine.Deployer, dockerClient *client.Client, s
 
 	case dArgs.composePath != "":
 		fmt.Printf("📦 Deploying compose file %s...\n", dArgs.composePath)
-		composeDeployer := engine.NewComposeDeployer(dockerClient)
-		services, err := composeDeployer.Deploy(context.Background(), dArgs.composePath, dArgs.projectID)
-		if err != nil {
-			exitError("Compose deploy failed: %v", err)
-		}
-		fmt.Printf("\n✅ Deployed %d services from compose file\n", len(services))
-		for _, s := range services {
-			fmt.Printf("   - %s (%s)\n", s.Name, s.ContainerID[:12])
-		}
+		exitError("Compose deployments via CLI are deprecated. Please use the Vessl Dashboard natively.", nil)
 
 	case dArgs.archivePath != "":
 		fmt.Printf("📦 Deploying archive %s...\n", dArgs.archivePath)

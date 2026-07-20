@@ -199,6 +199,7 @@ func (s *Server) registerSettingsRoutes(apiGroup, authGroup *echo.Group) {
 
 func (s *Server) registerMiscRoutes(apiGroup, authGroup *echo.Group) {
 	authGroup.POST("/compose/deploy", s.composeHandler.Deploy)
+	authGroup.POST("/compose/analyze", s.composeHandler.Analyze)
 	authGroup.POST("/deploy/archive", s.archiveHandler.DeployArchive)
 	authGroup.GET("/examples", s.exampleHandler.List)
 	authGroup.GET("/one-click", s.oneClickHandler.List)

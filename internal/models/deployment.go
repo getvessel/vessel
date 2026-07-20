@@ -138,6 +138,7 @@ type CreateAppServiceRequest struct {
 	ProjectID       string      `json:"projectId"`
 	Name            string      `json:"name"`
 	RepositoryURL   string      `json:"repositoryUrl"`
+	ImageRef        string      `json:"imageRef,omitempty"`
 	Branch          string      `json:"branch"`
 	RootDirectory   string      `json:"rootDirectory"`
 	RuntimeMode     RuntimeMode `json:"runtimeMode"`
