@@ -4,13 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"strconv"
 	"time"
 
 	"vessl.dev/vessl/internal/models"
-	"vessl.dev/vessl/internal/utils"
 )
 
 func (d *Deployer) getEnvironmentVariables(app *models.AppService, logWriter io.Writer) (map[string]string, error) {
@@ -114,25 +112,16 @@ func (d *Deployer) waitForHealthyContainer(ctx context.Context, containerName st
 				}
 				continue
 			}
-			if healthCheckPath != "" {
-				var containerIP string
-				if net, ok := inspect.NetworkSettings.Networks[utils.GetRuntimeNetwork()]; ok {
-					containerIP = net.IPAddress
+			if healthCheckPath != "" && inspect.State.Health != nil {
+				if inspect.State.Health.Status == "healthy" {
+					return true
 				}
-				if containerIP != "" {
-					port := internalPort
-					if port <= 0 {
-						port = 3000
-					}
-					resp, err := http.Get(fmt.Sprintf("http://%s:%d%s", containerIP, port, healthCheckPath))
-					if err == nil {
-						resp.Body.Close()
-						if resp.StatusCode >= 200 && resp.StatusCode < 400 {
-							return true
-						}
-					}
+				if inspect.State.Health.Status == "unhealthy" {
+					return false
 				}
+				// if "starting", we keep waiting
 			} else {
+				// No healthcheck configured or health state missing, assume healthy if running
 				return true
 			}
 		}

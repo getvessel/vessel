@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/containerd/errdefs"
 	"github.com/docker/docker/api/types"
@@ -36,6 +37,7 @@ type ContainerRunOptions struct {
 	MemoryLimitMB   int
 	CPURequest      float64
 	HealthCheckPath string
+	Volumes         []models.ServiceVolume
 }
 
 func (c *ContainerManager) CreateAndStart(ctx context.Context, opts ContainerRunOptions) (string, error) {
@@ -49,10 +51,26 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, opts ContainerRun
 		Env:   opts.Envs,
 	}
 
+	if opts.HealthCheckPath != "" {
+		config.Healthcheck = &container.HealthConfig{
+			Test:     []string{"CMD-SHELL", fmt.Sprintf("curl -f http://localhost:%d%s || exit 1", opts.InternalPort, opts.HealthCheckPath)},
+			Interval: 10 * time.Second,
+			Timeout:  5 * time.Second,
+			Retries:  3,
+		}
+	}
+
 	if opts.RuntimeMode != models.RuntimeModeWorker {
 		config.ExposedPorts = nat.PortSet{containerPort: struct{}{}}
 		if opts.ServiceID != "" && opts.Domain != "" {
 			config.Labels = c.buildTraefikLabels(opts.ServiceID, opts.Domain, opts.InternalPort, opts.HealthCheckPath)
+		}
+	}
+
+	var binds []string
+	if len(opts.Volumes) > 0 {
+		for _, v := range opts.Volumes {
+			binds = append(binds, fmt.Sprintf("%s:%s", v.HostPath, v.ContainerPath))
 		}
 	}
 
@@ -64,6 +82,7 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, opts ContainerRun
 		},
 		NetworkMode: container.NetworkMode(utils.GetRuntimeNetwork()),
 		DNS:         c.getCustomDNSResolvers(),
+		Binds:       binds,
 	}
 
 	_ = c.StopAndRemove(ctx, opts.Name)

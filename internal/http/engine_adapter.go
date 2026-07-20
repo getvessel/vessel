@@ -9,16 +9,16 @@ import (
 )
 
 type engineAdapter struct {
-	settingsRepo   repositories.SettingsRepository
-	appRepo        repositories.AppServiceRepository
-	envRepo        repositories.EnvRepository
-	dbRepo         repositories.DatabaseRepository
-	projectRepo    repositories.ProjectRepository
-	jobRepo        repositories.JobRepository
-	backupRepo     repositories.BackupRepository
-	s3Repo         repositories.S3DestinationRepository
-	serviceVarRepo repositories.ServiceVarRepository
-	serverlessRepo repositories.ServerlessRepository
+	settingsRepo      repositories.SettingsRepository
+	appRepo           repositories.AppServiceRepository
+	envRepo           repositories.EnvRepository
+	dbRepo            repositories.DatabaseRepository
+	projectRepo       repositories.ProjectRepository
+	scheduledTaskRepo repositories.ScheduledTaskRepository
+	backupRepo        repositories.BackupRepository
+	s3Repo            repositories.S3DestinationRepository
+	serviceVarRepo    repositories.ServiceVarRepository
+	serverlessRepo    repositories.ServerlessRepository
 }
 
 func newEngineAdapter(
@@ -27,23 +27,23 @@ func newEngineAdapter(
 	envRepo repositories.EnvRepository,
 	dbRepo repositories.DatabaseRepository,
 	projectRepo repositories.ProjectRepository,
-	jobRepo repositories.JobRepository,
+	scheduledTaskRepo repositories.ScheduledTaskRepository,
 	backupRepo repositories.BackupRepository,
 	s3Repo repositories.S3DestinationRepository,
 	serviceVarRepo repositories.ServiceVarRepository,
 	serverlessRepo repositories.ServerlessRepository,
 ) *engineAdapter {
 	return &engineAdapter{
-		settingsRepo:   settingsRepo,
-		appRepo:        appRepo,
-		envRepo:        envRepo,
-		dbRepo:         dbRepo,
-		projectRepo:    projectRepo,
-		jobRepo:        jobRepo,
-		backupRepo:     backupRepo,
-		s3Repo:         s3Repo,
-		serviceVarRepo: serviceVarRepo,
-		serverlessRepo: serverlessRepo,
+		settingsRepo:      settingsRepo,
+		appRepo:           appRepo,
+		envRepo:           envRepo,
+		dbRepo:            dbRepo,
+		projectRepo:       projectRepo,
+		scheduledTaskRepo: scheduledTaskRepo,
+		backupRepo:        backupRepo,
+		s3Repo:            s3Repo,
+		serviceVarRepo:    serviceVarRepo,
+		serverlessRepo:    serverlessRepo,
 	}
 }
 
@@ -81,12 +81,12 @@ func (a *engineAdapter) GetDatabase(id string) (*models.Database, error) {
 	return a.dbRepo.GetByID(context.Background(), id)
 }
 
-func (a *engineAdapter) ListJobs() ([]models.Job, error) {
-	return a.jobRepo.ListAll(context.Background())
+func (a *engineAdapter) ListScheduledTasks() ([]models.ScheduledTask, error) {
+	return a.scheduledTaskRepo.ListAll(context.Background())
 }
 
-func (a *engineAdapter) GetJob(id string) (*models.Job, error) {
-	return a.jobRepo.GetByID(context.Background(), id)
+func (a *engineAdapter) GetScheduledTask(id string) (*models.ScheduledTask, error) {
+	return a.scheduledTaskRepo.GetByID(context.Background(), id)
 }
 
 func (a *engineAdapter) GetProject(id string) (*models.ProjectConfig, error) {
@@ -97,8 +97,8 @@ func (a *engineAdapter) GetAppService(id string) (*models.AppService, error) {
 	return a.appRepo.GetByID(context.Background(), id)
 }
 
-func (a *engineAdapter) UpdateJobStatusAndOutput(id string, status models.JobStatus, lastRunAt *time.Time, output string) error {
-	return a.jobRepo.UpdateStatus(context.Background(), id, status, lastRunAt, output)
+func (a *engineAdapter) UpdateScheduledTaskStatusAndOutput(id string, status models.ScheduledTaskStatus, lastRunAt *time.Time, output string) error {
+	return a.scheduledTaskRepo.UpdateStatus(context.Background(), id, status, lastRunAt, output)
 }
 
 func (a *engineAdapter) ListAllActiveBackupConfigs() ([]*models.BackupConfig, error) {

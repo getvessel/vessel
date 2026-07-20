@@ -73,15 +73,15 @@ const (
 	BuildEngineServerless BuildEngine = "serverless"
 )
 
-type JobStatus string
+type ScheduledTaskStatus string
 
 const (
-	JobStatusActive    JobStatus = "active"
-	JobStatusInactive  JobStatus = "inactive"
-	JobStatusRunning   JobStatus = "running"
-	JobStatusCompleted JobStatus = "completed"
-	JobStatusFailed    JobStatus = "failed"
-	JobStatusError     JobStatus = "error"
+	ScheduledTaskStatusActive    ScheduledTaskStatus = "active"
+	ScheduledTaskStatusInactive  ScheduledTaskStatus = "inactive"
+	ScheduledTaskStatusRunning   ScheduledTaskStatus = "running"
+	ScheduledTaskStatusCompleted ScheduledTaskStatus = "completed"
+	ScheduledTaskStatusFailed    ScheduledTaskStatus = "failed"
+	ScheduledTaskStatusError     ScheduledTaskStatus = "error"
 )
 
 type BackupConfigStatus string
@@ -135,6 +135,16 @@ type AppService struct {
 	MemoryLimit     int              `json:"memoryLimit,omitempty" db:"memory_limit"`
 	CreatedAt       time.Time        `json:"createdAt" db:"created_at"`
 	UpdatedAt       time.Time        `json:"updatedAt" db:"updated_at"`
+
+	Volumes []ServiceVolume `json:"volumes,omitempty" db:"-"`
+}
+
+type ServiceVolume struct {
+	ID            string    `json:"id" db:"id"`
+	ServiceID     string    `json:"serviceId" db:"service_id"`
+	HostPath      string    `json:"hostPath" db:"host_path"`
+	ContainerPath string    `json:"containerPath" db:"container_path"`
+	CreatedAt     time.Time `json:"createdAt" db:"created_at"`
 }
 
 type CreateAppServiceRequest struct {
@@ -200,29 +210,27 @@ type UpdateServiceVarRequest struct {
 	IsSecret bool   `json:"isSecret"`
 }
 
-type Job struct {
-	ID         string     `json:"id" db:"id"`
-	ProjectID  string     `json:"projectId" db:"project_id"`
-	ServiceID  string     `json:"serviceId" db:"service_id"`
-	Name       string     `json:"name" db:"name"`
-	Schedule   string     `json:"schedule" db:"schedule"`
-	Command    string     `json:"command" db:"command"`
-	Status     JobStatus  `json:"status" db:"status"`
-	LastRunAt  *time.Time `json:"lastRunAt" db:"last_run_at"`
-	LastOutput string     `json:"lastOutput" db:"last_output"`
-	CreatedAt  time.Time  `json:"createdAt" db:"created_at"`
-	UpdatedAt  time.Time  `json:"updatedAt" db:"updated_at"`
+type ScheduledTask struct {
+	ID         string    `json:"id" db:"id"`
+	ServiceID  string    `json:"serviceId" db:"service_id"`
+	Name       string    `json:"name" db:"name"`
+	Schedule   string    `json:"schedule" db:"schedule"`
+	Command    string    `json:"command" db:"command"`
+	Status     string    `json:"status" db:"status"` // active, paused
+	LastRunAt  time.Time `json:"lastRunAt" db:"last_run_at"`
+	LastOutput string    `json:"lastOutput" db:"last_output"`
+	CreatedAt  time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt  time.Time `json:"updatedAt" db:"updated_at"`
 }
 
-type CreateJobRequest struct {
-	ProjectID string `json:"projectId"`
+type CreateScheduledTaskRequest struct {
 	ServiceID string `json:"serviceId"`
 	Name      string `json:"name"`
 	Schedule  string `json:"schedule"`
 	Command   string `json:"command"`
 }
 
-type UpdateJobRequest struct {
+type UpdateScheduledTaskRequest struct {
 	Name     *string `json:"name,omitempty"`
 	Schedule *string `json:"schedule,omitempty"`
 	Command  *string `json:"command,omitempty"`

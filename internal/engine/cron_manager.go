@@ -41,17 +41,17 @@ func NewCronManager(dockerClient *client.Client, s CronManagerStore) *CronManage
 }
 
 func (cm *CronManager) Start() error {
-	jobs, err := cm.store.ListJobs()
+	scheduledTasks, err := cm.store.ListScheduledTasks()
 	if err != nil {
-		return fmt.Errorf("failed to load jobs during cron manager start: %w", err)
+		return fmt.Errorf("failed to load scheduledTasks during cron manager start: %w", err)
 	}
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
-	for _, j := range jobs {
+	for _, j := range scheduledTasks {
 		if j.Status == "active" {
-			jobCopy := j
-			if err := cm.registerJobLocked(&jobCopy); err != nil {
-				slog.Warn("failed to register cron job", "name", jobCopy.Name, "id", jobCopy.ID, "err", err)
+			scheduledTaskCopy := j
+			if err := cm.registerScheduledTaskLocked(&scheduledTaskCopy); err != nil {
+				slog.Warn("failed to register cron scheduledTask", "name", scheduledTaskCopy.Name, "id", scheduledTaskCopy.ID, "err", err)
 			}
 		}
 	}
@@ -66,13 +66,13 @@ func (cm *CronManager) Stop() {
 	}
 }
 
-func (cm *CronManager) RegisterJob(j *models.Job) error {
+func (cm *CronManager) RegisterScheduledTask(j *models.ScheduledTask) error {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
-	return cm.registerJobLocked(j)
+	return cm.registerScheduledTaskLocked(j)
 }
 
-func (cm *CronManager) registerJobLocked(j *models.Job) error {
+func (cm *CronManager) registerScheduledTaskLocked(j *models.ScheduledTask) error {
 	if entryID, exists := cm.entries[j.ID]; exists {
 		cm.cronEngine.Remove(entryID)
 		delete(cm.entries, j.ID)
@@ -84,11 +84,11 @@ func (cm *CronManager) registerJobLocked(j *models.Job) error {
 	if len(strings.Fields(schedule)) == 5 && !strings.HasPrefix(schedule, "@") {
 		schedule = "0 " + schedule
 	}
-	jobID := j.ID
+	scheduledTaskID := j.ID
 	entryID, err := cm.cronEngine.AddFunc(schedule, func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 		defer cancel()
-		_, _ = cm.ExecuteJob(ctx, jobID)
+		_, _ = cm.ExecuteScheduledTask(ctx, scheduledTaskID)
 	})
 	if err != nil {
 		return fmt.Errorf("invalid cron schedule '%s': %w", j.Schedule, err)
@@ -97,30 +97,30 @@ func (cm *CronManager) registerJobLocked(j *models.Job) error {
 	return nil
 }
 
-func (cm *CronManager) UnregisterJob(jobID string) {
+func (cm *CronManager) UnregisterScheduledTask(scheduledTaskID string) {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
-	if entryID, exists := cm.entries[jobID]; exists {
+	if entryID, exists := cm.entries[scheduledTaskID]; exists {
 		cm.cronEngine.Remove(entryID)
-		delete(cm.entries, jobID)
+		delete(cm.entries, scheduledTaskID)
 	}
 }
 
-func (cm *CronManager) ExecuteJob(ctx context.Context, jobID string) (string, error) {
-	j, err := cm.store.GetJob(jobID)
+func (cm *CronManager) ExecuteScheduledTask(ctx context.Context, scheduledTaskID string) (string, error) {
+	j, err := cm.store.GetScheduledTask(scheduledTaskID)
 	if err != nil || j == nil {
-		return "", fmt.Errorf("job %s not found: %w", jobID, err)
+		return "", fmt.Errorf("scheduledTask %s not found: %w", scheduledTaskID, err)
 	}
 	app, err := cm.store.GetAppService(j.ServiceID)
 	if err != nil || app == nil {
-		return "", fmt.Errorf("service %s for job %s not found: %w", j.ServiceID, jobID, err)
+		return "", fmt.Errorf("service %s for scheduledTask %s not found: %w", j.ServiceID, scheduledTaskID, err)
 	}
 	containerName := utils.NormalizeContainerName(app.ID)
 	inspectResp, err := cm.dockerClient.ContainerInspect(ctx, containerName)
 	if err != nil || !inspectResp.State.Running {
-		errMsg := fmt.Sprintf("cannot run job: service container %s (%s) is stopped or not found", app.Name, containerName)
+		errMsg := fmt.Sprintf("cannot run scheduledTask: service container %s (%s) is stopped or not found", app.Name, containerName)
 		now := time.Now()
-		_ = cm.store.UpdateJobStatusAndOutput(jobID, models.JobStatusError, &now, errMsg)
+		_ = cm.store.UpdateScheduledTaskStatusAndOutput(scheduledTaskID, models.ScheduledTaskStatusError, &now, errMsg)
 		return errMsg, errors.New(errMsg)
 	}
 	execConfig := container.ExecOptions{
@@ -131,14 +131,14 @@ func (cm *CronManager) ExecuteJob(ctx context.Context, jobID string) (string, er
 	execCreateResp, err := cm.dockerClient.ContainerExecCreate(ctx, inspectResp.ID, execConfig)
 	if err != nil {
 		now := time.Now()
-		_ = cm.store.UpdateJobStatusAndOutput(jobID, models.JobStatusError, &now, err.Error())
-		return "", fmt.Errorf("failed to create container exec for job %s: %w", j.Name, err)
+		_ = cm.store.UpdateScheduledTaskStatusAndOutput(scheduledTaskID, models.ScheduledTaskStatusError, &now, err.Error())
+		return "", fmt.Errorf("failed to create container exec for scheduledTask %s: %w", j.Name, err)
 	}
 	attachResp, err := cm.dockerClient.ContainerExecAttach(ctx, execCreateResp.ID, container.ExecAttachOptions{})
 	if err != nil {
 		now := time.Now()
-		_ = cm.store.UpdateJobStatusAndOutput(jobID, models.JobStatusError, &now, err.Error())
-		return "", fmt.Errorf("failed to attach to container exec for job %s: %w", j.Name, err)
+		_ = cm.store.UpdateScheduledTaskStatusAndOutput(scheduledTaskID, models.ScheduledTaskStatusError, &now, err.Error())
+		return "", fmt.Errorf("failed to attach to container exec for scheduledTask %s: %w", j.Name, err)
 	}
 	defer attachResp.Close()
 	var stdoutBuf, stderrBuf bytes.Buffer
@@ -153,7 +153,7 @@ func (cm *CronManager) ExecuteJob(ctx context.Context, jobID string) (string, er
 		output += stderrBuf.String()
 	}
 	now := time.Now()
-	_ = cm.store.UpdateJobStatusAndOutput(jobID, models.JobStatusActive, &now, output)
+	_ = cm.store.UpdateScheduledTaskStatusAndOutput(scheduledTaskID, models.ScheduledTaskStatusActive, &now, output)
 	return output, nil
 }
 

@@ -75,12 +75,14 @@ CREATE TABLE IF NOT EXISTS databases (
 		,
 			environment_id TEXT DEFAULT '',
             logical_replication INTEGER DEFAULT 0,
-            project_id TEXT DEFAULT '');
+            project_id TEXT DEFAULT '',
+			cpu_limit REAL DEFAULT 0,
+			memory_limit INTEGER DEFAULT 0);
 
 
-CREATE TABLE IF NOT EXISTS jobs (
+CREATE TABLE IF NOT EXISTS scheduled_tasks (
 			id TEXT PRIMARY KEY,
-			project_id TEXT NOT NULL,
+			service_id TEXT NOT NULL,
 			name TEXT NOT NULL,
 			schedule TEXT NOT NULL,
 			command TEXT NOT NULL,
@@ -89,7 +91,7 @@ CREATE TABLE IF NOT EXISTS jobs (
 			last_output TEXT DEFAULT '',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+			FOREIGN KEY (service_id) REFERENCES app_services(id) ON DELETE CASCADE
 		);
 
 CREATE TABLE IF NOT EXISTS user_git_providers (
@@ -152,6 +154,9 @@ CREATE TABLE IF NOT EXISTS app_services (
 			runtime_mode TEXT DEFAULT 'web',
 			install_command TEXT DEFAULT '',
 			static_output TEXT DEFAULT '',
+			deploy_token TEXT DEFAULT '',
+			cpu_limit REAL DEFAULT 0,
+			memory_limit INTEGER DEFAULT 0,
 			UNIQUE(environment_id, name)
 		);
 
@@ -396,3 +401,11 @@ CREATE INDEX IF NOT EXISTS idx_project_members_project_id ON project_members(pro
 CREATE INDEX IF NOT EXISTS idx_project_members_user_id ON project_members(user_id);
 CREATE INDEX IF NOT EXISTS idx_backup_records_backup_config_id ON backup_records(backup_config_id);
 
+
+CREATE TABLE IF NOT EXISTS service_volumes (
+    id TEXT PRIMARY KEY,
+    service_id TEXT NOT NULL REFERENCES app_services(id) ON DELETE CASCADE,
+    host_path TEXT NOT NULL,
+    container_path TEXT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

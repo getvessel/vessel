@@ -348,6 +348,7 @@ func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) 
 			MemoryLimitMB:   memMB,
 			CPURequest:      cpuReq,
 			HealthCheckPath: opts.App.HealthCheckPath,
+			Volumes:         opts.App.Volumes,
 		}
 
 		_, err := d.containerManager.CreateAndStart(ctx, containerOpts)

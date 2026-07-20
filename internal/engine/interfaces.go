@@ -27,11 +27,11 @@ type StorageDeployerStore interface {
 }
 
 type CronManagerStore interface {
-	ListJobs() ([]models.Job, error)
-	GetJob(id string) (*models.Job, error)
+	ListScheduledTasks() ([]models.ScheduledTask, error)
+	GetScheduledTask(id string) (*models.ScheduledTask, error)
 	GetProject(id string) (*models.ProjectConfig, error)
 	GetAppService(id string) (*models.AppService, error)
-	UpdateJobStatusAndOutput(id string, status models.JobStatus, lastRunAt *time.Time, output string) error
+	UpdateScheduledTaskStatusAndOutput(id string, status models.ScheduledTaskStatus, lastRunAt *time.Time, output string) error
 }
 
 type BackupManagerStore interface {

@@ -1,1 +1,0 @@
-ALTER TABLE jobs ADD COLUMN service_id TEXT REFERENCES app_services(id) ON DELETE CASCADE;
