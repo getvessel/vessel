@@ -2,10 +2,10 @@ import { FitAddon } from '@xterm/addon-fit';
 import { SearchAddon } from '@xterm/addon-search';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { Terminal } from '@xterm/xterm';
-import { useEffect, useRef, useState } from 'react';
 import { env } from '#/env';
-import '@xterm/xterm/css/xterm.css';
 import { useAuthStore } from '#/stores/authStore';
+import '@xterm/xterm/css/xterm.css';
+import { useEffect, useRef, useState } from 'react';
 
 interface WebTerminalProps {
   serviceId: string;
