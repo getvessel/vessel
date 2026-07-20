@@ -116,6 +116,11 @@ func (a *AuthService) Login(ctx context.Context, email, password string) (*model
 	if err != nil {
 		return nil, "", err
 	}
+
+	now := time.Now()
+	u.LastLogin = &now
+	_ = a.userRepo.UpdateUser(ctx, u)
+
 	uCopy := *u
 	uCopy.PasswordHash = ""
 	return &uCopy, token, nil

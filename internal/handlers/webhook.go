@@ -64,6 +64,12 @@ func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 	if err != nil || appSvc == nil {
 		return utils.Error(c, http.StatusNotFound, "service not found")
 	}
+
+	token := c.QueryParam("token")
+	if appSvc.DeployToken == "" || token != appSvc.DeployToken {
+		return utils.Error(c, http.StatusUnauthorized, "invalid or missing deploy token")
+	}
+
 	h.deployServiceAsync(appSvc)
 	return utils.Accepted(c, fmt.Sprintf("triggering background build & rollout for service %s", appSvc.Name), nil)
 }

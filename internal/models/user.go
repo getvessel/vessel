@@ -11,15 +11,19 @@ const (
 )
 
 type User struct {
-	ID            string    `json:"id" db:"id"`
-	Email         string    `json:"email" db:"email"`
-	Name          string    `json:"name" db:"name"`
-	PasswordHash  string    `json:"-" db:"password_hash"`
-	Role          UserRole  `json:"role" db:"role"`
-	TOTPEnabled   bool      `json:"totpEnabled" db:"totp_enabled"`
-	OAuthProvider string    `json:"oauthProvider,omitempty" db:"oauth_provider"`
-	CreatedAt     time.Time `json:"createdAt" db:"created_at"`
-	UpdatedAt     time.Time `json:"updatedAt" db:"updated_at"`
+	ID            string     `json:"id" db:"id"`
+	Email         string     `json:"email" db:"email"`
+	Name          string     `json:"name" db:"name"`
+	PasswordHash  string     `json:"-" db:"password_hash"`
+	Role          UserRole   `json:"role" db:"role"`
+	TOTPEnabled   bool       `json:"totpEnabled" db:"totp_enabled"`
+	OAuthProvider string     `json:"oauthProvider,omitempty" db:"oauth_provider"`
+	CreatedAt     time.Time  `json:"createdAt" db:"created_at"`
+	UpdatedAt     time.Time  `json:"updatedAt" db:"updated_at"`
+	LastLogin     *time.Time `json:"lastLogin,omitempty" db:"last_login"`
+	ProjectsCount int        `json:"projectsCount" db:"projects_count"`
+	ServicesCount int        `json:"servicesCount" db:"services_count"`
+	APIKeysCount  int        `json:"apiKeysCount" db:"api_keys_count"`
 }
 
 type UserClaims struct {

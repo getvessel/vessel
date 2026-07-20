@@ -2,14 +2,14 @@ import type { BaseResponse } from '#/interfaces/base';
 import type {
   CreateAppResponse,
   CreateAppServiceRequest,
+  CreateServiceVarRequest,
   GetAppResponse,
   ListAppsResponse,
+  ListVariablesResponse,
   UpdateAppResponse,
   UpdateAppServiceRequest,
-  Variable,
-  ListVariablesResponse,
-  CreateServiceVarRequest,
   UpdateServiceVarRequest,
+  Variable,
 } from '#/interfaces/deployment';
 import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
@@ -121,7 +121,10 @@ export const appsService = {
     payload: UpdateServiceVarRequest
   ): Promise<BaseResponse<Variable>> => {
     try {
-      return await apiClient.put<BaseResponse<Variable>>(`/services/${appId}/variables/${varId}`, payload);
+      return await apiClient.put<BaseResponse<Variable>>(
+        `/services/${appId}/variables/${varId}`,
+        payload
+      );
     } catch (error) {
       throw handleApiError(error);
     }
@@ -135,4 +138,3 @@ export const appsService = {
     }
   },
 };
-

@@ -27,7 +27,17 @@ func NewJobHandler(s *services.JobService) *JobHandler {
 // @Router /jobs [get]
 func (h *JobHandler) ListProjectJobs(c echo.Context) error {
 	projectID := c.QueryParam("projectId")
-	jobs, err := h.jobService.ListJobsByProject(c.Request().Context(), projectID)
+	serviceID := c.QueryParam("serviceId")
+
+	var jobs []models.Job
+	var err error
+
+	if serviceID != "" {
+		jobs, err = h.jobService.ListJobsByService(c.Request().Context(), serviceID)
+	} else {
+		jobs, err = h.jobService.ListJobsByProject(c.Request().Context(), projectID)
+	}
+
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}

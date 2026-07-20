@@ -30,8 +30,8 @@ function ServiceBuildRoute() {
     <div className="space-y-6">
       <h1 className="font-bold text-2xl">Build Settings</h1>
       <BuildSettings serviceId={serviceId} />
-      
-      <h1 className="font-bold text-2xl pt-4">Resource Constraints</h1>
+
+      <h1 className="pt-4 font-bold text-2xl">Resource Constraints</h1>
       <ResourceLimitsCard app={app} />
     </div>
   );

@@ -30,6 +30,7 @@ type CronManagerStore interface {
 	ListJobs() ([]models.Job, error)
 	GetJob(id string) (*models.Job, error)
 	GetProject(id string) (*models.ProjectConfig, error)
+	GetAppService(id string) (*models.AppService, error)
 	UpdateJobStatusAndOutput(id string, status models.JobStatus, lastRunAt *time.Time, output string) error
 }
 

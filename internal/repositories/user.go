@@ -61,7 +61,7 @@ func (r *UserRepo) GetUserByEmail(ctx context.Context, email string) (*models.Us
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var u models.User
-	err := r.db.GetContext(ctx, &u, `SELECT id, email, name, password_hash, role, created_at, updated_at
+	err := r.db.GetContext(ctx, &u, `SELECT id, email, name, password_hash, role, created_at, updated_at, last_login
 		FROM users WHERE email = ?`, email)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, utils.NewNotFoundError("User", email)
@@ -76,7 +76,7 @@ func (r *UserRepo) GetUserByID(ctx context.Context, id string) (*models.User, er
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var u models.User
-	err := r.db.GetContext(ctx, &u, `SELECT id, email, name, password_hash, role, created_at, updated_at
+	err := r.db.GetContext(ctx, &u, `SELECT id, email, name, password_hash, role, created_at, updated_at, last_login
 		FROM users WHERE id = ?`, id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, utils.NewNotFoundError("User", id)
@@ -97,7 +97,15 @@ func (r *UserRepo) ListUsers(ctx context.Context, limit, offset int) ([]models.U
 	}
 
 	var users []models.User
-	err := r.db.SelectContext(ctx, &users, `SELECT id, email, name, password_hash, role, created_at, updated_at FROM users ORDER BY created_at ASC LIMIT ? OFFSET ?`, limit, offset)
+	err := r.db.SelectContext(ctx, &users, `
+		SELECT 
+			id, email, name, password_hash, role, created_at, updated_at, last_login,
+			(SELECT COUNT(*) FROM project_members WHERE user_id = users.id) AS projects_count,
+			(SELECT COUNT(*) FROM app_services WHERE project_id IN (SELECT project_id FROM project_members WHERE user_id = users.id) AND status = 'running') AS services_count,
+			(SELECT COUNT(*) FROM personal_access_tokens WHERE user_id = users.id) AS api_keys_count
+		FROM users 
+		ORDER BY created_at ASC 
+		LIMIT ? OFFSET ?`, limit, offset)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -111,8 +119,8 @@ func (r *UserRepo) UpdateUser(ctx context.Context, u *models.User) error {
 	u.UpdatedAt = time.Now()
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	_, err := r.db.ExecContext(ctx, `UPDATE users SET email = ?, name = ?, password_hash = ?, role = ?, updated_at = ? WHERE id = ?`,
-		u.Email, u.Name, u.PasswordHash, u.Role, u.UpdatedAt, u.ID)
+	_, err := r.db.ExecContext(ctx, `UPDATE users SET email = ?, name = ?, password_hash = ?, role = ?, last_login = ?, updated_at = ? WHERE id = ?`,
+		u.Email, u.Name, u.PasswordHash, u.Role, u.LastLogin, u.UpdatedAt, u.ID)
 	return err
 }
 

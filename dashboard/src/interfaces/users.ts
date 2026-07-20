@@ -11,6 +11,10 @@ export interface User {
   oauthProvider?: string;
   createdAt: string;
   updatedAt: string;
+  lastLogin?: string;
+  projectsCount?: number;
+  servicesCount?: number;
+  apiKeysCount?: number;
 }
 
 export interface PersonalAccessToken {

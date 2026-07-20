@@ -75,4 +75,3 @@ func (h *OnboardingHandler) Setup(c echo.Context) error {
 
 	return utils.Success(c, "Setup completed successfully", res)
 }
-

@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS users (
 			totp_secret TEXT DEFAULT '',
 			recovery_codes TEXT DEFAULT '',
 			oauth_provider TEXT DEFAULT '',
+			last_login DATETIME,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);

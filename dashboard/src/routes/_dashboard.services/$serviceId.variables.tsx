@@ -1,18 +1,18 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute } from '@tanstack/react-router';
+import { Edit, Eye, EyeOff, Loader2, Plus, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Plus, Trash, Edit, Eye, EyeOff } from 'lucide-react';
 import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
 import { Switch } from '#/components/ui/switch';
-import { toast } from 'sonner';
 import {
-  useListVariables,
   useCreateVariable,
-  useUpdateVariable,
   useDeleteVariable,
+  useListVariables,
+  useUpdateVariable,
 } from '#/hooks/useApps';
 
 export const Route = createFileRoute('/_dashboard/services/$serviceId/variables')({
@@ -84,14 +84,14 @@ function VariablesTab() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-medium">Environment Variables</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="font-medium text-lg">Environment Variables</h2>
+        <p className="text-muted-foreground text-sm">
           Manage environment variables and secrets for your service.
         </p>
       </div>
 
       <div className="rounded-lg border bg-card p-6">
-        <h3 className="mb-4 text-sm font-medium">Add New Variable</h3>
+        <h3 className="mb-4 font-medium text-sm">Add New Variable</h3>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-start gap-4">
           <div className="flex-1 space-y-2">
             <Input
@@ -100,7 +100,7 @@ function VariablesTab() {
               className={form.formState.errors.key ? 'border-destructive' : ''}
             />
             {form.formState.errors.key && (
-              <p className="text-xs text-destructive">{form.formState.errors.key.message}</p>
+              <p className="text-destructive text-xs">{form.formState.errors.key.message}</p>
             )}
           </div>
           <div className="flex-1 space-y-2">
@@ -110,7 +110,7 @@ function VariablesTab() {
               className={form.formState.errors.value ? 'border-destructive' : ''}
             />
             {form.formState.errors.value && (
-              <p className="text-xs text-destructive">{form.formState.errors.value.message}</p>
+              <p className="text-destructive text-xs">{form.formState.errors.value.message}</p>
             )}
           </div>
           <div className="flex items-center space-x-2 pt-2">
@@ -119,19 +119,23 @@ function VariablesTab() {
               onCheckedChange={(checked) => form.setValue('isSecret', checked)}
               id="isSecret"
             />
-            <label htmlFor="isSecret" className="text-sm font-medium">
+            <label htmlFor="isSecret" className="font-medium text-sm">
               Secret
             </label>
           </div>
           <Button type="submit" disabled={isCreating} className="pt-2">
-            {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+            {isCreating ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="mr-2 h-4 w-4" />
+            )}
             Add
           </Button>
         </form>
       </div>
 
       <div className="rounded-lg border bg-card">
-        <div className="grid grid-cols-[1fr_1fr_auto_auto] items-center gap-4 border-b bg-muted/50 px-6 py-3 text-sm font-medium">
+        <div className="grid grid-cols-[1fr_1fr_auto_auto] items-center gap-4 border-b bg-muted/50 px-6 py-3 font-medium text-sm">
           <div>Key</div>
           <div>Value</div>
           <div>Type</div>
@@ -139,15 +143,18 @@ function VariablesTab() {
         </div>
         <div className="divide-y">
           {variables.length === 0 ? (
-            <div className="p-6 text-center text-sm text-muted-foreground">
+            <div className="p-6 text-center text-muted-foreground text-sm">
               No environment variables found.
             </div>
           ) : (
             variables.map((v) => (
-              <div key={v.id} className="grid grid-cols-[1fr_1fr_auto_auto] items-center gap-4 px-6 py-4">
-                <div className="font-mono text-sm font-medium">{v.key}</div>
+              <div
+                key={v.id}
+                className="grid grid-cols-[1fr_1fr_auto_auto] items-center gap-4 px-6 py-4"
+              >
+                <div className="font-medium font-mono text-sm">{v.key}</div>
                 <div className="flex items-center gap-2">
-                  <div className="font-mono text-sm text-muted-foreground">
+                  <div className="font-mono text-muted-foreground text-sm">
                     {v.isSecret && !visibleValues[v.id] ? '••••••••••••••••' : v.value}
                   </div>
                   {v.isSecret && (
@@ -166,7 +173,7 @@ function VariablesTab() {
                   )}
                 </div>
                 <div>
-                  <span className="rounded-full bg-secondary px-2 py-1 text-xs font-medium">
+                  <span className="rounded-full bg-secondary px-2 py-1 font-medium text-xs">
                     {v.isSecret ? 'Secret' : 'Plain'}
                   </span>
                 </div>

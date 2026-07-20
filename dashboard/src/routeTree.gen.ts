@@ -45,9 +45,11 @@ import { Route as DashboardServicesServiceIdBuildRouteImport } from './routes/_d
 import { Route as DashboardServicesServiceIdDangerRouteImport } from './routes/_dashboard.services/$serviceId.danger'
 import { Route as DashboardServicesServiceIdDeploymentsRouteImport } from './routes/_dashboard.services/$serviceId.deployments'
 import { Route as DashboardServicesServiceIdDomainsRouteImport } from './routes/_dashboard.services/$serviceId.domains'
+import { Route as DashboardServicesServiceIdJobsRouteImport } from './routes/_dashboard.services/$serviceId.jobs'
 import { Route as DashboardServicesServiceIdServerlessRouteImport } from './routes/_dashboard.services/$serviceId.serverless'
 import { Route as DashboardServicesServiceIdTerminalRouteImport } from './routes/_dashboard.services/$serviceId.terminal'
 import { Route as DashboardServicesServiceIdVariablesRouteImport } from './routes/_dashboard.services/$serviceId.variables'
+import { Route as DashboardServicesServiceIdWebhooksRouteImport } from './routes/_dashboard.services/$serviceId.webhooks'
 
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
@@ -239,6 +241,12 @@ const DashboardServicesServiceIdDomainsRoute =
     path: '/domains',
     getParentRoute: () => DashboardServicesServiceIdRoute,
   } as any)
+const DashboardServicesServiceIdJobsRoute =
+  DashboardServicesServiceIdJobsRouteImport.update({
+    id: '/jobs',
+    path: '/jobs',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
 const DashboardServicesServiceIdServerlessRoute =
   DashboardServicesServiceIdServerlessRouteImport.update({
     id: '/serverless',
@@ -255,6 +263,12 @@ const DashboardServicesServiceIdVariablesRoute =
   DashboardServicesServiceIdVariablesRouteImport.update({
     id: '/variables',
     path: '/variables',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdWebhooksRoute =
+  DashboardServicesServiceIdWebhooksRouteImport.update({
+    id: '/webhooks',
+    path: '/webhooks',
     getParentRoute: () => DashboardServicesServiceIdRoute,
   } as any)
 
@@ -291,9 +305,11 @@ export interface FileRoutesByFullPath {
   '/services/$serviceId/danger': typeof DashboardServicesServiceIdDangerRoute
   '/services/$serviceId/deployments': typeof DashboardServicesServiceIdDeploymentsRoute
   '/services/$serviceId/domains': typeof DashboardServicesServiceIdDomainsRoute
+  '/services/$serviceId/jobs': typeof DashboardServicesServiceIdJobsRoute
   '/services/$serviceId/serverless': typeof DashboardServicesServiceIdServerlessRoute
   '/services/$serviceId/terminal': typeof DashboardServicesServiceIdTerminalRoute
   '/services/$serviceId/variables': typeof DashboardServicesServiceIdVariablesRoute
+  '/services/$serviceId/webhooks': typeof DashboardServicesServiceIdWebhooksRoute
   '/projects/$projectId/': typeof DashboardProjectsProjectIdIndexRoute
   '/services/$serviceId/': typeof DashboardServicesServiceIdIndexRoute
 }
@@ -329,9 +345,11 @@ export interface FileRoutesByTo {
   '/services/$serviceId/danger': typeof DashboardServicesServiceIdDangerRoute
   '/services/$serviceId/deployments': typeof DashboardServicesServiceIdDeploymentsRoute
   '/services/$serviceId/domains': typeof DashboardServicesServiceIdDomainsRoute
+  '/services/$serviceId/jobs': typeof DashboardServicesServiceIdJobsRoute
   '/services/$serviceId/serverless': typeof DashboardServicesServiceIdServerlessRoute
   '/services/$serviceId/terminal': typeof DashboardServicesServiceIdTerminalRoute
   '/services/$serviceId/variables': typeof DashboardServicesServiceIdVariablesRoute
+  '/services/$serviceId/webhooks': typeof DashboardServicesServiceIdWebhooksRoute
   '/projects/$projectId': typeof DashboardProjectsProjectIdIndexRoute
   '/services/$serviceId': typeof DashboardServicesServiceIdIndexRoute
 }
@@ -371,9 +389,11 @@ export interface FileRoutesById {
   '/_dashboard/services/$serviceId/danger': typeof DashboardServicesServiceIdDangerRoute
   '/_dashboard/services/$serviceId/deployments': typeof DashboardServicesServiceIdDeploymentsRoute
   '/_dashboard/services/$serviceId/domains': typeof DashboardServicesServiceIdDomainsRoute
+  '/_dashboard/services/$serviceId/jobs': typeof DashboardServicesServiceIdJobsRoute
   '/_dashboard/services/$serviceId/serverless': typeof DashboardServicesServiceIdServerlessRoute
   '/_dashboard/services/$serviceId/terminal': typeof DashboardServicesServiceIdTerminalRoute
   '/_dashboard/services/$serviceId/variables': typeof DashboardServicesServiceIdVariablesRoute
+  '/_dashboard/services/$serviceId/webhooks': typeof DashboardServicesServiceIdWebhooksRoute
   '/_dashboard/projects/$projectId/': typeof DashboardProjectsProjectIdIndexRoute
   '/_dashboard/services/$serviceId/': typeof DashboardServicesServiceIdIndexRoute
 }
@@ -412,9 +432,11 @@ export interface FileRouteTypes {
     | '/services/$serviceId/danger'
     | '/services/$serviceId/deployments'
     | '/services/$serviceId/domains'
+    | '/services/$serviceId/jobs'
     | '/services/$serviceId/serverless'
     | '/services/$serviceId/terminal'
     | '/services/$serviceId/variables'
+    | '/services/$serviceId/webhooks'
     | '/projects/$projectId/'
     | '/services/$serviceId/'
   fileRoutesByTo: FileRoutesByTo
@@ -450,9 +472,11 @@ export interface FileRouteTypes {
     | '/services/$serviceId/danger'
     | '/services/$serviceId/deployments'
     | '/services/$serviceId/domains'
+    | '/services/$serviceId/jobs'
     | '/services/$serviceId/serverless'
     | '/services/$serviceId/terminal'
     | '/services/$serviceId/variables'
+    | '/services/$serviceId/webhooks'
     | '/projects/$projectId'
     | '/services/$serviceId'
   id:
@@ -491,9 +515,11 @@ export interface FileRouteTypes {
     | '/_dashboard/services/$serviceId/danger'
     | '/_dashboard/services/$serviceId/deployments'
     | '/_dashboard/services/$serviceId/domains'
+    | '/_dashboard/services/$serviceId/jobs'
     | '/_dashboard/services/$serviceId/serverless'
     | '/_dashboard/services/$serviceId/terminal'
     | '/_dashboard/services/$serviceId/variables'
+    | '/_dashboard/services/$serviceId/webhooks'
     | '/_dashboard/projects/$projectId/'
     | '/_dashboard/services/$serviceId/'
   fileRoutesById: FileRoutesById
@@ -759,6 +785,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardServicesServiceIdDomainsRouteImport
       parentRoute: typeof DashboardServicesServiceIdRoute
     }
+    '/_dashboard/services/$serviceId/jobs': {
+      id: '/_dashboard/services/$serviceId/jobs'
+      path: '/jobs'
+      fullPath: '/services/$serviceId/jobs'
+      preLoaderRoute: typeof DashboardServicesServiceIdJobsRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
     '/_dashboard/services/$serviceId/serverless': {
       id: '/_dashboard/services/$serviceId/serverless'
       path: '/serverless'
@@ -778,6 +811,13 @@ declare module '@tanstack/react-router' {
       path: '/variables'
       fullPath: '/services/$serviceId/variables'
       preLoaderRoute: typeof DashboardServicesServiceIdVariablesRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/webhooks': {
+      id: '/_dashboard/services/$serviceId/webhooks'
+      path: '/webhooks'
+      fullPath: '/services/$serviceId/webhooks'
+      preLoaderRoute: typeof DashboardServicesServiceIdWebhooksRouteImport
       parentRoute: typeof DashboardServicesServiceIdRoute
     }
   }
@@ -804,9 +844,11 @@ interface DashboardServicesServiceIdRouteChildren {
   DashboardServicesServiceIdDangerRoute: typeof DashboardServicesServiceIdDangerRoute
   DashboardServicesServiceIdDeploymentsRoute: typeof DashboardServicesServiceIdDeploymentsRoute
   DashboardServicesServiceIdDomainsRoute: typeof DashboardServicesServiceIdDomainsRoute
+  DashboardServicesServiceIdJobsRoute: typeof DashboardServicesServiceIdJobsRoute
   DashboardServicesServiceIdServerlessRoute: typeof DashboardServicesServiceIdServerlessRoute
   DashboardServicesServiceIdTerminalRoute: typeof DashboardServicesServiceIdTerminalRoute
   DashboardServicesServiceIdVariablesRoute: typeof DashboardServicesServiceIdVariablesRoute
+  DashboardServicesServiceIdWebhooksRoute: typeof DashboardServicesServiceIdWebhooksRoute
   DashboardServicesServiceIdIndexRoute: typeof DashboardServicesServiceIdIndexRoute
 }
 
@@ -819,12 +861,15 @@ const DashboardServicesServiceIdRouteChildren: DashboardServicesServiceIdRouteCh
       DashboardServicesServiceIdDeploymentsRoute,
     DashboardServicesServiceIdDomainsRoute:
       DashboardServicesServiceIdDomainsRoute,
+    DashboardServicesServiceIdJobsRoute: DashboardServicesServiceIdJobsRoute,
     DashboardServicesServiceIdServerlessRoute:
       DashboardServicesServiceIdServerlessRoute,
     DashboardServicesServiceIdTerminalRoute:
       DashboardServicesServiceIdTerminalRoute,
     DashboardServicesServiceIdVariablesRoute:
       DashboardServicesServiceIdVariablesRoute,
+    DashboardServicesServiceIdWebhooksRoute:
+      DashboardServicesServiceIdWebhooksRoute,
     DashboardServicesServiceIdIndexRoute: DashboardServicesServiceIdIndexRoute,
   }
 

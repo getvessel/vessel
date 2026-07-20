@@ -93,6 +93,10 @@ func (a *engineAdapter) GetProject(id string) (*models.ProjectConfig, error) {
 	return a.projectRepo.Get(context.Background(), id)
 }
 
+func (a *engineAdapter) GetAppService(id string) (*models.AppService, error) {
+	return a.appRepo.GetByID(context.Background(), id)
+}
+
 func (a *engineAdapter) UpdateJobStatusAndOutput(id string, status models.JobStatus, lastRunAt *time.Time, output string) error {
 	return a.jobRepo.UpdateStatus(context.Background(), id, status, lastRunAt, output)
 }

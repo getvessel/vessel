@@ -1,4 +1,5 @@
-import { Plus, Trash2, Users } from 'lucide-react';
+import { format } from 'date-fns';
+import { Key, LayoutGrid, Plus, Server, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '#/components/ui/button';
 import { Skeleton } from '#/components/ui/skeleton';
@@ -7,27 +8,60 @@ import type { User } from '#/interfaces/users';
 import { UserDeleteDialog } from './components/user-delete-dialog';
 import { UserInviteDialog } from './components/user-invite-dialog';
 
+const formatLastLogin = (dateStr?: string) => {
+  if (!dateStr) return 'NEVER';
+  try {
+    return format(new Date(dateStr), 'MMM d, h:mm a').toUpperCase();
+  } catch {
+    return 'UNKNOWN';
+  }
+};
+
+const StatBox = ({ icon: Icon, label, value }: { icon: any; label: string; value: number }) => (
+  <div className="flex items-center justify-between rounded-lg border border-border/50 bg-card/20 px-4 py-3">
+    <div className="flex items-center gap-3">
+      <Icon className="h-4 w-4 text-muted-foreground" />
+      <span className="font-bold text-[10px] text-muted-foreground uppercase tracking-widest">
+        {label}
+      </span>
+    </div>
+    <span className="font-bold text-sm">{value || 0}</span>
+  </div>
+);
+
 const UserRow = ({ user, onDelete }: { user: User; onDelete: (u: User) => void }) => (
-  <div className="rounded-2xl border border-border/50 bg-card/40 p-6">
+  <div className="group relative rounded-2xl border border-border/50 bg-card/40 p-6">
     <div className="flex items-start justify-between">
-      <div>
+      <div className="space-y-2">
         <div className="flex items-center gap-3">
-          <h3 className="font-bold text-foreground text-xl">{user.name}</h3>
+          <h3 className="font-bold text-foreground text-xl">
+            {user.name || user.email.split('@')[0]}
+          </h3>
           <div className="rounded border border-primary/30 bg-primary/10 px-2 py-0.5 font-bold text-[10px] text-primary uppercase tracking-widest">
             {user.role}
           </div>
         </div>
-        <p className="mt-2 font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
-          {user.email}
-        </p>
+        <p className="font-mono text-muted-foreground text-sm">{user.email}</p>
       </div>
-      <Button
-        variant="outline"
-        onClick={() => onDelete(user)}
-        className="h-10 w-10 border-border/50 bg-transparent p-0 text-muted-foreground transition-colors hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
+
+      <div className="flex flex-col items-end gap-2">
+        <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
+          LAST LOGIN {formatLastLogin(user.lastLogin)}
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => onDelete(user)}
+          className="absolute top-6 right-6 h-8 w-8 border-border/50 bg-transparent p-0 text-muted-foreground opacity-0 transition-colors hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+
+    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <StatBox icon={Users} label="Projects" value={user.projectsCount || 0} />
+      <StatBox icon={Server} label="Active Services" value={user.servicesCount || 0} />
+      <StatBox icon={Key} label="API Keys" value={user.apiKeysCount || 0} />
     </div>
   </div>
 );

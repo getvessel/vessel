@@ -126,6 +126,7 @@ type AppService struct {
 	InternalPort    int              `json:"internalPort" db:"internal_port"`
 	Domain          string           `json:"domain" db:"domain"`
 	StaticOutput    string           `json:"staticOutput" db:"static_output"`
+	DeployToken     string           `json:"deployToken,omitempty" db:"deploy_token"`
 	HealthCheckPath string           `json:"healthCheckPath" db:"health_check_path"`
 	ContainerID     string           `json:"containerId" db:"container_id"`
 	Status          AppServiceStatus `json:"status" db:"status"`
@@ -172,6 +173,7 @@ type UpdateAppServiceRequest struct {
 	HealthCheckPath string      `json:"healthCheckPath"`
 	ContainerID     string      `json:"containerId"`
 	Status          string      `json:"status"`
+	DeployToken     string      `json:"deployToken"`
 }
 
 type Variable struct {
@@ -201,6 +203,7 @@ type UpdateServiceVarRequest struct {
 type Job struct {
 	ID         string     `json:"id" db:"id"`
 	ProjectID  string     `json:"projectId" db:"project_id"`
+	ServiceID  string     `json:"serviceId" db:"service_id"`
 	Name       string     `json:"name" db:"name"`
 	Schedule   string     `json:"schedule" db:"schedule"`
 	Command    string     `json:"command" db:"command"`
@@ -213,6 +216,7 @@ type Job struct {
 
 type CreateJobRequest struct {
 	ProjectID string `json:"projectId"`
+	ServiceID string `json:"serviceId"`
 	Name      string `json:"name"`
 	Schedule  string `json:"schedule"`
 	Command   string `json:"command"`

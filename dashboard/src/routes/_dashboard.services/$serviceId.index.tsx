@@ -5,6 +5,7 @@ import { DataBrowser } from '#/features/databases/data-browser';
 import { DatabaseConnectionCard } from '#/features/databases/database-connection-card';
 import { DatabaseNetworking } from '#/features/databases/database-networking';
 import { RedisKeyBrowser } from '#/features/databases/redis-key-browser';
+import { HealthcheckCard } from '#/features/services/healthcheck-card';
 import { RuntimeModeCard } from '#/features/services/runtime-mode-card';
 import { useGetApp } from '#/hooks/useApps';
 import { useGetDatabase } from '#/hooks/useDatabases';
@@ -54,6 +55,7 @@ function ServiceIndexRoute() {
       <div className="space-y-6">
         <h1 className="font-bold text-2xl">Service: {app.name}</h1>
         <RuntimeModeCard serviceId={app.id} />
+        <HealthcheckCard serviceId={app.id} />
       </div>
     );
   }

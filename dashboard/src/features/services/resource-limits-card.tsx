@@ -1,18 +1,18 @@
-import { useState, useEffect } from "react";
-import { toast } from "sonner";
-import { Button } from "#/components/ui/button";
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from '#/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
-} from "#/components/ui/card";
-import { Input } from "#/components/ui/input";
-import { Label } from "#/components/ui/label";
-import { useUpdateApp } from "#/hooks/useApps";
-import type { AppService } from "#/interfaces/deployment";
+} from '#/components/ui/card';
+import { Input } from '#/components/ui/input';
+import { Label } from '#/components/ui/label';
+import { useUpdateApp } from '#/hooks/useApps';
+import type { AppService } from '#/interfaces/deployment';
 
 interface ResourceLimitsProps {
   app: AppService;
@@ -20,15 +20,13 @@ interface ResourceLimitsProps {
 
 export function ResourceLimitsCard({ app }: ResourceLimitsProps) {
   const { mutateAsync: updateApp, isPending } = useUpdateApp();
-  const [cpuLimit, setCpuLimit] = useState(app.cpuLimit?.toString() || "");
-  const [memoryLimit, setMemoryLimit] = useState(
-    app.memoryLimit?.toString() || "",
-  );
+  const [cpuLimit, setCpuLimit] = useState(app.cpuLimit?.toString() || '');
+  const [memoryLimit, setMemoryLimit] = useState(app.memoryLimit?.toString() || '');
 
   // Reset local state if app data updates externally
   useEffect(() => {
-    setCpuLimit(app.cpuLimit?.toString() || "");
-    setMemoryLimit(app.memoryLimit?.toString() || "");
+    setCpuLimit(app.cpuLimit?.toString() || '');
+    setMemoryLimit(app.memoryLimit?.toString() || '');
   }, [app.cpuLimit, app.memoryLimit]);
 
   const handleSave = async () => {
@@ -41,9 +39,9 @@ export function ResourceLimitsCard({ app }: ResourceLimitsProps) {
           memoryLimit: memoryLimit ? parseInt(memoryLimit, 10) : undefined,
         },
       });
-      toast.success("Resource limits updated");
+      toast.success('Resource limits updated');
     } catch (error) {
-      toast.error("Failed to update resource limits");
+      toast.error('Failed to update resource limits');
     }
   };
 
@@ -69,7 +67,7 @@ export function ResourceLimitsCard({ app }: ResourceLimitsProps) {
                 value={cpuLimit}
                 onChange={(e) => setCpuLimit(e.target.value)}
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Leave empty for unbounded CPU. Example: 0.5 = 50% of 1 core.
               </p>
             </div>
@@ -89,7 +87,7 @@ export function ResourceLimitsCard({ app }: ResourceLimitsProps) {
                 value={memoryLimit}
                 onChange={(e) => setMemoryLimit(e.target.value)}
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Leave empty for unbounded memory. Minimum is 64 MB.
               </p>
             </div>
@@ -98,7 +96,7 @@ export function ResourceLimitsCard({ app }: ResourceLimitsProps) {
       </CardContent>
       <CardFooter className="border-t bg-muted/50 px-6 py-4">
         <Button onClick={handleSave} disabled={isPending}>
-          {isPending ? "Saving..." : "Save Limits"}
+          {isPending ? 'Saving...' : 'Save Limits'}
         </Button>
       </CardFooter>
     </Card>

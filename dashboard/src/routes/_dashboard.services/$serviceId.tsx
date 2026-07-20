@@ -3,12 +3,14 @@ import {
   Activity,
   AlertTriangle,
   ArrowLeft,
+  Calendar,
   Code,
   Globe,
   Loader2,
   Settings,
   Terminal,
   Variable,
+  Webhook,
   Wrench,
 } from 'lucide-react';
 import { Button } from '#/components/ui/button';
@@ -42,6 +44,8 @@ function ServiceLayoutRoute() {
     { name: 'Configuration', href: `/services/${serviceId}`, icon: Settings, exact: true },
     { name: 'Build Settings', href: `/services/${serviceId}/build`, icon: Wrench },
     { name: 'Deployments', href: `/services/${serviceId}/deployments`, icon: Activity },
+    { name: 'Webhooks', href: `/services/${serviceId}/webhooks`, icon: Webhook },
+    { name: 'Scheduled Tasks', href: `/services/${serviceId}/jobs`, icon: Calendar },
     { name: 'Domains', href: `/services/${serviceId}/domains`, icon: Globe },
     { name: 'Variables', href: `/services/${serviceId}/variables`, icon: Variable },
     { name: 'Terminal', href: `/services/${serviceId}/terminal`, icon: Terminal },

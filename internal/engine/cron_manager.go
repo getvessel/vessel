@@ -111,14 +111,14 @@ func (cm *CronManager) ExecuteJob(ctx context.Context, jobID string) (string, er
 	if err != nil || j == nil {
 		return "", fmt.Errorf("job %s not found: %w", jobID, err)
 	}
-	project, err := cm.store.GetProject(j.ProjectID)
-	if err != nil || project == nil {
-		return "", fmt.Errorf("project %s for job %s not found: %w", j.ProjectID, jobID, err)
+	app, err := cm.store.GetAppService(j.ServiceID)
+	if err != nil || app == nil {
+		return "", fmt.Errorf("service %s for job %s not found: %w", j.ServiceID, jobID, err)
 	}
-	containerName := utils.NormalizeContainerName(project.ID)
+	containerName := utils.NormalizeContainerName(app.ID)
 	inspectResp, err := cm.dockerClient.ContainerInspect(ctx, containerName)
 	if err != nil || !inspectResp.State.Running {
-		errMsg := fmt.Sprintf("cannot run job: project container %s (%s) is stopped or not found", project.Name, containerName)
+		errMsg := fmt.Sprintf("cannot run job: service container %s (%s) is stopped or not found", app.Name, containerName)
 		now := time.Now()
 		_ = cm.store.UpdateJobStatusAndOutput(jobID, models.JobStatusError, &now, errMsg)
 		return errMsg, errors.New(errMsg)

@@ -25,8 +25,8 @@ func NewJobService(r repositories.JobRepository, m *engine.CronManager) *JobServ
 }
 
 func (s *JobService) CreateJob(ctx context.Context, j *models.Job) (*models.Job, error) {
-	if j == nil || j.ProjectID == "" || j.Name == "" {
-		return nil, errors.New("valid job with projectId and name required")
+	if j == nil || j.ProjectID == "" || j.ServiceID == "" || j.Name == "" {
+		return nil, errors.New("valid job with projectId, serviceId, and name required")
 	}
 	if j.ID == "" {
 		j.ID = uuid.New().String()
@@ -65,6 +65,13 @@ func (s *JobService) ListJobsByProject(ctx context.Context, projectID string) ([
 		return nil, errors.New("project id required")
 	}
 	return s.repo.ListByProject(ctx, projectID)
+}
+
+func (s *JobService) ListJobsByService(ctx context.Context, serviceID string) ([]models.Job, error) {
+	if serviceID == "" {
+		return nil, errors.New("service id required")
+	}
+	return s.repo.ListByService(ctx, serviceID)
 }
 
 func (s *JobService) UpdateJob(ctx context.Context, j *models.Job) error {

@@ -19,6 +19,7 @@ type JobRepository interface {
 	GetByID(ctx context.Context, id string) (*models.Job, error)
 	ListAll(ctx context.Context) ([]models.Job, error)
 	ListByProject(ctx context.Context, projectID string) ([]models.Job, error)
+	ListByService(ctx context.Context, serviceID string) ([]models.Job, error)
 	Update(ctx context.Context, j *models.Job) error
 	Delete(ctx context.Context, id string) error
 	UpdateStatus(ctx context.Context, id string, status models.JobStatus, lastRunAt *time.Time, output string) error
@@ -46,15 +47,15 @@ func (r *JobRepo) Create(_ context.Context, j *models.Job) error {
 		j.Status = "active"
 	}
 	_, err := r.db.Exec(`INSERT INTO jobs (
-		id, project_id, name, schedule, command, status, last_run_at, last_output, created_at, updated_at
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		j.ID, j.ProjectID, j.Name, j.Schedule, j.Command, j.Status, j.LastRunAt, j.LastOutput, j.CreatedAt, j.UpdatedAt)
+		id, project_id, service_id, name, schedule, command, status, last_run_at, last_output, created_at, updated_at
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		j.ID, j.ProjectID, j.ServiceID, j.Name, j.Schedule, j.Command, j.Status, j.LastRunAt, j.LastOutput, j.CreatedAt, j.UpdatedAt)
 	return err
 }
 
 func (r *JobRepo) GetByID(_ context.Context, id string) (*models.Job, error) {
 	var j models.Job
-	err := r.db.Get(&j, `SELECT id, project_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at
+	err := r.db.Get(&j, `SELECT id, project_id, service_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at
 		FROM jobs WHERE id = ?`, id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, utils.NewNotFoundError("Entity", id)
@@ -67,7 +68,7 @@ func (r *JobRepo) GetByID(_ context.Context, id string) (*models.Job, error) {
 
 func (r *JobRepo) ListAll(_ context.Context) ([]models.Job, error) {
 	var jobs []models.Job
-	err := r.db.Select(&jobs, `SELECT id, project_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at FROM jobs ORDER BY created_at ASC`)
+	err := r.db.Select(&jobs, `SELECT id, project_id, service_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at FROM jobs ORDER BY created_at ASC`)
 	if err != nil {
 		return nil, err
 	}
@@ -81,11 +82,24 @@ func (r *JobRepo) ListByProject(_ context.Context, projectID string) ([]models.J
 	var jobs []models.Job
 	var err error
 	if projectID == "" {
-		err = r.db.Select(&jobs, `SELECT id, project_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at FROM jobs ORDER BY created_at ASC`)
+		err = r.db.Select(&jobs, `SELECT id, project_id, service_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at FROM jobs ORDER BY created_at ASC`)
 	} else {
-		err = r.db.Select(&jobs, `SELECT id, project_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at
+		err = r.db.Select(&jobs, `SELECT id, project_id, service_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at
 		FROM jobs WHERE project_id = ? ORDER BY created_at ASC`, projectID)
 	}
+	if err != nil {
+		return nil, err
+	}
+	if jobs == nil {
+		jobs = make([]models.Job, 0)
+	}
+	return jobs, nil
+}
+
+func (r *JobRepo) ListByService(_ context.Context, serviceID string) ([]models.Job, error) {
+	var jobs []models.Job
+	err := r.db.Select(&jobs, `SELECT id, project_id, service_id, name, schedule, command, status, last_run_at, COALESCE(last_output, '') AS last_output, created_at, updated_at
+		FROM jobs WHERE service_id = ? ORDER BY created_at ASC`, serviceID)
 	if err != nil {
 		return nil, err
 	}
@@ -99,8 +113,10 @@ func (r *JobRepo) Update(_ context.Context, j *models.Job) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	j.UpdatedAt = time.Now()
-	_, err := r.db.Exec(`UPDATE jobs SET name = ?, schedule = ?, command = ?, status = ?, last_run_at = ?, last_output = ?, updated_at = ? WHERE id = ?`,
-		j.Name, j.Schedule, j.Command, j.Status, j.LastRunAt, j.LastOutput, j.UpdatedAt, j.ID)
+	_, err := r.db.Exec(`UPDATE jobs SET
+		project_id = ?, service_id = ?, name = ?, schedule = ?, command = ?, status = ?, last_run_at = ?, last_output = ?, updated_at = ?
+		WHERE id = ?`,
+		j.ProjectID, j.ServiceID, j.Name, j.Schedule, j.Command, j.Status, j.LastRunAt, j.LastOutput, j.UpdatedAt, j.ID)
 	return err
 }
 
