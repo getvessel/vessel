@@ -1,5 +1,6 @@
+import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { Key, Loader2, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '#/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#/components/ui/card';
 import {
@@ -63,6 +64,56 @@ export function AccessTokensList() {
     }
   };
 
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: 'name',
+        header: 'Name',
+        cell: (info: any) => <span className="font-medium">{info.getValue()}</span>,
+      },
+      {
+        accessorKey: 'createdAt',
+        header: 'Created',
+        cell: (info: any) => new Date(info.getValue()).toLocaleString(),
+      },
+      {
+        accessorKey: 'lastUsedAt',
+        header: 'Last Used',
+        cell: (info: any) => {
+          const val = info.getValue();
+          return val ? new Date(val).toLocaleString() : 'Never';
+        },
+      },
+      {
+        id: 'actions',
+        header: () => <div className="text-right">Actions</div>,
+        cell: (info: any) => {
+          const token = info.row.original;
+          return (
+            <div className="text-right">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => handleDelete(token.id)}
+                disabled={deleteToken.isPending}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          );
+        },
+      },
+    ],
+    [deleteToken.isPending]
+  );
+
+  const table = useReactTable({
+    data: tokens,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -90,34 +141,36 @@ export function AccessTokensList() {
         ) : (
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Last Used</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tokens.map((token: any) => (
-                <TableRow key={token.id}>
-                  <TableCell className="font-medium">{token.name}</TableCell>
-                  <TableCell>{new Date(token.createdAt).toLocaleString()}</TableCell>
-                  <TableCell>
-                    {token.lastUsedAt ? new Date(token.lastUsedAt).toLocaleString() : 'Never'}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => handleDelete(token.id)}
-                      disabled={deleteToken.isPending}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  ))}
                 </TableRow>
               ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         )}

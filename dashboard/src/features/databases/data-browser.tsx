@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#/components/ui/card';
 import {
   Select,
@@ -43,6 +44,39 @@ export function DataBrowser({ databaseId }: Props) {
   const tables = schemasData?.data || [];
   const selectedSchema = tables.find((t) => t.name === selectedTable);
   const rows = tableData?.data || [];
+
+  const columns = useMemo(() => {
+    if (selectedSchema) {
+      return selectedSchema.columns.map((col) => ({
+        accessorKey: col.name,
+        header: () => (
+          <div>
+            {col.name}
+            <span className="ml-2 font-normal text-muted-foreground text-xs">{col.type}</span>
+          </div>
+        ),
+        cell: (info: any) => (
+          <span className="max-w-75 truncate">{String(info.getValue() ?? '')}</span>
+        ),
+      }));
+    }
+    if (rows.length > 0) {
+      return Object.keys(rows[0] || {}).map((key) => ({
+        accessorKey: key,
+        header: key,
+        cell: (info: any) => (
+          <span className="max-w-75 truncate">{String(info.getValue() ?? '')}</span>
+        ),
+      }));
+    }
+    return [];
+  }, [selectedSchema, rows]);
+
+  const table = useReactTable({
+    data: rows,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   return (
     <Card className="flex h-full min-h-125 flex-col">
@@ -97,36 +131,36 @@ export function DataBrowser({ databaseId }: Props) {
           <div className="overflow-x-auto rounded-md border">
             <Table>
               <TableHeader>
-                <TableRow>
-                  {selectedSchema?.columns.map((col) => (
-                    <TableHead key={col.name} className="whitespace-nowrap">
-                      {col.name}
-                      <span className="ml-2 font-normal text-muted-foreground text-xs">
-                        {col.type}
-                      </span>
-                    </TableHead>
-                  ))}
-                  {/* Fallback if schema doesn't match data exactly */}
-                  {!selectedSchema &&
-                    Object.keys(rows[0] || {}).map((key) => <TableHead key={key}>{key}</TableHead>)}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((row, i) => (
-                  <TableRow key={i}>
-                    {selectedSchema
-                      ? selectedSchema.columns.map((col) => (
-                          <TableCell key={col.name} className="max-w-75 truncate">
-                            {String(row[col.name] ?? '')}
-                          </TableCell>
-                        ))
-                      : Object.values(row).map((val, j) => (
-                          <TableCell key={j} className="max-w-75 truncate">
-                            {String(val ?? '')}
-                          </TableCell>
-                        ))}
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id} className="whitespace-nowrap">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    ))}
                   </TableRow>
                 ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="max-w-75 truncate">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { Clock, Database, Search, Trash } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Badge } from '#/components/ui/badge';
@@ -67,6 +68,77 @@ export function RedisKeyBrowser({ databaseId }: RedisKeyBrowserProps) {
     }
   };
 
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: 'key',
+        header: 'Key',
+        cell: (info: any) => <span className="font-mono text-sm">{info.getValue()}</span>,
+      },
+      {
+        accessorKey: 'type',
+        header: 'Type',
+        cell: (info: any) => (
+          <Badge variant="secondary" className={getTypeColor(info.getValue())}>
+            {info.getValue()}
+          </Badge>
+        ),
+      },
+      {
+        accessorKey: 'value',
+        header: 'Value Summary',
+        cell: (info: any) => (
+          <div className="max-w-xs truncate font-mono text-muted-foreground text-xs">
+            {info.getValue()}
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'ttl',
+        header: 'TTL',
+        cell: (info: any) => {
+          const ttl = info.getValue();
+          return ttl === -1 ? (
+            <Badge variant="outline">No Expiry</Badge>
+          ) : (
+            <span className="flex items-center gap-1 text-muted-foreground text-sm">
+              <Clock className="h-3 w-3" />
+              {ttl}s
+            </span>
+          );
+        },
+      },
+      {
+        id: 'actions',
+        header: () => <div className="w-25"></div>,
+        cell: (info: any) => {
+          const k = info.row.original;
+          return (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                if (confirm(`Delete key ${k.key}?`)) {
+                  deleteKey.mutate(k.key);
+                }
+              }}
+              disabled={deleteKey.isPending}
+            >
+              <Trash className="h-4 w-4 text-destructive" />
+            </Button>
+          );
+        },
+      },
+    ],
+    [deleteKey]
+  );
+
+  const table = useReactTable({
+    data: keys || [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
     <Card className="flex h-[calc(100vh-12rem)] flex-col">
       <CardHeader className="border-b py-4">
@@ -93,62 +165,45 @@ export function RedisKeyBrowser({ databaseId }: RedisKeyBrowserProps) {
       <CardContent className="flex-1 overflow-auto p-0">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Key</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Value Summary</TableHead>
-              <TableHead>TTL</TableHead>
-              <TableHead className="w-25"></TableHead>
-            </TableRow>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-32 text-center text-muted-foreground"
+                >
                   Loading keys...
                 </TableCell>
               </TableRow>
-            ) : !keys || keys.length === 0 ? (
+            ) : table.getRowModel().rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-32 text-center text-muted-foreground"
+                >
                   No keys found matching "{search}"
                 </TableCell>
               </TableRow>
             ) : (
-              keys.map((k) => (
-                <TableRow key={k.key}>
-                  <TableCell className="font-mono text-sm">{k.key}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className={getTypeColor(k.type)}>
-                      {k.type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="max-w-xs truncate font-mono text-muted-foreground text-xs">
-                    {k.value}
-                  </TableCell>
-                  <TableCell>
-                    {k.ttl === -1 ? (
-                      <Badge variant="outline">No Expiry</Badge>
-                    ) : (
-                      <span className="flex items-center gap-1 text-muted-foreground text-sm">
-                        <Clock className="h-3 w-3" />
-                        {k.ttl}s
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        if (confirm(`Delete key ${k.key}?`)) {
-                          deleteKey.mutate(k.key);
-                        }
-                      }}
-                    >
-                      <Trash className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </TableCell>
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
                 </TableRow>
               ))
             )}

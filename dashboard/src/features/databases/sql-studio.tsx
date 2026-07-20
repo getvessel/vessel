@@ -1,7 +1,8 @@
 import MonacoEditor from '@monaco-editor/react';
 import { useMutation } from '@tanstack/react-query';
+import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { Loader2, Play } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '#/components/ui/button';
@@ -49,6 +50,29 @@ export function SqlStudio({ databaseId }: SqlStudioProps) {
     executeQuery.mutate(query);
   };
 
+  const tableColumns = useMemo(
+    () =>
+      columns.map((col) => ({
+        accessorKey: col,
+        header: col,
+        cell: (info: any) => {
+          const val = info.getValue();
+          return val !== null ? (
+            String(val)
+          ) : (
+            <span className="text-muted-foreground italic">null</span>
+          );
+        },
+      })),
+    [columns]
+  );
+
+  const table = useReactTable({
+    data: results || [],
+    columns: tableColumns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
     <div className="flex h-[calc(100vh-12rem)] flex-col gap-4">
       <Card className="flex flex-1 flex-col shadow-sm">
@@ -95,28 +119,36 @@ export function SqlStudio({ databaseId }: SqlStudioProps) {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  {columns.map((col) => (
-                    <TableHead key={col} className="whitespace-nowrap">
-                      {col}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {results.map((row, i) => (
-                  <TableRow key={i}>
-                    {columns.map((col) => (
-                      <TableCell key={col} className="whitespace-nowrap">
-                        {row[col] !== null ? (
-                          String(row[col])
-                        ) : (
-                          <span className="text-muted-foreground italic">null</span>
-                        )}
-                      </TableCell>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id} className="whitespace-nowrap">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
                     ))}
                   </TableRow>
                 ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="whitespace-nowrap">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           )}
