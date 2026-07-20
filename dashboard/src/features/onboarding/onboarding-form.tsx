@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useStore } from '@tanstack/react-store';
+
 import {
   ArrowLeft,
   ArrowRight,
@@ -13,13 +13,13 @@ import {
 import { FormProvider, useForm } from 'react-hook-form';
 import { Button } from '#/components/ui/button';
 import { useSetup } from '#/hooks/useAuth';
-import { onboardingActions, onboardingStore } from '#/stores/onboardingStore';
+import { useOnboardingStore } from '#/stores/onboardingStore';
 import { ImportModal, type SetupSchema, StepDomain, StepOwner, StepRuntime, setupSchema } from '.';
 
 export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
   const { mutateAsync: setupUser, isPending } = useSetup();
-  const currentStep = useStore(onboardingStore, (state) => state.currentStep);
-  const isImportModalOpen = useStore(onboardingStore, (state) => state.isImportModalOpen);
+  const currentStep = useOnboardingStore((state) => state.currentStep);
+  const isImportModalOpen = useOnboardingStore((state) => state.isImportModalOpen);
 
   const methods = useForm<SetupSchema>({
     resolver: zodResolver(setupSchema),
@@ -60,11 +60,11 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
       if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
         document.activeElement.blur();
       }
-      onboardingActions.nextStep();
+      useOnboardingStore.getState().nextStep();
     }
   };
 
-  const prevStep = () => onboardingActions.prevStep();
+  const prevStep = () => useOnboardingStore.getState().prevStep();
 
   const onSubmit = async (data: SetupSchema) => {
     if (currentStep !== 3) {
@@ -217,13 +217,16 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
       <div className="mt-16 flex justify-center border-border/50 border-t pt-10">
         <Button
           variant="outline"
-          onClick={() => onboardingActions.setImportModalOpen(true)}
+          onClick={() => useOnboardingStore.getState().setImportModalOpen(true)}
           className="flex h-11 items-center gap-2 rounded-xl bg-background px-6 font-semibold text-muted-foreground text-xs uppercase tracking-widest transition-all duration-300 hover:border-primary/50 hover:text-foreground"
         >
           <Database className="h-4 w-4" />
           IMPORT EXISTING VESSL
         </Button>
-        <ImportModal open={isImportModalOpen} onOpenChange={onboardingActions.setImportModalOpen} />
+        <ImportModal
+          open={isImportModalOpen}
+          onOpenChange={useOnboardingStore.getState().setImportModalOpen}
+        />
       </div>
     </div>
   );

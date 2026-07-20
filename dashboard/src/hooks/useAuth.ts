@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import { authService } from '#/services/auth';
-import { authActions } from '#/stores/authStore';
+import { useAuthStore } from '#/stores/authStore';
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
@@ -17,7 +17,7 @@ export const useLogin = () => {
         return;
       }
 
-      authActions.setAuth(data.token, data.user);
+      useAuthStore.getState().setAuth(data.token, data.user);
 
       queryClient.clear();
 
@@ -44,7 +44,7 @@ export const useRegister = () => {
         return;
       }
 
-      authActions.setAuth(data.token, data.user);
+      useAuthStore.getState().setAuth(data.token, data.user);
       queryClient.clear();
       await router.navigate({ to: '/' });
 
@@ -110,12 +110,12 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: () => authService.logout(),
     onSuccess: async () => {
-      authActions.logout();
+      useAuthStore.getState().logout();
       queryClient.clear();
       await router.navigate({ to: '/signin' });
     },
     onError: () => {
-      authActions.logout();
+      useAuthStore.getState().logout();
       queryClient.clear();
       router.navigate({ to: '/signin' });
     },

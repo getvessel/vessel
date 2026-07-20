@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, Database, Filter, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button } from '#/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#/components/ui/card';
@@ -64,6 +65,29 @@ export function TableDataGrid({ databaseId }: TableDataGridProps) {
   const columns = tableData?.columns || [];
   const rows = tableData?.rows || [];
 
+  const tableColumns = useMemo(
+    () =>
+      columns.map((col) => ({
+        accessorKey: col,
+        header: col,
+        cell: (info: any) => {
+          const val = info.getValue();
+          return val !== null ? (
+            String(val)
+          ) : (
+            <span className="text-muted-foreground italic">null</span>
+          );
+        },
+      })),
+    [columns]
+  );
+
+  const table = useReactTable({
+    data: rows,
+    columns: tableColumns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   const handleAddRow = () => {
     setEditorData(null);
     setIsEditorOpen(true);
@@ -120,13 +144,17 @@ export function TableDataGrid({ databaseId }: TableDataGridProps) {
       <CardContent className="flex-1 overflow-auto p-0">
         <Table>
           <TableHeader>
-            <TableRow>
-              {columns.map((col) => (
-                <TableHead key={col} className="whitespace-nowrap">
-                  {col}
-                </TableHead>
-              ))}
-            </TableRow>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="whitespace-nowrap">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
           </TableHeader>
           <TableBody>
             {isLoadingData ? (
@@ -138,7 +166,7 @@ export function TableDataGrid({ databaseId }: TableDataGridProps) {
                   Loading data...
                 </TableCell>
               </TableRow>
-            ) : rows.length === 0 ? (
+            ) : table.getRowModel().rows?.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length || 1}
@@ -148,19 +176,15 @@ export function TableDataGrid({ databaseId }: TableDataGridProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              rows.map((row, i) => (
+              table.getRowModel().rows.map((row) => (
                 <TableRow
-                  key={i}
-                  onDoubleClick={() => handleEditRow(row)}
+                  key={row.id}
+                  onDoubleClick={() => handleEditRow(row.original as Record<string, unknown>)}
                   className="cursor-pointer hover:bg-muted/50"
                 >
-                  {columns.map((col) => (
-                    <TableCell key={col} className="max-w-50 truncate whitespace-nowrap">
-                      {row[col] !== null ? (
-                        String(row[col])
-                      ) : (
-                        <span className="text-muted-foreground italic">null</span>
-                      )}
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="max-w-50 truncate whitespace-nowrap">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>

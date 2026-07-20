@@ -1,38 +1,33 @@
-import { Store } from '@tanstack/store';
+import { create } from 'zustand';
 
 export interface OnboardingState {
   currentStep: number;
   isImportModalOpen: boolean;
+  setStep: (step: number) => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  setImportModalOpen: (isOpen: boolean) => void;
 }
 
-export const onboardingStore = new Store<OnboardingState>({
+export const useOnboardingStore = create<OnboardingState>((set) => ({
   currentStep: 1,
   isImportModalOpen: false,
-});
-
-export const onboardingActions = {
   setStep: (step: number) => {
-    onboardingStore.setState((state) => ({
-      ...state,
+    set(() => ({
       currentStep: Math.min(Math.max(step, 1), 3),
     }));
   },
   nextStep: () => {
-    onboardingStore.setState((state) => ({
-      ...state,
+    set((state) => ({
       currentStep: Math.min(state.currentStep + 1, 3),
     }));
   },
   prevStep: () => {
-    onboardingStore.setState((state) => ({
-      ...state,
+    set((state) => ({
       currentStep: Math.max(state.currentStep - 1, 1),
     }));
   },
   setImportModalOpen: (isOpen: boolean) => {
-    onboardingStore.setState((state) => ({
-      ...state,
-      isImportModalOpen: isOpen,
-    }));
+    set({ isImportModalOpen: isOpen });
   },
-};
+}));

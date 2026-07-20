@@ -5,7 +5,7 @@ import { Terminal } from '@xterm/xterm';
 import { useEffect, useRef, useState } from 'react';
 import { env } from '#/env';
 import '@xterm/xterm/css/xterm.css';
-import { authStore } from '#/stores/authStore';
+import { useAuthStore } from '#/stores/authStore';
 
 interface WebTerminalProps {
   serviceId: string;
@@ -48,7 +48,7 @@ export function WebTerminal({ serviceId }: WebTerminalProps) {
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsHost = env.VITE_API_URL.replace(/^http(s?):\/\//, '');
-    const wsUrl = `${protocol}//${wsHost}/api/services/${serviceId}/terminal?token=${authStore.state.token || ''}`;
+    const wsUrl = `${protocol}//${wsHost}/api/services/${serviceId}/terminal?token=${useAuthStore.getState().token || ''}`;
 
     const socket = new WebSocket(wsUrl);
 

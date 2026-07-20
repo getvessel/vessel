@@ -12,7 +12,7 @@ import {
 import { useTheme } from 'next-themes';
 import { useEffect, useRef, useState } from 'react';
 import { useLogout } from '#/hooks/useAuth';
-import { useAuthState } from '#/stores/authStore';
+import { useAuthStore } from '#/stores/authStore';
 
 interface UserMenuProps {
   collapsed: boolean;
@@ -20,7 +20,7 @@ interface UserMenuProps {
 
 export function UserMenu({ collapsed }: UserMenuProps) {
   const { theme, setTheme } = useTheme();
-  const authState = useAuthState();
+  const authState = useAuthStore();
   const { mutateAsync: logout } = useLogout();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -29,7 +29,7 @@ export function UserMenu({ collapsed }: UserMenuProps) {
   const initials = user?.name
     ? user.name
         .split(' ')
-        .map((n) => n[0])
+        .map((n: string) => n[0])
         .join('')
         .toUpperCase()
     : 'U';

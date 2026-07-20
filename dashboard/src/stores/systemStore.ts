@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { settingsService } from '#/services/settings';
 
-interface SystemState {
+export interface SystemState {
   registrationEnabled: boolean;
   siteName: string;
   emailEnabled: boolean;
