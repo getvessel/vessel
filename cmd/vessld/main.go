@@ -58,6 +58,10 @@ func (a *dbDeployerStore) ListServiceVariables(serviceID string) ([]*models.Vari
 	return svVarRepo.ListByService(context.Background(), serviceID)
 }
 
+func (a *dbDeployerStore) ListLogDrainsByService(serviceID string) ([]*models.LogDrain, error) {
+	return repositories.NewAppServiceRepo(a.db).ListLogDrainsByService(context.Background(), serviceID)
+}
+
 func (a *dbDeployerStore) GetServerlessFunctionCode(serviceID string) (*models.ServerlessFunctionCode, error) {
 	svlsRepo := repositories.NewServerlessRepository(a.db)
 	return svlsRepo.GetCodeByServiceID(context.Background(), serviceID)

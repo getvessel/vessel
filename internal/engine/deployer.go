@@ -114,12 +114,41 @@ func (d *Deployer) prepareServerlessCode(app *models.AppService, sourceDir strin
 	}
 
 	if code.Runtime == "nodejs" {
-		handlerPath := filepath.Join(sourceDir, "handler.js")
-		if err := os.WriteFile(handlerPath, []byte(code.CodeContent), 0644); err != nil {
-			return err
-		}
+		return prepareNodeJSCode(sourceDir, code.CodeContent, logWriter)
+	}
 
-		pkgJSON := `{
+	if code.Runtime == "python" {
+		return preparePythonCode(sourceDir, code.CodeContent, logWriter)
+	}
+
+	if code.Runtime == "go" {
+		return prepareGoCode(sourceDir, code.CodeContent, logWriter)
+	}
+
+	var filename string
+	switch code.Runtime {
+	default:
+		filename = "main.txt"
+	}
+
+	filePath := filepath.Join(sourceDir, filename)
+	if err := os.WriteFile(filePath, []byte(code.CodeContent), 0644); err != nil {
+		return fmt.Errorf("could not write serverless code to file: %w", err)
+	}
+
+	if logWriter != nil {
+		fmt.Fprintf(logWriter, "📝 [Deployer] Wrote serverless function code to %s\n", filePath)
+	}
+	return nil
+}
+
+func prepareNodeJSCode(sourceDir, codeContent string, logWriter io.Writer) error {
+	handlerPath := filepath.Join(sourceDir, "handler.js")
+	if err := os.WriteFile(handlerPath, []byte(codeContent), 0644); err != nil {
+		return err
+	}
+
+	pkgJSON := `{
   "name": "vessl-function",
   "version": "1.0.0",
   "main": "server.js",
@@ -130,11 +159,11 @@ func (d *Deployer) prepareServerlessCode(app *models.AppService, sourceDir strin
     "express": "^4.18.2"
   }
 }`
-		if err := os.WriteFile(filepath.Join(sourceDir, "package.json"), []byte(pkgJSON), 0644); err != nil {
-			return err
-		}
+	if err := os.WriteFile(filepath.Join(sourceDir, "package.json"), []byte(pkgJSON), 0644); err != nil {
+		return err
+	}
 
-		serverJS := `const express = require('express');
+	serverJS := `const express = require('express');
 const app = express();
 app.use(express.json());
 
@@ -163,28 +192,28 @@ app.all('*', async (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log('Function listening on port', port));`
-		if err := os.WriteFile(filepath.Join(sourceDir, "server.js"), []byte(serverJS), 0644); err != nil {
-			return err
-		}
-
-		if logWriter != nil {
-			fmt.Fprintf(logWriter, "📝 [Deployer] Wrapped NodeJS serverless function with Express\n")
-		}
-		return nil
+	if err := os.WriteFile(filepath.Join(sourceDir, "server.js"), []byte(serverJS), 0644); err != nil {
+		return err
 	}
 
-	if code.Runtime == "python" {
-		handlerPath := filepath.Join(sourceDir, "handler.py")
-		if err := os.WriteFile(handlerPath, []byte(code.CodeContent), 0644); err != nil {
-			return err
-		}
+	if logWriter != nil {
+		fmt.Fprintf(logWriter, "📝 [Deployer] Wrapped NodeJS serverless function with Express\n")
+	}
+	return nil
+}
 
-		reqs := "Flask==2.3.2\nWerkzeug==2.3.4"
-		if err := os.WriteFile(filepath.Join(sourceDir, "requirements.txt"), []byte(reqs), 0644); err != nil {
-			return err
-		}
+func preparePythonCode(sourceDir, codeContent string, logWriter io.Writer) error {
+	handlerPath := filepath.Join(sourceDir, "handler.py")
+	if err := os.WriteFile(handlerPath, []byte(codeContent), 0644); err != nil {
+		return err
+	}
 
-		serverPy := `import os
+	reqs := "Flask==2.3.2\nWerkzeug==2.3.4"
+	if err := os.WriteFile(filepath.Join(sourceDir, "requirements.txt"), []byte(reqs), 0644); err != nil {
+		return err
+	}
+
+	serverPy := `import os
 from flask import Flask, request
 import handler
 
@@ -204,23 +233,23 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 3000))
     app.run(host='0.0.0.0', port=port)
 `
-		if err := os.WriteFile(filepath.Join(sourceDir, "main.py"), []byte(serverPy), 0644); err != nil {
-			return err
-		}
-
-		if logWriter != nil {
-			fmt.Fprintf(logWriter, "📝 [Deployer] Wrapped Python serverless function with Flask\n")
-		}
-		return nil
+	if err := os.WriteFile(filepath.Join(sourceDir, "main.py"), []byte(serverPy), 0644); err != nil {
+		return err
 	}
 
-	if code.Runtime == "go" {
-		handlerPath := filepath.Join(sourceDir, "handler.go")
-		if err := os.WriteFile(handlerPath, []byte(code.CodeContent), 0644); err != nil {
-			return err
-		}
+	if logWriter != nil {
+		fmt.Fprintf(logWriter, "📝 [Deployer] Wrapped Python serverless function with Flask\n")
+	}
+	return nil
+}
 
-		serverGo := `package main
+func prepareGoCode(sourceDir, codeContent string, logWriter io.Writer) error {
+	handlerPath := filepath.Join(sourceDir, "handler.go")
+	if err := os.WriteFile(handlerPath, []byte(codeContent), 0644); err != nil {
+		return err
+	}
+
+	serverGo := `package main
 
 import (
 	"fmt"
@@ -238,37 +267,20 @@ func main() {
 	http.ListenAndServe(":"+port, nil)
 }
 `
-		if err := os.WriteFile(filepath.Join(sourceDir, "main.go"), []byte(serverGo), 0644); err != nil {
-			return err
-		}
+	if err := os.WriteFile(filepath.Join(sourceDir, "main.go"), []byte(serverGo), 0644); err != nil {
+		return err
+	}
 
-		goMod := `module vessl-function
+	goMod := `module vessl-function
 
 go 1.23
 `
-		if err := os.WriteFile(filepath.Join(sourceDir, "go.mod"), []byte(goMod), 0644); err != nil {
-			return err
-		}
-
-		if logWriter != nil {
-			fmt.Fprintf(logWriter, "📝 [Deployer] Wrapped Go serverless function with net/http\n")
-		}
-		return nil
-	}
-
-	var filename string
-	switch code.Runtime {
-	default:
-		filename = "main.txt"
-	}
-
-	filePath := filepath.Join(sourceDir, filename)
-	if err := os.WriteFile(filePath, []byte(code.CodeContent), 0644); err != nil {
-		return fmt.Errorf("could not write serverless code to file: %w", err)
+	if err := os.WriteFile(filepath.Join(sourceDir, "go.mod"), []byte(goMod), 0644); err != nil {
+		return err
 	}
 
 	if logWriter != nil {
-		fmt.Fprintf(logWriter, "📝 [Deployer] Wrote serverless function code to %s\n", filePath)
+		fmt.Fprintf(logWriter, "📝 [Deployer] Wrapped Go serverless function with net/http\n")
 	}
 	return nil
 }
@@ -304,6 +316,7 @@ type StartContainerOpts struct {
 	ContainerName string
 	ImageTag      string
 	EnvSlice      []string
+	LogDrains     []*models.LogDrain
 }
 
 func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) ([]string, error) {
@@ -321,6 +334,14 @@ func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) 
 	}
 
 	var startedNames []string
+
+	logDrains := opts.LogDrains
+	if len(logDrains) == 0 {
+		fetchedDrains, err := d.store.ListLogDrainsByService(opts.App.ID)
+		if err == nil {
+			logDrains = fetchedDrains
+		}
+	}
 
 	for i := 0; i < replicas; i++ {
 		containerName := opts.ContainerName
@@ -349,6 +370,8 @@ func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) 
 			CPURequest:      cpuReq,
 			HealthCheckPath: opts.App.HealthCheckPath,
 			Volumes:         opts.App.Volumes,
+			MaintenanceMode: opts.App.MaintenanceMode,
+			LogDrains:       logDrains,
 		}
 
 		_, err := d.containerManager.CreateAndStart(ctx, containerOpts)

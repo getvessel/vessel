@@ -64,6 +64,11 @@ func (m *mockAppRepo) ListWebhooksByService(ctx context.Context, serviceID strin
 	return nil, nil
 }
 func (m *mockAppRepo) DeleteWebhook(ctx context.Context, id, serviceID string) error { return nil }
+func (m *mockAppRepo) CreateLogDrain(ctx context.Context, d *models.LogDrain) error  { return nil }
+func (m *mockAppRepo) ListLogDrainsByService(ctx context.Context, serviceID string) ([]*models.LogDrain, error) {
+	return nil, nil
+}
+func (m *mockAppRepo) DeleteLogDrain(ctx context.Context, id, serviceID string) error { return nil }
 
 type mockVarRepo struct{}
 

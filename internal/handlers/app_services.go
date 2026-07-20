@@ -171,6 +171,7 @@ func (h *AppHandler) Update(c echo.Context) error {
 	existing.CPULimit = req.CPULimit
 	existing.MemoryLimit = req.MemoryLimit
 	existing.DeployToken = req.DeployToken
+	existing.MaintenanceMode = req.MaintenanceMode
 	if err := h.appService.UpdateAppService(c.Request().Context(), existing); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
@@ -252,4 +253,63 @@ func (h *AppHandler) RestartService(c echo.Context) error {
 	existing.Status = models.AppServiceStatusRunning
 	_ = h.appService.UpdateAppService(c.Request().Context(), existing)
 	return utils.Success(c, "Service restarted successfully", existing)
+}
+
+func (h *AppHandler) CreateLogDrain(c echo.Context) error {
+	id := c.Param("id")
+	existing, err := h.appService.GetAppService(c.Request().Context(), id)
+	if err != nil || existing == nil {
+		return utils.Error(c, http.StatusNotFound, "app service not found")
+	}
+	if err := h.verifyProjectOwnership(c, existing.ProjectID); err != nil {
+		return err
+	}
+	var req models.CreateLogDrainRequest
+	if err := c.Bind(&req); err != nil {
+		return utils.Error(c, http.StatusBadRequest, "invalid payload")
+	}
+	drain := &models.LogDrain{
+		ServiceID:   existing.ID,
+		ProjectID:   existing.ProjectID,
+		DrainType:   req.DrainType,
+		EndpointURL: req.EndpointURL,
+		AuthToken:   req.AuthToken,
+	}
+	created, err := h.appService.CreateLogDrain(c.Request().Context(), drain)
+	if err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+	return utils.Created(c, "Log drain created successfully", created)
+}
+
+func (h *AppHandler) ListLogDrains(c echo.Context) error {
+	id := c.Param("id")
+	existing, err := h.appService.GetAppService(c.Request().Context(), id)
+	if err != nil || existing == nil {
+		return utils.Error(c, http.StatusNotFound, "app service not found")
+	}
+	if err := h.verifyProjectOwnership(c, existing.ProjectID); err != nil {
+		return err
+	}
+	drains, err := h.appService.ListLogDrains(c.Request().Context(), id)
+	if err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+	return utils.Success(c, "Operation successful", drains)
+}
+
+func (h *AppHandler) DeleteLogDrain(c echo.Context) error {
+	id := c.Param("id")
+	drainID := c.Param("drainId")
+	existing, err := h.appService.GetAppService(c.Request().Context(), id)
+	if err != nil || existing == nil {
+		return utils.Error(c, http.StatusNotFound, "app service not found")
+	}
+	if err := h.verifyProjectOwnership(c, existing.ProjectID); err != nil {
+		return err
+	}
+	if err := h.appService.DeleteLogDrain(c.Request().Context(), drainID, id); err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+	return c.NoContent(http.StatusNoContent)
 }

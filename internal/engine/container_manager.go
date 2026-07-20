@@ -34,10 +34,13 @@ type ContainerRunOptions struct {
 	InternalPort    int
 	RuntimeMode     models.RuntimeMode
 	Envs            []string
+	Cmd             []string
 	MemoryLimitMB   int
 	CPURequest      float64
 	HealthCheckPath string
 	Volumes         []models.ServiceVolume
+	MaintenanceMode bool
+	LogDrains       []*models.LogDrain
 }
 
 func (c *ContainerManager) CreateAndStart(ctx context.Context, opts ContainerRunOptions) (string, error) {
@@ -46,9 +49,18 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, opts ContainerRun
 		return "", fmt.Errorf("invalid port definition: %w", err)
 	}
 
+	if opts.MaintenanceMode {
+		opts.ImageTag = "nginx:alpine"
+		opts.Cmd = []string{"/bin/sh", "-c", "echo '<html><head><title>Under Maintenance</title><style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;text-align:center;} h1{font-size:2rem;margin-bottom:0.5rem;} p{color:#888;}</style></head><body><div><h1>Under Maintenance</h1><p>This service is temporarily down for maintenance.</p><p>Please check back shortly.</p></div></body></html>' > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'"}
+		opts.InternalPort = 80
+		opts.HealthCheckPath = "/"
+		containerPort, _ = nat.NewPort("tcp", "80")
+	}
+
 	config := &container.Config{
 		Image: opts.ImageTag,
 		Env:   opts.Envs,
+		Cmd:   opts.Cmd,
 	}
 
 	if opts.HealthCheckPath != "" {
@@ -93,6 +105,11 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, opts ContainerRun
 	if err := c.dockerClient.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
 		return "", fmt.Errorf("docker container start failed: %w", err)
 	}
+
+	if len(opts.LogDrains) > 0 {
+		StartLogDrains(context.Background(), c.dockerClient, resp.ID, opts.Name, opts.LogDrains)
+	}
+
 	return resp.ID, nil
 }
 

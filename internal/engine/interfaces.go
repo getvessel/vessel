@@ -13,6 +13,7 @@ type DeployerStore interface {
 	ListServiceVariables(serviceID string) ([]*models.Variable, error)
 	GetServerlessFunctionCode(serviceID string) (*models.ServerlessFunctionCode, error)
 	UpdateAppService(app *models.AppService) error
+	ListLogDrainsByService(serviceID string) ([]*models.LogDrain, error)
 }
 
 type DatabaseDeployerStore interface {

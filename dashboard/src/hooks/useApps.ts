@@ -139,3 +139,33 @@ export const useDeleteVariable = () => {
     },
   });
 };
+
+export const useListLogDrains = (appId: string) => {
+  return useQuery({
+    queryKey: ['apps', 'logDrains', appId],
+    queryFn: () => appsService.listLogDrains(appId),
+    enabled: !!appId,
+  });
+};
+
+export const useCreateLogDrain = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { appId: string; payload: any }) =>
+      appsService.createLogDrain(payload.appId, payload.payload),
+    onSuccess: async (_, { appId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['apps', 'logDrains', appId] });
+    },
+  });
+};
+
+export const useDeleteLogDrain = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { appId: string; drainId: string }) =>
+      appsService.deleteLogDrain(payload.appId, payload.drainId),
+    onSuccess: async (_, { appId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['apps', 'logDrains', appId] });
+    },
+  });
+};

@@ -10,6 +10,7 @@ import {
   Globe,
   HardDrive,
   Loader2,
+  Network,
   Settings,
   Terminal,
   Variable,
@@ -57,6 +58,7 @@ function ServiceLayoutRoute() {
     { name: 'Terminal', href: `/services/${serviceId}/terminal`, icon: Terminal },
     { name: 'Serverless Editor', href: `/services/${serviceId}/serverless`, icon: Code },
     { name: 'PR Previews', href: `/services/${serviceId}/previews`, icon: GitPullRequest },
+    { name: 'Log Drains', href: `/services/${serviceId}/log-drains`, icon: Network },
     { name: 'Danger Zone', href: `/services/${serviceId}/danger`, icon: AlertTriangle },
   ];
 

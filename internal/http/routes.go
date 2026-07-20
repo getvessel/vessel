@@ -135,6 +135,9 @@ func (s *Server) registerAppRoutes(apiGroup, authGroup *echo.Group) {
 	appsGroup.GET("/:id/volumes", s.appServiceHandler.ListVolumes)
 	appsGroup.POST("/:id/volumes", s.appServiceHandler.CreateVolume)
 	appsGroup.DELETE("/:id/volumes/:volumeId", s.appServiceHandler.DeleteVolume)
+	appsGroup.GET("/:id/log-drains", s.appServiceHandler.ListLogDrains)
+	appsGroup.POST("/:id/log-drains", s.appServiceHandler.CreateLogDrain)
+	appsGroup.DELETE("/:id/log-drains/:drainId", s.appServiceHandler.DeleteLogDrain)
 
 	authGroup.GET("/services/:serviceId/variables", s.serviceVarHandler.List)
 	authGroup.GET("/services/:serviceId/env-suggestions", s.serviceVarHandler.Suggest)

@@ -137,4 +137,30 @@ export const appsService = {
       throw handleApiError(error);
     }
   },
+
+  listLogDrains: async (appId: string): Promise<any[]> => {
+    try {
+      const response = await apiClient.get<any>(`/apps/${appId}/log-drains`);
+      return response.data?.data || [];
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  createLogDrain: async (appId: string, data: any): Promise<any> => {
+    try {
+      const response = await apiClient.post<any>(`/apps/${appId}/log-drains`, data);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  deleteLogDrain: async (appId: string, drainId: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/apps/${appId}/log-drains/${drainId}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
 };

@@ -137,6 +137,7 @@ type AppService struct {
 	CreatedAt        time.Time        `json:"createdAt" db:"created_at"`
 	UpdatedAt        time.Time        `json:"updatedAt" db:"updated_at"`
 	EnablePRPreviews bool             `json:"enablePRPreviews" db:"enable_pr_previews"`
+	MaintenanceMode  bool             `json:"maintenanceMode" db:"maintenance_mode"`
 
 	Volumes []ServiceVolume `json:"volumes,omitempty" db:"-"`
 }
@@ -166,6 +167,7 @@ type CreateAppServiceRequest struct {
 	Domain          string      `json:"domain"`
 	StaticOutput    string      `json:"staticOutput"`
 	HealthCheckPath string      `json:"healthCheckPath"`
+	MaintenanceMode bool        `json:"maintenanceMode,omitempty"`
 }
 
 type UpdateAppServiceRequest struct {
@@ -186,6 +188,7 @@ type UpdateAppServiceRequest struct {
 	ContainerID     string      `json:"containerId"`
 	Status          string      `json:"status"`
 	DeployToken     string      `json:"deployToken"`
+	MaintenanceMode bool        `json:"maintenanceMode,omitempty"`
 }
 
 type Variable struct {
@@ -309,4 +312,30 @@ type PRPreview struct {
 	ContainerID   string          `json:"containerId" db:"container_id"`
 	CreatedAt     time.Time       `json:"createdAt" db:"created_at"`
 	UpdatedAt     time.Time       `json:"updatedAt" db:"updated_at"`
+}
+
+type LogDrainType string
+
+const (
+	LogDrainTypeAxiom    LogDrainType = "axiom"
+	LogDrainTypeNewRelic LogDrainType = "new_relic"
+	LogDrainTypeDatadog  LogDrainType = "datadog"
+	LogDrainTypeWebhook  LogDrainType = "webhook"
+)
+
+type LogDrain struct {
+	ID          string       `json:"id" db:"id"`
+	ServiceID   string       `json:"serviceId" db:"service_id"`
+	ProjectID   string       `json:"projectId" db:"project_id"`
+	DrainType   LogDrainType `json:"drainType" db:"drain_type"`
+	EndpointURL string       `json:"endpointUrl" db:"endpoint_url"`
+	AuthToken   string       `json:"authToken" db:"auth_token"`
+	CreatedAt   time.Time    `json:"createdAt" db:"created_at"`
+	UpdatedAt   time.Time    `json:"updatedAt" db:"updated_at"`
+}
+
+type CreateLogDrainRequest struct {
+	DrainType   LogDrainType `json:"drainType"`
+	EndpointURL string       `json:"endpointUrl"`
+	AuthToken   string       `json:"authToken"`
 }

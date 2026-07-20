@@ -225,3 +225,40 @@ func (s *AppService) DeleteVolume(ctx context.Context, id string) error {
 	}
 	return s.volumeRepo.Delete(ctx, id)
 }
+
+func (s *AppService) CreateLogDrain(ctx context.Context, d *models.LogDrain) (*models.LogDrain, error) {
+	if d == nil {
+		return nil, errors.New("log drain is nil")
+	}
+	if d.ServiceID == "" || d.ProjectID == "" {
+		return nil, errors.New("serviceId and projectId are required")
+	}
+	if d.DrainType == "" || d.EndpointURL == "" {
+		return nil, errors.New("drainType and endpointUrl are required")
+	}
+
+	if d.ID == "" {
+		d.ID = uuid.New().String()
+	}
+	d.CreatedAt = time.Now()
+	d.UpdatedAt = time.Now()
+
+	if err := s.repo.CreateLogDrain(ctx, d); err != nil {
+		return nil, err
+	}
+	return d, nil
+}
+
+func (s *AppService) ListLogDrains(ctx context.Context, serviceID string) ([]*models.LogDrain, error) {
+	if serviceID == "" {
+		return nil, errors.New("serviceId is required")
+	}
+	return s.repo.ListLogDrainsByService(ctx, serviceID)
+}
+
+func (s *AppService) DeleteLogDrain(ctx context.Context, id, serviceID string) error {
+	if id == "" || serviceID == "" {
+		return errors.New("id and serviceId are required")
+	}
+	return s.repo.DeleteLogDrain(ctx, id, serviceID)
+}

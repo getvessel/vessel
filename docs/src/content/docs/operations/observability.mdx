@@ -17,6 +17,22 @@ While standard Docker logs are ephemeral, Vessl seamlessly integrates with **Gra
 ### Configuration
 Loki configuration can be managed via Environment Variables on the Vessl daemon. You can point the Vessl engine to your external Loki instance URL to begin streaming all stdout/stderr logs automatically.
 
+## Log Drains (Webhooks & External Services)
+
+Vessl allows you to forward runtime container logs directly to external observability tools in real-time.
+
+### Supported Destinations
+- **Custom Webhooks**: Send POST requests with JSON log payloads to any endpoint.
+- **Axiom**: Forward logs directly to Axiom datasets.
+- **New Relic**: Stream logs to New Relic Logs.
+- **Datadog**: Send logs natively to Datadog's log ingestion APIs.
+
+### Configuration
+1. Navigate to your Service in the Dashboard.
+2. Open the **Log Drains** tab.
+3. Select your destination type, provide the Endpoint URL, and an optional Auth Token.
+4. Vessl will automatically spawn a background worker that multiplexes container logs to your destination.
+
 ## Historical Metrics / TSDB (Prometheus)
 
 To monitor infrastructure health, Vessl exposes metrics natively and can query historical time-series data from **Prometheus** or **VictoriaMetrics**.

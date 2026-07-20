@@ -145,6 +145,9 @@ curl -H "Authorization: Bearer vpt_xxx" \
 | GET    | `/api/apps/:id/volumes`                | List app storage volumes  |
 | POST   | `/api/apps/:id/volumes`                | Create an app volume      |
 | DELETE | `/api/apps/:id/volumes/:volumeId`      | Delete an app volume      |
+| GET    | `/api/services/:id/log-drains`         | List log drains           |
+| POST   | `/api/services/:id/log-drains`         | Create a log drain        |
+| DELETE | `/api/services/:id/log-drains/:drainId`| Delete a log drain        |
 
 
 
