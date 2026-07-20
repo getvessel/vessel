@@ -25,13 +25,13 @@ import { useAddMember, useListMembers, useRemoveMember } from '#/hooks/useProjec
 export function ProjectMembers({ projectId }: { projectId: string }) {
   const { data: members, isLoading } = useListMembers(projectId);
   const { data: profile } = useGetProfile();
-  
+
   const currentUserRole =
     members?.data?.find(
       (m: any) => m.email === profile?.data?.email || m.user_id === profile?.data?.id
     )?.permission || 'member';
 
-  const canManage = currentUserRole === 'owner' || currentUserRole === 'admin';
+  const canManage = String(currentUserRole) === 'owner' || String(currentUserRole) === 'admin';
 
   const { mutateAsync: addMember, isPending: isAdding } = useAddMember();
   const { mutateAsync: removeMember, isPending: isRemoving } = useRemoveMember();
@@ -76,7 +76,10 @@ export function ProjectMembers({ projectId }: { projectId: string }) {
       </div>
 
       {canManage && (
-        <form onSubmit={handleAdd} className="flex items-end gap-4 rounded-lg border bg-gray-50 p-4">
+        <form
+          onSubmit={handleAdd}
+          className="flex items-end gap-4 rounded-lg border bg-gray-50 p-4"
+        >
           <div className="flex-1 space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
