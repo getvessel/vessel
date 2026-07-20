@@ -1,15 +1,75 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Loader2 } from 'lucide-react';
-import { ServiceVariables } from '#/features/services/service-variables';
-import { useGetApp } from '#/hooks/useApps';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2, Plus, Trash, Edit, Eye, EyeOff } from 'lucide-react';
+import { Button } from '#/components/ui/button';
+import { Input } from '#/components/ui/input';
+import { Switch } from '#/components/ui/switch';
+import { toast } from 'sonner';
+import {
+  useListVariables,
+  useCreateVariable,
+  useUpdateVariable,
+  useDeleteVariable,
+} from '#/hooks/useApps';
 
 export const Route = createFileRoute('/_dashboard/services/$serviceId/variables')({
-  component: ServiceVariablesRoute,
+  component: VariablesTab,
 });
 
-function ServiceVariablesRoute() {
+const variableSchema = z.object({
+  key: z.string().min(1, 'Key is required'),
+  value: z.string().min(1, 'Value is required'),
+  isSecret: z.boolean().default(false),
+});
+
+type VariableFormValues = z.infer<typeof variableSchema>;
+
+function VariablesTab() {
   const { serviceId } = Route.useParams();
-  const { data: appData, isLoading } = useGetApp(serviceId);
+  const { data: variablesData, isLoading } = useListVariables(serviceId);
+  const { mutateAsync: createVar, isPending: isCreating } = useCreateVariable();
+  const { mutateAsync: deleteVar } = useDeleteVariable();
+
+  const [visibleValues, setVisibleValues] = useState<Record<string, boolean>>({});
+
+  const form = useForm<VariableFormValues>({
+    resolver: zodResolver(variableSchema),
+    defaultValues: {
+      key: '',
+      value: '',
+      isSecret: false,
+    },
+  });
+
+  const onSubmit = async (data: VariableFormValues) => {
+    try {
+      await createVar({ appId: serviceId, payload: data });
+      toast.success('Variable created successfully');
+      form.reset();
+    } catch (error) {
+      toast.error('Failed to create variable');
+    }
+  };
+
+  const handleDelete = async (varId: string) => {
+    if (!confirm('Are you sure you want to delete this variable?')) return;
+    try {
+      await deleteVar({ appId: serviceId, varId });
+      toast.success('Variable deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete variable');
+    }
+  };
+
+  const toggleVisibility = (varId: string) => {
+    setVisibleValues((prev) => ({
+      ...prev,
+      [varId]: !prev[varId],
+    }));
+  };
 
   if (isLoading) {
     return (
@@ -19,16 +79,112 @@ function ServiceVariablesRoute() {
     );
   }
 
-  const app = appData?.data;
-
-  if (!app) {
-    return <div>Service not found.</div>;
-  }
+  const variables = variablesData?.data || [];
 
   return (
     <div className="space-y-6">
-      <h1 className="font-bold text-2xl">Variables</h1>
-      <ServiceVariables app={app} />
+      <div>
+        <h2 className="text-lg font-medium">Environment Variables</h2>
+        <p className="text-sm text-muted-foreground">
+          Manage environment variables and secrets for your service.
+        </p>
+      </div>
+
+      <div className="rounded-lg border bg-card p-6">
+        <h3 className="mb-4 text-sm font-medium">Add New Variable</h3>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-start gap-4">
+          <div className="flex-1 space-y-2">
+            <Input
+              placeholder="API_KEY"
+              {...form.register('key')}
+              className={form.formState.errors.key ? 'border-destructive' : ''}
+            />
+            {form.formState.errors.key && (
+              <p className="text-xs text-destructive">{form.formState.errors.key.message}</p>
+            )}
+          </div>
+          <div className="flex-1 space-y-2">
+            <Input
+              placeholder="your-secret-value"
+              {...form.register('value')}
+              className={form.formState.errors.value ? 'border-destructive' : ''}
+            />
+            {form.formState.errors.value && (
+              <p className="text-xs text-destructive">{form.formState.errors.value.message}</p>
+            )}
+          </div>
+          <div className="flex items-center space-x-2 pt-2">
+            <Switch
+              checked={form.watch('isSecret')}
+              onCheckedChange={(checked) => form.setValue('isSecret', checked)}
+              id="isSecret"
+            />
+            <label htmlFor="isSecret" className="text-sm font-medium">
+              Secret
+            </label>
+          </div>
+          <Button type="submit" disabled={isCreating} className="pt-2">
+            {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+            Add
+          </Button>
+        </form>
+      </div>
+
+      <div className="rounded-lg border bg-card">
+        <div className="grid grid-cols-[1fr_1fr_auto_auto] items-center gap-4 border-b bg-muted/50 px-6 py-3 text-sm font-medium">
+          <div>Key</div>
+          <div>Value</div>
+          <div>Type</div>
+          <div className="w-[100px] text-right">Actions</div>
+        </div>
+        <div className="divide-y">
+          {variables.length === 0 ? (
+            <div className="p-6 text-center text-sm text-muted-foreground">
+              No environment variables found.
+            </div>
+          ) : (
+            variables.map((v) => (
+              <div key={v.id} className="grid grid-cols-[1fr_1fr_auto_auto] items-center gap-4 px-6 py-4">
+                <div className="font-mono text-sm font-medium">{v.key}</div>
+                <div className="flex items-center gap-2">
+                  <div className="font-mono text-sm text-muted-foreground">
+                    {v.isSecret && !visibleValues[v.id] ? '••••••••••••••••' : v.value}
+                  </div>
+                  {v.isSecret && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => toggleVisibility(v.id)}
+                    >
+                      {visibleValues[v.id] ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
+                </div>
+                <div>
+                  <span className="rounded-full bg-secondary px-2 py-1 text-xs font-medium">
+                    {v.isSecret ? 'Secret' : 'Plain'}
+                  </span>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => handleDelete(v.id)}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }

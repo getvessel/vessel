@@ -50,7 +50,7 @@ function DangerZoneRoute() {
       }
       toast.success('Service deleted successfully');
       navigate({ to: `/projects/${projectId}` });
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete service');
     }
   };
@@ -63,7 +63,7 @@ function DangerZoneRoute() {
         await restartApp.mutateAsync({ appId: serviceId });
       }
       toast.success('Service restart initiated');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to restart service');
     }
   };
@@ -76,7 +76,7 @@ function DangerZoneRoute() {
         await stopApp.mutateAsync({ appId: serviceId });
       }
       toast.success('Service stop initiated');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to stop service');
     }
   };

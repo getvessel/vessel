@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { Loader2 } from 'lucide-react';
 import { BuildSettings } from '#/features/services/build-settings';
+import { ResourceLimitsCard } from '#/features/services/resource-limits-card';
 import { useGetApp } from '#/hooks/useApps';
 
 export const Route = createFileRoute('/_dashboard/services/$serviceId/build')({
@@ -29,6 +30,9 @@ function ServiceBuildRoute() {
     <div className="space-y-6">
       <h1 className="font-bold text-2xl">Build Settings</h1>
       <BuildSettings serviceId={serviceId} />
+      
+      <h1 className="font-bold text-2xl pt-4">Resource Constraints</h1>
+      <ResourceLimitsCard app={app} />
     </div>
   );
 }

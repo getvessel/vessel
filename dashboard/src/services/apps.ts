@@ -1,3 +1,4 @@
+import type { BaseResponse } from '#/interfaces/base';
 import type {
   CreateAppResponse,
   CreateAppServiceRequest,
@@ -5,6 +6,10 @@ import type {
   ListAppsResponse,
   UpdateAppResponse,
   UpdateAppServiceRequest,
+  Variable,
+  ListVariablesResponse,
+  CreateServiceVarRequest,
+  UpdateServiceVarRequest,
 } from '#/interfaces/deployment';
 import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
@@ -90,4 +95,44 @@ export const appsService = {
       throw handleApiError(error);
     }
   },
+
+  listVariables: async (appId: string): Promise<ListVariablesResponse> => {
+    try {
+      return await apiClient.get<ListVariablesResponse>(`/services/${appId}/variables`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  createVariable: async (
+    appId: string,
+    payload: CreateServiceVarRequest
+  ): Promise<BaseResponse<Variable>> => {
+    try {
+      return await apiClient.post<BaseResponse<Variable>>(`/services/${appId}/variables`, payload);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  updateVariable: async (
+    appId: string,
+    varId: string,
+    payload: UpdateServiceVarRequest
+  ): Promise<BaseResponse<Variable>> => {
+    try {
+      return await apiClient.put<BaseResponse<Variable>>(`/services/${appId}/variables/${varId}`, payload);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  deleteVariable: async (appId: string, varId: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/services/${appId}/variables/${varId}`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
 };
+

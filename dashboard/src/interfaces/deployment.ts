@@ -53,6 +53,8 @@ export interface AppService {
   status: ServiceStatus;
   createdAt: string;
   updatedAt: string;
+  cpuLimit?: number;
+  memoryLimit?: number;
 }
 
 export interface Deployment {
@@ -140,6 +142,8 @@ export interface CreateAppServiceRequest {
   domain: string;
   staticOutput: string;
   healthCheckPath: string;
+  cpuLimit?: number;
+  memoryLimit?: number;
 }
 
 export interface UpdateAppServiceRequest {
@@ -160,6 +164,8 @@ export interface UpdateAppServiceRequest {
   healthCheckPath: string;
   containerId: string;
   status: ServiceStatus;
+  cpuLimit?: number;
+  memoryLimit?: number;
 }
 
 export interface TriggerDeploymentRequest {

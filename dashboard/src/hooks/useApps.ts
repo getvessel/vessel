@@ -93,3 +93,49 @@ export const useRestartApp = () => {
     },
   });
 };
+
+export const useListVariables = (appId: string) => {
+  return useQuery({
+    queryKey: ['apps', 'variables', appId],
+    queryFn: () => appsService.listVariables(appId),
+    enabled: !!appId,
+  });
+};
+
+export const useCreateVariable = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: {
+      appId: string;
+      payload: Parameters<typeof appsService.createVariable>[1];
+    }) => appsService.createVariable(payload.appId, payload.payload),
+    onSuccess: async (_, { appId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['apps', 'variables', appId] });
+    },
+  });
+};
+
+export const useUpdateVariable = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: {
+      appId: string;
+      varId: string;
+      payload: Parameters<typeof appsService.updateVariable>[2];
+    }) => appsService.updateVariable(payload.appId, payload.varId, payload.payload),
+    onSuccess: async (_, { appId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['apps', 'variables', appId] });
+    },
+  });
+};
+
+export const useDeleteVariable = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { appId: string; varId: string }) =>
+      appsService.deleteVariable(payload.appId, payload.varId),
+    onSuccess: async (_, { appId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['apps', 'variables', appId] });
+    },
+  });
+};
