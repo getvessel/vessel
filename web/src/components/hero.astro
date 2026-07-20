@@ -25,7 +25,7 @@ const capabilities = [
   <div class="relative mx-auto max-w-4xl px-6 text-center">
 
     <!-- Badge -->
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-(--color-border) bg-(--color-surface) text-xs text-(--color-muted-foreground) mb-8 font-medium">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-(--color-border) bg-(--color-background)/80 backdrop-blur-md text-xs text-(--color-muted-foreground) mb-8 font-medium">
       <span class="size-1.5 rounded-full bg-(--color-primary) animate-pulse"></span>
       Open source &amp; free forever
     </div>
@@ -42,7 +42,7 @@ const capabilities = [
     </p>
 
     <!-- Install command strip -->
-    <div class="mt-10 mx-auto max-w-lg flex items-center gap-2 rounded-lg border border-(--color-border) bg-(--color-surface) px-4 py-3 font-mono text-sm">
+    <div class="mt-10 mx-auto max-w-lg flex items-center gap-2 rounded-lg border border-(--color-border) bg-(--color-background)/80 backdrop-blur-md px-4 py-3 font-mono text-sm">
       <span class="text-(--color-primary) font-bold shrink-0">$</span>
       <code class="flex-1 text-left text-(--color-foreground) truncate text-[0.8rem]">curl -fsSL https://get.vessl.dev | sh</code>
       <button id="copy-btn" aria-label="Copy install command" class="shrink-0 p-1.5 rounded text-(--color-muted-foreground) hover:text-(--color-foreground) hover:bg-(--color-border) transition-colors">
@@ -53,7 +53,7 @@ const capabilities = [
     <!-- CTA buttons -->
     <div class="mt-6 flex flex-row items-start justify-center gap-3 sm:gap-4">
       <div class="flex flex-col items-center">
-        <a href="https://app.vessl.dev" class="flex items-center justify-center gap-2 px-6 sm:px-10 py-3.5 rounded-lg font-semibold text-sm bg-(--color-surface) hover:bg-(--color-border) border border-(--color-border) text-(--color-foreground) transition-colors whitespace-nowrap">
+        <a href="https://app.vessl.dev" class="flex items-center justify-center gap-2 px-6 sm:px-10 py-3.5 rounded-lg font-semibold text-sm bg-(--color-background)/80 backdrop-blur-md hover:bg-(--color-border) border border-(--color-border) text-(--color-foreground) transition-colors whitespace-nowrap">
           <Icon name="lucide:cloud" class="size-4 text-(--color-primary)" />
           Cloud
         </a>
@@ -62,7 +62,7 @@ const capabilities = [
         </p>
       </div>
       <div class="flex flex-col items-center">
-        <a href="https://docs.vessl.dev/self-host" target="_blank" class="flex items-center justify-center gap-2 px-6 sm:px-10 py-3.5 rounded-lg font-semibold text-sm bg-(--color-surface) hover:bg-(--color-border) border border-(--color-border) text-(--color-foreground) transition-colors whitespace-nowrap">
+        <a href="https://docs.vessl.dev/self-host" target="_blank" class="flex items-center justify-center gap-2 px-6 sm:px-10 py-3.5 rounded-lg font-semibold text-sm bg-(--color-background)/80 backdrop-blur-md hover:bg-(--color-border) border border-(--color-border) text-(--color-foreground) transition-colors whitespace-nowrap">
           <Icon name="lucide:server" class="size-4 text-(--color-primary)" />
           Self-hosted
         </a>
@@ -73,8 +73,8 @@ const capabilities = [
     </div>
 
     <!-- Terminal panel -->
-    <div class="mt-12 rounded-xl border border-(--color-border) bg-(--color-surface) overflow-hidden text-left font-mono text-xs">
-      <div class="flex items-center justify-between px-4 py-3 border-b border-(--color-border) bg-(--color-background)">
+    <div class="mt-12 rounded-xl border border-(--color-border) bg-(--color-background)/80 backdrop-blur-md overflow-hidden text-left font-mono text-xs">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-(--color-border) bg-(--color-background)/40">
         <span class="text-(--color-muted-foreground) text-[10px] font-bold uppercase tracking-widest">vessl daemon</span>
         <span class="flex items-center gap-1.5 text-green-400 text-[10px] font-semibold">
           <span class="size-1.5 rounded-full bg-green-400 animate-pulse"></span>
