@@ -2,11 +2,7 @@ import { Loader2 } from 'lucide-react';
 import { useListByService } from '#/hooks/useDeployments';
 import { DeploymentFailureAi } from './deployment-failure-ai';
 
-export function ServiceDeployments({
-  app,
-}: {
-  app: any /* biome-ignore lint/suspicious/noExplicitAny: any */;
-}) {
+export function ServiceDeployments({ app }: { app: any }) {
   const { data, isLoading } = useListByService(app.id);
 
   if (isLoading) {
@@ -22,7 +18,7 @@ export function ServiceDeployments({
         <p className="text-gray-500 text-sm">No deployments found.</p>
       ) : (
         <div className="space-y-2">
-          {deployments.map((dep: any /* biome-ignore lint/suspicious/noExplicitAny: any */) => (
+          {deployments.map((dep: any) => (
             <div key={dep.id} className="rounded border p-3 text-sm">
               <div className="mb-2 flex items-center justify-between">
                 <div>

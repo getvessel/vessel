@@ -95,7 +95,10 @@ function NewResourcePage() {
             <Card
               className="cursor-pointer transition-colors hover:border-primary/50"
               onClick={() =>
-                navigate({ to: '/projects/$projectId/compose', params: { projectId } })
+                navigate({
+                  to: '/projects/$projectId/compose',
+                  params: { projectId },
+                })
               }
             >
               <CardHeader>

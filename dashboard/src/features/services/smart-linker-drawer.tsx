@@ -28,10 +28,7 @@ export function SmartLinkerDrawer({
   // Fetch available databases or services to link variables from
   const { data: linkableResources, isLoading } = useQuery({
     queryKey: ['project-resources', projectId],
-    queryFn: () =>
-      apiClient.get<any /* biome-ignore lint/suspicious/noExplicitAny: any */[]>(
-        `/projects/${projectId}/resources`
-      ),
+    queryFn: () => apiClient.get<any[]>(`/projects/${projectId}/resources`),
   });
 
   return (
@@ -41,7 +38,7 @@ export function SmartLinkerDrawer({
           Smart Linker
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-[400px] overflow-y-auto sm:w-[540px]">
+      <SheetContent className="w-100 overflow-y-auto sm:w-135">
         <SheetHeader>
           <SheetTitle>Smart Variable Linker</SheetTitle>
           <SheetDescription>

@@ -153,7 +153,7 @@ function ProjectOverviewComponent() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {apps.map((app: any /* biome-ignore lint/suspicious/noExplicitAny: any */) => (
+            {apps.map((app: any) => (
               <Link
                 key={app.id}
                 to="/services/$serviceId"
@@ -187,7 +187,7 @@ function ProjectOverviewComponent() {
               </Link>
             ))}
 
-            {dbs.map((db: any /* biome-ignore lint/suspicious/noExplicitAny: any */) => (
+            {dbs.map((db: any) => (
               <div
                 key={db.id}
                 className="group flex cursor-default flex-col rounded-xl border bg-card p-5 transition-all hover:border-primary/50 hover:shadow-md"

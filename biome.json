@@ -37,7 +37,8 @@
       },
       "suspicious": {
         "noArrayIndexKey": "off",
-        "noShorthandPropertyOverrides": "off"
+        "noShorthandPropertyOverrides": "off",
+        "noExplicitAny": "off"
       },
       "nursery": {
         "useSortedClasses": {

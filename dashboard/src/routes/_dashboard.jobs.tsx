@@ -57,13 +57,11 @@ function JobsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">All Projects</SelectItem>
-                {projects.map(
-                  (project: any /* biome-ignore lint/suspicious/noExplicitAny: any */) => (
-                    <SelectItem key={project.id} value={project.id}>
-                      {project.name}
-                    </SelectItem>
-                  )
-                )}
+                {projects.map((project: any) => (
+                  <SelectItem key={project.id} value={project.id}>
+                    {project.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

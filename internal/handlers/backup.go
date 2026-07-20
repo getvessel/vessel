@@ -76,8 +76,6 @@ func (h *BackupHandler) Update(c echo.Context) error {
 		return utils.Error(c, http.StatusNotFound, "backup config not found")
 	}
 
-
-
 	var req struct {
 		Name            string `json:"name"`
 		Description     string `json:"description"`

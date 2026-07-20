@@ -80,12 +80,12 @@ func (s *EnvSuggestionService) fetchGitHubFile(ctx context.Context, owner, repo,
 	reqURL := fmt.Sprintf("https://api.github.com/repos/%s/%s/contents/%s?ref=%s", owner, repo, path, branch)
 
 	gp, _ := s.gitService.GetAnyProviderByType(ctx, "github")
-	
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
 	if err != nil {
 		return "", err
 	}
-	
+
 	req.Header.Set("Accept", "application/vnd.github.v3+json")
 	if gp != nil && gp.AccessToken != "" {
 		req.Header.Set("Authorization", "Bearer "+gp.AccessToken)

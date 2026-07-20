@@ -71,13 +71,11 @@ function DeploymentsPage() {
                 <SelectValue placeholder="Select Project" />
               </SelectTrigger>
               <SelectContent>
-                {projects.map(
-                  (project: any /* biome-ignore lint/suspicious/noExplicitAny: any */) => (
-                    <SelectItem key={project.id} value={project.id}>
-                      {project.name}
-                    </SelectItem>
-                  )
-                )}
+                {projects.map((project: any) => (
+                  <SelectItem key={project.id} value={project.id}>
+                    {project.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -90,7 +88,7 @@ function DeploymentsPage() {
                 <SelectValue placeholder="Select App" />
               </SelectTrigger>
               <SelectContent>
-                {apps.map((app: any /* biome-ignore lint/suspicious/noExplicitAny: any */) => (
+                {apps.map((app: any) => (
                   <SelectItem key={app.id} value={app.id}>
                     {app.name}
                   </SelectItem>
@@ -126,19 +124,17 @@ function DeploymentsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {deployments.map(
-                  (deployment: any /* biome-ignore lint/suspicious/noExplicitAny: any */) => (
-                    <TableRow key={deployment.id}>
-                      <TableCell className="font-medium">{deployment.status}</TableCell>
-                      <TableCell>{deployment.branch || '-'}</TableCell>
-                      <TableCell className="max-w-[100px] truncate font-mono text-xs">
-                        {deployment.commitHash ? deployment.commitHash.substring(0, 7) : '-'}
-                      </TableCell>
-                      <TableCell>{deployment.trigger || '-'}</TableCell>
-                      <TableCell>{new Date(deployment.createdAt).toLocaleString()}</TableCell>
-                    </TableRow>
-                  )
-                )}
+                {deployments.map((deployment: any) => (
+                  <TableRow key={deployment.id}>
+                    <TableCell className="font-medium">{deployment.status}</TableCell>
+                    <TableCell>{deployment.branch || '-'}</TableCell>
+                    <TableCell className="max-w-[100px] truncate font-mono text-xs">
+                      {deployment.commitHash ? deployment.commitHash.substring(0, 7) : '-'}
+                    </TableCell>
+                    <TableCell>{deployment.trigger || '-'}</TableCell>
+                    <TableCell>{new Date(deployment.createdAt).toLocaleString()}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           )}
