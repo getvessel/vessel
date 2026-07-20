@@ -130,6 +130,8 @@ type AppService struct {
 	ContainerID     string           `json:"containerId" db:"container_id"`
 	Status          AppServiceStatus `json:"status" db:"status"`
 	Replicas        int              `json:"replicas" db:"replicas"`
+	CPULimit        float64          `json:"cpuLimit,omitempty" db:"cpu_limit"`
+	MemoryLimit     int              `json:"memoryLimit,omitempty" db:"memory_limit"`
 	CreatedAt       time.Time        `json:"createdAt" db:"created_at"`
 	UpdatedAt       time.Time        `json:"updatedAt" db:"updated_at"`
 }

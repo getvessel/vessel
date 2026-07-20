@@ -56,6 +56,9 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
 
     const isValid = await trigger(fieldsToValidate);
     if (isValid) {
+      if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
       setCurrentStep((prev) => Math.min(prev + 1, 3));
     }
   };
@@ -65,6 +68,9 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
   const onSubmit = async (data: SetupSchema) => {
     if (currentStep !== 3) {
       return nextStep();
+    }
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
     }
     try {
       await setupUser(data);
@@ -158,19 +164,7 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
       </div>
 
       <FormProvider {...methods}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              if (currentStep < 3) {
-                nextStep();
-              } else {
-                handleSubmit(onSubmit)(e);
-              }
-            }
-          }}
-        >
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6 min-h-87.5 rounded-xl border border-border/50 bg-card/40 p-6 shadow-xl backdrop-blur-xl">
             <div className="mb-6">
               <p className="mb-3 font-bold text-primary text-xs uppercase tracking-widest">

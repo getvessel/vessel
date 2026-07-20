@@ -379,7 +379,7 @@ CREATE TABLE IF NOT EXISTS oauth_providers (
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);
 
-CREATE INDEX IF NOT EXISTS idx_domains_project_id ON domains(project_id);
+-- CREATE INDEX IF NOT EXISTS idx_domains_project_id ON domains(project_id);
 CREATE INDEX IF NOT EXISTS idx_env_vars_project_id ON env_vars(project_id);
 CREATE INDEX IF NOT EXISTS idx_jobs_project_id ON jobs(project_id);
 CREATE INDEX IF NOT EXISTS idx_user_git_providers_user_id ON user_git_providers(user_id);

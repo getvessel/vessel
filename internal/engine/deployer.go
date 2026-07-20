@@ -328,6 +328,15 @@ func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) 
 			containerName = fmt.Sprintf("%s-%d", opts.ContainerName, i)
 		}
 
+		memMB := opts.App.MemoryLimit
+		if memMB <= 0 {
+			memMB = defaultMemoryMB()
+		}
+		cpuReq := opts.App.CPULimit
+		if cpuReq <= 0 {
+			cpuReq = defaultCPURequest()
+		}
+
 		containerOpts := ContainerRunOptions{
 			Name:            containerName,
 			ImageTag:        opts.ImageTag,
@@ -336,8 +345,8 @@ func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) 
 			InternalPort:    port,
 			RuntimeMode:     opts.App.RuntimeMode,
 			Envs:            opts.EnvSlice,
-			MemoryLimitMB:   defaultMemoryMB(),
-			CPURequest:      defaultCPURequest(),
+			MemoryLimitMB:   memMB,
+			CPURequest:      cpuReq,
 			HealthCheckPath: opts.App.HealthCheckPath,
 		}
 

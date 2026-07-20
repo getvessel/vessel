@@ -190,6 +190,8 @@ func (h *AppHandler) Update(c echo.Context) error {
 	existing.HealthCheckPath = req.HealthCheckPath
 	existing.ContainerID = req.ContainerID
 	existing.Status = req.Status
+	existing.CPULimit = req.CPULimit
+	existing.MemoryLimit = req.MemoryLimit
 	if err := h.appService.UpdateAppService(c.Request().Context(), existing); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}

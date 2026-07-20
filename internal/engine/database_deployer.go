@@ -172,11 +172,20 @@ func (d *DatabaseDeployer) createContainerSettings(dbConfig *models.Database, co
 		Cmd:    cmd,
 		Labels: labels,
 	}
+	memMB := dbConfig.MemoryLimit
+	if memMB <= 0 {
+		memMB = utils.DefaultDBMemoryMB()
+	}
+	cpuReq := dbConfig.CPULimit
+	if cpuReq <= 0 {
+		cpuReq = utils.DefaultDBCPURequest()
+	}
+
 	hostCfg := &container.HostConfig{
 		RestartPolicy: container.RestartPolicy{Name: "always"},
 		Resources: container.Resources{
-			Memory:   utils.MegaBytesToBytes(utils.DefaultDBMemoryMB()),
-			NanoCPUs: utils.CPURequestToNanoCPUs(utils.DefaultDBCPURequest()),
+			Memory:   utils.MegaBytesToBytes(memMB),
+			NanoCPUs: utils.CPURequestToNanoCPUs(cpuReq),
 		},
 		Mounts: []mount.Mount{
 			{

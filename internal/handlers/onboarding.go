@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 
@@ -107,9 +108,25 @@ func (h *OnboardingHandler) Setup(c echo.Context) error {
 		req.Env.JWTSecret = hex.EncodeToString(b)
 	}
 
-	envContent := fmt.Sprintf("VESSL_JWT_SECRET=%s\nVESSL_DATA_DIR=%s\nVESSL_DASHBOARD_URL=%s\nPORT=%d\n",
-		req.Env.JWTSecret, req.Env.DataDir, req.Env.DashboardURL, req.Env.Port)
-	_ = os.WriteFile(".env.local", []byte(envContent), 0644)
+	envBytes, err := os.ReadFile(".env.example")
+	if err == nil {
+		envStr := string(envBytes)
+		envStr = strings.ReplaceAll(envStr, "VESSL_JWT_SECRET=change-this-to-a-secure-random-secret-in-prod", "VESSL_JWT_SECRET="+req.Env.JWTSecret)
+		if req.Env.DataDir != "" {
+			envStr = strings.ReplaceAll(envStr, "VESSL_DATA_DIR=./data", "VESSL_DATA_DIR="+req.Env.DataDir)
+		}
+		if req.Env.DashboardURL != "" {
+			envStr = strings.ReplaceAll(envStr, "VESSL_DASHBOARD_URL=http://localhost:3000", "VESSL_DASHBOARD_URL="+req.Env.DashboardURL)
+		}
+		if req.Env.Port != 0 {
+			envStr = strings.ReplaceAll(envStr, "PORT=8080", fmt.Sprintf("PORT=%d", req.Env.Port))
+		}
+		_ = os.WriteFile(".env", []byte(envStr), 0644)
+	} else {
+		envContent := fmt.Sprintf("VESSL_JWT_SECRET=%s\nVESSL_DATA_DIR=%s\nVESSL_DASHBOARD_URL=%s\nPORT=%d\n",
+			req.Env.JWTSecret, req.Env.DataDir, req.Env.DashboardURL, req.Env.Port)
+		_ = os.WriteFile(".env", []byte(envContent), 0644)
+	}
 
 	settings, err := h.settingsRepo.GetSettings(ctx)
 	if err == nil && settings != nil {

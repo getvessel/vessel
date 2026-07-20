@@ -47,13 +47,13 @@ func (r *DatabaseRepo) Create(_ context.Context, db *models.Database) error {
 		return err
 	}
 	_, err = r.db.Exec(`INSERT INTO databases (
-		id, project_id, environment_id, name, engine, version, port, username, encrypted_password, database_name, volume_path, container_id, status, internal_dns, external_dns, custom_args, logical_replication, created_at, updated_at
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		db.ID, db.ProjectID, db.EnvironmentID, db.Name, db.Engine, db.Version, db.Port, db.Username, encryptedPassword, db.DatabaseName, db.VolumePath, db.ContainerID, db.Status, db.InternalDNS, db.ExternalDNS, db.CustomArgs, db.LogicalReplication, db.CreatedAt, db.UpdatedAt)
+		id, project_id, environment_id, name, engine, version, port, username, encrypted_password, database_name, volume_path, container_id, status, internal_dns, external_dns, custom_args, logical_replication, cpu_limit, memory_limit, created_at, updated_at
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		db.ID, db.ProjectID, db.EnvironmentID, db.Name, db.Engine, db.Version, db.Port, db.Username, encryptedPassword, db.DatabaseName, db.VolumePath, db.ContainerID, db.Status, db.InternalDNS, db.ExternalDNS, db.CustomArgs, db.LogicalReplication, db.CPULimit, db.MemoryLimit, db.CreatedAt, db.UpdatedAt)
 	return err
 }
 
-const listDatabaseQuery = `SELECT id, COALESCE(project_id, '') AS project_id, COALESCE(environment_id, '') AS environment_id, name, engine, version, port, username, encrypted_password, database_name, volume_path, COALESCE(container_id, '') AS container_id, status, COALESCE(internal_dns, '') AS internal_dns, COALESCE(external_dns, '') AS external_dns, COALESCE(custom_args, '') AS custom_args, COALESCE(logical_replication, 0) AS logical_replication, created_at, updated_at FROM databases`
+const listDatabaseQuery = `SELECT id, COALESCE(project_id, '') AS project_id, COALESCE(environment_id, '') AS environment_id, name, engine, version, port, username, encrypted_password, database_name, volume_path, COALESCE(container_id, '') AS container_id, status, COALESCE(internal_dns, '') AS internal_dns, COALESCE(external_dns, '') AS external_dns, COALESCE(custom_args, '') AS custom_args, COALESCE(logical_replication, 0) AS logical_replication, COALESCE(cpu_limit, 0) AS cpu_limit, COALESCE(memory_limit, 0) AS memory_limit, created_at, updated_at FROM databases`
 
 func (r *DatabaseRepo) decryptPassword(encrypted string, d *models.Database) {
 	if plain, err := r.vault.Decrypt(encrypted); err == nil {
@@ -125,7 +125,7 @@ func (r *DatabaseRepo) Update(_ context.Context, db *models.Database) error {
 	if err != nil {
 		return err
 	}
-	_, err = r.db.Exec(`UPDATE databases SET project_id = ?, environment_id = ?, name = ?, engine = ?, version = ?, port = ?, username = ?, encrypted_password = ?, database_name = ?, volume_path = ?, container_id = ?, status = ?, internal_dns = ?, external_dns = ?, custom_args = ?, logical_replication = ?, updated_at = ? WHERE id = ?`,
-		db.ProjectID, db.EnvironmentID, db.Name, db.Engine, db.Version, db.Port, db.Username, encryptedPassword, db.DatabaseName, db.VolumePath, db.ContainerID, db.Status, db.InternalDNS, db.ExternalDNS, db.CustomArgs, db.LogicalReplication, db.UpdatedAt, db.ID)
+	_, err = r.db.Exec(`UPDATE databases SET project_id = ?, environment_id = ?, name = ?, engine = ?, version = ?, port = ?, username = ?, encrypted_password = ?, database_name = ?, volume_path = ?, container_id = ?, status = ?, internal_dns = ?, external_dns = ?, custom_args = ?, logical_replication = ?, cpu_limit = ?, memory_limit = ?, updated_at = ? WHERE id = ?`,
+		db.ProjectID, db.EnvironmentID, db.Name, db.Engine, db.Version, db.Port, db.Username, encryptedPassword, db.DatabaseName, db.VolumePath, db.ContainerID, db.Status, db.InternalDNS, db.ExternalDNS, db.CustomArgs, db.LogicalReplication, db.CPULimit, db.MemoryLimit, db.UpdatedAt, db.ID)
 	return err
 }

@@ -129,6 +129,8 @@ func (h *DatabaseHandler) UpdateDatabase(c echo.Context) error {
 	db.ExternalDNS = req.ExternalDNS
 	db.CustomArgs = req.CustomArgs
 	db.LogicalReplication = req.LogicalReplication
+	db.CPULimit = req.CPULimit
+	db.MemoryLimit = req.MemoryLimit
 	if err := h.databaseService.UpdateDatabase(c.Request().Context(), db); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}

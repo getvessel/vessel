@@ -64,6 +64,8 @@ type Database struct {
 	ExternalDNS        string         `json:"externalDns" db:"external_dns"`
 	CustomArgs         string         `json:"customArgs" db:"custom_args"`
 	LogicalReplication bool           `json:"logicalReplication" db:"logical_replication"`
+	CPULimit           float64        `json:"cpuLimit,omitempty" db:"cpu_limit"`
+	MemoryLimit        int            `json:"memoryLimit,omitempty" db:"memory_limit"`
 	CreatedAt          time.Time      `json:"createdAt" db:"created_at"`
 	UpdatedAt          time.Time      `json:"updatedAt" db:"updated_at"`
 }
@@ -84,9 +86,11 @@ type CreateDatabaseRequest struct {
 }
 
 type UpdateDatabaseRequest struct {
-	ExternalDNS        string `json:"externalDns"`
-	CustomArgs         string `json:"customArgs"`
-	LogicalReplication bool   `json:"logicalReplication"`
+	ExternalDNS        string  `json:"externalDns"`
+	CustomArgs         string  `json:"customArgs"`
+	LogicalReplication bool    `json:"logicalReplication"`
+	CPULimit           float64 `json:"cpuLimit"`
+	MemoryLimit        int     `json:"memoryLimit"`
 }
 
 type ImportDatabaseRequest struct {

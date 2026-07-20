@@ -1,0 +1,5 @@
+ALTER TABLE app_services ADD COLUMN cpu_limit REAL DEFAULT 0;
+ALTER TABLE app_services ADD COLUMN memory_limit INTEGER DEFAULT 0;
+
+ALTER TABLE databases ADD COLUMN cpu_limit REAL DEFAULT 0;
+ALTER TABLE databases ADD COLUMN memory_limit INTEGER DEFAULT 0;
