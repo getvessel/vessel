@@ -26,7 +26,6 @@ func NewTemplateManager() (*TemplateManager, error) {
 	err := fs.WalkDir(templateFiles, "compose", mgr.walkDir)
 	if err != nil {
 		fmt.Printf("warning: template manager WalkDir error: %v\n", err)
-		// Return mgr anyway so we don't return nil
 	}
 
 	return mgr, nil

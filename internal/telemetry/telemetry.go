@@ -13,7 +13,6 @@ var (
 	mu     sync.Mutex
 )
 
-// Init initializes the PostHog client if POSTHOG_API_KEY is present
 func Init() {
 	mu.Lock()
 	defer mu.Unlock()
@@ -39,7 +38,6 @@ func Init() {
 	client = c
 }
 
-// Track sends an event to PostHog
 func Track(distinctID string, event string, properties map[string]interface{}) {
 	if client == nil {
 		return
@@ -55,7 +53,6 @@ func Track(distinctID string, event string, properties map[string]interface{}) {
 	}
 }
 
-// Close gracefully flushes and closes the telemetry client
 func Close() {
 	mu.Lock()
 	defer mu.Unlock()

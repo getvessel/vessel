@@ -120,9 +120,7 @@ func (d *Deployer) waitForHealthyContainer(ctx context.Context, containerName st
 				if inspect.State.Health.Status == "unhealthy" {
 					return false
 				}
-				// if "starting", we keep waiting
 			} else if healthCheckPath != "" {
-				// No docker healthcheck, use engine-side HTTP probe
 				ip := ""
 				for _, net := range inspect.NetworkSettings.Networks {
 					ip = net.IPAddress
@@ -138,7 +136,6 @@ func (d *Deployer) waitForHealthyContainer(ctx context.Context, containerName st
 					}
 				}
 			} else {
-				// No healthcheck configured or health state missing, assume healthy if running
 				return true
 			}
 		}

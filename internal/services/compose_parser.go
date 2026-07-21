@@ -30,12 +30,10 @@ func (s *ComposeParserService) Parse(composeData []byte, projectID string) (*Par
 	}
 
 	for name, svc := range compose.Services {
-		// Detect if it's a database based on image name
 		imageLower := strings.ToLower(svc.Image)
 		engine := detectDatabaseEngine(imageLower)
 
 		if engine != "" {
-			// It's a database
 			dbReq := models.CreateDatabaseRequest{
 				ProjectID: projectID,
 				Name:      name,
@@ -45,7 +43,6 @@ func (s *ComposeParserService) Parse(composeData []byte, projectID string) (*Par
 			}
 			result.Databases = append(result.Databases, dbReq)
 		} else {
-			// It's an App Service
 			appReq := models.CreateAppServiceRequest{
 				ProjectID:   projectID,
 				Name:        name,

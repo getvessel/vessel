@@ -199,7 +199,6 @@ func (s *DeploymentService) GetMetrics(ctx context.Context, appID string) (*engi
 }
 
 func detectAppIcon(sourceDir string) string {
-	// Check package.json dependencies first if it exists
 	if b, err := os.ReadFile(filepath.Join(sourceDir, "package.json")); err == nil {
 		s := strings.ToLower(string(b))
 		if strings.Contains(s, "\"next\"") {
@@ -294,7 +293,6 @@ func detectAppIcon(sourceDir string) string {
 		}
 	}
 
-	// Fallback to file-based detection
 	files := map[string]string{
 		"next.config.js": "nextjs", "next.config.mjs": "nextjs",
 		"vite.config.ts": "vite", "vite.config.js": "vite",
@@ -313,7 +311,6 @@ func detectAppIcon(sourceDir string) string {
 		}
 	}
 
-	// Specific text content checks
 	if b, err := os.ReadFile(filepath.Join(sourceDir, "requirements.txt")); err == nil {
 		s := strings.ToLower(string(b))
 		if strings.Contains(s, "fastapi") {

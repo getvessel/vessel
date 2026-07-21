@@ -63,7 +63,6 @@ func (s *AppService) GetAppService(ctx context.Context, id string) (*models.AppS
 		return nil, err
 	}
 
-	// Load volumes
 	if s.volumeRepo != nil {
 		volumes, _ := s.volumeRepo.ListByService(ctx, app.ID)
 		app.Volumes = volumes

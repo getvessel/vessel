@@ -30,7 +30,6 @@ type EnvExampleVariableSuggestion struct {
 }
 
 func (s *EnvSuggestionService) SuggestEnvVars(ctx context.Context, repoURL, branch, rootDir string) ([]EnvExampleVariableSuggestion, error) {
-	// Parse repo URL to get owner and repo
 	u, err := url.Parse(repoURL)
 	if err != nil {
 		return nil, fmt.Errorf("invalid repository url: %w", err)

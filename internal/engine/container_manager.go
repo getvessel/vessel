@@ -63,8 +63,6 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, opts ContainerRun
 	}
 
 	if opts.HealthCheckPath != "" {
-		// Health check is now handled via engine-side HTTP probe in deployer_helpers.go
-		// and via Traefik labels below.
 	}
 
 	if opts.RuntimeMode != models.RuntimeModeWorker {

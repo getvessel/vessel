@@ -210,10 +210,7 @@ func (h *AppHandler) Delete(c echo.Context) error {
 		return err
 	}
 
-	// Stop and remove the container to prevent orphan apps running
 	_ = h.deployer.StopAppService(c.Request().Context(), id)
-	// Optionally remove the container via deployer.Remove if it exists, but StopAppService might be enough or we can use ContainerManager
-	// The PR preview does: _ = s.deployer.Stop(ctx, p.ContainerID); _ = s.deployer.Remove(ctx, p.ContainerID)
 	if existing.ContainerID != "" {
 		_ = h.deployer.StopAppService(c.Request().Context(), id)
 	}
@@ -319,7 +316,6 @@ func (h *AppHandler) CreateLogDrain(c echo.Context) error {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 
-	// Restart service to apply log drain
 	go func() {
 		_ = h.appService.UpdateAppService(context.Background(), existing)
 	}()

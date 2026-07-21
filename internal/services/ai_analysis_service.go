@@ -66,14 +66,6 @@ func (s *AIAnalysisService) ExplainDeploymentFailure(ctx context.Context, deploy
 
 	switch provider {
 	case "anthropic":
-		// Note: the current logic uses OpenAI compatible schemas. If Anthropic doesn't support OpenAI compatible JSON schema directly
-		// through a wrapper, we should implement a dedicated callAnthropic. For now, since "i have support for all ai providers too just like aeroplane",
-		// we assume we will route to a unified proxy or implement it. Wait, the user said "i have support for all ai providers too just like aeroplane"
-		// Aeroplane uses OpenAI API schema for Groq, Mistral, DeepSeek, xAI, Moonshot!
-		// But for Anthropic/Google we might need a specific impl if they don't have an OpenAI proxy.
-		// For simplicity, let's just pass the keys to callOpenAI and assume the BaseURL points to an OpenAI-compatible endpoint if not OpenAI.
-		// Actually, I'll just check if it's an OpenAI compatible one or return error for now if not implemented.
-		// Wait, Groq, Mistral, DeepSeek, xAI, Moonshot all have an OpenAI compatible endpoint!
 		return nil, errors.New("Anthropic is not fully supported yet in this AI pipeline without a custom proxy")
 	case "google":
 		return nil, errors.New("Google is not fully supported yet in this AI pipeline without a custom proxy")

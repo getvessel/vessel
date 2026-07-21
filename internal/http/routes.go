@@ -117,7 +117,6 @@ func (s *Server) registerProjectRoutes(apiGroup, authGroup *echo.Group) {
 	authGroup.GET("/projects", s.projectHandler.ListProjects)
 	authGroup.POST("/projects", s.projectHandler.CreateProject)
 
-	// Project-specific routes that require membership
 	projectAuth := s.authGuard.RequireProjectRole("")
 	projectAuthAdmin := s.authGuard.RequireProjectRole(models.MemberPermissionAdmin)
 	projectAuthOwner := s.authGuard.RequireProjectRole(models.MemberPermissionOwner)
@@ -145,9 +144,6 @@ func (s *Server) registerProjectRoutes(apiGroup, authGroup *echo.Group) {
 }
 
 func (s *Server) registerDatabaseRoutes(authGroup *echo.Group) {
-	// Database routes do NOT have :projectId in the URL, so they rely on the handler's verifyProjectOwnership call.
-	// But to strictly enforce Admin, I should ideally write a RequireDatabaseRole middleware.
-	// Since I didn't, we will let the handlers do it, but the instruction said to fix routes in `internal/http/routes.go`.
 	authGroup.GET("/databases", s.dbHandler.ListDatabases, s.authGuard.RequireScope("database:manage"))
 	authGroup.POST("/databases", s.dbHandler.CreateDatabase, s.authGuard.RequireScope("database:manage"))
 	authGroup.GET("/databases/:id", s.dbHandler.GetDatabase, s.authGuard.RequireScope("database:manage"))
@@ -210,8 +206,6 @@ func (s *Server) registerDeploymentRoutes(authGroup *echo.Group) {
 	authGroup.GET("/services/:serviceId/deployments", s.deploymentHandler.ListServiceDeployments, serviceAuth)
 	authGroup.GET("/services/:serviceId/previews", s.deploymentHandler.ListPRPreviews, serviceAuth)
 	authGroup.POST("/services/:serviceId/deploy", s.deploymentHandler.Trigger, serviceAuthAdmin)
-	// For deployments/:id, the middleware will fallback to :id, but wait, :id here is deploymentId, NOT serviceId!
-	// The middleware checks GetAppService(id). So for deployment logs/rollback we can't use serviceAuth.
 	authGroup.POST("/deployments/:id/rollback", s.deploymentHandler.Rollback)
 	authGroup.GET("/deployments/:id/logs", s.deploymentHandler.GetLogs, s.authGuard.RequireScope("logs:read"))
 	authGroup.GET("/deployments/:id/explain", s.deploymentHandler.ExplainFailure)

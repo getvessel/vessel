@@ -6,7 +6,6 @@ import (
 	"strings"
 )
 
-// ValidateURL ensures the URL is valid, not empty, and uses HTTP/HTTPS scheme.
 func ValidateURL(inputURL string) (string, error) {
 	trimmedURL := strings.TrimSpace(inputURL)
 	if trimmedURL == "" {
@@ -19,7 +18,6 @@ func ValidateURL(inputURL string) (string, error) {
 	return trimmedURL, nil
 }
 
-// ValidateEventTypes ensures no empty types and no commas.
 func ValidateEventTypes(eventTypes []string) ([]string, error) {
 	if eventTypes == nil {
 		return nil, nil

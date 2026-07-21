@@ -100,7 +100,6 @@ func (h *ProjectSettingsHandler) AddMember(c echo.Context) error {
 		req.Permission = models.MemberPermissionMember
 	}
 
-	// Prevent privilege escalation: An admin cannot create an owner
 	callerClaims, ok := c.Get("user").(*models.UserClaims)
 	if ok && callerClaims != nil && callerClaims.Role != "admin" { // global admin bypass
 		callerMember, err := h.settingsService.GetMember(c.Request().Context(), projectID, callerClaims.UserID)
