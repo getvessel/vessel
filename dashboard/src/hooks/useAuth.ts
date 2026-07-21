@@ -17,7 +17,7 @@ export const useLogin = () => {
         return;
       }
 
-      useAuthStore.getState().setAuth(data.token, data.user);
+      useAuthStore.getState().setAuth(data.token, data.refreshToken || null, data.user);
 
       queryClient.clear();
 
@@ -44,7 +44,7 @@ export const useRegister = () => {
         return;
       }
 
-      useAuthStore.getState().setAuth(data.token, data.user);
+      useAuthStore.getState().setAuth(data.token, data.refreshToken || null, data.user);
       queryClient.clear();
       await router.navigate({ to: '/' });
 

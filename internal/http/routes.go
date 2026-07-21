@@ -75,6 +75,7 @@ func (s *Server) RequireServiceRole(minPermission models.MemberPermission) echo.
 func (s *Server) registerAuthRoutes(apiGroup, authGroup *echo.Group) {
 	apiGroup.POST("/auth/signup", s.authHandler.Register, s.authRateLimiter.Middleware)
 	apiGroup.POST("/auth/signin", s.authHandler.Login, s.authRateLimiter.Middleware)
+	apiGroup.POST("/auth/refresh", s.authHandler.Refresh)
 	apiGroup.POST("/auth/forgot-password", s.authHandler.ForgotPassword, s.authRateLimiter.Middleware)
 	apiGroup.POST("/auth/reset-password", s.authHandler.ResetPassword, s.authRateLimiter.Middleware)
 	apiGroup.POST("/auth/logout", s.authHandler.Logout)

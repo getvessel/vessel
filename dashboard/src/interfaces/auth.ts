@@ -3,6 +3,7 @@ import type { User } from './users';
 
 export interface AuthResponse {
   token: string;
+  refreshToken?: string;
   user: User;
 }
 

@@ -52,18 +52,18 @@ func NewOnboardingService(
 	}
 }
 
-func (s *OnboardingService) CompleteSetup(ctx context.Context, req SetupRequest) (*models.User, string, error) {
+func (s *OnboardingService) CompleteSetup(ctx context.Context, req SetupRequest) (*models.User, string, string, error) {
 	count, err := s.userService.CountUsers(ctx)
 	if err != nil {
-		return nil, "", fmt.Errorf("failed to check user count: %w", err)
+		return nil, "", "", fmt.Errorf("failed to check user count: %w", err)
 	}
 	if count > 0 {
-		return nil, "", fmt.Errorf("setup has already been completed")
+		return nil, "", "", fmt.Errorf("setup has already been completed")
 	}
 
-	u, token, err := s.authService.Register(ctx, req.Name, req.Email, req.Password)
+	u, token, refreshToken, err := s.authService.Register(ctx, req.Name, req.Email, req.Password)
 	if err != nil {
-		return nil, "", fmt.Errorf("registration failed: %w", err)
+		return nil, "", "", fmt.Errorf("registration failed: %w", err)
 	}
 
 	if req.Env.JWTSecret == "" {
@@ -80,7 +80,7 @@ func (s *OnboardingService) CompleteSetup(ctx context.Context, req SetupRequest)
 		}
 	}
 
-	return u, token, nil
+	return u, token, refreshToken, nil
 }
 
 func (s *OnboardingService) generateJWTSecret() string {

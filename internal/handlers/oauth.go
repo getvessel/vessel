@@ -85,11 +85,19 @@ func (h *OAuthHandler) OAuthCallback(c echo.Context) error {
 	if code == "" {
 		return utils.Error(c, http.StatusBadRequest, "missing authorization code parameter")
 	}
-	token, _, err := h.oauthService.HandleCallback(c.Request().Context(), providerName, code)
+	token, refreshToken, _, err := h.oauthService.HandleCallback(c.Request().Context(), providerName, code)
 	if err != nil {
 		return utils.Error(c, http.StatusUnauthorized, err.Error())
 	}
 	SetAuthCookie(c, token)
+	c.SetCookie(&http.Cookie{
+		Name:     "vessl_refresh_token",
+		Value:    refreshToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	})
 	return c.Redirect(http.StatusTemporaryRedirect, "/")
 }
 
