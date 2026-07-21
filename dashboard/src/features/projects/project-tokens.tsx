@@ -12,12 +12,27 @@ import {
   TableHeader,
   TableRow,
 } from '#/components/ui/table';
-import { useCreateToken, useDeleteToken, useListTokens } from '#/hooks/useProjectSettings';
+import { useGetProfile } from '#/hooks/useProfile';
+import {
+  useCreateToken,
+  useDeleteToken,
+  useListMembers,
+  useListTokens,
+} from '#/hooks/useProjectSettings';
 
 export function ProjectTokens({ projectId }: { projectId: string }) {
   const { data: tokens, isLoading } = useListTokens(projectId);
+  const { data: members } = useListMembers(projectId);
+  const { data: profile } = useGetProfile();
   const { mutateAsync: createToken, isPending: isCreating } = useCreateToken();
   const { mutateAsync: deleteToken, isPending: isDeleting } = useDeleteToken();
+
+  const currentUserRole =
+    members?.data?.find(
+      (m: any) => m.email === profile?.data?.email || m.user_id === profile?.data?.id
+    )?.permission || 'member';
+
+  const canManage = String(currentUserRole) === 'owner' || String(currentUserRole) === 'admin';
 
   const [name, setName] = useState('');
   const [newTokenValue, setNewTokenValue] = useState<string | null>(null);
@@ -62,29 +77,31 @@ export function ProjectTokens({ projectId }: { projectId: string }) {
         </p>
       </div>
 
-      <form
-        onSubmit={handleCreate}
-        className="flex items-end gap-4 rounded-lg border bg-gray-50 p-4"
-      >
-        <div className="flex-1 space-y-2">
-          <Label htmlFor="tokenName">Token Name</Label>
-          <Input
-            id="tokenName"
-            placeholder="e.g. CI/CD Pipeline"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-        <Button type="submit" disabled={isCreating}>
-          {isCreating ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Plus className="mr-2 h-4 w-4" />
-          )}
-          Create Token
-        </Button>
-      </form>
+      {canManage && (
+        <form
+          onSubmit={handleCreate}
+          className="flex items-end gap-4 rounded-lg border bg-gray-50 p-4"
+        >
+          <div className="flex-1 space-y-2">
+            <Label htmlFor="tokenName">Token Name</Label>
+            <Input
+              id="tokenName"
+              placeholder="e.g. CI/CD Pipeline"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <Button type="submit" disabled={isCreating}>
+            {isCreating ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="mr-2 h-4 w-4" />
+            )}
+            Create Token
+          </Button>
+        </form>
+      )}
 
       {newTokenValue && (
         <div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-4">
@@ -131,15 +148,17 @@ export function ProjectTokens({ projectId }: { projectId: string }) {
                   <TableCell className="font-medium">{token.name}</TableCell>
                   <TableCell>{new Date(token.created_at).toLocaleDateString()}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => handleDelete(token.id)}
-                      disabled={isDeleting}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {canManage && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                        onClick={() => handleDelete(token.id)}
+                        disabled={isDeleting}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -120,6 +121,22 @@ func (d *Deployer) waitForHealthyContainer(ctx context.Context, containerName st
 					return false
 				}
 				// if "starting", we keep waiting
+			} else if healthCheckPath != "" {
+				// No docker healthcheck, use engine-side HTTP probe
+				ip := ""
+				for _, net := range inspect.NetworkSettings.Networks {
+					ip = net.IPAddress
+					break
+				}
+				if ip != "" {
+					resp, err := http.Get(fmt.Sprintf("http://%s:%d%s", ip, internalPort, healthCheckPath))
+					if err == nil {
+						resp.Body.Close()
+						if resp.StatusCode >= 200 && resp.StatusCode < 400 {
+							return true
+						}
+					}
+				}
 			} else {
 				// No healthcheck configured or health state missing, assume healthy if running
 				return true

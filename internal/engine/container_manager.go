@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"time"
 
 	"github.com/containerd/errdefs"
 	"github.com/docker/docker/api/types"
@@ -64,12 +63,8 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, opts ContainerRun
 	}
 
 	if opts.HealthCheckPath != "" {
-		config.Healthcheck = &container.HealthConfig{
-			Test:     []string{"CMD-SHELL", fmt.Sprintf("wget -q --spider http://localhost:%d%s || curl -f http://localhost:%d%s || exit 1", opts.InternalPort, opts.HealthCheckPath, opts.InternalPort, opts.HealthCheckPath)},
-			Interval: 10 * time.Second,
-			Timeout:  5 * time.Second,
-			Retries:  3,
-		}
+		// Health check is now handled via engine-side HTTP probe in deployer_helpers.go
+		// and via Traefik labels below.
 	}
 
 	if opts.RuntimeMode != models.RuntimeModeWorker {
@@ -82,7 +77,7 @@ func (c *ContainerManager) CreateAndStart(ctx context.Context, opts ContainerRun
 	var binds []string
 	if len(opts.Volumes) > 0 {
 		for _, v := range opts.Volumes {
-			if err := validateHostPath(v.HostPath); err != nil {
+			if err := validateHostPath(v.HostPath, opts.ServiceID); err != nil {
 				return "", fmt.Errorf("invalid volume host path %s: %w", v.HostPath, err)
 			}
 			binds = append(binds, fmt.Sprintf("%s:%s", v.HostPath, v.ContainerPath))
@@ -206,15 +201,16 @@ func (c *ContainerManager) CleanupOrphanedContainers(ctx context.Context, prefix
 	return nil
 }
 
-func validateHostPath(path string) error {
+func validateHostPath(path string, serviceID string) error {
 	forbidden := []string{"/var/run/docker.sock", "/proc", "/sys", "/etc", "/root", "/boot"}
 	for _, f := range forbidden {
 		if strings.Contains(path, f) {
 			return fmt.Errorf("forbidden path")
 		}
 	}
-	if !strings.HasPrefix(path, "/data/vessl/") {
-		return fmt.Errorf("must start with /data/vessl/")
+	expectedPrefix := fmt.Sprintf("/data/vessl/%s/", serviceID)
+	if !strings.HasPrefix(path, expectedPrefix) {
+		return fmt.Errorf("must start with %s", expectedPrefix)
 	}
 	return nil
 }

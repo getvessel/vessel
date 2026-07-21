@@ -11,6 +11,7 @@ type DeploymentCompleted struct {
 	ServiceID  string
 	Status     string
 	CommitHash string
+	Branch     string
 	DeployTime time.Duration
 }
 

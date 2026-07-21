@@ -296,9 +296,7 @@ export function BackupsList() {
                       size="sm"
                       onClick={() => handleRestore(record.id)}
                       disabled={
-                        restoreBackup.isPending ||
-                        record.status !== 'completed' ||
-                        (!record.s3Url && !record.filePath)
+                        restoreBackup.isPending || record.status !== 'completed' || !record.filePath
                       }
                     >
                       <ArchiveRestore className="mr-2 h-4 w-4" />

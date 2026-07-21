@@ -46,9 +46,9 @@ export function WebTerminal({ serviceId }: WebTerminalProps) {
 
     window.addEventListener('resize', handleResize);
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHost = env.VITE_API_URL.replace(/^http(s?):\/\//, '');
-    const wsUrl = `${protocol}//${wsHost}/ws/services/${serviceId}/terminal`;
+    const apiUrl = new URL(env.VITE_API_URL || '', window.location.origin);
+    const protocol = apiUrl.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${apiUrl.host}/api/ws/services/${serviceId}/terminal`;
 
     const socket = new WebSocket(wsUrl);
     socket.binaryType = 'arraybuffer';

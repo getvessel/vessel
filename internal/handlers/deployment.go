@@ -64,6 +64,14 @@ func (h *DeploymentHandler) ListServiceDeployments(c echo.Context) error {
 		return utils.Error(c, http.StatusBadRequest, "missing serviceId parameter")
 	}
 
+	svc, err := h.appService.GetAppService(c.Request().Context(), serviceID)
+	if err != nil || svc == nil {
+		return utils.Error(c, http.StatusNotFound, "service not found")
+	}
+	if err := h.verifyProjectOwnership(c, svc.ProjectID); err != nil {
+		return err
+	}
+
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	if page < 1 {
 		page = 1
@@ -128,6 +136,11 @@ func (h *DeploymentHandler) Rollback(c echo.Context) error {
 	if err != nil || targetDep == nil {
 		return utils.Error(c, http.StatusNotFound, "deployment not found")
 	}
+
+	if err := h.verifyProjectOwnership(c, targetDep.ProjectID); err != nil {
+		return err
+	}
+
 	newDep := &models.Deployment{
 		ServiceID:     targetDep.ServiceID,
 		EnvironmentID: targetDep.EnvironmentID,
@@ -164,10 +177,15 @@ func (h *DeploymentHandler) GetLogs(c echo.Context) error {
 	if id == "" {
 		return utils.Error(c, http.StatusBadRequest, "missing id parameter")
 	}
+
 	dep, err := h.deploymentService.GetDeployment(c.Request().Context(), id)
 	if err != nil || dep == nil {
 		return utils.Error(c, http.StatusNotFound, "deployment not found")
 	}
+	if err := h.verifyProjectOwnership(c, dep.ProjectID); err != nil {
+		return err
+	}
+
 	return utils.Success(c, "Logs fetched successfully", map[string]string{
 		"id":        dep.ID,
 		"buildLogs": dep.BuildLogs,
@@ -179,6 +197,14 @@ func (h *DeploymentHandler) GetMetrics(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	if serviceID == "" {
 		return utils.Error(c, http.StatusBadRequest, "serviceId is required")
+	}
+
+	svc, err := h.appService.GetAppService(c.Request().Context(), serviceID)
+	if err != nil || svc == nil {
+		return utils.Error(c, http.StatusNotFound, "service not found")
+	}
+	if err := h.verifyProjectOwnership(c, svc.ProjectID); err != nil {
+		return err
 	}
 
 	health, err := h.deploymentService.GetMetrics(c.Request().Context(), serviceID)
@@ -225,6 +251,14 @@ func (h *DeploymentHandler) ListPRPreviews(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	if serviceID == "" {
 		return utils.Error(c, http.StatusBadRequest, "missing serviceId parameter")
+	}
+
+	svc, err := h.appService.GetAppService(c.Request().Context(), serviceID)
+	if err != nil || svc == nil {
+		return utils.Error(c, http.StatusNotFound, "service not found")
+	}
+	if err := h.verifyProjectOwnership(c, svc.ProjectID); err != nil {
+		return err
 	}
 
 	previews, err := h.prPreviewService.ListByApp(c.Request().Context(), serviceID)

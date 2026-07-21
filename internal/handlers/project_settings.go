@@ -100,6 +100,17 @@ func (h *ProjectSettingsHandler) AddMember(c echo.Context) error {
 		req.Permission = models.MemberPermissionMember
 	}
 
+	// Prevent privilege escalation: An admin cannot create an owner
+	callerClaims, ok := c.Get("user").(*models.UserClaims)
+	if ok && callerClaims != nil && callerClaims.Role != "admin" { // global admin bypass
+		callerMember, err := h.settingsService.GetMember(c.Request().Context(), projectID, callerClaims.UserID)
+		if err == nil && callerMember != nil {
+			if callerMember.Permission != models.MemberPermissionOwner && req.Permission == models.MemberPermissionOwner {
+				return utils.Error(c, http.StatusForbidden, "only project owners can assign the owner role")
+			}
+		}
+	}
+
 	scheme := "http"
 	if c.Request().TLS != nil || c.Request().Header.Get("X-Forwarded-Proto") == "https" {
 		scheme = "https"

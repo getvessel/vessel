@@ -16,16 +16,16 @@ var domainsCmd = &cobra.Command{
 
 var domainsListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List domains for a project",
+	Short: "List domains for a service",
 	Run: func(cmd *cobra.Command, args []string) {
-		projectID, _ := cmd.Flags().GetString("project")
-		if projectID == "" {
-			fmt.Println("Error: --project flag is required")
+		serviceID, _ := cmd.Flags().GetString("service")
+		if serviceID == "" {
+			fmt.Println("Error: --service flag is required")
 			os.Exit(1)
 		}
 
 		client := getClient()
-		domains, err := client.ListDomains(projectID)
+		domains, err := client.ListDomains(serviceID)
 		if err != nil {
 			fmt.Printf("Error listing domains: %v\n", err)
 			os.Exit(1)
@@ -42,7 +42,7 @@ var domainsListCmd = &cobra.Command{
 
 var domainsAddCmd = &cobra.Command{
 	Use:   "add",
-	Short: "Add a domain to a project",
+	Short: "Add a domain to a service",
 	Run: func(cmd *cobra.Command, args []string) {
 		serviceID, _ := cmd.Flags().GetString("service")
 		domainName, _ := cmd.Flags().GetString("domain")
@@ -86,9 +86,9 @@ var domainsRemoveCmd = &cobra.Command{
 }
 
 func init() {
-	domainsListCmd.Flags().StringP("project", "p", "", "Project ID (required)")
+	domainsListCmd.Flags().StringP("service", "s", "", "Service ID (required)")
 
-	domainsAddCmd.Flags().StringP("project", "p", "", "Project ID (required)")
+	domainsAddCmd.Flags().StringP("service", "s", "", "Service ID (required)")
 	domainsAddCmd.Flags().StringP("domain", "d", "", "Domain name (required)")
 	domainsAddCmd.Flags().String("redirect", "", "Redirect To URL")
 	domainsAddCmd.Flags().String("prefix", "", "Path Prefix")

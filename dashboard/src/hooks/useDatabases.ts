@@ -15,6 +15,14 @@ export const useGetDatabase = (id: string) => {
   });
 };
 
+export const useGetDatabases = (projectId: string) => {
+  return useQuery({
+    queryKey: ['databases', 'getDatabases', projectId].filter(Boolean),
+    queryFn: () => databasesService.getDatabases(projectId),
+    enabled: !!projectId,
+  });
+};
+
 export const useCreateDatabase = () => {
   const queryClient = useQueryClient();
   return useMutation({

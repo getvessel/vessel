@@ -1,7 +1,11 @@
 package handlers
 
 import (
+	"context"
+	"errors"
+	"net"
 	"net/http"
+	"net/url"
 
 	"github.com/labstack/echo/v4"
 
@@ -168,6 +172,8 @@ func (h *AppHandler) Update(c echo.Context) error {
 		return utils.Error(c, http.StatusBadRequest, "invalid health check path")
 	}
 	existing.Name = req.Name
+	existing.ProjectID = req.ProjectID
+	existing.EnvironmentID = req.EnvironmentID
 	existing.RepositoryURL = req.RepositoryURL
 	existing.Branch = req.Branch
 	existing.RootDirectory = req.RootDirectory
@@ -203,6 +209,15 @@ func (h *AppHandler) Delete(c echo.Context) error {
 	if err := h.verifyProjectOwnership(c, existing.ProjectID); err != nil {
 		return err
 	}
+
+	// Stop and remove the container to prevent orphan apps running
+	_ = h.deployer.StopAppService(c.Request().Context(), id)
+	// Optionally remove the container via deployer.Remove if it exists, but StopAppService might be enough or we can use ContainerManager
+	// The PR preview does: _ = s.deployer.Stop(ctx, p.ContainerID); _ = s.deployer.Remove(ctx, p.ContainerID)
+	if existing.ContainerID != "" {
+		_ = h.deployer.StopAppService(c.Request().Context(), id)
+	}
+
 	if err := h.appService.DeleteAppService(c.Request().Context(), id); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
@@ -273,6 +288,11 @@ func (h *AppHandler) RestartService(c echo.Context) error {
 
 func (h *AppHandler) CreateLogDrain(c echo.Context) error {
 	id := c.Param("id")
+	var req models.CreateLogDrainRequest
+	if err := c.Bind(&req); err != nil {
+		return utils.Error(c, http.StatusBadRequest, "invalid payload")
+	}
+
 	existing, err := h.appService.GetAppService(c.Request().Context(), id)
 	if err != nil || existing == nil {
 		return utils.Error(c, http.StatusNotFound, "app service not found")
@@ -280,10 +300,13 @@ func (h *AppHandler) CreateLogDrain(c echo.Context) error {
 	if err := h.verifyProjectOwnership(c, existing.ProjectID); err != nil {
 		return err
 	}
-	var req models.CreateLogDrainRequest
-	if err := c.Bind(&req); err != nil {
-		return utils.Error(c, http.StatusBadRequest, "invalid payload")
+
+	if req.EndpointURL != "" {
+		if err := validateDrainURL(req.EndpointURL); err != nil {
+			return utils.Error(c, http.StatusBadRequest, err.Error())
+		}
 	}
+
 	drain := &models.LogDrain{
 		ServiceID:   existing.ID,
 		ProjectID:   existing.ProjectID,
@@ -295,6 +318,12 @@ func (h *AppHandler) CreateLogDrain(c echo.Context) error {
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
+
+	// Restart service to apply log drain
+	go func() {
+		_ = h.appService.UpdateAppService(context.Background(), existing)
+	}()
+	created.AuthToken = ""
 	return utils.Created(c, "Log drain created successfully", created)
 }
 
@@ -310,6 +339,9 @@ func (h *AppHandler) ListLogDrains(c echo.Context) error {
 	drains, err := h.appService.ListLogDrains(c.Request().Context(), id)
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+	for _, drain := range drains {
+		drain.AuthToken = ""
 	}
 	return utils.Success(c, "Operation successful", drains)
 }
@@ -327,7 +359,33 @@ func (h *AppHandler) DeleteLogDrain(c echo.Context) error {
 	if err := h.appService.DeleteLogDrain(c.Request().Context(), drainID, id); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
+
+	go func() {
+		_ = h.appService.UpdateAppService(context.Background(), existing)
+	}()
+
 	return c.NoContent(http.StatusNoContent)
+}
+
+func validateDrainURL(u string) error {
+	parsed, err := url.Parse(u)
+	if err != nil {
+		return errors.New("invalid url format")
+	}
+	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+		return errors.New("url must use http or https")
+	}
+	host := parsed.Hostname()
+	ips, err := net.LookupIP(host)
+	if err != nil {
+		return nil
+	}
+	for _, ip := range ips {
+		if ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified() {
+			return errors.New("internal or private IPs are not allowed for log drains")
+		}
+	}
+	return nil
 }
 
 func isValidHealthCheckPath(path string) bool {

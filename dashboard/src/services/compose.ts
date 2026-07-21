@@ -16,7 +16,7 @@ export interface ComposeAnalyzeResponse {
 class ComposeService {
   async analyze(req: ComposeAnalyzeRequest): Promise<ComposeAnalyzeResponse> {
     const response = await apiClient.post<{ data: ComposeAnalyzeResponse }>(
-      '/compose/analyze',
+      `/projects/${req.projectId}/compose/analyze`,
       req
     );
     return response.data;
@@ -29,7 +29,10 @@ class ComposeService {
     const blob = new Blob([composeContent], { type: 'text/yaml' });
     formData.append('file', blob, 'docker-compose.yml');
 
-    const response = await apiClient.post<{ data: any }>('/compose/deploy', formData);
+    const response = await apiClient.post<{ data: any }>(
+      `/projects/${projectId}/compose/deploy`,
+      formData
+    );
     return response.data;
   }
 }

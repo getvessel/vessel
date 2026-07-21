@@ -29,6 +29,8 @@ type Server struct {
 	cronManager            *engine.CronManager
 	serviceLinker          *services.ServiceLinker
 	dispatcherService      *core.DispatcherService
+	projectService         *services.ProjectService
+	appService             *services.AppService
 	appServiceHandler      *handlers.AppHandler
 	dbHandler              *handlers.DatabaseHandler
 	scheduledTaskHandler   *handlers.ScheduledTaskHandler

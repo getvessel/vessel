@@ -84,6 +84,7 @@ func (s *PRPreviewService) DeployPRPreview(ctx context.Context, opts DeployPRPre
 		bgCtx := context.Background()
 		sourceDir := filepath.Join(utils.GetDataDir(), "builds", "pr-previews", preview.ID)
 		clonedApp := *app
+		clonedApp.ID = preview.ID
 		clonedApp.Branch = opts.Branch
 		if err := s.gitService.CloneOrPullAppRepository(bgCtx, &clonedApp, sourceDir, nil); err != nil {
 			slog.Warn("PR preview clone failed", "branch", opts.Branch, "err", err)
@@ -114,10 +115,9 @@ func (s *PRPreviewService) DestroyPRPreview(ctx context.Context, appID string, p
 		return err
 	}
 	for _, p := range previews {
-		if p.ContainerID != "" {
-			_ = s.deployer.Stop(ctx, p.ContainerID)
-			_ = s.deployer.Remove(ctx, p.ContainerID)
-		}
+		_ = s.deployer.StopAppService(ctx, p.ID)
+		sourceDir := filepath.Join(utils.GetDataDir(), "builds", "pr-previews", p.ID)
+		_ = os.RemoveAll(sourceDir)
 		_ = s.repo.Delete(ctx, p.ID)
 	}
 	return nil

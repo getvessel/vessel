@@ -122,6 +122,10 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	authService := services.NewAuthService(userRepo, settingsRepo, notifRepo, projectSettingsRepo, tokenService, mailerService)
 	projectSettingsService := services.NewProjectSettingsService(projectSettingsRepo, userRepo, authService)
 	dispatcherService := core.NewDispatcherService(settingsRepo, notifRepo, userRepo, mailerService)
+
+	deploymentListeners := core.NewDeploymentListeners(dispatcherService, appRepo)
+	deploymentListeners.Register()
+
 	scheduledTaskService := services.NewScheduledTaskService(scheduledTaskRepo, cronManager)
 	canvasService := services.NewCanvasService(canvasRepo)
 	gitService := services.NewGitService(gitRepo)
@@ -215,6 +219,8 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		cronManager:            cronManager,
 		serviceLinker:          serviceLinker,
 		dispatcherService:      dispatcherService,
+		projectService:         projectService,
+		appService:             appService,
 		appServiceHandler:      appHandler,
 		dbHandler:              databaseHandler,
 		scheduledTaskHandler:   scheduledTaskHandler,

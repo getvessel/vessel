@@ -7,6 +7,7 @@ import { DataBrowser } from '#/features/databases/data-browser';
 import { DatabaseConnectionCard } from '#/features/databases/database-connection-card';
 import { DatabaseImportModal } from '#/features/databases/database-import-modal';
 import { DatabaseNetworking } from '#/features/databases/database-networking';
+import { RedisKeyBrowser } from '#/features/databases/redis-key-browser';
 
 import { HealthcheckCard } from '#/features/services/healthcheck-card';
 import { MaintenanceModeCard } from '#/features/services/maintenance-mode-card';
@@ -54,6 +55,8 @@ function ServiceIndexRoute() {
         />
         {['postgres', 'postgresql', 'mysql', 'mariadb'].includes(db.engine) ? (
           <DataBrowser databaseId={db.id} />
+        ) : db.engine === 'redis' ? (
+          <RedisKeyBrowser databaseId={db.id} />
         ) : (
           <div className="rounded-lg border p-8 text-center text-muted-foreground">
             Data browser coming soon for {db.engine}

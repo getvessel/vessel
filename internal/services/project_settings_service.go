@@ -140,3 +140,10 @@ func (s *ProjectSettingsService) RemoveMember(ctx context.Context, id, projectID
 	}
 	return s.repo.RemoveMember(ctx, id, projectID)
 }
+
+func (s *ProjectSettingsService) GetMember(ctx context.Context, projectID, userID string) (*models.ProjectMember, error) {
+	if projectID == "" || userID == "" {
+		return nil, errors.New("projectId and userId required")
+	}
+	return s.repo.GetMember(ctx, projectID, userID)
+}

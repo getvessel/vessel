@@ -47,28 +47,25 @@ func (h *ProjectHandler) CreateProject(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid payload")
 	}
-	p, err := h.projectService.CreateProjectFromRequest(c.Request().Context(), &req)
-	if err != nil {
-		return utils.Error(c, http.StatusInternalServerError, err.Error())
-	}
 
 	userClaims, ok := c.Get("user").(*models.UserClaims)
-	if ok && userClaims != nil {
-		_, err := h.projectSettingsService.AddMemberByEmail(c.Request().Context(), services.AddMemberOpts{
-			ProjectID:  p.ID,
-			Email:      userClaims.Email,
-			Permission: models.MemberPermissionOwner,
-		})
-		if err != nil {
-			_ = h.projectService.DeleteProject(c.Request().Context(), p.ID)
-			return utils.Error(c, http.StatusInternalServerError, "failed to set project owner")
-		}
+	var p *models.ProjectConfig
+	var err error
 
+	if ok && userClaims != nil {
+		p, err = h.projectService.CreateProjectWithMemberFromRequest(c.Request().Context(), &req, userClaims.UserID, string(models.MemberPermissionOwner))
+		if err != nil {
+			return utils.Error(c, http.StatusInternalServerError, "failed to create project and assign owner: "+err.Error())
+		}
 		telemetry.Track(userClaims.Email, "project_created", map[string]interface{}{
 			"project_id": p.ID,
 			"name":       p.Name,
 		})
 	} else {
+		p, err = h.projectService.CreateProjectFromRequest(c.Request().Context(), &req)
+		if err != nil {
+			return utils.Error(c, http.StatusInternalServerError, err.Error())
+		}
 		telemetry.Track("anonymous", "project_created", map[string]interface{}{
 			"project_id": p.ID,
 			"name":       p.Name,

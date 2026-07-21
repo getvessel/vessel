@@ -225,6 +225,13 @@ func (g *AuthGuard) RequireProjectRole(minPermission models.MemberPermission) ec
 				if c.Get("project_id") != projectID {
 					return utils.Error(c, http.StatusForbidden, "api token not authorized for this project")
 				}
+				// API tokens shouldn't bypass admin/owner requirements.
+				if minPermission != "" && minPermission != models.MemberPermissionMember {
+					// Currently API tokens do not have a built-in role, they inherit the project.
+					// We should probably block them from destructive/admin actions unless they are specifically admin tokens.
+					// For now, block API tokens from admin/owner actions.
+					return utils.Error(c, http.StatusForbidden, "api tokens cannot perform administrative actions")
+				}
 				return next(c)
 			}
 

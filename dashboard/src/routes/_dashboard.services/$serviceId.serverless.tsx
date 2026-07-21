@@ -37,7 +37,8 @@ export const Route = createFileRoute('/_dashboard/services/$serviceId/serverless
 function ServiceServerlessRoute() {
   const { serviceId } = Route.useParams();
   const { data: appData, isLoading: appLoading } = useGetApp(serviceId);
-  const { data: codeData, isLoading: codeLoading } = useGetCode(serviceId);
+  const app = appData?.data;
+  const { data: codeData, isLoading: codeLoading } = useGetCode(app?.projectId, serviceId);
   const saveCode = useSaveCode();
 
   const [runtime, setRuntime] = useState('nodejs');
@@ -45,8 +46,10 @@ function ServiceServerlessRoute() {
 
   useEffect(() => {
     if (codeData?.data) {
-      if (codeData.data.codeContent) setCode(codeData.data.codeContent);
-      if (codeData.data.runtime) setRuntime(codeData.data.runtime);
+      const respData = codeData.data as any;
+      const codeObj = respData.code || respData;
+      if (codeObj.codeContent) setCode(codeObj.codeContent);
+      if (codeObj.runtime) setRuntime(codeObj.runtime);
     }
   }, [codeData]);
 
@@ -65,19 +68,19 @@ function ServiceServerlessRoute() {
     );
   }
 
-  const app = appData?.data;
-
   if (!app) {
     return <div>Service not found.</div>;
   }
 
   const handleSave = async () => {
+    if (!app?.projectId) return;
     try {
       await saveCode.mutateAsync({
+        projectId: app.projectId,
         serviceId,
         payload: { codeContent: code, runtime },
       });
-      toast.success('Function code saved successfully. You can now deploy this service.');
+      toast.success('Function code saved successfully.');
     } catch (err: any) {
       toast.error(err.message || 'Failed to save code');
     }
