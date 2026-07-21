@@ -24,16 +24,15 @@ export function UserDeleteDialog({ target, onClose }: UserDeleteDialogProps) {
     try {
       await deleteUser(target.id);
       toast.success(`${target.name} removed`);
+      onClose();
     } catch {
       toast.error('Failed to remove user');
-    } finally {
-      onClose();
     }
   };
 
   return (
     <Dialog open={!!target} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[400px] [&>button]:hidden">
+      <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-100 [&>button]:hidden">
         <div className="p-5">
           <div className="flex items-start justify-between">
             <div className="flex flex-col">
@@ -41,10 +40,7 @@ export function UserDeleteDialog({ target, onClose }: UserDeleteDialogProps) {
                 <Trash2 className="h-5 w-5" />
                 Remove User
               </DialogTitle>
-              <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
-                <Trash2 className="h-3 w-3" />
-                This will permanently remove {target?.email}
-              </DialogDescription>
+              <DialogDescription>This will permanently remove {target?.email}</DialogDescription>
             </div>
             <DialogClose asChild>
               <Button

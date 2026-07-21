@@ -156,7 +156,7 @@ export function ProfileEmailForm() {
       </form>
 
       <Dialog open={otpOpen} onOpenChange={setOtpOpen}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[400px] [&>button]:hidden">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-100 [&>button]:hidden">
           <div className="px-5 pt-5 pb-4">
             <div className="flex items-start justify-between">
               <div className="flex flex-col">
@@ -164,10 +164,7 @@ export function ProfileEmailForm() {
                   <Mail className="h-5 w-5 text-primary" />
                   Verify Email Change
                 </DialogTitle>
-                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
-                  <Mail className="h-3 w-3" />
-                  Code sent to new email
-                </DialogDescription>
+                <DialogDescription>Code sent to new email</DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button

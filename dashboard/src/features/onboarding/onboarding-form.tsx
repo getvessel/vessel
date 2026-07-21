@@ -9,16 +9,16 @@ import {
   Settings,
   Shield,
 } from 'lucide-react';
-import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Button } from '#/components/ui/button';
 import { useSetup } from '#/hooks/useAuth';
+import { useOnboardingStore } from '#/stores/onboardingStore';
 import { ImportModal, type SetupSchema, StepDomain, StepOwner, StepRuntime, setupSchema } from '.';
 
 export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
   const { mutateAsync: setupUser, isPending } = useSetup();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const currentStep = useOnboardingStore((state) => state.currentStep);
+  const isImportModalOpen = useOnboardingStore((state) => state.isImportModalOpen);
 
   const methods = useForm<SetupSchema>({
     resolver: zodResolver(setupSchema),
@@ -56,15 +56,21 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
 
     const isValid = await trigger(fieldsToValidate);
     if (isValid) {
-      setCurrentStep((prev) => Math.min(prev + 1, 3));
+      if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      useOnboardingStore.getState().nextStep();
     }
   };
 
-  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const prevStep = () => useOnboardingStore.getState().prevStep();
 
   const onSubmit = async (data: SetupSchema) => {
     if (currentStep !== 3) {
       return nextStep();
+    }
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
     }
     try {
       await setupUser(data);
@@ -158,19 +164,7 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
       </div>
 
       <FormProvider {...methods}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              if (currentStep < 3) {
-                nextStep();
-              } else {
-                handleSubmit(onSubmit)(e);
-              }
-            }
-          }}
-        >
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6 min-h-87.5 rounded-xl border border-border/50 bg-card/40 p-6 shadow-xl backdrop-blur-xl">
             <div className="mb-6">
               <p className="mb-3 font-bold text-primary text-xs uppercase tracking-widest">
@@ -222,13 +216,16 @@ export const OnboardingForm = ({ cwd }: { cwd?: string }) => {
       <div className="mt-16 flex justify-center border-border/50 border-t pt-10">
         <Button
           variant="outline"
-          onClick={() => setIsImportModalOpen(true)}
+          onClick={() => useOnboardingStore.getState().setImportModalOpen(true)}
           className="flex h-11 items-center gap-2 rounded-xl bg-background px-6 font-semibold text-muted-foreground text-xs uppercase tracking-widest transition-all duration-300 hover:border-primary/50 hover:text-foreground"
         >
           <Database className="h-4 w-4" />
           IMPORT EXISTING VESSL
         </Button>
-        <ImportModal open={isImportModalOpen} onOpenChange={setIsImportModalOpen} />
+        <ImportModal
+          open={isImportModalOpen}
+          onOpenChange={useOnboardingStore.getState().setImportModalOpen}
+        />
       </div>
     </div>
   );

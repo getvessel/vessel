@@ -29,9 +29,11 @@ type Server struct {
 	cronManager            *engine.CronManager
 	serviceLinker          *services.ServiceLinker
 	dispatcherService      *core.DispatcherService
+	projectService         *services.ProjectService
+	appService             *services.AppService
 	appServiceHandler      *handlers.AppHandler
 	dbHandler              *handlers.DatabaseHandler
-	jobHandler             *handlers.JobHandler
+	scheduledTaskHandler   *handlers.ScheduledTaskHandler
 	canvasHandler          *handlers.CanvasHandler
 	terminalHandler        *handlers.TerminalHandler
 	deploymentHandler      *handlers.DeploymentHandler
@@ -64,6 +66,7 @@ type Server struct {
 	metricsHandler         *handlers.MetricsHandler
 	logHandler             *handlers.LogHandler
 	auditLogHandler        *handlers.AuditLogHandler
+	exampleHandler         *handlers.ExampleHandler
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

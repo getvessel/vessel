@@ -7,6 +7,14 @@ import { Steps } from '@astrojs/starlight/components';
 
 Vessl includes built-in tools to monitor server health, automatically clean up unused resources, and update itself without any manual intervention.
 
+## Application Maintenance Mode
+
+Vessl allows you to instantly place any running Application Service into **Maintenance Mode**.
+
+- **What it does**: When enabled, the underlying container is gracefully stopped, and an `nginx:alpine` container serving a static "Under Maintenance" HTML page takes its place using the same routing rules and domain names.
+- **When to use it**: This is extremely useful when you need to perform manual, time-consuming database migrations, heavy application updates, or emergency patching without throwing 502 Bad Gateway errors to your users.
+- **How to toggle**: Navigate to the specific Service's **Configuration** tab in the Dashboard, find the Maintenance Mode card, and toggle the switch. All web traffic will be instantly routed to the maintenance page.
+
 ## System Maintenance
 
 Vessl proactively tracks disk and resource usage to prevent your server from running out of space.

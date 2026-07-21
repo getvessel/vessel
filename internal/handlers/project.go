@@ -11,24 +11,18 @@ import (
 	"vessl.dev/vessl/internal/http/middleware"
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/services"
+	"vessl.dev/vessl/internal/telemetry"
 )
 
 type ProjectHandler struct {
-	projectService *services.ProjectService
+	projectService         *services.ProjectService
+	projectSettingsService *services.ProjectSettingsService
 }
 
-func NewProjectHandler(s *services.ProjectService) *ProjectHandler {
-	return &ProjectHandler{projectService: s}
+func NewProjectHandler(s *services.ProjectService, pss *services.ProjectSettingsService) *ProjectHandler {
+	return &ProjectHandler{projectService: s, projectSettingsService: pss}
 }
 
-// @Summary ListProjects endpoint
-// @Description ListProjects endpoint
-// @Tags Projects
-// @Accept json
-// @Produce json
-// @Param page query int false "Page number"
-// @Param limit query int false "Items per page"
-// @Router /projects [get]
 func (h *ProjectHandler) ListProjects(c echo.Context) error {
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	if page < 1 {
@@ -48,32 +42,39 @@ func (h *ProjectHandler) ListProjects(c echo.Context) error {
 	return utils.Paginated(c, "Operation successful", projects, total, page, limit)
 }
 
-// @Summary CreateProject endpoint
-// @Description CreateProject endpoint
-// @Tags Projects
-// @Accept json
-// @Produce json
-// @Param request body models.CreateProjectRequest true "Payload"
-// @Router /projects [post]
 func (h *ProjectHandler) CreateProject(c echo.Context) error {
 	var req models.CreateProjectRequest
 	if err := c.Bind(&req); err != nil {
 		return utils.Error(c, http.StatusBadRequest, "invalid payload")
 	}
-	p, err := h.projectService.CreateProjectFromRequest(c.Request().Context(), &req)
-	if err != nil {
-		return utils.Error(c, http.StatusInternalServerError, err.Error())
+
+	userClaims, ok := c.Get("user").(*models.UserClaims)
+	var p *models.ProjectConfig
+	var err error
+
+	if ok && userClaims != nil {
+		p, err = h.projectService.CreateProjectWithMemberFromRequest(c.Request().Context(), &req, userClaims.UserID, string(models.MemberPermissionOwner))
+		if err != nil {
+			return utils.Error(c, http.StatusInternalServerError, "failed to create project and assign owner: "+err.Error())
+		}
+		telemetry.Track(userClaims.Email, "project_created", map[string]interface{}{
+			"project_id": p.ID,
+			"name":       p.Name,
+		})
+	} else {
+		p, err = h.projectService.CreateProjectFromRequest(c.Request().Context(), &req)
+		if err != nil {
+			return utils.Error(c, http.StatusInternalServerError, err.Error())
+		}
+		telemetry.Track("anonymous", "project_created", map[string]interface{}{
+			"project_id": p.ID,
+			"name":       p.Name,
+		})
 	}
+
 	return utils.Created(c, "Created successfully", p)
 }
 
-// @Summary GetProject endpoint
-// @Description GetProject endpoint
-// @Tags Projects
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /projects/{id} [get]
 func (h *ProjectHandler) GetProject(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -89,13 +90,6 @@ func (h *ProjectHandler) GetProject(c echo.Context) error {
 	return utils.Success(c, "Operation successful", p)
 }
 
-// @Summary DeleteProject endpoint
-// @Description DeleteProject endpoint
-// @Tags Projects
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /projects/{id} [delete]
 func (h *ProjectHandler) DeleteProject(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {

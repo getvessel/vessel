@@ -10,6 +10,10 @@ import (
 	"vessl.dev/vessl/internal/utils"
 )
 
+type AIDiagnoseRequest struct {
+	Prompt string `json:"prompt"`
+}
+
 type AISettingsHandler struct {
 	aiSettingsService *services.AISettingsService
 }
@@ -41,4 +45,22 @@ func (h *AISettingsHandler) UpdateAISettings(c echo.Context) error {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 	return utils.Success(c, "AI settings updated successfully", updated)
+}
+
+func (h *AISettingsHandler) DiagnoseLogs(c echo.Context) error {
+	var req AIDiagnoseRequest
+	if err := c.Bind(&req); err != nil {
+		return c.String(http.StatusBadRequest, "Invalid request")
+	}
+
+	if req.Prompt == "" {
+		return c.String(http.StatusBadRequest, "Prompt is required")
+	}
+
+	diagnosis, err := h.aiSettingsService.DiagnoseLogs(c.Request().Context(), req.Prompt)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.String(http.StatusOK, diagnosis)
 }

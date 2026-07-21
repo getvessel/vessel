@@ -9,6 +9,13 @@ export const useListOneClickApps = () => {
   });
 };
 
+export const useListExampleApps = () => {
+  return useQuery({
+    queryKey: ['exampleApps'],
+    queryFn: () => templatesService.listExampleApps(),
+  });
+};
+
 export const useDeployOneClickApp = () => {
   const queryClient = useQueryClient();
   return useMutation({

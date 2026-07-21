@@ -23,19 +23,22 @@ func NewDatabaseHandler(s *services.DatabaseService, ps *services.ProjectService
 }
 
 func (h *DatabaseHandler) verifyProjectOwnership(c echo.Context, projectID string) error {
-	_, err := h.projectService.GetProject(c.Request().Context(), projectID)
-	if err != nil {
+	user := middleware.GetUserClaimsFromContext(c.Request().Context())
+	if user == nil {
+		return utils.Error(c, http.StatusUnauthorized, "unauthorized")
+	}
+
+	project, err := h.projectService.GetProject(c.Request().Context(), projectID)
+	if err != nil || project == nil {
 		return utils.Error(c, http.StatusNotFound, "project not found")
+	}
+
+	if !h.projectService.IsMemberOrOwner(c.Request().Context(), projectID, user.UserID, user.Role) {
+		return utils.Error(c, http.StatusForbidden, "access denied")
 	}
 	return nil
 }
 
-// @Summary ListDatabases endpoint
-// @Description ListDatabases endpoint
-// @Tags Databases
-// @Accept json
-// @Produce json
-// @Router /databases [get]
 func (h *DatabaseHandler) ListDatabases(c echo.Context) error {
 	databases, err := h.databaseService.ListDatabases(c.Request().Context())
 	if err != nil {
@@ -58,13 +61,6 @@ func (h *DatabaseHandler) ListDatabases(c echo.Context) error {
 	return utils.Success(c, "Operation successful", databases)
 }
 
-// @Summary CreateDatabase endpoint
-// @Description CreateDatabase endpoint
-// @Tags Databases
-// @Accept json
-// @Produce json
-// @Param request body models.CreateDatabaseRequest true "Payload"
-// @Router /databases [post]
 func (h *DatabaseHandler) CreateDatabase(c echo.Context) error {
 	var req models.CreateDatabaseRequest
 	if err := c.Bind(&req); err != nil {
@@ -80,13 +76,6 @@ func (h *DatabaseHandler) CreateDatabase(c echo.Context) error {
 	return utils.Created(c, "Created successfully", db)
 }
 
-// @Summary GetDatabase endpoint
-// @Description GetDatabase endpoint
-// @Tags Databases
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /databases/{id} [get]
 func (h *DatabaseHandler) GetDatabase(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -102,14 +91,6 @@ func (h *DatabaseHandler) GetDatabase(c echo.Context) error {
 	return utils.Success(c, "Operation successful", db)
 }
 
-// @Summary UpdateDatabase endpoint
-// @Description UpdateDatabase endpoint
-// @Tags Databases
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Param request body models.UpdateDatabaseRequest true "Payload"
-// @Router /databases/{id} [put]
 func (h *DatabaseHandler) UpdateDatabase(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -129,19 +110,14 @@ func (h *DatabaseHandler) UpdateDatabase(c echo.Context) error {
 	db.ExternalDNS = req.ExternalDNS
 	db.CustomArgs = req.CustomArgs
 	db.LogicalReplication = req.LogicalReplication
+	db.CPULimit = req.CPULimit
+	db.MemoryLimit = req.MemoryLimit
 	if err := h.databaseService.UpdateDatabase(c.Request().Context(), db); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 	return utils.Success(c, "Operation successful", db)
 }
 
-// @Summary DeleteDatabase endpoint
-// @Description DeleteDatabase endpoint
-// @Tags Databases
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /databases/{id} [delete]
 func (h *DatabaseHandler) DeleteDatabase(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -160,13 +136,6 @@ func (h *DatabaseHandler) DeleteDatabase(c echo.Context) error {
 	return utils.Success(c, "Operation successful", map[string]string{"status": "deleted"})
 }
 
-// @Summary StartDatabase endpoint
-// @Description StartDatabase endpoint
-// @Tags Databases
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /databases/{id}/start [post]
 func (h *DatabaseHandler) StartDatabase(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -186,13 +155,6 @@ func (h *DatabaseHandler) StartDatabase(c echo.Context) error {
 	return utils.Success(c, "Operation successful", dbStarted)
 }
 
-// @Summary StopDatabase endpoint
-// @Description StopDatabase endpoint
-// @Tags Databases
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /databases/{id}/stop [post]
 func (h *DatabaseHandler) StopDatabase(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -211,13 +173,6 @@ func (h *DatabaseHandler) StopDatabase(c echo.Context) error {
 	return utils.Success(c, "Operation successful", map[string]string{"status": "stopped"})
 }
 
-// @Summary RestartDatabase endpoint
-// @Description RestartDatabase endpoint
-// @Tags Databases
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /databases/{id}/restart [post]
 func (h *DatabaseHandler) RestartDatabase(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -240,14 +195,6 @@ func (h *DatabaseHandler) RestartDatabase(c echo.Context) error {
 	return utils.Success(c, "Operation successful", dbStarted)
 }
 
-// @Summary ImportData endpoint
-// @Description ImportData endpoint
-// @Tags Databases
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Param request body models.ImportDatabaseRequest true "Payload"
-// @Router /databases/{id}/import [post]
 func (h *DatabaseHandler) ImportData(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -270,14 +217,6 @@ func (h *DatabaseHandler) ImportData(c echo.Context) error {
 	return utils.Success(c, "Import started", nil)
 }
 
-// @Summary QueryDatabase endpoint
-// @Description QueryDatabase endpoint
-// @Tags Databases
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Param request body models.DatabaseQueryRequest true "Payload"
-// @Router /databases/{id}/query [post]
 func (h *DatabaseHandler) QueryDatabase(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {

@@ -24,10 +24,15 @@ export function DnsProviderForm({
         <div className="fade-in-50 animate-in space-y-6 duration-300">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-3">
-              <Label className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]">
+              <Label
+                htmlFor="cf-api-token"
+                className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]"
+              >
                 API KEY / TOKEN
               </Label>
               <Input
+                id="cf-api-token"
+                type="password"
                 placeholder="Cloudflare API key or DNS token"
                 value={formData.cloudflareApiToken}
                 onChange={(e) =>
@@ -38,12 +43,19 @@ export function DnsProviderForm({
                 }
                 className="h-12 rounded-xl border-border/50 bg-background/80 px-4 font-medium"
               />
+              <p className="text-[11px] text-muted-foreground/70">
+                API Tokens only. Global API keys are not supported.
+              </p>
             </div>
             <div className="space-y-3">
-              <Label className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]">
+              <Label
+                htmlFor="cf-email"
+                className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]"
+              >
                 ACCOUNT EMAIL
               </Label>
               <Input
+                id="cf-email"
                 placeholder="Only needed for global API keys"
                 value={formData.cloudflareEmail}
                 onChange={(e) =>
@@ -57,10 +69,14 @@ export function DnsProviderForm({
             </div>
           </div>
           <div className="space-y-3">
-            <Label className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]">
+            <Label
+              htmlFor="cf-zone-id"
+              className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]"
+            >
               ZONE ID
             </Label>
             <Input
+              id="cf-zone-id"
               placeholder="Optional zone ID"
               value={formData.cloudflareZoneId}
               onChange={(e) =>
@@ -79,10 +95,14 @@ export function DnsProviderForm({
         <div className="fade-in-50 animate-in space-y-6 duration-300">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-3">
-              <Label className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]">
+              <Label
+                htmlFor="nc-api-user"
+                className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]"
+              >
                 API USER
               </Label>
               <Input
+                id="nc-api-user"
                 placeholder="username"
                 value={formData.namecheapApiUser}
                 onChange={(e) =>
@@ -95,10 +115,14 @@ export function DnsProviderForm({
               />
             </div>
             <div className="space-y-3">
-              <Label className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]">
+              <Label
+                htmlFor="nc-api-key"
+                className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]"
+              >
                 API KEY
               </Label>
               <Input
+                id="nc-api-key"
                 type="password"
                 placeholder="••••••••••••••••"
                 value={formData.namecheapApiKey}
@@ -113,10 +137,14 @@ export function DnsProviderForm({
             </div>
           </div>
           <div className="space-y-3">
-            <Label className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]">
+            <Label
+              htmlFor="nc-client-ip"
+              className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]"
+            >
               CLIENT IP
             </Label>
             <Input
+              id="nc-client-ip"
               placeholder="Whitelisted server IP"
               value={formData.namecheapClientIp}
               onChange={(e) =>
@@ -135,10 +163,15 @@ export function DnsProviderForm({
         <div className="fade-in-50 animate-in space-y-6 duration-300">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-3">
-              <Label className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]">
+              <Label
+                htmlFor="ss-api-key"
+                className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]"
+              >
                 API KEY
               </Label>
               <Input
+                id="ss-api-key"
+                type="password"
                 placeholder="Spaceship API key"
                 value={formData.spaceshipApiKey}
                 onChange={(e) =>
@@ -151,10 +184,14 @@ export function DnsProviderForm({
               />
             </div>
             <div className="space-y-3">
-              <Label className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]">
+              <Label
+                htmlFor="ss-api-secret"
+                className="font-bold text-[10px] text-muted-foreground/90 uppercase tracking-[0.15em]"
+              >
                 API SECRET
               </Label>
               <Input
+                id="ss-api-secret"
                 type="password"
                 placeholder="Spaceship API secret"
                 value={formData.spaceshipApiSecret}

@@ -149,7 +149,6 @@ export const settingsService = {
     return await settingsService.getGithubApps();
   },
 
-  // biome-ignore lint/suspicious/noExplicitAny: Provider payload and response depend dynamically on provider string
   saveGitApp: async (payload: any): Promise<any> => {
     return await settingsService.saveGithubApp(payload);
   },

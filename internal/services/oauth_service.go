@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"sync"
@@ -12,7 +11,10 @@ import (
 
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/repositories"
+	"vessl.dev/vessl/internal/utils"
 )
+
+var ErrInvalidPasscode = errors.New("invalid passcode")
 
 type OAuthService struct {
 	oauthRepo       repositories.OAuthRepository
@@ -61,8 +63,11 @@ func (s *OAuthService) SaveProvider(ctx context.Context, p *models.OAuthProvider
 		return errors.New("valid provider required")
 	}
 	existing, err := s.oauthRepo.GetProvider(ctx, p.ProviderName)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return fmt.Errorf("failed to get provider: %w", err)
+	if err != nil {
+		var notFound *utils.NotFoundError
+		if !errors.As(err, &notFound) {
+			return fmt.Errorf("failed to get provider: %w", err)
+		}
 	}
 	if existing != nil {
 		if p.ID == "" {
@@ -190,7 +195,7 @@ func (s *OAuthService) Validate2FA(ctx context.Context, userID, passcode string)
 		return errors.New("2fa is not enabled")
 	}
 	if !ValidateTOTP(secret, passcode) {
-		return errors.New("invalid passcode")
+		return ErrInvalidPasscode
 	}
 	return nil
 }

@@ -21,18 +21,8 @@ func NewBackupHandler(s *services.BackupService) *BackupHandler {
 	return &BackupHandler{backupService: s}
 }
 
-// @Summary List Backups
-// @Description List Backups
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Router /backups [get]
 func (h *BackupHandler) List(c echo.Context) error {
-	projectID := c.QueryParam("projectId")
-	if projectID == "" {
-		return utils.Error(c, http.StatusBadRequest, "missing projectId query parameter")
-	}
-	list, err := h.backupService.ListConfigsByProject(c.Request().Context(), projectID)
+	list, err := h.backupService.ListConfigs(c.Request().Context())
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
@@ -42,13 +32,6 @@ func (h *BackupHandler) List(c echo.Context) error {
 	return utils.Success(c, "Operation successful", list)
 }
 
-// @Summary Create Backup
-// @Description Create Backup
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Param request body models.BackupConfig true "Payload"
-// @Router /backups [post]
 func (h *BackupHandler) Create(c echo.Context) error {
 	var cfg models.BackupConfig
 	if err := c.Bind(&cfg); err != nil {
@@ -60,14 +43,6 @@ func (h *BackupHandler) Create(c echo.Context) error {
 	return utils.Created(c, "Created successfully", cfg)
 }
 
-// @Summary Update Backup
-// @Description Update Backup
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Param id path string true "Backup ID"
-// @Param request body models.BackupConfig true "Payload"
-// @Router /backups/{id} [put]
 func (h *BackupHandler) Update(c echo.Context) error {
 	id := c.Param("id")
 
@@ -75,15 +50,9 @@ func (h *BackupHandler) Update(c echo.Context) error {
 	if err != nil || existing == nil {
 		var notFoundErr *utils.NotFoundError
 		if err != nil && !errors.As(err, &notFoundErr) {
-			return utils.Error(c, http.StatusInternalServerError, err.Error())
+			return utils.Error(c, http.StatusInternalServerError, "failed to get backup config")
 		}
 		return utils.Error(c, http.StatusNotFound, "backup config not found")
-	}
-
-	if tokenProjID, ok := c.Get("project_id").(string); ok && tokenProjID != "" {
-		if tokenProjID != existing.ProjectID {
-			return utils.Error(c, http.StatusForbidden, "permission denied for this project")
-		}
 	}
 
 	var req struct {
@@ -162,13 +131,6 @@ func (h *BackupHandler) Update(c echo.Context) error {
 	return utils.Success(c, "Updated successfully", existing)
 }
 
-// @Summary Get Backup
-// @Description Get Backup
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Param id path string true "Backup ID"
-// @Router /backups/{id} [get]
 func (h *BackupHandler) Get(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -178,7 +140,7 @@ func (h *BackupHandler) Get(c echo.Context) error {
 	if err != nil || cfg == nil {
 		var notFoundErr *utils.NotFoundError
 		if err != nil && !errors.As(err, &notFoundErr) {
-			return utils.Error(c, http.StatusInternalServerError, err.Error())
+			return utils.Error(c, http.StatusInternalServerError, "failed to get backup config")
 		}
 		return utils.Error(c, http.StatusNotFound, "backup config not found")
 	}
@@ -186,32 +148,17 @@ func (h *BackupHandler) Get(c echo.Context) error {
 	return utils.Success(c, "Operation successful", cfg)
 }
 
-// @Summary Delete Backup
-// @Description Delete Backup
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Param id path string true "Backup ID"
-// @Router /backups/{id} [delete]
 func (h *BackupHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
-	projectID := c.QueryParam("projectId")
-	if id == "" || projectID == "" {
-		return utils.Error(c, http.StatusBadRequest, "missing id or projectId")
+	if id == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing id")
 	}
-	if err := h.backupService.DeleteConfig(c.Request().Context(), id, projectID); err != nil {
+	if err := h.backupService.DeleteConfig(c.Request().Context(), id); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)
 }
 
-// @Summary Trigger endpoint
-// @Description Trigger endpoint
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /backups/{id}/trigger [post]
 func (h *BackupHandler) Trigger(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -224,13 +171,6 @@ func (h *BackupHandler) Trigger(c echo.Context) error {
 	return utils.Success(c, "Operation successful", rec)
 }
 
-// @Summary ListRecords endpoint
-// @Description ListRecords endpoint
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /backups/{id}/records [get]
 func (h *BackupHandler) ListRecords(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -243,14 +183,6 @@ func (h *BackupHandler) ListRecords(c echo.Context) error {
 	return utils.Success(c, "Operation successful", recs)
 }
 
-// @Summary Download Backup Record
-// @Description Download Backup Record
-// @Tags Backups
-// @Accept json
-// @Produce application/octet-stream
-// @Param id path string true "Backup ID"
-// @Param recordId path string true "Record ID"
-// @Router /backups/{id}/records/{recordId}/download [get]
 func (h *BackupHandler) DownloadRecord(c echo.Context) error {
 	id := c.Param("id")
 	recordID := c.Param("recordId")
@@ -258,26 +190,26 @@ func (h *BackupHandler) DownloadRecord(c echo.Context) error {
 		return utils.Error(c, http.StatusBadRequest, "missing id or recordId parameter")
 	}
 	rec, err := h.backupService.GetRecord(c.Request().Context(), recordID)
-	if err != nil || rec == nil {
+	if err != nil {
+		var notFound *utils.NotFoundError
+		if !errors.As(err, &notFound) {
+			return utils.Error(c, http.StatusInternalServerError, "failed to get backup record")
+		}
+		return utils.Error(c, http.StatusNotFound, "record not found")
+	}
+	if rec == nil {
 		return utils.Error(c, http.StatusNotFound, "record not found")
 	}
 	if rec.BackupConfigID != id {
 		return utils.Error(c, http.StatusNotFound, "record not found")
 	}
+
 	if rec.FilePath == "" {
 		return utils.Error(c, http.StatusNotFound, "local backup file not available")
 	}
 	return c.Attachment(rec.FilePath, filepath.Base(rec.FilePath))
 }
 
-// @Summary Delete Backup Record
-// @Description Delete Backup Record
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Param id path string true "Backup ID"
-// @Param recordId path string true "Record ID"
-// @Router /backups/{id}/records/{recordId} [delete]
 func (h *BackupHandler) DeleteRecord(c echo.Context) error {
 	id := c.Param("id")
 	recordID := c.Param("recordId")
@@ -285,25 +217,26 @@ func (h *BackupHandler) DeleteRecord(c echo.Context) error {
 		return utils.Error(c, http.StatusBadRequest, "missing id or recordId parameter")
 	}
 	rec, err := h.backupService.GetRecord(c.Request().Context(), recordID)
-	if err != nil || rec == nil {
+	if err != nil {
+		var notFound *utils.NotFoundError
+		if !errors.As(err, &notFound) {
+			return utils.Error(c, http.StatusInternalServerError, "failed to get backup record")
+		}
+		return utils.Error(c, http.StatusNotFound, "record not found")
+	}
+	if rec == nil {
 		return utils.Error(c, http.StatusNotFound, "record not found")
 	}
 	if rec.BackupConfigID != id {
 		return utils.Error(c, http.StatusNotFound, "record not found")
 	}
+
 	if err := h.backupService.DeleteRecord(c.Request().Context(), recordID); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)
 }
 
-// @Summary Restore endpoint
-// @Description Restore endpoint
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /backups/{id}/restore [post]
 func (h *BackupHandler) Restore(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -316,31 +249,14 @@ func (h *BackupHandler) Restore(c echo.Context) error {
 	return utils.Success(c, "Backup successfully restored", nil)
 }
 
-// @Summary ListS3Destinations endpoint
-// @Description ListS3Destinations endpoint
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Router /s3-destinations [get]
 func (h *BackupHandler) ListS3Destinations(c echo.Context) error {
-	projectID := c.QueryParam("projectId")
-	if projectID == "" {
-		return utils.Error(c, http.StatusBadRequest, "missing projectId query parameter")
-	}
-	list, err := h.backupService.ListS3Destinations(c.Request().Context(), projectID)
+	list, err := h.backupService.ListS3Destinations(c.Request().Context())
 	if err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 	return utils.Success(c, "Operation successful", list)
 }
 
-// @Summary CreateS3Destination endpoint
-// @Description CreateS3Destination endpoint
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Param request body models.S3Destination true "Payload"
-// @Router /s3-destinations [post]
 func (h *BackupHandler) CreateS3Destination(c echo.Context) error {
 	var dest models.S3Destination
 	if err := c.Bind(&dest); err != nil {
@@ -352,20 +268,12 @@ func (h *BackupHandler) CreateS3Destination(c echo.Context) error {
 	return utils.Created(c, "Created successfully", dest)
 }
 
-// @Summary DeleteS3Destination endpoint
-// @Description DeleteS3Destination endpoint
-// @Tags Backups
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /s3-destinations/{id} [delete]
 func (h *BackupHandler) DeleteS3Destination(c echo.Context) error {
 	id := c.Param("id")
-	projectID := c.QueryParam("projectId")
-	if id == "" || projectID == "" {
-		return utils.Error(c, http.StatusBadRequest, "missing id or projectId")
+	if id == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing id")
 	}
-	if err := h.backupService.DeleteS3Destination(c.Request().Context(), id, projectID); err != nil {
+	if err := h.backupService.DeleteS3Destination(c.Request().Context(), id); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)

@@ -1,5 +1,14 @@
 import { format } from 'date-fns';
-import { Calendar, Check, Database, Download, History, Play, Trash2 } from 'lucide-react';
+import {
+  ArchiveRestore,
+  Calendar,
+  Check,
+  Database,
+  Download,
+  History,
+  Play,
+  Trash2,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -14,12 +23,13 @@ import {
   useDeleteRecord,
   useList,
   useListRecords,
+  useRestore,
   useTrigger,
   useUpdate,
 } from '#/hooks/useBackups';
 
 export function BackupsList() {
-  const { data: configsData, isLoading } = useList('global');
+  const { data: configsData, isLoading } = useList();
   const configs = configsData?.data || [];
   const config = configs[0];
 
@@ -28,6 +38,7 @@ export function BackupsList() {
   const triggerBackup = useTrigger();
   const deleteBackup = useDelete();
   const deleteRecord = useDeleteRecord();
+  const restoreBackup = useRestore();
 
   const { data: recordsData, isLoading: isLoadingRecords } = useListRecords(config?.id || '');
   const records = recordsData?.data || [];
@@ -105,6 +116,23 @@ export function BackupsList() {
       toast.success('Backup triggered successfully');
     } catch {
       toast.error('Failed to trigger backup');
+    }
+  };
+
+  const handleRestore = async (recordId: string) => {
+    if (
+      !confirm(
+        'Are you sure you want to restore this backup? This will overwrite the current database and cannot be undone.'
+      )
+    ) {
+      return;
+    }
+    try {
+      toast.info('Restoring backup... this may take a moment.');
+      await restoreBackup.mutateAsync({ id: recordId });
+      toast.success('Backup restored successfully');
+    } catch (err: unknown) {
+      toast.error((err as any)?.response?.data?.error || 'Failed to restore backup');
     }
   };
 
@@ -263,6 +291,17 @@ export function BackupsList() {
                   </div>
 
                   <div className="mt-2 flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleRestore(record.id)}
+                      disabled={
+                        restoreBackup.isPending || record.status !== 'completed' || !record.filePath
+                      }
+                    >
+                      <ArchiveRestore className="mr-2 h-4 w-4" />
+                      Restore
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"

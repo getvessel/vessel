@@ -5,7 +5,7 @@
 
 import { toast } from 'sonner';
 import { env } from '#/env';
-import { authActions, authStore } from '#/stores/authStore';
+import { useAuthStore } from '#/stores/authStore';
 
 const API_BASE_URL = env.VITE_API_URL;
 
@@ -37,7 +37,7 @@ export const apiClient = {
       headers.set('Content-Type', 'application/json');
     }
 
-    const token = authStore.state.token;
+    const token = useAuthStore.getState().token;
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
@@ -54,7 +54,7 @@ export const apiClient = {
     });
 
     if (response.status === 401) {
-      authActions.logout();
+      useAuthStore.getState().logout();
       if (
         !window.location.pathname.startsWith('/signin') &&
         !window.location.pathname.startsWith('/signup') &&
@@ -91,7 +91,7 @@ export const apiClient = {
   async getBlob(endpoint: string, options?: RequestInit): Promise<Blob> {
     const url = `${API_BASE_URL}${endpoint}`;
     const headers = new Headers(options?.headers || {});
-    const token = authStore.state.token;
+    const token = useAuthStore.getState().token;
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
@@ -107,7 +107,7 @@ export const apiClient = {
     });
 
     if (response.status === 401) {
-      authActions.logout();
+      useAuthStore.getState().logout();
       if (
         !window.location.pathname.startsWith('/signin') &&
         !window.location.pathname.startsWith('/signup') &&
@@ -137,7 +137,7 @@ export const apiClient = {
     if (!headers.has('Content-Type') && !(body instanceof FormData)) {
       headers.set('Content-Type', 'application/json');
     }
-    const token = authStore.state.token;
+    const token = useAuthStore.getState().token;
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
@@ -154,7 +154,7 @@ export const apiClient = {
     });
 
     if (response.status === 401) {
-      authActions.logout();
+      useAuthStore.getState().logout();
       if (
         !window.location.pathname.startsWith('/signin') &&
         !window.location.pathname.startsWith('/signup') &&

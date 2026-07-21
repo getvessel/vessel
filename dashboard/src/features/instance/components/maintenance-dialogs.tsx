@@ -32,7 +32,7 @@ export function MaintenanceDialogs({
   return (
     <>
       <Dialog open={confirmCleanup} onOpenChange={setConfirmCleanup}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[400px] [&>button]:hidden">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-100 [&>button]:hidden">
           <div className="p-5">
             <div className="flex items-start justify-between">
               <div className="flex flex-col">
@@ -40,10 +40,7 @@ export function MaintenanceDialogs({
                   <Trash2 className="h-5 w-5 text-primary" />
                   Run Docker Cleanup
                 </DialogTitle>
-                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
-                  <Trash2 className="h-3 w-3" />
-                  Removes unused images and volumes
-                </DialogDescription>
+                <DialogDescription>Removes unused images and volumes</DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button
@@ -77,7 +74,7 @@ export function MaintenanceDialogs({
       </Dialog>
 
       <Dialog open={confirmRestart} onOpenChange={setConfirmRestart}>
-        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[400px] [&>button]:hidden">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-100 [&>button]:hidden">
           <div className="p-5">
             <div className="flex items-start justify-between">
               <div className="flex flex-col">
@@ -85,10 +82,7 @@ export function MaintenanceDialogs({
                   <RefreshCw className="h-5 w-5" />
                   Restart Daemon
                 </DialogTitle>
-                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
-                  <RefreshCw className="h-3 w-3" />
-                  All services will be briefly unavailable
-                </DialogDescription>
+                <DialogDescription>All services will be briefly unavailable</DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button

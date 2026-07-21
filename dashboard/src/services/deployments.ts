@@ -1,8 +1,10 @@
 import type {
+  ExplainDeploymentResponse,
   GetDeploymentLogsResponse,
   GetDiagnosticsResponse,
   GetServiceMetricsResponse,
   ListDeploymentsResponse,
+  ListPRPreviewsResponse,
   RollbackDeploymentResponse,
   TriggerDeploymentRequest,
   TriggerDeploymentResponse,
@@ -14,6 +16,14 @@ export const deploymentsService = {
   listByService: async (serviceId: string): Promise<ListDeploymentsResponse> => {
     try {
       return await apiClient.get<ListDeploymentsResponse>(`/services/${serviceId}/deployments`);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  listPRPreviews: async (serviceId: string): Promise<ListPRPreviewsResponse> => {
+    try {
+      return await apiClient.get<ListPRPreviewsResponse>(`/services/${serviceId}/previews`);
     } catch (error) {
       throw handleApiError(error);
     }
@@ -64,6 +74,14 @@ export const deploymentsService = {
       return await apiClient.post<GetDiagnosticsResponse>(
         `/deployments/${deploymentId}/diagnostics`
       );
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  explainFailure: async (deploymentId: string): Promise<ExplainDeploymentResponse> => {
+    try {
+      return await apiClient.get<ExplainDeploymentResponse>(`/deployments/${deploymentId}/explain`);
     } catch (error) {
       throw handleApiError(error);
     }

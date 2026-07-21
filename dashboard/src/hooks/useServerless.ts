@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { serverlessService } from '#/services/serverless';
 
-export const useGetCode = (serviceId: string) => {
+export const useGetCode = (projectId: string | undefined, serviceId: string) => {
   return useQuery({
-    queryKey: ['serverless', 'getCode', serviceId].filter(Boolean),
-    queryFn: () => serverlessService.getCode(serviceId),
+    queryKey: ['serverless', 'getCode', projectId, serviceId].filter(Boolean),
+    queryFn: () => serverlessService.getCode(projectId!, serviceId),
+    enabled: !!projectId,
   });
 };
 
@@ -12,9 +13,10 @@ export const useSaveCode = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: {
+      projectId: string;
       serviceId: string;
       payload: { codeContent: string; runtime?: string };
-    }) => serverlessService.saveCode(payload.serviceId, payload.payload),
+    }) => serverlessService.saveCode(payload.projectId, payload.serviceId, payload.payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['serverless'] });
     },

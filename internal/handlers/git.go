@@ -19,13 +19,6 @@ func NewGitHandler(s *services.GitService) *GitHandler {
 	return &GitHandler{gitService: s}
 }
 
-// @Summary Connect endpoint
-// @Description Connect endpoint
-// @Tags Git
-// @Accept json
-// @Produce json
-// @Param request body models.GitConnectRequest true "Payload"
-// @Router /git/connect [post]
 func (h *GitHandler) Connect(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {
@@ -42,12 +35,6 @@ func (h *GitHandler) Connect(c echo.Context) error {
 	return utils.Created(c, "Created successfully", gp)
 }
 
-// @Summary Status endpoint
-// @Description Status endpoint
-// @Tags Git
-// @Accept json
-// @Produce json
-// @Router /git/status [get]
 func (h *GitHandler) Status(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {
@@ -60,13 +47,6 @@ func (h *GitHandler) Status(c echo.Context) error {
 	return utils.Success(c, "Operation successful", status)
 }
 
-// @Summary Disconnect endpoint
-// @Description Disconnect endpoint
-// @Tags Git
-// @Accept json
-// @Produce json
-// @Param provider path string true "provider"
-// @Router /git/connect/{provider} [delete]
 func (h *GitHandler) Disconnect(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {
@@ -82,21 +62,12 @@ func (h *GitHandler) Disconnect(c echo.Context) error {
 	return utils.Success(c, "Operation successful", map[string]string{"status": "disconnected"})
 }
 
-// @Summary ListRepos endpoint
-// @Description ListRepos endpoint
-// @Tags Git
-// @Accept json
-// @Produce json
-// @Router /git/repos [get]
 func (h *GitHandler) ListRepos(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {
 		return utils.Error(c, http.StatusUnauthorized, "unauthorized")
 	}
 	provider := c.QueryParam("provider")
-	if provider == "" {
-		return utils.Error(c, http.StatusBadRequest, "missing provider query parameter")
-	}
 	repos, err := h.gitService.ListRepositories(c.Request().Context(), userID, provider)
 	if err != nil {
 		return utils.Error(c, http.StatusBadRequest, err.Error())

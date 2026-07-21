@@ -12,6 +12,8 @@ type DeployerStore interface {
 	GetEnvVars(projectID string) (map[string]string, error)
 	ListServiceVariables(serviceID string) ([]*models.Variable, error)
 	GetServerlessFunctionCode(serviceID string) (*models.ServerlessFunctionCode, error)
+	UpdateAppService(app *models.AppService) error
+	ListLogDrainsByService(serviceID string) ([]*models.LogDrain, error)
 }
 
 type DatabaseDeployerStore interface {
@@ -20,17 +22,12 @@ type DatabaseDeployerStore interface {
 	GetDatabase(id string) (*models.Database, error)
 }
 
-type StorageDeployerStore interface {
-	GetServerSettings() (*models.ServerSettings, error)
-	UpdateStorageStatus(id string, status models.StorageStatus, containerID string) error
-	GetStorage(id string) (*models.Storage, error)
-}
-
 type CronManagerStore interface {
-	ListJobs() ([]models.Job, error)
-	GetJob(id string) (*models.Job, error)
+	ListScheduledTasks() ([]models.ScheduledTask, error)
+	GetScheduledTask(id string) (*models.ScheduledTask, error)
 	GetProject(id string) (*models.ProjectConfig, error)
-	UpdateJobStatusAndOutput(id string, status models.JobStatus, lastRunAt *time.Time, output string) error
+	GetAppService(id string) (*models.AppService, error)
+	UpdateScheduledTaskStatusAndOutput(id string, status models.ScheduledTaskStatus, lastRunAt *time.Time, output string) error
 }
 
 type BackupManagerStore interface {

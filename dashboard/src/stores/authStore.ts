@@ -1,16 +1,17 @@
-import { useStore } from '@tanstack/react-store';
-import { Store } from '@tanstack/store';
+import { create } from 'zustand';
 import type { User } from '#/interfaces';
 
-interface AuthState {
+export interface AuthState {
   token: string | null;
   user: User | null;
   isAuthenticated: boolean;
+  setAuth: (token: string, user: User) => void;
+  logout: () => void;
 }
 
 const isBrowser = typeof window !== 'undefined';
 
-const getInitialAuth = (): AuthState => {
+const getInitialAuth = () => {
   if (!isBrowser) {
     return { token: null, user: null, isAuthenticated: false };
   }
@@ -34,11 +35,18 @@ const getInitialAuth = (): AuthState => {
   };
 };
 
-export const authStore = new Store<AuthState>(getInitialAuth());
+export const useAuthStore = create<AuthState>((set) => ({
+  ...getInitialAuth(),
+  setAuth: (token: string, user: User) => {
+    set({ token, user, isAuthenticated: true });
+  },
+  logout: () => {
+    set({ token: null, user: null, isAuthenticated: false });
+  },
+}));
 
 if (isBrowser) {
-  authStore.subscribe(() => {
-    const state = authStore.state;
+  useAuthStore.subscribe((state) => {
     if (state.token) {
       localStorage.setItem('vessl_auth_token', state.token);
     } else {
@@ -52,26 +60,3 @@ if (isBrowser) {
     }
   });
 }
-
-export const authActions = {
-  setAuth: (token: string, user: User) => {
-    authStore.setState((state) => ({
-      ...state,
-      token,
-      user,
-      isAuthenticated: true,
-    }));
-  },
-  logout: () => {
-    authStore.setState((state) => ({
-      ...state,
-      token: null,
-      user: null,
-      isAuthenticated: false,
-    }));
-  },
-};
-
-export const useAuthState = () => {
-  return useStore(authStore, (state) => state);
-};

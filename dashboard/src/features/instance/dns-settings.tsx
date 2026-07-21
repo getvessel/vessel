@@ -45,12 +45,15 @@ export const DnsSettings = () => {
       const payload: Record<string, string> = {};
       if (provider === 'cloudflare') {
         payload.cloudflareApiToken = formData.cloudflareApiToken;
+        payload.cloudflareEmail = formData.cloudflareEmail;
+        payload.cloudflareZoneId = formData.cloudflareZoneId;
       } else if (provider === 'namecheap') {
         payload.namecheapApiUser = formData.namecheapApiUser;
         payload.namecheapApiKey = formData.namecheapApiKey;
         payload.namecheapClientIp = formData.namecheapClientIp;
       } else if (provider === 'spaceship') {
         payload.spaceshipApiKey = formData.spaceshipApiKey;
+        payload.spaceshipApiSecret = formData.spaceshipApiSecret;
       }
 
       await updateSettings({ payload });

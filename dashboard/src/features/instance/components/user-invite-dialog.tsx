@@ -11,6 +11,13 @@ import {
 } from '#/components/ui/dialog';
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '#/components/ui/select';
 import { useInviteUser } from '#/hooks/useUsers';
 
 interface UserInviteDialogProps {
@@ -21,15 +28,17 @@ interface UserInviteDialogProps {
 export function UserInviteDialog({ open, onOpenChange }: UserInviteDialogProps) {
   const { mutateAsync: inviteUser, isPending: inviting } = useInviteUser();
   const [inviteEmail, setInviteEmail] = useState('');
+  const [role, setRole] = useState('member');
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteEmail) return;
     try {
-      await inviteUser(inviteEmail);
+      await inviteUser({ email: inviteEmail, role });
       toast.success('User invited successfully');
       onOpenChange(false);
       setInviteEmail('');
+      setRole('member');
     } catch (err) {
       const error = err as Error;
       toast.error(error.message || 'Failed to invite user');
@@ -38,7 +47,7 @@ export function UserInviteDialog({ open, onOpenChange }: UserInviteDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[400px] [&>button]:hidden">
+      <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-100 [&>button]:hidden">
         <form onSubmit={handleInvite}>
           <div className="px-5 pt-5 pb-4">
             <div className="flex items-start justify-between">
@@ -47,10 +56,7 @@ export function UserInviteDialog({ open, onOpenChange }: UserInviteDialogProps) 
                   <Mail className="h-5 w-5 text-primary" />
                   Invite User
                 </DialogTitle>
-                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
-                  <Mail className="h-3 w-3" />
-                  Send an email invitation
-                </DialogDescription>
+                <DialogDescription>Send an email invitation</DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button
@@ -67,22 +73,46 @@ export function UserInviteDialog({ open, onOpenChange }: UserInviteDialogProps) 
           <div className="h-px w-full bg-border/50" />
 
           <div className="px-5 pt-4 pb-5">
-            <div className="space-y-2.5">
-              <Label
-                htmlFor="email"
-                className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]"
-              >
-                EMAIL ADDRESS
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                required
-                className="h-10 rounded-lg border-border/50 bg-background/80 px-3 text-sm transition-all duration-300 focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
-              />
+            <div className="space-y-4">
+              <div className="space-y-2.5">
+                <Label
+                  htmlFor="email"
+                  className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]"
+                >
+                  EMAIL ADDRESS
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  required
+                  className="h-10 rounded-lg border-border/50 bg-background/80 px-3 text-sm transition-all duration-300 focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
+                />
+              </div>
+
+              <div className="space-y-2.5">
+                <Label
+                  htmlFor="role"
+                  className="font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]"
+                >
+                  ROLE
+                </Label>
+                <Select value={role} onValueChange={setRole}>
+                  <SelectTrigger
+                    id="role"
+                    className="h-10 rounded-lg border-border/50 bg-background/80 px-3 text-sm transition-all duration-300 focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
+                  >
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="owner">Owner</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="member">Member</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 

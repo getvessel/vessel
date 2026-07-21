@@ -9,9 +9,22 @@ import { apiClient } from '#/lib/apiClient';
 import { handleApiError } from '#/lib/error';
 
 export const templatesService = {
-  listOneClickApps: async (): Promise<Record<string, OneClickApp>> => {
+  listOneClickApps: async (): Promise<OneClickApp[]> => {
     try {
-      const response = await apiClient.get<{ data: Record<string, OneClickApp> }>('/one-click');
+      const response = await apiClient.get<{ data: OneClickApp[] }>('/one-click');
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  listExampleApps: async (): Promise<
+    { id: string; name: string; description: string; repo: string; icon?: string }[]
+  > => {
+    try {
+      const response = await apiClient.get<{
+        data: { id: string; name: string; description: string; repo: string; icon?: string }[];
+      }>('/examples');
       return response.data;
     } catch (error) {
       throw handleApiError(error);

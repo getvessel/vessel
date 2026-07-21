@@ -69,7 +69,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	notifRepo := repositories.NewNotificationSettingsRepo(db)
 	aiRepo := repositories.NewAISettingsRepo(db)
 	envVarRepo := repositories.NewEnvRepo(db, v)
-	jobRepo := repositories.NewJobRepo(db)
+	scheduledTaskRepo := repositories.NewScheduledTaskRepo(db)
 	backupRepo := repositories.NewBackupRepo(db, v)
 	s3DestinationRepo := repositories.NewS3DestinationRepo(db)
 	serverlessRepository := repositories.NewServerlessRepository(db)
@@ -84,8 +84,9 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	gitAppRepo := repositories.NewGitAppRepo(db, v)
 	dnsRepo := repositories.NewDNSRepo(db)
 	auditRepository := repositories.NewAuditLogRepo(db)
+	volumeRepo := repositories.NewServiceVolumeRepo(db)
 
-	httpEngineAdapter := newEngineAdapter(settingsRepo, appRepo, envVarRepo, dbRepo, projectRepo, jobRepo, backupRepo, s3DestinationRepo, serviceVarRepo, serverlessRepository)
+	httpEngineAdapter := newEngineAdapter(settingsRepo, appRepo, envVarRepo, dbRepo, projectRepo, scheduledTaskRepo, backupRepo, s3DestinationRepo, serviceVarRepo, serverlessRepository)
 	databaseDeployer := engine.NewDatabaseDeployer(dockerClient, httpEngineAdapter)
 
 	cronManager := engine.NewCronManager(dockerClient, httpEngineAdapter)
@@ -103,8 +104,8 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	backupManager := engine.NewBackupManager(dockerClient, httpEngineAdapter, "")
 	_ = backupManager.Start()
 
-	projectService := services.NewProjectService(projectRepo, environmentRepo, appRepo, serviceVarRepo, settingsRepo)
-	appService := services.NewAppService(appRepo, serviceVarRepo)
+	projectService := services.NewProjectService(projectRepo, environmentRepo, appRepo, serviceVarRepo, settingsRepo, projectSettingsRepo)
+	appService := services.NewAppService(appRepo, serviceVarRepo, volumeRepo)
 	databaseService := services.NewDatabaseService(dbRepo, databaseDeployer)
 	tokenService, err := services.NewTokenService()
 	if err != nil {
@@ -121,11 +122,16 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	authService := services.NewAuthService(userRepo, settingsRepo, notifRepo, projectSettingsRepo, tokenService, mailerService)
 	projectSettingsService := services.NewProjectSettingsService(projectSettingsRepo, userRepo, authService)
 	dispatcherService := core.NewDispatcherService(settingsRepo, notifRepo, userRepo, mailerService)
-	jobService := services.NewJobService(jobRepo, cronManager)
+
+	deploymentListeners := core.NewDeploymentListeners(dispatcherService, appRepo)
+	deploymentListeners.Register()
+
+	scheduledTaskService := services.NewScheduledTaskService(scheduledTaskRepo, cronManager)
 	canvasService := services.NewCanvasService(canvasRepo)
 	gitService := services.NewGitService(gitRepo)
 	statsMonitor := engine.NewStatsMonitor(dockerClient)
-	deploymentService := services.NewDeploymentService(deployRepo, appRepo, projectRepo, deployer, gitService, statsMonitor)
+	deploymentService := services.NewDeploymentService(deployRepo, appRepo, projectRepo, deployer, gitService, statsMonitor, volumeRepo)
+	aiAnalysisService := services.NewAIAnalysisService(deployRepo, appRepo, aiRepo)
 
 	autoscaler := engine.NewAutoscalerWorker(appRepo, statsMonitor, deploymentService)
 	autoscaler.Start()
@@ -140,6 +146,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	gitAppsService := services.NewGitAppsService(gitAppRepo)
 	serverlessService := services.NewServerlessService(serverlessRepository)
 	dnsService := services.NewDNSService(dnsRepo, dnsProviderService)
+	envSuggestionService := services.NewEnvSuggestionService(gitService)
 	metricsService := services.NewMetricsService()
 	logService := services.NewLogService()
 	auditService := services.NewAuditService(auditRepository)
@@ -149,15 +156,17 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 
 	bridge := NewBridge(projectService, appService, databaseService)
 
-	authGuard := middleware.NewAuthGuard(tokenService, settingsService, projectSettingsService)
+	authGuard := middleware.NewAuthGuard(tokenService, settingsService, projectSettingsService, projectSettingsRepo)
 
-	appHandler := handlers.NewAppHandler(appService, projectService, deployer, deploymentService)
+	appHandler := handlers.NewAppHandler(appService, projectService, deployer, deploymentService, environmentService)
 	databaseHandler := handlers.NewDatabaseHandler(databaseService, projectService)
-	jobHandler := handlers.NewJobHandler(jobService)
+	scheduledTaskHandler := handlers.NewScheduledTaskHandler(scheduledTaskService)
 	canvasHandler := handlers.NewCanvasHandler(canvasService)
 	terminalHandler := handlers.NewTerminalHandler(dockerClient, tokenService, appService)
-	deploymentHandler := handlers.NewDeploymentHandler(deploymentService, appService, auditService)
-	serviceVarHandler := handlers.NewServiceVarHandler(appService, auditService)
+	projectHandler := handlers.NewProjectHandler(projectService, projectSettingsService)
+	environmentHandler := handlers.NewEnvironmentHandler(environmentService)
+	deploymentHandler := handlers.NewDeploymentHandler(deploymentService, appService, auditService, aiAnalysisService, prPreviewService, projectService)
+	serviceVarHandler := handlers.NewServiceVarHandler(appService, auditService, envSuggestionService)
 	projectSettingsHandler := handlers.NewProjectSettingsHandler(projectSettingsService)
 	backupHandler := handlers.NewBackupHandler(backupService)
 	settingsHandler := handlers.NewSettingsHandler(settingsService, notifSettingsService)
@@ -169,15 +178,14 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	oAuthHandler := handlers.NewOAuthHandler(oAuthService)
 	gitHandler := handlers.NewGitHandler(gitService)
 	webhookHandler := handlers.NewWebhookHandler(gitService, projectService, appService, deploymentService, prPreviewService, gitAppsService)
-	projectHandler := handlers.NewProjectHandler(projectService)
-	environmentHandler := handlers.NewEnvironmentHandler(environmentService)
+
 	domainHandler := handlers.NewDomainHandler(environmentService)
 	projectEnvHandler := handlers.NewProjectEnvHandler(environmentService)
 	notificationHandler := handlers.NewNotificationHandler(notificationService)
 	gitAppsHandler := handlers.NewGitAppsHandler(gitAppsService)
 	tmplMgr, _ := engine.NewTemplateManager()
-	composeDeployer := engine.NewComposeDeployer(dockerClient)
-	composeHandler := handlers.NewComposeHandler(composeDeployer, projectService, appService, environmentRepo, appRepo)
+	composeParserService := services.NewComposeParserService()
+	composeHandler := handlers.NewComposeHandler(projectService, appService, databaseService, environmentRepo, appRepo, composeParserService)
 	oneClickService := services.NewOneClickService(tmplMgr, databaseDeployer, environmentRepo, dbRepo)
 	oneClickHandler := handlers.NewOneClickHandler(oneClickService)
 	archiveService := services.NewArchiveService(appService, deploymentService)
@@ -187,11 +195,14 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 	systemHandler := handlers.NewSystemHandler(systemService)
 	migrationService := services.NewMigrationService(dbRepo, dataDir)
 	migrationHandler := handlers.NewMigrationHandler(migrationService)
-	onboardingHandler := handlers.NewOnboardingHandler(userService, authService, settingsService, gitAppsService, backupService)
+	onboardingService := services.NewOnboardingService(userService, authService, settingsService, gitAppsService, backupService)
+	onboardingHandler := handlers.NewOnboardingHandler(userService, onboardingService)
 	dnsHandler := handlers.NewDNSHandler(dnsService)
 	metricsHandler := handlers.NewMetricsHandler(metricsService)
 	logHandler := handlers.NewLogHandler(logService)
 	auditLogHandler := handlers.NewAuditLogHandler(auditService)
+	exampleService := services.NewExampleService()
+	exampleHandler := handlers.NewExampleHandler(exampleService)
 	authLimiter := middleware.NewRateLimiter(10, time.Minute)
 	otpLimiter := middleware.NewRateLimiter(5, time.Minute)
 
@@ -208,9 +219,11 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		cronManager:            cronManager,
 		serviceLinker:          serviceLinker,
 		dispatcherService:      dispatcherService,
+		projectService:         projectService,
+		appService:             appService,
 		appServiceHandler:      appHandler,
 		dbHandler:              databaseHandler,
-		jobHandler:             jobHandler,
+		scheduledTaskHandler:   scheduledTaskHandler,
 		canvasHandler:          canvasHandler,
 		terminalHandler:        terminalHandler,
 		deploymentHandler:      deploymentHandler,
@@ -243,6 +256,7 @@ func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikMan
 		metricsHandler:         metricsHandler,
 		logHandler:             logHandler,
 		auditLogHandler:        auditLogHandler,
+		exampleHandler:         exampleHandler,
 	}
 
 	if srv.deployer != nil {

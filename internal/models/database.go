@@ -30,21 +30,6 @@ const (
 	DatabaseStatusError   DatabaseStatus = "error"
 )
 
-type StorageType string
-
-const (
-	StorageTypeMinIO StorageType = "minio"
-	StorageTypeS3    StorageType = "s3"
-)
-
-type StorageStatus string
-
-const (
-	StorageStatusRunning StorageStatus = "running"
-	StorageStatusStopped StorageStatus = "stopped"
-	StorageStatusError   StorageStatus = "error"
-)
-
 type Database struct {
 	ID                 string         `json:"id" db:"id"`
 	ProjectID          string         `json:"projectId" db:"project_id"`
@@ -64,6 +49,8 @@ type Database struct {
 	ExternalDNS        string         `json:"externalDns" db:"external_dns"`
 	CustomArgs         string         `json:"customArgs" db:"custom_args"`
 	LogicalReplication bool           `json:"logicalReplication" db:"logical_replication"`
+	CPULimit           float64        `json:"cpuLimit,omitempty" db:"cpu_limit"`
+	MemoryLimit        int            `json:"memoryLimit,omitempty" db:"memory_limit"`
 	CreatedAt          time.Time      `json:"createdAt" db:"created_at"`
 	UpdatedAt          time.Time      `json:"updatedAt" db:"updated_at"`
 }
@@ -84,33 +71,15 @@ type CreateDatabaseRequest struct {
 }
 
 type UpdateDatabaseRequest struct {
-	ExternalDNS        string `json:"externalDns"`
-	CustomArgs         string `json:"customArgs"`
-	LogicalReplication bool   `json:"logicalReplication"`
+	ExternalDNS        string  `json:"externalDns"`
+	CustomArgs         string  `json:"customArgs"`
+	LogicalReplication bool    `json:"logicalReplication"`
+	CPULimit           float64 `json:"cpuLimit"`
+	MemoryLimit        int     `json:"memoryLimit"`
 }
 
 type ImportDatabaseRequest struct {
 	SourceURL string `json:"sourceUrl"`
-}
-
-type Storage struct {
-	ID            string        `json:"id"`
-	ProjectID     string        `json:"projectId"`
-	EnvironmentID string        `json:"environmentId"`
-	Name          string        `json:"name"`
-	Type          StorageType   `json:"type"`
-	APIPort       int           `json:"apiPort"`
-	ConsolePort   int           `json:"consolePort"`
-	AccessKey     string        `json:"accessKey"`
-	SecretKey     string        `json:"secretKey,omitempty"`
-	BucketName    string        `json:"bucketName"`
-	VolumePath    string        `json:"volumePath"`
-	ContainerID   string        `json:"containerId"`
-	Status        StorageStatus `json:"status"`
-	InternalDNS   string        `json:"internalDns"`
-	ExternalDNS   string        `json:"externalDns"`
-	CreatedAt     time.Time     `json:"createdAt"`
-	UpdatedAt     time.Time     `json:"updatedAt"`
 }
 
 type DatabaseQueryRequest struct {

@@ -9,6 +9,7 @@ import (
 
 	"vessl.dev/vessl/internal/utils"
 
+	"vessl.dev/vessl/internal/http/middleware"
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/services"
 )
@@ -17,29 +18,58 @@ type DeploymentHandler struct {
 	deploymentService *services.DeploymentService
 	appService        *services.AppService
 	auditService      *services.AuditService
+	aiAnalysis        *services.AIAnalysisService
+	prPreviewService  *services.PRPreviewService
+	projectService    *services.ProjectService
 }
 
-func NewDeploymentHandler(ds *services.DeploymentService, as *services.AppService, audit *services.AuditService) *DeploymentHandler {
+func NewDeploymentHandler(ds *services.DeploymentService, as *services.AppService, audit *services.AuditService, aiAnalysis *services.AIAnalysisService, prp *services.PRPreviewService, ps *services.ProjectService) *DeploymentHandler {
 	return &DeploymentHandler{
 		deploymentService: ds,
 		appService:        as,
 		auditService:      audit,
+		aiAnalysis:        aiAnalysis,
+		prPreviewService:  prp,
+		projectService:    ps,
 	}
 }
 
-// @Summary ListServiceDeployments endpoint
-// @Description ListServiceDeployments endpoint
-// @Tags AppServices
-// @Accept json
-// @Produce json
-// @Param serviceId path string true "serviceId"
-// @Param page query int false "Page number"
-// @Param limit query int false "Items per page"
-// @Router /services/{serviceId}/deployments [get]
+func (h *DeploymentHandler) verifyProjectOwnership(c echo.Context, projectID string) error {
+	user := middleware.GetUserClaimsFromContext(c.Request().Context())
+	if user == nil {
+		return utils.Error(c, http.StatusUnauthorized, "unauthorized")
+	}
+
+	if user.Role == "api" {
+		tokenProjectID, ok := c.Get("project_id").(string)
+		if ok && tokenProjectID != projectID {
+			return utils.Error(c, http.StatusForbidden, "token does not have access to this project")
+		}
+	}
+
+	project, err := h.projectService.GetProject(c.Request().Context(), projectID)
+	if err != nil || project == nil {
+		return utils.Error(c, http.StatusNotFound, "project not found")
+	}
+
+	if !h.projectService.IsMemberOrOwner(c.Request().Context(), projectID, user.UserID, user.Role) {
+		return utils.Error(c, http.StatusForbidden, "access denied")
+	}
+	return nil
+}
+
 func (h *DeploymentHandler) ListServiceDeployments(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	if serviceID == "" {
 		return utils.Error(c, http.StatusBadRequest, "missing serviceId parameter")
+	}
+
+	svc, err := h.appService.GetAppService(c.Request().Context(), serviceID)
+	if err != nil || svc == nil {
+		return utils.Error(c, http.StatusNotFound, "service not found")
+	}
+	if err := h.verifyProjectOwnership(c, svc.ProjectID); err != nil {
+		return err
 	}
 
 	page, _ := strconv.Atoi(c.QueryParam("page"))
@@ -59,13 +89,6 @@ func (h *DeploymentHandler) ListServiceDeployments(c echo.Context) error {
 	return utils.Paginated(c, "Deployments retrieved", deps, total, page, limit)
 }
 
-// @Summary Trigger Deployment
-// @Description Trigger Deployment
-// @Tags Deployments
-// @Accept json
-// @Produce json
-// @Param serviceId path string true "Service ID"
-// @Router /services/{serviceId}/deploy [post]
 func (h *DeploymentHandler) Trigger(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	if serviceID == "" {
@@ -104,13 +127,6 @@ func (h *DeploymentHandler) Trigger(c echo.Context) error {
 	return utils.Accepted(c, "Deployment created", created)
 }
 
-// @Summary Rollback endpoint
-// @Description Rollback endpoint
-// @Tags Deployments
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /deployments/{id}/rollback [post]
 func (h *DeploymentHandler) Rollback(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -120,6 +136,11 @@ func (h *DeploymentHandler) Rollback(c echo.Context) error {
 	if err != nil || targetDep == nil {
 		return utils.Error(c, http.StatusNotFound, "deployment not found")
 	}
+
+	if err := h.verifyProjectOwnership(c, targetDep.ProjectID); err != nil {
+		return err
+	}
+
 	newDep := &models.Deployment{
 		ServiceID:     targetDep.ServiceID,
 		EnvironmentID: targetDep.EnvironmentID,
@@ -151,22 +172,20 @@ func (h *DeploymentHandler) Rollback(c echo.Context) error {
 	return utils.Accepted(c, "Rollback created", created)
 }
 
-// @Summary GetLogs endpoint
-// @Description GetLogs endpoint
-// @Tags Deployments
-// @Accept json
-// @Produce json
-// @Param id path string true "id"
-// @Router /deployments/{id}/logs [get]
 func (h *DeploymentHandler) GetLogs(c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
 		return utils.Error(c, http.StatusBadRequest, "missing id parameter")
 	}
+
 	dep, err := h.deploymentService.GetDeployment(c.Request().Context(), id)
 	if err != nil || dep == nil {
 		return utils.Error(c, http.StatusNotFound, "deployment not found")
 	}
+	if err := h.verifyProjectOwnership(c, dep.ProjectID); err != nil {
+		return err
+	}
+
 	return utils.Success(c, "Logs fetched successfully", map[string]string{
 		"id":        dep.ID,
 		"buildLogs": dep.BuildLogs,
@@ -174,17 +193,18 @@ func (h *DeploymentHandler) GetLogs(c echo.Context) error {
 	})
 }
 
-// @Summary GetMetrics endpoint
-// @Description GetMetrics endpoint
-// @Tags AppServices
-// @Accept json
-// @Produce json
-// @Param serviceId path string true "serviceId"
-// @Router /services/{serviceId}/metrics [get]
 func (h *DeploymentHandler) GetMetrics(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	if serviceID == "" {
 		return utils.Error(c, http.StatusBadRequest, "serviceId is required")
+	}
+
+	svc, err := h.appService.GetAppService(c.Request().Context(), serviceID)
+	if err != nil || svc == nil {
+		return utils.Error(c, http.StatusNotFound, "service not found")
+	}
+	if err := h.verifyProjectOwnership(c, svc.ProjectID); err != nil {
+		return err
 	}
 
 	health, err := h.deploymentService.GetMetrics(c.Request().Context(), serviceID)
@@ -203,4 +223,48 @@ func (h *DeploymentHandler) GetMetrics(c echo.Context) error {
 		},
 	}
 	return utils.Success(c, "Operation successful", metrics)
+}
+
+func (h *DeploymentHandler) ExplainFailure(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing id parameter")
+	}
+	dep, err := h.deploymentService.GetDeployment(c.Request().Context(), id)
+	if err != nil || dep == nil {
+		return utils.Error(c, http.StatusNotFound, "deployment not found")
+	}
+
+	if err := h.verifyProjectOwnership(c, dep.ProjectID); err != nil {
+		return err
+	}
+
+	explanation, err := h.aiAnalysis.ExplainDeploymentFailure(c.Request().Context(), id)
+	if err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+
+	return utils.Success(c, "AI Analysis completed", explanation)
+}
+
+func (h *DeploymentHandler) ListPRPreviews(c echo.Context) error {
+	serviceID := c.Param("serviceId")
+	if serviceID == "" {
+		return utils.Error(c, http.StatusBadRequest, "missing serviceId parameter")
+	}
+
+	svc, err := h.appService.GetAppService(c.Request().Context(), serviceID)
+	if err != nil || svc == nil {
+		return utils.Error(c, http.StatusNotFound, "service not found")
+	}
+	if err := h.verifyProjectOwnership(c, svc.ProjectID); err != nil {
+		return err
+	}
+
+	previews, err := h.prPreviewService.ListByApp(c.Request().Context(), serviceID)
+	if err != nil {
+		return utils.Error(c, http.StatusInternalServerError, err.Error())
+	}
+
+	return utils.Success(c, "Operation successful", previews)
 }

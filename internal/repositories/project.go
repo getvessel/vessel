@@ -15,6 +15,7 @@ type ProjectRepository interface {
 	List(ctx context.Context, limit, offset int) ([]models.ProjectConfig, int, error)
 	Get(ctx context.Context, id string) (*models.ProjectConfig, error)
 	Create(ctx context.Context, p *models.ProjectConfig) error
+	CreateWithMember(ctx context.Context, p *models.ProjectConfig, userID, role string) error
 	Delete(ctx context.Context, id string) error
 }
 
@@ -77,6 +78,48 @@ func (r *ProjectRepo) Create(ctx context.Context, p *models.ProjectConfig) error
 	if err != nil {
 		return err
 	}
+	defaultEnv := &models.EnvironmentConfig{
+		ProjectID: p.ID,
+		Name:      "production",
+		IsDefault: true,
+	}
+	return r.environments.Create(ctx, defaultEnv)
+}
+
+func (r *ProjectRepo) CreateWithMember(ctx context.Context, p *models.ProjectConfig, userID, role string) error {
+	if p.ID == "" {
+		p.ID = uuid.NewString()
+	}
+	now := time.Now().UTC()
+	p.CreatedAt = now
+	p.UpdatedAt = now
+
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.ExecContext(ctx,
+		`INSERT INTO projects (id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`,
+		p.ID, p.Name, p.Description, p.CreatedAt, p.UpdatedAt,
+	)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx,
+		`INSERT INTO project_members (project_id, user_id, role, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`,
+		p.ID, userID, role, models.MemberStatusAccepted, now, now,
+	)
+	if err != nil {
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
 	defaultEnv := &models.EnvironmentConfig{
 		ProjectID: p.ID,
 		Name:      "production",

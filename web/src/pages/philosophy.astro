@@ -91,7 +91,7 @@ import Layout from '../layouts/layout.astro';
     <!-- Support buttons -->
     <div class="pt-10 pb-4 flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4">
       <a href="https://github.com/sponsors/techxteam" target="_blank"
-        class="flex items-center justify-center gap-2.5 px-6 sm:px-10 py-3.5 rounded-lg border border-border bg-surface hover:bg-border text-foreground font-semibold text-sm transition-colors whitespace-nowrap">
+        class="flex items-center justify-center gap-2.5 px-6 sm:px-10 py-3.5 rounded-lg border border-border bg-background/80 backdrop-blur-md hover:bg-border text-foreground font-semibold text-sm transition-colors whitespace-nowrap">
         <Icon name="simple-icons:github" class="size-5 shrink-0" />
         <span>GitHub Sponsors</span>
       </a>
@@ -116,7 +116,7 @@ import Layout from '../layouts/layout.astro';
           { label: 'Active Servers', value: '1,200+',  href: 'https://app.vessl.dev' },
         ].map(stat => (
           <a href={stat.href} target="_blank"
-            class="bg-surface rounded-xl p-6 border border-border hover:border-primary/40 transition-colors group text-center">
+            class="bg-background/80 backdrop-blur-md rounded-xl p-6 border border-border hover:border-primary/40 transition-colors group text-center">
             <div class="text-3xl font-extrabold text-foreground group-hover:text-primary transition-colors">{stat.value}</div>
             <div class="text-sm text-muted-foreground mt-1">{stat.label}</div>
           </a>

@@ -73,15 +73,15 @@ const (
 	BuildEngineServerless BuildEngine = "serverless"
 )
 
-type JobStatus string
+type ScheduledTaskStatus string
 
 const (
-	JobStatusActive    JobStatus = "active"
-	JobStatusInactive  JobStatus = "inactive"
-	JobStatusRunning   JobStatus = "running"
-	JobStatusCompleted JobStatus = "completed"
-	JobStatusFailed    JobStatus = "failed"
-	JobStatusError     JobStatus = "error"
+	ScheduledTaskStatusActive    ScheduledTaskStatus = "active"
+	ScheduledTaskStatusInactive  ScheduledTaskStatus = "inactive"
+	ScheduledTaskStatusRunning   ScheduledTaskStatus = "running"
+	ScheduledTaskStatusCompleted ScheduledTaskStatus = "completed"
+	ScheduledTaskStatusFailed    ScheduledTaskStatus = "failed"
+	ScheduledTaskStatusError     ScheduledTaskStatus = "error"
 )
 
 type BackupConfigStatus string
@@ -109,35 +109,52 @@ const (
 )
 
 type AppService struct {
-	ID              string           `json:"id" db:"id"`
-	ProjectID       string           `json:"projectId" db:"project_id"`
-	EnvironmentID   string           `json:"environmentId" db:"environment_id"`
-	Name            string           `json:"name" db:"name"`
-	RepositoryURL   string           `json:"repositoryUrl" db:"repository_url"`
-	ImageRef        string           `json:"imageRef,omitempty" db:"image_ref"`
-	Branch          string           `json:"branch" db:"branch"`
-	RootDirectory   string           `json:"rootDirectory" db:"root_directory"`
-	RuntimeMode     RuntimeMode      `json:"runtimeMode" db:"runtime_mode"`
-	InstallCommand  string           `json:"installCommand" db:"install_command"`
-	BuildCommand    string           `json:"buildCommand" db:"build_command"`
-	StartCommand    string           `json:"startCommand" db:"start_command"`
-	DockerfilePath  string           `json:"dockerfilePath" db:"dockerfile_path"`
-	BuildEngine     BuildEngine      `json:"buildEngine" db:"build_engine"`
-	InternalPort    int              `json:"internalPort" db:"internal_port"`
-	Domain          string           `json:"domain" db:"domain"`
-	StaticOutput    string           `json:"staticOutput" db:"static_output"`
-	HealthCheckPath string           `json:"healthCheckPath" db:"health_check_path"`
-	ContainerID     string           `json:"containerId" db:"container_id"`
-	Status          AppServiceStatus `json:"status" db:"status"`
-	Replicas        int              `json:"replicas" db:"replicas"`
-	CreatedAt       time.Time        `json:"createdAt" db:"created_at"`
-	UpdatedAt       time.Time        `json:"updatedAt" db:"updated_at"`
+	ID               string           `json:"id" db:"id"`
+	ProjectID        string           `json:"projectId" db:"project_id"`
+	EnvironmentID    string           `json:"environmentId" db:"environment_id"`
+	Name             string           `json:"name" db:"name"`
+	RepositoryURL    string           `json:"repositoryUrl" db:"repository_url"`
+	ImageRef         string           `json:"imageRef,omitempty" db:"image_ref"`
+	Branch           string           `json:"branch" db:"branch"`
+	RootDirectory    string           `json:"rootDirectory" db:"root_directory"`
+	Icon             string           `json:"icon" db:"icon"`
+	RuntimeMode      RuntimeMode      `json:"runtimeMode" db:"runtime_mode"`
+	InstallCommand   string           `json:"installCommand" db:"install_command"`
+	BuildCommand     string           `json:"buildCommand" db:"build_command"`
+	StartCommand     string           `json:"startCommand" db:"start_command"`
+	DockerfilePath   string           `json:"dockerfilePath" db:"dockerfile_path"`
+	BuildEngine      BuildEngine      `json:"buildEngine" db:"build_engine"`
+	InternalPort     int              `json:"internalPort" db:"internal_port"`
+	Domain           string           `json:"domain" db:"domain"`
+	StaticOutput     string           `json:"staticOutput" db:"static_output"`
+	DeployToken      string           `json:"deployToken,omitempty" db:"deploy_token"`
+	HealthCheckPath  string           `json:"healthCheckPath" db:"health_check_path"`
+	ContainerID      string           `json:"containerId" db:"container_id"`
+	Status           AppServiceStatus `json:"status" db:"status"`
+	Replicas         int              `json:"replicas" db:"replicas"`
+	CPULimit         float64          `json:"cpuLimit,omitempty" db:"cpu_limit"`
+	MemoryLimit      int              `json:"memoryLimit,omitempty" db:"memory_limit"`
+	CreatedAt        time.Time        `json:"createdAt" db:"created_at"`
+	UpdatedAt        time.Time        `json:"updatedAt" db:"updated_at"`
+	EnablePRPreviews bool             `json:"enablePRPreviews" db:"enable_pr_previews"`
+	MaintenanceMode  bool             `json:"maintenanceMode" db:"maintenance_mode"`
+
+	Volumes []ServiceVolume `json:"volumes,omitempty" db:"-"`
+}
+
+type ServiceVolume struct {
+	ID            string    `json:"id" db:"id"`
+	ServiceID     string    `json:"serviceId" db:"service_id"`
+	HostPath      string    `json:"hostPath" db:"host_path"`
+	ContainerPath string    `json:"containerPath" db:"container_path"`
+	CreatedAt     time.Time `json:"createdAt" db:"created_at"`
 }
 
 type CreateAppServiceRequest struct {
 	ProjectID       string      `json:"projectId"`
 	Name            string      `json:"name"`
 	RepositoryURL   string      `json:"repositoryUrl"`
+	ImageRef        string      `json:"imageRef,omitempty"`
 	Branch          string      `json:"branch"`
 	RootDirectory   string      `json:"rootDirectory"`
 	RuntimeMode     RuntimeMode `json:"runtimeMode"`
@@ -150,6 +167,7 @@ type CreateAppServiceRequest struct {
 	Domain          string      `json:"domain"`
 	StaticOutput    string      `json:"staticOutput"`
 	HealthCheckPath string      `json:"healthCheckPath"`
+	MaintenanceMode bool        `json:"maintenanceMode,omitempty"`
 }
 
 type UpdateAppServiceRequest struct {
@@ -169,6 +187,8 @@ type UpdateAppServiceRequest struct {
 	HealthCheckPath string      `json:"healthCheckPath"`
 	ContainerID     string      `json:"containerId"`
 	Status          string      `json:"status"`
+	DeployToken     string      `json:"deployToken"`
+	MaintenanceMode bool        `json:"maintenanceMode,omitempty"`
 }
 
 type Variable struct {
@@ -195,27 +215,27 @@ type UpdateServiceVarRequest struct {
 	IsSecret bool   `json:"isSecret"`
 }
 
-type Job struct {
-	ID         string     `json:"id" db:"id"`
-	ProjectID  string     `json:"projectId" db:"project_id"`
-	Name       string     `json:"name" db:"name"`
-	Schedule   string     `json:"schedule" db:"schedule"`
-	Command    string     `json:"command" db:"command"`
-	Status     JobStatus  `json:"status" db:"status"`
-	LastRunAt  *time.Time `json:"lastRunAt" db:"last_run_at"`
-	LastOutput string     `json:"lastOutput" db:"last_output"`
-	CreatedAt  time.Time  `json:"createdAt" db:"created_at"`
-	UpdatedAt  time.Time  `json:"updatedAt" db:"updated_at"`
+type ScheduledTask struct {
+	ID         string    `json:"id" db:"id"`
+	ServiceID  string    `json:"serviceId" db:"service_id"`
+	Name       string    `json:"name" db:"name"`
+	Schedule   string    `json:"schedule" db:"schedule"`
+	Command    string    `json:"command" db:"command"`
+	Status     string    `json:"status" db:"status"` // active, paused
+	LastRunAt  time.Time `json:"lastRunAt" db:"last_run_at"`
+	LastOutput string    `json:"lastOutput" db:"last_output"`
+	CreatedAt  time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt  time.Time `json:"updatedAt" db:"updated_at"`
 }
 
-type CreateJobRequest struct {
-	ProjectID string `json:"projectId"`
+type CreateScheduledTaskRequest struct {
+	ServiceID string `json:"serviceId"`
 	Name      string `json:"name"`
 	Schedule  string `json:"schedule"`
 	Command   string `json:"command"`
 }
 
-type UpdateJobRequest struct {
+type UpdateScheduledTaskRequest struct {
 	Name     *string `json:"name,omitempty"`
 	Schedule *string `json:"schedule,omitempty"`
 	Command  *string `json:"command,omitempty"`
@@ -224,7 +244,6 @@ type UpdateJobRequest struct {
 
 type BackupConfig struct {
 	ID              string             `json:"id" db:"id"`
-	ProjectID       string             `json:"projectId" db:"project_id"`
 	DatabaseID      string             `json:"databaseId,omitempty" db:"database_id"`
 	S3DestinationID string             `json:"s3DestinationId,omitempty" db:"s3_destination_id"`
 	Name            string             `json:"name" db:"name"`
@@ -248,7 +267,6 @@ type BackupConfig struct {
 type BackupRecord struct {
 	ID             string             `json:"id" db:"id"`
 	BackupConfigID string             `json:"backupConfigId" db:"backup_config_id"`
-	ProjectID      string             `json:"projectId" db:"project_id"`
 	DatabaseID     string             `json:"databaseId,omitempty" db:"database_id"`
 	Status         BackupRecordStatus `json:"status" db:"status"`
 	FilePath       string             `json:"filePath" db:"file_path"`
@@ -271,7 +289,6 @@ type UpdateBackupRecordOpts struct {
 
 type S3Destination struct {
 	ID              string `json:"id" db:"id"`
-	ProjectID       string `json:"projectId" db:"project_id"`
 	Name            string `json:"name" db:"name"`
 	Description     string `json:"description" db:"description"`
 	Provider        string `json:"provider" db:"provider"`
@@ -295,4 +312,30 @@ type PRPreview struct {
 	ContainerID   string          `json:"containerId" db:"container_id"`
 	CreatedAt     time.Time       `json:"createdAt" db:"created_at"`
 	UpdatedAt     time.Time       `json:"updatedAt" db:"updated_at"`
+}
+
+type LogDrainType string
+
+const (
+	LogDrainTypeAxiom    LogDrainType = "axiom"
+	LogDrainTypeNewRelic LogDrainType = "new_relic"
+	LogDrainTypeDatadog  LogDrainType = "datadog"
+	LogDrainTypeWebhook  LogDrainType = "webhook"
+)
+
+type LogDrain struct {
+	ID          string       `json:"id" db:"id"`
+	ServiceID   string       `json:"serviceId" db:"service_id"`
+	ProjectID   string       `json:"projectId" db:"project_id"`
+	DrainType   LogDrainType `json:"drainType" db:"drain_type"`
+	EndpointURL string       `json:"endpointUrl" db:"endpoint_url"`
+	AuthToken   string       `json:"authToken" db:"auth_token"`
+	CreatedAt   time.Time    `json:"createdAt" db:"created_at"`
+	UpdatedAt   time.Time    `json:"updatedAt" db:"updated_at"`
+}
+
+type CreateLogDrainRequest struct {
+	DrainType   LogDrainType `json:"drainType"`
+	EndpointURL string       `json:"endpointUrl"`
+	AuthToken   string       `json:"authToken"`
 }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -26,12 +27,6 @@ type Verify2FARequest struct {
 	Passcode string `json:"passcode"`
 }
 
-// @Summary ListProviders endpoint
-// @Description ListProviders endpoint
-// @Tags Settings
-// @Accept json
-// @Produce json
-// @Router /settings/oauth/providers [get]
 func (h *OAuthHandler) ListProviders(c echo.Context) error {
 	providers, err := h.oauthService.ListProviders(c.Request().Context())
 	if err != nil {
@@ -40,12 +35,6 @@ func (h *OAuthHandler) ListProviders(c echo.Context) error {
 	return utils.Success(c, "Operation successful", providers)
 }
 
-// @Summary ListEnabledProviders endpoint
-// @Description ListEnabledProviders endpoint
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Router /auth/oauth/providers/enabled [get]
 func (h *OAuthHandler) ListEnabledProviders(c echo.Context) error {
 	providers, err := h.oauthService.ListEnabledProviders(c.Request().Context())
 	if err != nil {
@@ -57,13 +46,6 @@ func (h *OAuthHandler) ListEnabledProviders(c echo.Context) error {
 	return utils.Success(c, "Operation successful", providers)
 }
 
-// @Summary SaveProvider endpoint
-// @Description SaveProvider endpoint
-// @Tags Settings
-// @Accept json
-// @Produce json
-// @Param request body models.OAuthProviderConfig true "Payload"
-// @Router /settings/oauth/providers [put]
 func (h *OAuthHandler) SaveProvider(c echo.Context) error {
 	var p models.OAuthProviderConfig
 	if err := c.Bind(&p); err != nil {
@@ -75,13 +57,6 @@ func (h *OAuthHandler) SaveProvider(c echo.Context) error {
 	return utils.Success(c, "Operation successful", p)
 }
 
-// @Summary OAuthRedirect endpoint
-// @Description OAuthRedirect endpoint
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Param provider path string true "provider"
-// @Router /auth/oauth/{provider} [get]
 func (h *OAuthHandler) OAuthRedirect(c echo.Context) error {
 	providerName := strings.TrimPrefix(c.Request().URL.Path, "/api/auth/oauth/")
 	if idx := strings.Index(providerName, "/"); idx != -1 {
@@ -103,13 +78,6 @@ func (h *OAuthHandler) OAuthRedirect(c echo.Context) error {
 	return c.Redirect(http.StatusTemporaryRedirect, authURL)
 }
 
-// @Summary OAuthCallback endpoint
-// @Description OAuthCallback endpoint
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Param provider path string true "provider"
-// @Router /auth/oauth/{provider}/callback [get]
 func (h *OAuthHandler) OAuthCallback(c echo.Context) error {
 	providerName := strings.TrimPrefix(c.Request().URL.Path, "/api/auth/oauth/")
 	providerName = strings.TrimSuffix(providerName, "/callback")
@@ -125,12 +93,6 @@ func (h *OAuthHandler) OAuthCallback(c echo.Context) error {
 	return c.Redirect(http.StatusTemporaryRedirect, "/")
 }
 
-// @Summary Setup2FA endpoint
-// @Description Setup2FA endpoint
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Router /auth/2fa/setup [post]
 func (h *OAuthHandler) Setup2FA(c echo.Context) error {
 	claims := ExtractClaims(c)
 	if claims == nil || claims.UserID == "" {
@@ -143,13 +105,6 @@ func (h *OAuthHandler) Setup2FA(c echo.Context) error {
 	return utils.Success(c, "Operation successful", res)
 }
 
-// @Summary Verify2FA endpoint
-// @Description Verify2FA endpoint
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Param request body handlers.Verify2FARequest true "Payload"
-// @Router /auth/2fa/verify [post]
 func (h *OAuthHandler) Verify2FA(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {
@@ -165,12 +120,6 @@ func (h *OAuthHandler) Verify2FA(c echo.Context) error {
 	return utils.Success(c, "Operation successful", map[string]string{"status": "totp_enabled"})
 }
 
-// @Summary Disable2FA endpoint
-// @Description Disable2FA endpoint
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Router /auth/2fa/disable [post]
 func (h *OAuthHandler) Disable2FA(c echo.Context) error {
 	userID := ExtractUserID(c)
 	if userID == "" {
@@ -181,7 +130,10 @@ func (h *OAuthHandler) Disable2FA(c echo.Context) error {
 		return utils.Error(c, http.StatusBadRequest, "missing passcode")
 	}
 	if err := h.oauthService.Validate2FA(c.Request().Context(), userID, payload.Passcode); err != nil {
-		return utils.Error(c, http.StatusUnauthorized, err.Error())
+		if errors.Is(err, services.ErrInvalidPasscode) {
+			return utils.Error(c, http.StatusUnauthorized, err.Error())
+		}
+		return utils.Error(c, http.StatusInternalServerError, "failed to validate 2fa")
 	}
 	if err := h.oauthService.Disable2FA(c.Request().Context(), userID); err != nil {
 		return utils.Error(c, http.StatusInternalServerError, err.Error())

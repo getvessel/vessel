@@ -1,11 +1,3 @@
-// @title Vessl API
-// @version 1.0
-// @description Vessl API Documentation
-// @host localhost:8080
-// @BasePath /api
-// @securityDefinitions.apikey BearerAuth
-// @in header
-// @name Authorization
 package main
 
 import (
@@ -30,6 +22,7 @@ import (
 	"vessl.dev/vessl/internal/models"
 	"vessl.dev/vessl/internal/repositories"
 	"vessl.dev/vessl/internal/services"
+	"vessl.dev/vessl/internal/telemetry"
 	"vessl.dev/vessl/internal/utils"
 )
 
@@ -57,9 +50,18 @@ func (a *dbDeployerStore) ListServiceVariables(serviceID string) ([]*models.Vari
 	return svVarRepo.ListByService(context.Background(), serviceID)
 }
 
+func (a *dbDeployerStore) ListLogDrainsByService(serviceID string) ([]*models.LogDrain, error) {
+	return repositories.NewAppServiceRepo(a.db).ListLogDrainsByService(context.Background(), serviceID)
+}
+
 func (a *dbDeployerStore) GetServerlessFunctionCode(serviceID string) (*models.ServerlessFunctionCode, error) {
 	svlsRepo := repositories.NewServerlessRepository(a.db)
 	return svlsRepo.GetCodeByServiceID(context.Background(), serviceID)
+}
+
+func (a *dbDeployerStore) UpdateAppService(app *models.AppService) error {
+	repo := repositories.NewAppServiceRepo(a.db)
+	return repo.Update(context.Background(), app)
 }
 
 func main() {
@@ -98,6 +100,14 @@ func startServer() {
 	slog.Info("booting daemon", "version", vesslVersion, "os", runtime.GOOS, "arch", runtime.GOARCH)
 	dataDir, db, vlt := initDataDir()
 	defer db.Close()
+
+	telemetry.Init()
+	defer telemetry.Close()
+	telemetry.Track("system", "daemon_start", map[string]interface{}{
+		"version": vesslVersion,
+		"os":      runtime.GOOS,
+		"arch":    runtime.GOARCH,
+	})
 
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {

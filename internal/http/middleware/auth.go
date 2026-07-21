@@ -28,14 +28,19 @@ type ProjectTokenProvider interface {
 	UpdateTokenLastUsed(ctx context.Context, id string) error
 }
 
-type AuthGuard struct {
-	TokenService  *services.TokenService
-	Settings      SettingsProvider
-	ProjectTokens ProjectTokenProvider
+type ProjectMemberProvider interface {
+	GetMember(ctx context.Context, projectID, userID string) (*models.ProjectMember, error)
 }
 
-func NewAuthGuard(ts *services.TokenService, sp SettingsProvider, pt ProjectTokenProvider) *AuthGuard {
-	return &AuthGuard{TokenService: ts, Settings: sp, ProjectTokens: pt}
+type AuthGuard struct {
+	TokenService   *services.TokenService
+	Settings       SettingsProvider
+	ProjectTokens  ProjectTokenProvider
+	ProjectMembers ProjectMemberProvider
+}
+
+func NewAuthGuard(ts *services.TokenService, sp SettingsProvider, pt ProjectTokenProvider, pm ProjectMemberProvider) *AuthGuard {
+	return &AuthGuard{TokenService: ts, Settings: sp, ProjectTokens: pt, ProjectMembers: pm}
 }
 
 func (g *AuthGuard) checkIPAllowlist(c echo.Context) error {
@@ -195,6 +200,57 @@ func (g *AuthGuard) RequireScope(requiredScope string) echo.MiddlewareFunc {
 	}
 }
 
+func (g *AuthGuard) RequireProjectRole(minPermission models.MemberPermission) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			userClaims, ok := c.Get("user").(*models.UserClaims)
+			if !ok || userClaims == nil {
+				return utils.Error(c, http.StatusUnauthorized, "unauthorized")
+			}
+
+			if userClaims.Role == "admin" {
+				return next(c)
+			}
+
+			projectID := c.Param("projectId")
+			if projectID == "" {
+				projectID = c.Param("id") // fallback if route uses :id instead of :projectId
+			}
+			if projectID == "" {
+				return utils.Error(c, http.StatusBadRequest, "missing project id")
+			}
+
+			if userClaims.Role == "api" {
+				if c.Get("project_id") != projectID {
+					return utils.Error(c, http.StatusForbidden, "api token not authorized for this project")
+				}
+				if minPermission != "" && minPermission != models.MemberPermissionMember {
+					return utils.Error(c, http.StatusForbidden, "api tokens cannot perform administrative actions")
+				}
+				return next(c)
+			}
+
+			if g.ProjectMembers == nil {
+				return utils.Error(c, http.StatusInternalServerError, "project members provider not configured")
+			}
+
+			member, err := g.ProjectMembers.GetMember(c.Request().Context(), projectID, userClaims.UserID)
+			if err != nil {
+				return utils.Error(c, http.StatusInternalServerError, "failed to verify project membership")
+			}
+			if member == nil {
+				return utils.Error(c, http.StatusForbidden, "you do not have access to this project")
+			}
+
+			if minPermission != "" && member.Permission != minPermission && member.Permission != models.MemberPermissionAdmin && member.Permission != models.MemberPermissionOwner {
+				return utils.Error(c, http.StatusForbidden, "insufficient project permissions")
+			}
+
+			return next(c)
+		}
+	}
+}
+
 func (g *AuthGuard) RequireRole(requiredRole models.UserRole) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -202,8 +258,8 @@ func (g *AuthGuard) RequireRole(requiredRole models.UserRole) echo.MiddlewareFun
 			if err != nil {
 				return err
 			}
-			if userClaims.Role != requiredRole && userClaims.Role != models.UserRoleAdmin {
-				return utils.Error(c, http.StatusForbidden, "insufficient permissions")
+			if userClaims.Role != requiredRole && userClaims.Role != models.UserRoleAdmin && userClaims.Role != models.UserRoleOwner {
+				return utils.Error(c, http.StatusForbidden, "insufficient instance permissions")
 			}
 			c.Set("user", userClaims)
 			ctx := context.WithValue(c.Request().Context(), userClaimsKey, userClaims)

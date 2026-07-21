@@ -22,7 +22,6 @@ import (
 type deployArgs struct {
 	gitURL      string
 	imageRef    string
-	composePath string
 	archivePath string
 	projectID   string
 	branch      string
@@ -33,18 +32,18 @@ type deployArgs struct {
 func runDeploy(args []string) {
 	dArgs := parseDeployArgs(args)
 
-	if dArgs.gitURL == "" && dArgs.imageRef == "" && dArgs.composePath == "" && dArgs.archivePath == "" {
-		exitError("Usage: vessld deploy <git-url> | --template <t> | --image <img> | --compose <file> | --archive <file>")
+	if dArgs.gitURL == "" && dArgs.imageRef == "" && dArgs.archivePath == "" {
+		exitError("Usage: vessld deploy <git-url> | --template <t> | --image <img> | --archive <file>")
 	}
 
 	count := 0
-	for _, v := range []bool{dArgs.gitURL != "", dArgs.imageRef != "", dArgs.composePath != "", dArgs.archivePath != ""} {
+	for _, v := range []bool{dArgs.gitURL != "", dArgs.imageRef != "", dArgs.archivePath != ""} {
 		if v {
 			count++
 		}
 	}
 	if count > 1 {
-		exitError("Specify only one: Git URL, --image, --compose, or --archive")
+		exitError("Specify only one: Git URL, --image, or --archive")
 	}
 
 	dataDir, db, vlt := initDataDir()
@@ -87,11 +86,6 @@ func parseDeployArgs(args []string) deployArgs {
 		case "--image", "-i":
 			if i+1 < len(args) {
 				d.imageRef = args[i+1]
-				i++
-			}
-		case "--compose", "-c":
-			if i+1 < len(args) {
-				d.composePath = args[i+1]
 				i++
 			}
 		case "--archive", "-a":
@@ -284,18 +278,6 @@ func performDeployment(deployer *engine.Deployer, dockerClient *client.Client, s
 		}
 		slog.Info("container started from image", "image", dArgs.imageRef, "containerID", containerID)
 		fmt.Printf("\n✅ Deployed! Container: %s\n", containerID)
-
-	case dArgs.composePath != "":
-		fmt.Printf("📦 Deploying compose file %s...\n", dArgs.composePath)
-		composeDeployer := engine.NewComposeDeployer(dockerClient)
-		services, err := composeDeployer.Deploy(context.Background(), dArgs.composePath, dArgs.projectID)
-		if err != nil {
-			exitError("Compose deploy failed: %v", err)
-		}
-		fmt.Printf("\n✅ Deployed %d services from compose file\n", len(services))
-		for _, s := range services {
-			fmt.Printf("   - %s (%s)\n", s.Name, s.ContainerID[:12])
-		}
 
 	case dArgs.archivePath != "":
 		fmt.Printf("📦 Deploying archive %s...\n", dArgs.archivePath)

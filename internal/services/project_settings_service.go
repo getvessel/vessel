@@ -86,7 +86,7 @@ func (s *ProjectSettingsService) AddMemberByEmail(ctx context.Context, opts AddM
 		return nil, errors.New("valid member with projectId and email required")
 	}
 
-	u, err := s.authService.InviteUser(ctx, opts.Email, opts.OriginURL)
+	u, err := s.authService.InviteUser(ctx, opts.Email, models.UserRoleMember, opts.OriginURL)
 	if err != nil {
 		return nil, err
 	}
@@ -139,4 +139,11 @@ func (s *ProjectSettingsService) RemoveMember(ctx context.Context, id, projectID
 		return errors.New("id and projectId required")
 	}
 	return s.repo.RemoveMember(ctx, id, projectID)
+}
+
+func (s *ProjectSettingsService) GetMember(ctx context.Context, projectID, userID string) (*models.ProjectMember, error) {
+	if projectID == "" || userID == "" {
+		return nil, errors.New("projectId and userId required")
+	}
+	return s.repo.GetMember(ctx, projectID, userID)
 }

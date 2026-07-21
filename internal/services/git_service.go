@@ -132,6 +132,21 @@ func (s *GitService) DeleteProvider(ctx context.Context, userID, provider string
 }
 
 func (s *GitService) ListRepositories(ctx context.Context, userID, provider string) ([]models.GitRepository, error) {
+	if provider == "" {
+		providers, err := s.repo.ListProvidersByUser(ctx, userID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to list providers: %w", err)
+		}
+		var allRepos []models.GitRepository
+		for _, p := range providers {
+			repos, err := s.ListRepositories(ctx, userID, p.Provider)
+			if err == nil {
+				allRepos = append(allRepos, repos...)
+			}
+		}
+		return allRepos, nil
+	}
+
 	gp, err := s.repo.GetProvider(ctx, userID, provider)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load git credentials: %w", err)

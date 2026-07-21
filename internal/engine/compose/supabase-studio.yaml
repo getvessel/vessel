@@ -15,4 +15,4 @@ services:
     image: postgres:16-alpine
     restart: always
     environment:
-      POSTGRES_DB: supabase
+      - POSTGRES_DB=supabase

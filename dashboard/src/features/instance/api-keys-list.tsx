@@ -156,6 +156,10 @@ export function ApiKeysList() {
         open={isNewKeyOpen}
         onOpenChange={setIsNewKeyOpen}
         newKeyPlain={newKeyPlain}
+        onClose={() => {
+          setNewKeyPlain('');
+          setIsNewKeyOpen(false);
+        }}
       />
       <ApiKeyDeleteDialog deleteId={deleteId} onClose={() => setDeleteId(null)} />
     </div>

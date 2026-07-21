@@ -43,7 +43,7 @@ export function S3DestinationsList() {
   const [secretAccessKey, setSecretAccessKey] = useState('');
   const [showSecret, setShowSecret] = useState(false);
 
-  const { data: s3Destinations, isLoading } = useListS3Destinations('global');
+  const { data: s3Destinations, isLoading } = useListS3Destinations();
   const createS3Dest = useCreateS3Destination();
   const deleteS3Dest = useDeleteS3Destination();
 
@@ -129,7 +129,7 @@ export function S3DestinationsList() {
               NEW DESTINATION
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-150 gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
+          <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-150 [&>button]:hidden">
             <div className="px-5 pt-5 pb-4">
               <div className="flex items-start justify-between">
                 <div className="flex flex-col">
@@ -137,10 +137,7 @@ export function S3DestinationsList() {
                     <Database className="h-5 w-5 text-primary" />
                     New S3 Storage
                   </DialogTitle>
-                  <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
-                    <Database className="h-3 w-3" />
-                    Connect compatible S3 storage
-                  </DialogDescription>
+                  <DialogDescription>Connect compatible S3 storage</DialogDescription>
                 </div>
                 <DialogClose asChild>
                   <Button

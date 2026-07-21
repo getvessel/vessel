@@ -48,13 +48,6 @@ func NewWebhookHandler(
 	}
 }
 
-// @Summary HandleServiceWebhook endpoint
-// @Description HandleServiceWebhook endpoint
-// @Tags Webhooks
-// @Accept json
-// @Produce json
-// @Param serviceId path string true "serviceId"
-// @Router /webhooks/git/services/{serviceId} [post]
 func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	if serviceID == "" {
@@ -64,6 +57,12 @@ func (h *WebhookHandler) HandleServiceWebhook(c echo.Context) error {
 	if err != nil || appSvc == nil {
 		return utils.Error(c, http.StatusNotFound, "service not found")
 	}
+
+	token := c.QueryParam("token")
+	if appSvc.DeployToken == "" || token != appSvc.DeployToken {
+		return utils.Error(c, http.StatusUnauthorized, "invalid or missing deploy token")
+	}
+
 	h.deployServiceAsync(appSvc)
 	return utils.Accepted(c, fmt.Sprintf("triggering background build & rollout for service %s", appSvc.Name), nil)
 }
@@ -98,14 +97,6 @@ func verifyHMAC(payload []byte, secret, signature string) bool {
 	return hmac.Equal([]byte(expectedMAC), []byte(signature))
 }
 
-// @Summary HandleGitHubWebhook endpoint
-// @Description HandleGitHubWebhook endpoint
-// @Tags Webhooks
-// @Accept json
-// @Produce json
-// @Param serviceId path string true "serviceId"
-// @Param request body models.GithubWebhookPayload true "Payload"
-// @Router /webhooks/github/services/{serviceId} [post]
 func (h *WebhookHandler) HandleGitHubWebhook(c echo.Context) error {
 	serviceID := c.Param("serviceId")
 	if serviceID == "" {
@@ -159,8 +150,15 @@ func (h *WebhookHandler) HandleGitHubWebhook(c echo.Context) error {
 	}
 
 	if event == "pull_request" {
+		appSvc, err := h.appService.GetAppService(c.Request().Context(), serviceID)
+		if err != nil || appSvc == nil {
+			return utils.Error(c, http.StatusNotFound, "service not found")
+		}
 		switch payload.Action {
 		case "opened", "synchronize", "reopened":
+			if !appSvc.EnablePRPreviews {
+				return utils.Success(c, "PR previews are disabled for this service", nil)
+			}
 			h.deployPRPreviewAsync(serviceID, payload)
 			return utils.Accepted(c, "Deploying PR preview", nil)
 		case "closed":

@@ -19,15 +19,17 @@ type ProjectService struct {
 	appRepo        repositories.AppServiceRepository
 	serviceVarRepo repositories.ServiceVarRepository
 	settingsRepo   repositories.SettingsRepository
+	membersRepo    repositories.ProjectSettingsRepository
 }
 
-func NewProjectService(pr repositories.ProjectRepository, er repositories.EnvironmentRepository, ar repositories.AppServiceRepository, svr repositories.ServiceVarRepository, sr repositories.SettingsRepository) *ProjectService {
+func NewProjectService(pr repositories.ProjectRepository, er repositories.EnvironmentRepository, ar repositories.AppServiceRepository, svr repositories.ServiceVarRepository, sr repositories.SettingsRepository, mr repositories.ProjectSettingsRepository) *ProjectService {
 	return &ProjectService{
 		projectRepo:    pr,
 		envRepo:        er,
 		appRepo:        ar,
 		serviceVarRepo: svr,
 		settingsRepo:   sr,
+		membersRepo:    mr,
 	}
 }
 
@@ -71,11 +73,64 @@ func (s *ProjectService) CreateProjectFromRequest(ctx context.Context, req *mode
 	return p, nil
 }
 
+func (s *ProjectService) CreateProjectWithMemberFromRequest(ctx context.Context, req *models.CreateProjectRequest, userID, role string) (*models.ProjectConfig, error) {
+	if req.Name == "" {
+		req.Name = utils.GenerateRandomName()
+	}
+	id := req.ID
+	if id == "" {
+		id = uuid.NewString()
+	}
+	p := &models.ProjectConfig{
+		ID:          id,
+		Name:        req.Name,
+		Description: req.Description,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	if err := s.projectRepo.CreateWithMember(ctx, p, userID, role); err != nil {
+		return nil, fmt.Errorf("failed to create project with member: %w", err)
+	}
+	return p, nil
+}
+
 func (s *ProjectService) GetProject(ctx context.Context, id string) (*models.ProjectConfig, error) {
 	if id == "" {
 		return nil, errors.New("project id is required")
 	}
 	return s.projectRepo.Get(ctx, id)
+}
+
+func (s *ProjectService) IsMemberOrOwner(ctx context.Context, projectID, userID string, userRole models.UserRole) bool {
+	if userRole == models.UserRoleOwner || userRole == models.UserRoleAdmin {
+		return true
+	}
+	member, err := s.membersRepo.GetMember(ctx, projectID, userID)
+	if err != nil || member == nil {
+		return false
+	}
+	return member.Status == models.MemberStatusAccepted
+}
+
+func (s *ProjectService) HasPermission(ctx context.Context, projectID, userID string, userRole models.UserRole, minPermission models.MemberPermission) bool {
+	if userRole == models.UserRoleOwner || userRole == models.UserRoleAdmin {
+		return true
+	}
+	member, err := s.membersRepo.GetMember(ctx, projectID, userID)
+	if err != nil || member == nil || member.Status != models.MemberStatusAccepted {
+		return false
+	}
+
+	switch minPermission {
+	case models.MemberPermissionOwner:
+		return member.Permission == models.MemberPermissionOwner
+	case models.MemberPermissionAdmin:
+		return member.Permission == models.MemberPermissionOwner || member.Permission == models.MemberPermissionAdmin
+	case models.MemberPermissionMember, "":
+		return true
+	default:
+		return false
+	}
 }
 
 func (s *ProjectService) ListProjects(ctx context.Context, limit, offset int) ([]models.ProjectConfig, int, error) {

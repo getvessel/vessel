@@ -54,3 +54,11 @@ export const useDiagnostics = () => {
     mutationFn: (deploymentId: string) => deploymentsService.diagnostics(deploymentId),
   });
 };
+
+export const useExplainFailure = (deploymentId: string, enabled: boolean) => {
+  return useQuery({
+    queryKey: ['deployments', 'explainFailure', deploymentId].filter(Boolean),
+    queryFn: () => deploymentsService.explainFailure(deploymentId),
+    enabled: enabled && !!deploymentId,
+  });
+};

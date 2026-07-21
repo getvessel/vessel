@@ -9,155 +9,73 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as DashboardRouteImport } from './routes/_dashboard'
-import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as SplatRouteImport } from './routes/$'
-import { Route as DashboardIndexRouteImport } from './routes/_dashboard.index'
-import { Route as DashboardUsersRouteImport } from './routes/_dashboard.users'
-import { Route as DashboardUpdatesRouteImport } from './routes/_dashboard.updates'
-import { Route as DashboardTemplatesRouteImport } from './routes/_dashboard.templates'
-import { Route as DashboardSourcesRouteImport } from './routes/_dashboard.sources'
-import { Route as DashboardSettingsRouteImport } from './routes/_dashboard.settings'
-import { Route as DashboardS3DestinationsRouteImport } from './routes/_dashboard.s3-destinations'
-import { Route as DashboardProfileRouteImport } from './routes/_dashboard.profile'
-import { Route as DashboardMigrationsRouteImport } from './routes/_dashboard.migrations'
-import { Route as DashboardMaintenanceRouteImport } from './routes/_dashboard.maintenance'
-import { Route as DashboardJobsRouteImport } from './routes/_dashboard.jobs'
-import { Route as DashboardDomainsRouteImport } from './routes/_dashboard.domains'
-import { Route as DashboardDnsRouteImport } from './routes/_dashboard.dns'
-import { Route as DashboardDeploymentsRouteImport } from './routes/_dashboard.deployments'
-import { Route as DashboardAuditLogsRouteImport } from './routes/_dashboard.audit-logs'
-import { Route as DashboardApiAccessRouteImport } from './routes/_dashboard.api-access'
-import { Route as DashboardAiRouteImport } from './routes/_dashboard.ai'
-import { Route as AuthSignupRouteImport } from './routes/_auth.signup'
-import { Route as AuthSigninRouteImport } from './routes/_auth.signin'
-import { Route as AuthResetPasswordRouteImport } from './routes/_auth.reset-password'
+import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as DashboardRouteImport } from './routes/_dashboard'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth.forgot-password'
-import { Route as DashboardServicesServiceIdIndexRouteImport } from './routes/_dashboard.services/$serviceId.index'
+import { Route as AuthResetPasswordRouteImport } from './routes/_auth.reset-password'
+import { Route as AuthSigninRouteImport } from './routes/_auth.signin'
+import { Route as AuthSignupRouteImport } from './routes/_auth.signup'
+import { Route as DashboardIndexRouteImport } from './routes/_dashboard.index'
+import { Route as DashboardAiRouteImport } from './routes/_dashboard.ai'
+import { Route as DashboardApiAccessRouteImport } from './routes/_dashboard.api-access'
+import { Route as DashboardAuditLogsRouteImport } from './routes/_dashboard.audit-logs'
+import { Route as DashboardDeploymentsRouteImport } from './routes/_dashboard.deployments'
+import { Route as DashboardDnsRouteImport } from './routes/_dashboard.dns'
+import { Route as DashboardDomainsRouteImport } from './routes/_dashboard.domains'
+import { Route as DashboardMaintenanceRouteImport } from './routes/_dashboard.maintenance'
+import { Route as DashboardMigrationsRouteImport } from './routes/_dashboard.migrations'
+import { Route as DashboardProfileRouteImport } from './routes/_dashboard.profile'
+import { Route as DashboardS3DestinationsRouteImport } from './routes/_dashboard.s3-destinations'
+import { Route as DashboardScheduledTasksRouteImport } from './routes/_dashboard.scheduled-tasks'
+import { Route as DashboardSettingsRouteImport } from './routes/_dashboard.settings'
+import { Route as DashboardSourcesRouteImport } from './routes/_dashboard.sources'
+import { Route as DashboardUpdatesRouteImport } from './routes/_dashboard.updates'
+import { Route as DashboardUsersRouteImport } from './routes/_dashboard.users'
+import { Route as DashboardServicesServiceIdRouteImport } from './routes/_dashboard.services/$serviceId'
 import { Route as DashboardProjectsProjectIdIndexRouteImport } from './routes/_dashboard.projects/$projectId.index'
-import { Route as DashboardServicesServiceIdVariablesRouteImport } from './routes/_dashboard.services/$serviceId.variables'
-import { Route as DashboardServicesServiceIdTerminalRouteImport } from './routes/_dashboard.services/$serviceId.terminal'
-import { Route as DashboardServicesServiceIdServerlessRouteImport } from './routes/_dashboard.services/$serviceId.serverless'
-import { Route as DashboardServicesServiceIdDomainsRouteImport } from './routes/_dashboard.services/$serviceId.domains'
-import { Route as DashboardServicesServiceIdDeploymentsRouteImport } from './routes/_dashboard.services/$serviceId.deployments'
-import { Route as DashboardServicesServiceIdBuildRouteImport } from './routes/_dashboard.services/$serviceId.build'
-import { Route as DashboardProjectsProjectIdSettingsRouteImport } from './routes/_dashboard.projects/$projectId.settings'
-import { Route as DashboardProjectsProjectIdJobsRouteImport } from './routes/_dashboard.projects/$projectId.jobs'
-import { Route as DashboardProjectsProjectIdComposeRouteImport } from './routes/_dashboard.projects/$projectId.compose'
 import { Route as DashboardProjectsProjectIdCanvasRouteImport } from './routes/_dashboard.projects/$projectId.canvas'
+import { Route as DashboardProjectsProjectIdComposeRouteImport } from './routes/_dashboard.projects/$projectId.compose'
+import { Route as DashboardProjectsProjectIdNewRouteImport } from './routes/_dashboard.projects/$projectId.new'
+import { Route as DashboardProjectsProjectIdScheduledTasksRouteImport } from './routes/_dashboard.projects/$projectId.scheduled-tasks'
+import { Route as DashboardProjectsProjectIdSettingsRouteImport } from './routes/_dashboard.projects/$projectId.settings'
+import { Route as DashboardServicesServiceIdIndexRouteImport } from './routes/_dashboard.services/$serviceId.index'
+import { Route as DashboardServicesServiceIdBuildRouteImport } from './routes/_dashboard.services/$serviceId.build'
+import { Route as DashboardServicesServiceIdDangerRouteImport } from './routes/_dashboard.services/$serviceId.danger'
+import { Route as DashboardServicesServiceIdDeploymentsRouteImport } from './routes/_dashboard.services/$serviceId.deployments'
+import { Route as DashboardServicesServiceIdDomainsRouteImport } from './routes/_dashboard.services/$serviceId.domains'
+import { Route as DashboardServicesServiceIdLogDrainsRouteImport } from './routes/_dashboard.services/$serviceId.log-drains'
+import { Route as DashboardServicesServiceIdMetricsRouteImport } from './routes/_dashboard.services/$serviceId.metrics'
+import { Route as DashboardServicesServiceIdPreviewsRouteImport } from './routes/_dashboard.services/$serviceId.previews'
+import { Route as DashboardServicesServiceIdScheduledTasksRouteImport } from './routes/_dashboard.services/$serviceId.scheduled-tasks'
+import { Route as DashboardServicesServiceIdServerlessRouteImport } from './routes/_dashboard.services/$serviceId.serverless'
+import { Route as DashboardServicesServiceIdTerminalRouteImport } from './routes/_dashboard.services/$serviceId.terminal'
+import { Route as DashboardServicesServiceIdVariablesRouteImport } from './routes/_dashboard.services/$serviceId.variables'
+import { Route as DashboardServicesServiceIdVolumesRouteImport } from './routes/_dashboard.services/$serviceId.volumes'
+import { Route as DashboardServicesServiceIdWebhooksRouteImport } from './routes/_dashboard.services/$serviceId.webhooks'
 
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/_dashboard',
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SplatRoute = SplatRouteImport.update({
-  id: '/$',
-  path: '/$',
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/_dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardRoute,
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardUsersRoute = DashboardUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardUpdatesRoute = DashboardUpdatesRouteImport.update({
-  id: '/updates',
-  path: '/updates',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardTemplatesRoute = DashboardTemplatesRouteImport.update({
-  id: '/templates',
-  path: '/templates',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardSourcesRoute = DashboardSourcesRouteImport.update({
-  id: '/sources',
-  path: '/sources',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardS3DestinationsRoute = DashboardS3DestinationsRouteImport.update({
-  id: '/s3-destinations',
-  path: '/s3-destinations',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardProfileRoute = DashboardProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardMigrationsRoute = DashboardMigrationsRouteImport.update({
-  id: '/migrations',
-  path: '/migrations',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardMaintenanceRoute = DashboardMaintenanceRouteImport.update({
-  id: '/maintenance',
-  path: '/maintenance',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardJobsRoute = DashboardJobsRouteImport.update({
-  id: '/jobs',
-  path: '/jobs',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardDomainsRoute = DashboardDomainsRouteImport.update({
-  id: '/domains',
-  path: '/domains',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardDnsRoute = DashboardDnsRouteImport.update({
-  id: '/dns',
-  path: '/dns',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardDeploymentsRoute = DashboardDeploymentsRouteImport.update({
-  id: '/deployments',
-  path: '/deployments',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardAuditLogsRoute = DashboardAuditLogsRouteImport.update({
-  id: '/audit-logs',
-  path: '/audit-logs',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardApiAccessRoute = DashboardApiAccessRouteImport.update({
-  id: '/api-access',
-  path: '/api-access',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardAiRoute = DashboardAiRouteImport.update({
-  id: '/ai',
-  path: '/ai',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const AuthSignupRoute = AuthSignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthSigninRoute = AuthSigninRouteImport.update({
-  id: '/signin',
-  path: '/signin',
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
@@ -165,15 +83,100 @@ const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
+const AuthSigninRoute = AuthSigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
   getParentRoute: () => AuthRoute,
 } as any)
-const DashboardServicesServiceIdIndexRoute =
-  DashboardServicesServiceIdIndexRouteImport.update({
-    id: '/services/$serviceId/',
-    path: '/services/$serviceId/',
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => AuthRoute,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAiRoute = DashboardAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardApiAccessRoute = DashboardApiAccessRouteImport.update({
+  id: '/api-access',
+  path: '/api-access',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAuditLogsRoute = DashboardAuditLogsRouteImport.update({
+  id: '/audit-logs',
+  path: '/audit-logs',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDeploymentsRoute = DashboardDeploymentsRouteImport.update({
+  id: '/deployments',
+  path: '/deployments',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDnsRoute = DashboardDnsRouteImport.update({
+  id: '/dns',
+  path: '/dns',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDomainsRoute = DashboardDomainsRouteImport.update({
+  id: '/domains',
+  path: '/domains',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardMaintenanceRoute = DashboardMaintenanceRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardMigrationsRoute = DashboardMigrationsRouteImport.update({
+  id: '/migrations',
+  path: '/migrations',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardProfileRoute = DashboardProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardS3DestinationsRoute = DashboardS3DestinationsRouteImport.update({
+  id: '/s3-destinations',
+  path: '/s3-destinations',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardScheduledTasksRoute = DashboardScheduledTasksRouteImport.update({
+  id: '/scheduled-tasks',
+  path: '/scheduled-tasks',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSourcesRoute = DashboardSourcesRouteImport.update({
+  id: '/sources',
+  path: '/sources',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardUpdatesRoute = DashboardUpdatesRouteImport.update({
+  id: '/updates',
+  path: '/updates',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardUsersRoute = DashboardUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardServicesServiceIdRoute =
+  DashboardServicesServiceIdRouteImport.update({
+    id: '/services/$serviceId',
+    path: '/services/$serviceId',
     getParentRoute: () => DashboardRoute,
   } as any)
 const DashboardProjectsProjectIdIndexRoute =
@@ -182,52 +185,10 @@ const DashboardProjectsProjectIdIndexRoute =
     path: '/projects/$projectId/',
     getParentRoute: () => DashboardRoute,
   } as any)
-const DashboardServicesServiceIdVariablesRoute =
-  DashboardServicesServiceIdVariablesRouteImport.update({
-    id: '/services/$serviceId/variables',
-    path: '/services/$serviceId/variables',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardServicesServiceIdTerminalRoute =
-  DashboardServicesServiceIdTerminalRouteImport.update({
-    id: '/services/$serviceId/terminal',
-    path: '/services/$serviceId/terminal',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardServicesServiceIdServerlessRoute =
-  DashboardServicesServiceIdServerlessRouteImport.update({
-    id: '/services/$serviceId/serverless',
-    path: '/services/$serviceId/serverless',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardServicesServiceIdDomainsRoute =
-  DashboardServicesServiceIdDomainsRouteImport.update({
-    id: '/services/$serviceId/domains',
-    path: '/services/$serviceId/domains',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardServicesServiceIdDeploymentsRoute =
-  DashboardServicesServiceIdDeploymentsRouteImport.update({
-    id: '/services/$serviceId/deployments',
-    path: '/services/$serviceId/deployments',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardServicesServiceIdBuildRoute =
-  DashboardServicesServiceIdBuildRouteImport.update({
-    id: '/services/$serviceId/build',
-    path: '/services/$serviceId/build',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardProjectsProjectIdSettingsRoute =
-  DashboardProjectsProjectIdSettingsRouteImport.update({
-    id: '/projects/$projectId/settings',
-    path: '/projects/$projectId/settings',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardProjectsProjectIdJobsRoute =
-  DashboardProjectsProjectIdJobsRouteImport.update({
-    id: '/projects/$projectId/jobs',
-    path: '/projects/$projectId/jobs',
+const DashboardProjectsProjectIdCanvasRoute =
+  DashboardProjectsProjectIdCanvasRouteImport.update({
+    id: '/projects/$projectId/canvas',
+    path: '/projects/$projectId/canvas',
     getParentRoute: () => DashboardRoute,
   } as any)
 const DashboardProjectsProjectIdComposeRoute =
@@ -236,11 +197,107 @@ const DashboardProjectsProjectIdComposeRoute =
     path: '/projects/$projectId/compose',
     getParentRoute: () => DashboardRoute,
   } as any)
-const DashboardProjectsProjectIdCanvasRoute =
-  DashboardProjectsProjectIdCanvasRouteImport.update({
-    id: '/projects/$projectId/canvas',
-    path: '/projects/$projectId/canvas',
+const DashboardProjectsProjectIdNewRoute =
+  DashboardProjectsProjectIdNewRouteImport.update({
+    id: '/projects/$projectId/new',
+    path: '/projects/$projectId/new',
     getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardProjectsProjectIdScheduledTasksRoute =
+  DashboardProjectsProjectIdScheduledTasksRouteImport.update({
+    id: '/projects/$projectId/scheduled-tasks',
+    path: '/projects/$projectId/scheduled-tasks',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardProjectsProjectIdSettingsRoute =
+  DashboardProjectsProjectIdSettingsRouteImport.update({
+    id: '/projects/$projectId/settings',
+    path: '/projects/$projectId/settings',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardServicesServiceIdIndexRoute =
+  DashboardServicesServiceIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdBuildRoute =
+  DashboardServicesServiceIdBuildRouteImport.update({
+    id: '/build',
+    path: '/build',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdDangerRoute =
+  DashboardServicesServiceIdDangerRouteImport.update({
+    id: '/danger',
+    path: '/danger',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdDeploymentsRoute =
+  DashboardServicesServiceIdDeploymentsRouteImport.update({
+    id: '/deployments',
+    path: '/deployments',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdDomainsRoute =
+  DashboardServicesServiceIdDomainsRouteImport.update({
+    id: '/domains',
+    path: '/domains',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdLogDrainsRoute =
+  DashboardServicesServiceIdLogDrainsRouteImport.update({
+    id: '/log-drains',
+    path: '/log-drains',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdMetricsRoute =
+  DashboardServicesServiceIdMetricsRouteImport.update({
+    id: '/metrics',
+    path: '/metrics',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdPreviewsRoute =
+  DashboardServicesServiceIdPreviewsRouteImport.update({
+    id: '/previews',
+    path: '/previews',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdScheduledTasksRoute =
+  DashboardServicesServiceIdScheduledTasksRouteImport.update({
+    id: '/scheduled-tasks',
+    path: '/scheduled-tasks',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdServerlessRoute =
+  DashboardServicesServiceIdServerlessRouteImport.update({
+    id: '/serverless',
+    path: '/serverless',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdTerminalRoute =
+  DashboardServicesServiceIdTerminalRouteImport.update({
+    id: '/terminal',
+    path: '/terminal',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdVariablesRoute =
+  DashboardServicesServiceIdVariablesRouteImport.update({
+    id: '/variables',
+    path: '/variables',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdVolumesRoute =
+  DashboardServicesServiceIdVolumesRouteImport.update({
+    id: '/volumes',
+    path: '/volumes',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
+  } as any)
+const DashboardServicesServiceIdWebhooksRoute =
+  DashboardServicesServiceIdWebhooksRouteImport.update({
+    id: '/webhooks',
+    path: '/webhooks',
+    getParentRoute: () => DashboardServicesServiceIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -257,26 +314,34 @@ export interface FileRoutesByFullPath {
   '/deployments': typeof DashboardDeploymentsRoute
   '/dns': typeof DashboardDnsRoute
   '/domains': typeof DashboardDomainsRoute
-  '/jobs': typeof DashboardJobsRoute
   '/maintenance': typeof DashboardMaintenanceRoute
   '/migrations': typeof DashboardMigrationsRoute
   '/profile': typeof DashboardProfileRoute
   '/s3-destinations': typeof DashboardS3DestinationsRoute
+  '/scheduled-tasks': typeof DashboardScheduledTasksRoute
   '/settings': typeof DashboardSettingsRoute
   '/sources': typeof DashboardSourcesRoute
-  '/templates': typeof DashboardTemplatesRoute
   '/updates': typeof DashboardUpdatesRoute
   '/users': typeof DashboardUsersRoute
+  '/services/$serviceId': typeof DashboardServicesServiceIdRouteWithChildren
   '/projects/$projectId/canvas': typeof DashboardProjectsProjectIdCanvasRoute
   '/projects/$projectId/compose': typeof DashboardProjectsProjectIdComposeRoute
-  '/projects/$projectId/jobs': typeof DashboardProjectsProjectIdJobsRoute
+  '/projects/$projectId/new': typeof DashboardProjectsProjectIdNewRoute
+  '/projects/$projectId/scheduled-tasks': typeof DashboardProjectsProjectIdScheduledTasksRoute
   '/projects/$projectId/settings': typeof DashboardProjectsProjectIdSettingsRoute
   '/services/$serviceId/build': typeof DashboardServicesServiceIdBuildRoute
+  '/services/$serviceId/danger': typeof DashboardServicesServiceIdDangerRoute
   '/services/$serviceId/deployments': typeof DashboardServicesServiceIdDeploymentsRoute
   '/services/$serviceId/domains': typeof DashboardServicesServiceIdDomainsRoute
+  '/services/$serviceId/log-drains': typeof DashboardServicesServiceIdLogDrainsRoute
+  '/services/$serviceId/metrics': typeof DashboardServicesServiceIdMetricsRoute
+  '/services/$serviceId/previews': typeof DashboardServicesServiceIdPreviewsRoute
+  '/services/$serviceId/scheduled-tasks': typeof DashboardServicesServiceIdScheduledTasksRoute
   '/services/$serviceId/serverless': typeof DashboardServicesServiceIdServerlessRoute
   '/services/$serviceId/terminal': typeof DashboardServicesServiceIdTerminalRoute
   '/services/$serviceId/variables': typeof DashboardServicesServiceIdVariablesRoute
+  '/services/$serviceId/volumes': typeof DashboardServicesServiceIdVolumesRoute
+  '/services/$serviceId/webhooks': typeof DashboardServicesServiceIdWebhooksRoute
   '/projects/$projectId/': typeof DashboardProjectsProjectIdIndexRoute
   '/services/$serviceId/': typeof DashboardServicesServiceIdIndexRoute
 }
@@ -294,26 +359,33 @@ export interface FileRoutesByTo {
   '/deployments': typeof DashboardDeploymentsRoute
   '/dns': typeof DashboardDnsRoute
   '/domains': typeof DashboardDomainsRoute
-  '/jobs': typeof DashboardJobsRoute
   '/maintenance': typeof DashboardMaintenanceRoute
   '/migrations': typeof DashboardMigrationsRoute
   '/profile': typeof DashboardProfileRoute
   '/s3-destinations': typeof DashboardS3DestinationsRoute
+  '/scheduled-tasks': typeof DashboardScheduledTasksRoute
   '/settings': typeof DashboardSettingsRoute
   '/sources': typeof DashboardSourcesRoute
-  '/templates': typeof DashboardTemplatesRoute
   '/updates': typeof DashboardUpdatesRoute
   '/users': typeof DashboardUsersRoute
   '/projects/$projectId/canvas': typeof DashboardProjectsProjectIdCanvasRoute
   '/projects/$projectId/compose': typeof DashboardProjectsProjectIdComposeRoute
-  '/projects/$projectId/jobs': typeof DashboardProjectsProjectIdJobsRoute
+  '/projects/$projectId/new': typeof DashboardProjectsProjectIdNewRoute
+  '/projects/$projectId/scheduled-tasks': typeof DashboardProjectsProjectIdScheduledTasksRoute
   '/projects/$projectId/settings': typeof DashboardProjectsProjectIdSettingsRoute
   '/services/$serviceId/build': typeof DashboardServicesServiceIdBuildRoute
+  '/services/$serviceId/danger': typeof DashboardServicesServiceIdDangerRoute
   '/services/$serviceId/deployments': typeof DashboardServicesServiceIdDeploymentsRoute
   '/services/$serviceId/domains': typeof DashboardServicesServiceIdDomainsRoute
+  '/services/$serviceId/log-drains': typeof DashboardServicesServiceIdLogDrainsRoute
+  '/services/$serviceId/metrics': typeof DashboardServicesServiceIdMetricsRoute
+  '/services/$serviceId/previews': typeof DashboardServicesServiceIdPreviewsRoute
+  '/services/$serviceId/scheduled-tasks': typeof DashboardServicesServiceIdScheduledTasksRoute
   '/services/$serviceId/serverless': typeof DashboardServicesServiceIdServerlessRoute
   '/services/$serviceId/terminal': typeof DashboardServicesServiceIdTerminalRoute
   '/services/$serviceId/variables': typeof DashboardServicesServiceIdVariablesRoute
+  '/services/$serviceId/volumes': typeof DashboardServicesServiceIdVolumesRoute
+  '/services/$serviceId/webhooks': typeof DashboardServicesServiceIdWebhooksRoute
   '/projects/$projectId': typeof DashboardProjectsProjectIdIndexRoute
   '/services/$serviceId': typeof DashboardServicesServiceIdIndexRoute
 }
@@ -333,27 +405,35 @@ export interface FileRoutesById {
   '/_dashboard/deployments': typeof DashboardDeploymentsRoute
   '/_dashboard/dns': typeof DashboardDnsRoute
   '/_dashboard/domains': typeof DashboardDomainsRoute
-  '/_dashboard/jobs': typeof DashboardJobsRoute
   '/_dashboard/maintenance': typeof DashboardMaintenanceRoute
   '/_dashboard/migrations': typeof DashboardMigrationsRoute
   '/_dashboard/profile': typeof DashboardProfileRoute
   '/_dashboard/s3-destinations': typeof DashboardS3DestinationsRoute
+  '/_dashboard/scheduled-tasks': typeof DashboardScheduledTasksRoute
   '/_dashboard/settings': typeof DashboardSettingsRoute
   '/_dashboard/sources': typeof DashboardSourcesRoute
-  '/_dashboard/templates': typeof DashboardTemplatesRoute
   '/_dashboard/updates': typeof DashboardUpdatesRoute
   '/_dashboard/users': typeof DashboardUsersRoute
   '/_dashboard/': typeof DashboardIndexRoute
+  '/_dashboard/services/$serviceId': typeof DashboardServicesServiceIdRouteWithChildren
   '/_dashboard/projects/$projectId/canvas': typeof DashboardProjectsProjectIdCanvasRoute
   '/_dashboard/projects/$projectId/compose': typeof DashboardProjectsProjectIdComposeRoute
-  '/_dashboard/projects/$projectId/jobs': typeof DashboardProjectsProjectIdJobsRoute
+  '/_dashboard/projects/$projectId/new': typeof DashboardProjectsProjectIdNewRoute
+  '/_dashboard/projects/$projectId/scheduled-tasks': typeof DashboardProjectsProjectIdScheduledTasksRoute
   '/_dashboard/projects/$projectId/settings': typeof DashboardProjectsProjectIdSettingsRoute
   '/_dashboard/services/$serviceId/build': typeof DashboardServicesServiceIdBuildRoute
+  '/_dashboard/services/$serviceId/danger': typeof DashboardServicesServiceIdDangerRoute
   '/_dashboard/services/$serviceId/deployments': typeof DashboardServicesServiceIdDeploymentsRoute
   '/_dashboard/services/$serviceId/domains': typeof DashboardServicesServiceIdDomainsRoute
+  '/_dashboard/services/$serviceId/log-drains': typeof DashboardServicesServiceIdLogDrainsRoute
+  '/_dashboard/services/$serviceId/metrics': typeof DashboardServicesServiceIdMetricsRoute
+  '/_dashboard/services/$serviceId/previews': typeof DashboardServicesServiceIdPreviewsRoute
+  '/_dashboard/services/$serviceId/scheduled-tasks': typeof DashboardServicesServiceIdScheduledTasksRoute
   '/_dashboard/services/$serviceId/serverless': typeof DashboardServicesServiceIdServerlessRoute
   '/_dashboard/services/$serviceId/terminal': typeof DashboardServicesServiceIdTerminalRoute
   '/_dashboard/services/$serviceId/variables': typeof DashboardServicesServiceIdVariablesRoute
+  '/_dashboard/services/$serviceId/volumes': typeof DashboardServicesServiceIdVolumesRoute
+  '/_dashboard/services/$serviceId/webhooks': typeof DashboardServicesServiceIdWebhooksRoute
   '/_dashboard/projects/$projectId/': typeof DashboardProjectsProjectIdIndexRoute
   '/_dashboard/services/$serviceId/': typeof DashboardServicesServiceIdIndexRoute
 }
@@ -373,26 +453,34 @@ export interface FileRouteTypes {
     | '/deployments'
     | '/dns'
     | '/domains'
-    | '/jobs'
     | '/maintenance'
     | '/migrations'
     | '/profile'
     | '/s3-destinations'
+    | '/scheduled-tasks'
     | '/settings'
     | '/sources'
-    | '/templates'
     | '/updates'
     | '/users'
+    | '/services/$serviceId'
     | '/projects/$projectId/canvas'
     | '/projects/$projectId/compose'
-    | '/projects/$projectId/jobs'
+    | '/projects/$projectId/new'
+    | '/projects/$projectId/scheduled-tasks'
     | '/projects/$projectId/settings'
     | '/services/$serviceId/build'
+    | '/services/$serviceId/danger'
     | '/services/$serviceId/deployments'
     | '/services/$serviceId/domains'
+    | '/services/$serviceId/log-drains'
+    | '/services/$serviceId/metrics'
+    | '/services/$serviceId/previews'
+    | '/services/$serviceId/scheduled-tasks'
     | '/services/$serviceId/serverless'
     | '/services/$serviceId/terminal'
     | '/services/$serviceId/variables'
+    | '/services/$serviceId/volumes'
+    | '/services/$serviceId/webhooks'
     | '/projects/$projectId/'
     | '/services/$serviceId/'
   fileRoutesByTo: FileRoutesByTo
@@ -410,26 +498,33 @@ export interface FileRouteTypes {
     | '/deployments'
     | '/dns'
     | '/domains'
-    | '/jobs'
     | '/maintenance'
     | '/migrations'
     | '/profile'
     | '/s3-destinations'
+    | '/scheduled-tasks'
     | '/settings'
     | '/sources'
-    | '/templates'
     | '/updates'
     | '/users'
     | '/projects/$projectId/canvas'
     | '/projects/$projectId/compose'
-    | '/projects/$projectId/jobs'
+    | '/projects/$projectId/new'
+    | '/projects/$projectId/scheduled-tasks'
     | '/projects/$projectId/settings'
     | '/services/$serviceId/build'
+    | '/services/$serviceId/danger'
     | '/services/$serviceId/deployments'
     | '/services/$serviceId/domains'
+    | '/services/$serviceId/log-drains'
+    | '/services/$serviceId/metrics'
+    | '/services/$serviceId/previews'
+    | '/services/$serviceId/scheduled-tasks'
     | '/services/$serviceId/serverless'
     | '/services/$serviceId/terminal'
     | '/services/$serviceId/variables'
+    | '/services/$serviceId/volumes'
+    | '/services/$serviceId/webhooks'
     | '/projects/$projectId'
     | '/services/$serviceId'
   id:
@@ -448,27 +543,35 @@ export interface FileRouteTypes {
     | '/_dashboard/deployments'
     | '/_dashboard/dns'
     | '/_dashboard/domains'
-    | '/_dashboard/jobs'
     | '/_dashboard/maintenance'
     | '/_dashboard/migrations'
     | '/_dashboard/profile'
     | '/_dashboard/s3-destinations'
+    | '/_dashboard/scheduled-tasks'
     | '/_dashboard/settings'
     | '/_dashboard/sources'
-    | '/_dashboard/templates'
     | '/_dashboard/updates'
     | '/_dashboard/users'
     | '/_dashboard/'
+    | '/_dashboard/services/$serviceId'
     | '/_dashboard/projects/$projectId/canvas'
     | '/_dashboard/projects/$projectId/compose'
-    | '/_dashboard/projects/$projectId/jobs'
+    | '/_dashboard/projects/$projectId/new'
+    | '/_dashboard/projects/$projectId/scheduled-tasks'
     | '/_dashboard/projects/$projectId/settings'
     | '/_dashboard/services/$serviceId/build'
+    | '/_dashboard/services/$serviceId/danger'
     | '/_dashboard/services/$serviceId/deployments'
     | '/_dashboard/services/$serviceId/domains'
+    | '/_dashboard/services/$serviceId/log-drains'
+    | '/_dashboard/services/$serviceId/metrics'
+    | '/_dashboard/services/$serviceId/previews'
+    | '/_dashboard/services/$serviceId/scheduled-tasks'
     | '/_dashboard/services/$serviceId/serverless'
     | '/_dashboard/services/$serviceId/terminal'
     | '/_dashboard/services/$serviceId/variables'
+    | '/_dashboard/services/$serviceId/volumes'
+    | '/_dashboard/services/$serviceId/webhooks'
     | '/_dashboard/projects/$projectId/'
     | '/_dashboard/services/$serviceId/'
   fileRoutesById: FileRoutesById
@@ -482,18 +585,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_dashboard': {
-      id: '/_dashboard'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof DashboardRouteImport
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth': {
@@ -503,144 +599,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$': {
-      id: '/$'
-      path: '/$'
-      fullPath: '/$'
-      preLoaderRoute: typeof SplatRouteImport
+    '/_dashboard': {
+      id: '/_dashboard'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_dashboard/': {
-      id: '/_dashboard/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof DashboardRoute
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_dashboard/users': {
-      id: '/_dashboard/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof DashboardUsersRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/updates': {
-      id: '/_dashboard/updates'
-      path: '/updates'
-      fullPath: '/updates'
-      preLoaderRoute: typeof DashboardUpdatesRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/templates': {
-      id: '/_dashboard/templates'
-      path: '/templates'
-      fullPath: '/templates'
-      preLoaderRoute: typeof DashboardTemplatesRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/sources': {
-      id: '/_dashboard/sources'
-      path: '/sources'
-      fullPath: '/sources'
-      preLoaderRoute: typeof DashboardSourcesRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/settings': {
-      id: '/_dashboard/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof DashboardSettingsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/s3-destinations': {
-      id: '/_dashboard/s3-destinations'
-      path: '/s3-destinations'
-      fullPath: '/s3-destinations'
-      preLoaderRoute: typeof DashboardS3DestinationsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/profile': {
-      id: '/_dashboard/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof DashboardProfileRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/migrations': {
-      id: '/_dashboard/migrations'
-      path: '/migrations'
-      fullPath: '/migrations'
-      preLoaderRoute: typeof DashboardMigrationsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/maintenance': {
-      id: '/_dashboard/maintenance'
-      path: '/maintenance'
-      fullPath: '/maintenance'
-      preLoaderRoute: typeof DashboardMaintenanceRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/jobs': {
-      id: '/_dashboard/jobs'
-      path: '/jobs'
-      fullPath: '/jobs'
-      preLoaderRoute: typeof DashboardJobsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/domains': {
-      id: '/_dashboard/domains'
-      path: '/domains'
-      fullPath: '/domains'
-      preLoaderRoute: typeof DashboardDomainsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/dns': {
-      id: '/_dashboard/dns'
-      path: '/dns'
-      fullPath: '/dns'
-      preLoaderRoute: typeof DashboardDnsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/deployments': {
-      id: '/_dashboard/deployments'
-      path: '/deployments'
-      fullPath: '/deployments'
-      preLoaderRoute: typeof DashboardDeploymentsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/audit-logs': {
-      id: '/_dashboard/audit-logs'
-      path: '/audit-logs'
-      fullPath: '/audit-logs'
-      preLoaderRoute: typeof DashboardAuditLogsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/api-access': {
-      id: '/_dashboard/api-access'
-      path: '/api-access'
-      fullPath: '/api-access'
-      preLoaderRoute: typeof DashboardApiAccessRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/ai': {
-      id: '/_dashboard/ai'
-      path: '/ai'
-      fullPath: '/ai'
-      preLoaderRoute: typeof DashboardAiRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_auth/signup': {
-      id: '/_auth/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof AuthSignupRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/signin': {
-      id: '/_auth/signin'
-      path: '/signin'
-      fullPath: '/signin'
-      preLoaderRoute: typeof AuthSigninRouteImport
+    '/_auth/forgot-password': {
+      id: '/_auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/reset-password': {
@@ -650,18 +627,137 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthResetPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/forgot-password': {
-      id: '/_auth/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+    '/_auth/signin': {
+      id: '/_auth/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof AuthSigninRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_dashboard/services/$serviceId/': {
-      id: '/_dashboard/services/$serviceId/'
+    '/_auth/signup': {
+      id: '/_auth/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_dashboard/': {
+      id: '/_dashboard/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/ai': {
+      id: '/_dashboard/ai'
+      path: '/ai'
+      fullPath: '/ai'
+      preLoaderRoute: typeof DashboardAiRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/api-access': {
+      id: '/_dashboard/api-access'
+      path: '/api-access'
+      fullPath: '/api-access'
+      preLoaderRoute: typeof DashboardApiAccessRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/audit-logs': {
+      id: '/_dashboard/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/audit-logs'
+      preLoaderRoute: typeof DashboardAuditLogsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/deployments': {
+      id: '/_dashboard/deployments'
+      path: '/deployments'
+      fullPath: '/deployments'
+      preLoaderRoute: typeof DashboardDeploymentsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dns': {
+      id: '/_dashboard/dns'
+      path: '/dns'
+      fullPath: '/dns'
+      preLoaderRoute: typeof DashboardDnsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/domains': {
+      id: '/_dashboard/domains'
+      path: '/domains'
+      fullPath: '/domains'
+      preLoaderRoute: typeof DashboardDomainsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/maintenance': {
+      id: '/_dashboard/maintenance'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof DashboardMaintenanceRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/migrations': {
+      id: '/_dashboard/migrations'
+      path: '/migrations'
+      fullPath: '/migrations'
+      preLoaderRoute: typeof DashboardMigrationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/profile': {
+      id: '/_dashboard/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof DashboardProfileRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/s3-destinations': {
+      id: '/_dashboard/s3-destinations'
+      path: '/s3-destinations'
+      fullPath: '/s3-destinations'
+      preLoaderRoute: typeof DashboardS3DestinationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/scheduled-tasks': {
+      id: '/_dashboard/scheduled-tasks'
+      path: '/scheduled-tasks'
+      fullPath: '/scheduled-tasks'
+      preLoaderRoute: typeof DashboardScheduledTasksRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/settings': {
+      id: '/_dashboard/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/sources': {
+      id: '/_dashboard/sources'
+      path: '/sources'
+      fullPath: '/sources'
+      preLoaderRoute: typeof DashboardSourcesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/updates': {
+      id: '/_dashboard/updates'
+      path: '/updates'
+      fullPath: '/updates'
+      preLoaderRoute: typeof DashboardUpdatesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/users': {
+      id: '/_dashboard/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof DashboardUsersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/services/$serviceId': {
+      id: '/_dashboard/services/$serviceId'
       path: '/services/$serviceId'
-      fullPath: '/services/$serviceId/'
-      preLoaderRoute: typeof DashboardServicesServiceIdIndexRouteImport
+      fullPath: '/services/$serviceId'
+      preLoaderRoute: typeof DashboardServicesServiceIdRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/projects/$projectId/': {
@@ -671,60 +767,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsProjectIdIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/services/$serviceId/variables': {
-      id: '/_dashboard/services/$serviceId/variables'
-      path: '/services/$serviceId/variables'
-      fullPath: '/services/$serviceId/variables'
-      preLoaderRoute: typeof DashboardServicesServiceIdVariablesRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/services/$serviceId/terminal': {
-      id: '/_dashboard/services/$serviceId/terminal'
-      path: '/services/$serviceId/terminal'
-      fullPath: '/services/$serviceId/terminal'
-      preLoaderRoute: typeof DashboardServicesServiceIdTerminalRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/services/$serviceId/serverless': {
-      id: '/_dashboard/services/$serviceId/serverless'
-      path: '/services/$serviceId/serverless'
-      fullPath: '/services/$serviceId/serverless'
-      preLoaderRoute: typeof DashboardServicesServiceIdServerlessRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/services/$serviceId/domains': {
-      id: '/_dashboard/services/$serviceId/domains'
-      path: '/services/$serviceId/domains'
-      fullPath: '/services/$serviceId/domains'
-      preLoaderRoute: typeof DashboardServicesServiceIdDomainsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/services/$serviceId/deployments': {
-      id: '/_dashboard/services/$serviceId/deployments'
-      path: '/services/$serviceId/deployments'
-      fullPath: '/services/$serviceId/deployments'
-      preLoaderRoute: typeof DashboardServicesServiceIdDeploymentsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/services/$serviceId/build': {
-      id: '/_dashboard/services/$serviceId/build'
-      path: '/services/$serviceId/build'
-      fullPath: '/services/$serviceId/build'
-      preLoaderRoute: typeof DashboardServicesServiceIdBuildRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/projects/$projectId/settings': {
-      id: '/_dashboard/projects/$projectId/settings'
-      path: '/projects/$projectId/settings'
-      fullPath: '/projects/$projectId/settings'
-      preLoaderRoute: typeof DashboardProjectsProjectIdSettingsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/projects/$projectId/jobs': {
-      id: '/_dashboard/projects/$projectId/jobs'
-      path: '/projects/$projectId/jobs'
-      fullPath: '/projects/$projectId/jobs'
-      preLoaderRoute: typeof DashboardProjectsProjectIdJobsRouteImport
+    '/_dashboard/projects/$projectId/canvas': {
+      id: '/_dashboard/projects/$projectId/canvas'
+      path: '/projects/$projectId/canvas'
+      fullPath: '/projects/$projectId/canvas'
+      preLoaderRoute: typeof DashboardProjectsProjectIdCanvasRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/projects/$projectId/compose': {
@@ -734,12 +781,124 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsProjectIdComposeRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/projects/$projectId/canvas': {
-      id: '/_dashboard/projects/$projectId/canvas'
-      path: '/projects/$projectId/canvas'
-      fullPath: '/projects/$projectId/canvas'
-      preLoaderRoute: typeof DashboardProjectsProjectIdCanvasRouteImport
+    '/_dashboard/projects/$projectId/new': {
+      id: '/_dashboard/projects/$projectId/new'
+      path: '/projects/$projectId/new'
+      fullPath: '/projects/$projectId/new'
+      preLoaderRoute: typeof DashboardProjectsProjectIdNewRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/projects/$projectId/scheduled-tasks': {
+      id: '/_dashboard/projects/$projectId/scheduled-tasks'
+      path: '/projects/$projectId/scheduled-tasks'
+      fullPath: '/projects/$projectId/scheduled-tasks'
+      preLoaderRoute: typeof DashboardProjectsProjectIdScheduledTasksRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/projects/$projectId/settings': {
+      id: '/_dashboard/projects/$projectId/settings'
+      path: '/projects/$projectId/settings'
+      fullPath: '/projects/$projectId/settings'
+      preLoaderRoute: typeof DashboardProjectsProjectIdSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/services/$serviceId/': {
+      id: '/_dashboard/services/$serviceId/'
+      path: '/'
+      fullPath: '/services/$serviceId/'
+      preLoaderRoute: typeof DashboardServicesServiceIdIndexRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/build': {
+      id: '/_dashboard/services/$serviceId/build'
+      path: '/build'
+      fullPath: '/services/$serviceId/build'
+      preLoaderRoute: typeof DashboardServicesServiceIdBuildRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/danger': {
+      id: '/_dashboard/services/$serviceId/danger'
+      path: '/danger'
+      fullPath: '/services/$serviceId/danger'
+      preLoaderRoute: typeof DashboardServicesServiceIdDangerRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/deployments': {
+      id: '/_dashboard/services/$serviceId/deployments'
+      path: '/deployments'
+      fullPath: '/services/$serviceId/deployments'
+      preLoaderRoute: typeof DashboardServicesServiceIdDeploymentsRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/domains': {
+      id: '/_dashboard/services/$serviceId/domains'
+      path: '/domains'
+      fullPath: '/services/$serviceId/domains'
+      preLoaderRoute: typeof DashboardServicesServiceIdDomainsRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/log-drains': {
+      id: '/_dashboard/services/$serviceId/log-drains'
+      path: '/log-drains'
+      fullPath: '/services/$serviceId/log-drains'
+      preLoaderRoute: typeof DashboardServicesServiceIdLogDrainsRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/metrics': {
+      id: '/_dashboard/services/$serviceId/metrics'
+      path: '/metrics'
+      fullPath: '/services/$serviceId/metrics'
+      preLoaderRoute: typeof DashboardServicesServiceIdMetricsRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/previews': {
+      id: '/_dashboard/services/$serviceId/previews'
+      path: '/previews'
+      fullPath: '/services/$serviceId/previews'
+      preLoaderRoute: typeof DashboardServicesServiceIdPreviewsRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/scheduled-tasks': {
+      id: '/_dashboard/services/$serviceId/scheduled-tasks'
+      path: '/scheduled-tasks'
+      fullPath: '/services/$serviceId/scheduled-tasks'
+      preLoaderRoute: typeof DashboardServicesServiceIdScheduledTasksRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/serverless': {
+      id: '/_dashboard/services/$serviceId/serverless'
+      path: '/serverless'
+      fullPath: '/services/$serviceId/serverless'
+      preLoaderRoute: typeof DashboardServicesServiceIdServerlessRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/terminal': {
+      id: '/_dashboard/services/$serviceId/terminal'
+      path: '/terminal'
+      fullPath: '/services/$serviceId/terminal'
+      preLoaderRoute: typeof DashboardServicesServiceIdTerminalRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/variables': {
+      id: '/_dashboard/services/$serviceId/variables'
+      path: '/variables'
+      fullPath: '/services/$serviceId/variables'
+      preLoaderRoute: typeof DashboardServicesServiceIdVariablesRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/volumes': {
+      id: '/_dashboard/services/$serviceId/volumes'
+      path: '/volumes'
+      fullPath: '/services/$serviceId/volumes'
+      preLoaderRoute: typeof DashboardServicesServiceIdVolumesRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
+    }
+    '/_dashboard/services/$serviceId/webhooks': {
+      id: '/_dashboard/services/$serviceId/webhooks'
+      path: '/webhooks'
+      fullPath: '/services/$serviceId/webhooks'
+      preLoaderRoute: typeof DashboardServicesServiceIdWebhooksRouteImport
+      parentRoute: typeof DashboardServicesServiceIdRoute
     }
   }
 }
@@ -760,6 +919,58 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface DashboardServicesServiceIdRouteChildren {
+  DashboardServicesServiceIdBuildRoute: typeof DashboardServicesServiceIdBuildRoute
+  DashboardServicesServiceIdDangerRoute: typeof DashboardServicesServiceIdDangerRoute
+  DashboardServicesServiceIdDeploymentsRoute: typeof DashboardServicesServiceIdDeploymentsRoute
+  DashboardServicesServiceIdDomainsRoute: typeof DashboardServicesServiceIdDomainsRoute
+  DashboardServicesServiceIdLogDrainsRoute: typeof DashboardServicesServiceIdLogDrainsRoute
+  DashboardServicesServiceIdMetricsRoute: typeof DashboardServicesServiceIdMetricsRoute
+  DashboardServicesServiceIdPreviewsRoute: typeof DashboardServicesServiceIdPreviewsRoute
+  DashboardServicesServiceIdScheduledTasksRoute: typeof DashboardServicesServiceIdScheduledTasksRoute
+  DashboardServicesServiceIdServerlessRoute: typeof DashboardServicesServiceIdServerlessRoute
+  DashboardServicesServiceIdTerminalRoute: typeof DashboardServicesServiceIdTerminalRoute
+  DashboardServicesServiceIdVariablesRoute: typeof DashboardServicesServiceIdVariablesRoute
+  DashboardServicesServiceIdVolumesRoute: typeof DashboardServicesServiceIdVolumesRoute
+  DashboardServicesServiceIdWebhooksRoute: typeof DashboardServicesServiceIdWebhooksRoute
+  DashboardServicesServiceIdIndexRoute: typeof DashboardServicesServiceIdIndexRoute
+}
+
+const DashboardServicesServiceIdRouteChildren: DashboardServicesServiceIdRouteChildren =
+  {
+    DashboardServicesServiceIdBuildRoute: DashboardServicesServiceIdBuildRoute,
+    DashboardServicesServiceIdDangerRoute:
+      DashboardServicesServiceIdDangerRoute,
+    DashboardServicesServiceIdDeploymentsRoute:
+      DashboardServicesServiceIdDeploymentsRoute,
+    DashboardServicesServiceIdDomainsRoute:
+      DashboardServicesServiceIdDomainsRoute,
+    DashboardServicesServiceIdLogDrainsRoute:
+      DashboardServicesServiceIdLogDrainsRoute,
+    DashboardServicesServiceIdMetricsRoute:
+      DashboardServicesServiceIdMetricsRoute,
+    DashboardServicesServiceIdPreviewsRoute:
+      DashboardServicesServiceIdPreviewsRoute,
+    DashboardServicesServiceIdScheduledTasksRoute:
+      DashboardServicesServiceIdScheduledTasksRoute,
+    DashboardServicesServiceIdServerlessRoute:
+      DashboardServicesServiceIdServerlessRoute,
+    DashboardServicesServiceIdTerminalRoute:
+      DashboardServicesServiceIdTerminalRoute,
+    DashboardServicesServiceIdVariablesRoute:
+      DashboardServicesServiceIdVariablesRoute,
+    DashboardServicesServiceIdVolumesRoute:
+      DashboardServicesServiceIdVolumesRoute,
+    DashboardServicesServiceIdWebhooksRoute:
+      DashboardServicesServiceIdWebhooksRoute,
+    DashboardServicesServiceIdIndexRoute: DashboardServicesServiceIdIndexRoute,
+  }
+
+const DashboardServicesServiceIdRouteWithChildren =
+  DashboardServicesServiceIdRoute._addFileChildren(
+    DashboardServicesServiceIdRouteChildren,
+  )
+
 interface DashboardRouteChildren {
   DashboardAiRoute: typeof DashboardAiRoute
   DashboardApiAccessRoute: typeof DashboardApiAccessRoute
@@ -767,29 +978,23 @@ interface DashboardRouteChildren {
   DashboardDeploymentsRoute: typeof DashboardDeploymentsRoute
   DashboardDnsRoute: typeof DashboardDnsRoute
   DashboardDomainsRoute: typeof DashboardDomainsRoute
-  DashboardJobsRoute: typeof DashboardJobsRoute
   DashboardMaintenanceRoute: typeof DashboardMaintenanceRoute
   DashboardMigrationsRoute: typeof DashboardMigrationsRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardS3DestinationsRoute: typeof DashboardS3DestinationsRoute
+  DashboardScheduledTasksRoute: typeof DashboardScheduledTasksRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardSourcesRoute: typeof DashboardSourcesRoute
-  DashboardTemplatesRoute: typeof DashboardTemplatesRoute
   DashboardUpdatesRoute: typeof DashboardUpdatesRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardServicesServiceIdRoute: typeof DashboardServicesServiceIdRouteWithChildren
   DashboardProjectsProjectIdCanvasRoute: typeof DashboardProjectsProjectIdCanvasRoute
   DashboardProjectsProjectIdComposeRoute: typeof DashboardProjectsProjectIdComposeRoute
-  DashboardProjectsProjectIdJobsRoute: typeof DashboardProjectsProjectIdJobsRoute
+  DashboardProjectsProjectIdNewRoute: typeof DashboardProjectsProjectIdNewRoute
+  DashboardProjectsProjectIdScheduledTasksRoute: typeof DashboardProjectsProjectIdScheduledTasksRoute
   DashboardProjectsProjectIdSettingsRoute: typeof DashboardProjectsProjectIdSettingsRoute
-  DashboardServicesServiceIdBuildRoute: typeof DashboardServicesServiceIdBuildRoute
-  DashboardServicesServiceIdDeploymentsRoute: typeof DashboardServicesServiceIdDeploymentsRoute
-  DashboardServicesServiceIdDomainsRoute: typeof DashboardServicesServiceIdDomainsRoute
-  DashboardServicesServiceIdServerlessRoute: typeof DashboardServicesServiceIdServerlessRoute
-  DashboardServicesServiceIdTerminalRoute: typeof DashboardServicesServiceIdTerminalRoute
-  DashboardServicesServiceIdVariablesRoute: typeof DashboardServicesServiceIdVariablesRoute
   DashboardProjectsProjectIdIndexRoute: typeof DashboardProjectsProjectIdIndexRoute
-  DashboardServicesServiceIdIndexRoute: typeof DashboardServicesServiceIdIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
@@ -799,36 +1004,26 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardDeploymentsRoute: DashboardDeploymentsRoute,
   DashboardDnsRoute: DashboardDnsRoute,
   DashboardDomainsRoute: DashboardDomainsRoute,
-  DashboardJobsRoute: DashboardJobsRoute,
   DashboardMaintenanceRoute: DashboardMaintenanceRoute,
   DashboardMigrationsRoute: DashboardMigrationsRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardS3DestinationsRoute: DashboardS3DestinationsRoute,
+  DashboardScheduledTasksRoute: DashboardScheduledTasksRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardSourcesRoute: DashboardSourcesRoute,
-  DashboardTemplatesRoute: DashboardTemplatesRoute,
   DashboardUpdatesRoute: DashboardUpdatesRoute,
   DashboardUsersRoute: DashboardUsersRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardServicesServiceIdRoute: DashboardServicesServiceIdRouteWithChildren,
   DashboardProjectsProjectIdCanvasRoute: DashboardProjectsProjectIdCanvasRoute,
   DashboardProjectsProjectIdComposeRoute:
     DashboardProjectsProjectIdComposeRoute,
-  DashboardProjectsProjectIdJobsRoute: DashboardProjectsProjectIdJobsRoute,
+  DashboardProjectsProjectIdNewRoute: DashboardProjectsProjectIdNewRoute,
+  DashboardProjectsProjectIdScheduledTasksRoute:
+    DashboardProjectsProjectIdScheduledTasksRoute,
   DashboardProjectsProjectIdSettingsRoute:
     DashboardProjectsProjectIdSettingsRoute,
-  DashboardServicesServiceIdBuildRoute: DashboardServicesServiceIdBuildRoute,
-  DashboardServicesServiceIdDeploymentsRoute:
-    DashboardServicesServiceIdDeploymentsRoute,
-  DashboardServicesServiceIdDomainsRoute:
-    DashboardServicesServiceIdDomainsRoute,
-  DashboardServicesServiceIdServerlessRoute:
-    DashboardServicesServiceIdServerlessRoute,
-  DashboardServicesServiceIdTerminalRoute:
-    DashboardServicesServiceIdTerminalRoute,
-  DashboardServicesServiceIdVariablesRoute:
-    DashboardServicesServiceIdVariablesRoute,
   DashboardProjectsProjectIdIndexRoute: DashboardProjectsProjectIdIndexRoute,
-  DashboardServicesServiceIdIndexRoute: DashboardServicesServiceIdIndexRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

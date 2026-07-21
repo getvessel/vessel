@@ -21,9 +21,9 @@ const (
 type MemberPermission string
 
 const (
+	MemberPermissionOwner  MemberPermission = "owner"
 	MemberPermissionAdmin  MemberPermission = "admin"
 	MemberPermissionMember MemberPermission = "member"
-	MemberPermissionViewer MemberPermission = "viewer"
 )
 
 type MemberStatus string
@@ -35,7 +35,7 @@ const (
 
 type DomainConfig struct {
 	ID            string        `json:"id" db:"id"`
-	ProjectID     string        `json:"projectId" db:"project_id"`
+	ServiceID     string        `json:"serviceId" db:"service_id"`
 	DomainName    string        `json:"domainName" db:"domain_name"`
 	RedirectTo    string        `json:"redirectTo,omitempty" db:"redirect_to"`
 	SSLCertStatus SSLCertStatus `json:"sslCertStatus" db:"ssl_cert_status"`
@@ -71,7 +71,6 @@ type CanvasSummary struct {
 	EnvironmentsCount  int                `json:"environmentsCount"`
 	AppsCount          int                `json:"appsCount"`
 	DatabasesCount     int                `json:"databasesCount"`
-	StorageCount       int                `json:"storageCount"`
 	OnlineServices     int                `json:"onlineServices"`
 	TotalServices      int                `json:"totalServices"`
 	ServiceIcons       []string           `json:"serviceIcons"`
@@ -82,7 +81,6 @@ type EnvironmentCanvas struct {
 	Environment *EnvironmentConfig `json:"environment"`
 	Apps        []*AppService      `json:"apps"`
 	Databases   []*Database        `json:"databases"`
-	Storage     []*Storage         `json:"storage"`
 }
 
 type CreateProjectRequest struct {

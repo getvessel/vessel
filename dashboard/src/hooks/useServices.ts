@@ -8,6 +8,14 @@ export const useList = (serviceId: string) => {
   });
 };
 
+export const useEnvSuggestions = (serviceId: string, enabled: boolean) => {
+  return useQuery({
+    queryKey: ['serviceVars', 'suggestions', serviceId].filter(Boolean),
+    queryFn: () => serviceVarsService.getEnvSuggestions(serviceId),
+    enabled: enabled && !!serviceId,
+  });
+};
+
 export const useCreate = () => {
   const queryClient = useQueryClient();
   return useMutation({

@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -99,43 +97,6 @@ func (d *Deployer) DeployAppService(ctx context.Context, app *models.AppService,
 	return startedNames[0], nil
 }
 
-func (d *Deployer) prepareServerlessCode(app *models.AppService, sourceDir string, logWriter io.Writer) error {
-	if app.BuildEngine != models.BuildEngineServerless {
-		return nil
-	}
-
-	code, err := d.store.GetServerlessFunctionCode(app.ID)
-	if err != nil {
-		return fmt.Errorf("could not retrieve serverless code: %w", err)
-	}
-
-	if err := os.MkdirAll(sourceDir, 0755); err != nil {
-		return fmt.Errorf("could not create source directory: %w", err)
-	}
-
-	var filename string
-	switch code.Runtime {
-	case "nodejs":
-		filename = "index.js"
-	case "python":
-		filename = "main.py"
-	case "go":
-		filename = "main.go"
-	default:
-		filename = "main.txt"
-	}
-
-	filePath := filepath.Join(sourceDir, filename)
-	if err := os.WriteFile(filePath, []byte(code.CodeContent), 0644); err != nil {
-		return fmt.Errorf("could not write serverless code to file: %w", err)
-	}
-
-	if logWriter != nil {
-		fmt.Fprintf(logWriter, "📝 [Deployer] Wrote serverless function code to %s\n", filePath)
-	}
-	return nil
-}
-
 type BuildImageOpts struct {
 	App        *models.AppService
 	SourceDir  string
@@ -167,6 +128,7 @@ type StartContainerOpts struct {
 	ContainerName string
 	ImageTag      string
 	EnvSlice      []string
+	LogDrains     []*models.LogDrain
 }
 
 func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) ([]string, error) {
@@ -175,7 +137,7 @@ func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) 
 		port = defaultAppPort()
 	}
 	if opts.App.StaticOutput != "" {
-		port = 80 // NGINX alpine default port
+		port = 80
 	}
 
 	replicas := opts.App.Replicas
@@ -185,10 +147,27 @@ func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) 
 
 	var startedNames []string
 
+	logDrains := opts.LogDrains
+	if len(logDrains) == 0 {
+		fetchedDrains, err := d.store.ListLogDrainsByService(opts.App.ID)
+		if err == nil {
+			logDrains = fetchedDrains
+		}
+	}
+
 	for i := 0; i < replicas; i++ {
 		containerName := opts.ContainerName
 		if replicas > 1 {
 			containerName = fmt.Sprintf("%s-%d", opts.ContainerName, i)
+		}
+
+		memMB := opts.App.MemoryLimit
+		if memMB <= 0 {
+			memMB = defaultMemoryMB()
+		}
+		cpuReq := opts.App.CPULimit
+		if cpuReq <= 0 {
+			cpuReq = defaultCPURequest()
 		}
 
 		containerOpts := ContainerRunOptions{
@@ -199,9 +178,12 @@ func (d *Deployer) startContainer(ctx context.Context, opts StartContainerOpts) 
 			InternalPort:    port,
 			RuntimeMode:     opts.App.RuntimeMode,
 			Envs:            opts.EnvSlice,
-			MemoryLimitMB:   defaultMemoryMB(),
-			CPURequest:      defaultCPURequest(),
+			MemoryLimitMB:   memMB,
+			CPURequest:      cpuReq,
 			HealthCheckPath: opts.App.HealthCheckPath,
+			Volumes:         opts.App.Volumes,
+			MaintenanceMode: opts.App.MaintenanceMode,
+			LogDrains:       logDrains,
 		}
 
 		_, err := d.containerManager.CreateAndStart(ctx, containerOpts)

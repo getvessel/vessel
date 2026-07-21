@@ -1,8 +1,8 @@
+import { useNavigate } from '@tanstack/react-router';
 import { Check, Edit, ExternalLink, Plus, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
-
 import {
   Dialog,
   DialogClose,
@@ -20,6 +20,7 @@ import {
   useSaveGitApp,
 } from '#/hooks/useSettings';
 import type { GithubApp } from '#/interfaces/settings';
+import { Route } from '#/routes/_dashboard.sources';
 
 const GithubIcon = ({ className }: { className?: string }) => (
   <svg
@@ -57,26 +58,35 @@ export function GithubIntegration() {
   const [appSlug, setAppSlug] = useState('');
   const [privateKey, setPrivateKey] = useState('');
 
+  const navigate = useNavigate();
+  const search = Route.useSearch();
+
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
+    const code = search.code;
     if (code && !exchangeMutation.isPending && !exchangeMutation.isSuccess) {
-      window.history.replaceState({}, document.title, window.location.pathname);
       exchangeMutation.mutate(
         { code },
         {
           onSuccess: () => {
+            navigate({ to: '/sources', replace: true });
             toast.success('GitHub App connected successfully!');
             setIsEditing(false);
             setEditingApp(null);
           },
           onError: (err) => {
+            navigate({ to: '/sources', replace: true });
             toast.error(err.message || 'Failed to connect GitHub App');
           },
         }
       );
     }
-  }, [exchangeMutation.isPending, exchangeMutation.isSuccess, exchangeMutation.mutate]);
+  }, [
+    exchangeMutation.isPending,
+    exchangeMutation.isSuccess,
+    exchangeMutation.mutate,
+    search.code,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (editingApp) {
@@ -140,22 +150,34 @@ export function GithubIntegration() {
 
   const manifestStr =
     typeof window !== 'undefined'
-      ? JSON.stringify({
-          name: `vessl-${Math.random().toString(36).substring(7)}`,
-          url: window.location.origin,
-          hook_attributes: {
-            url: `${window.location.origin}/api/webhooks/github/services/generic`,
-          },
-          redirect_url: `${window.location.origin}/dashboard/sources`,
-          public: false,
-          default_permissions: {
-            contents: 'read',
-            metadata: 'read',
-            pull_requests: 'read',
-            emails: 'read',
-          },
-          default_events: ['push', 'pull_request'],
-        })
+      ? (() => {
+          const isLocalhost =
+            window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+          const baseManifest = {
+            name: `vessl-${Math.random().toString(36).substring(7)}`,
+            url: window.location.origin,
+            redirect_url: `${window.location.origin}/dashboard/sources`,
+            public: false,
+            default_permissions: {
+              contents: 'read',
+              metadata: 'read',
+              pull_requests: 'read',
+              emails: 'read',
+            },
+          };
+
+          if (!isLocalhost) {
+            return JSON.stringify({
+              ...baseManifest,
+              hook_attributes: {
+                url: `${window.location.origin}/api/webhooks/github/services/generic`,
+              },
+              default_events: ['push', 'pull_request'],
+            });
+          }
+
+          return JSON.stringify(baseManifest);
+        })()
       : '{}';
 
   if (isLoading) {
@@ -277,18 +299,14 @@ export function GithubIntegration() {
       )}
 
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent className="max-w-200 gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-4xl [&>button]:hidden">
           <div className="px-5 pt-5 pb-4">
             <div className="flex items-start justify-between">
               <div className="flex flex-col">
-                <DialogTitle className="flex items-center gap-2 font-bold text-foreground text-xl tracking-tight">
-                  <GithubIcon className="h-5 w-5 text-primary" />
+                <DialogTitle className="font-bold text-foreground text-xl tracking-tight">
                   {editingApp ? 'Edit GitHub App' : 'Connect GitHub App'}
                 </DialogTitle>
-                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
-                  <GithubIcon className="h-3 w-3" />
-                  Configure Github Integration
-                </DialogDescription>
+                <DialogDescription>Configure Github Integration</DialogDescription>
               </div>
               <div className="flex items-center gap-3">
                 {!editingApp && (
@@ -457,7 +475,7 @@ export function GithubIntegration() {
       </Dialog>
 
       <Dialog open={!!deletingApp} onOpenChange={(open) => !open && setDeletingApp(null)}>
-        <DialogContent className="max-w-100 gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl [&>button]:hidden">
+        <DialogContent className="gap-0 border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-md [&>button]:hidden">
           <div className="p-5">
             <div className="flex items-start justify-between">
               <div className="flex flex-col">
@@ -465,10 +483,7 @@ export function GithubIntegration() {
                   <Trash className="h-5 w-5" />
                   Remove GitHub App
                 </DialogTitle>
-                <DialogDescription className="mt-1.5 flex items-center gap-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
-                  <Trash className="h-3 w-3" />
-                  This will break existing deployments
-                </DialogDescription>
+                <DialogDescription>This will break existing deployments</DialogDescription>
               </div>
               <DialogClose asChild>
                 <Button

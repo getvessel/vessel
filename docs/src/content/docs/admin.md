@@ -98,6 +98,12 @@ Access from **Settings** in the dashboard. Only the first registered user (insta
 - **HTTP Redirect**: Force HTTPS across all services.
 - **Dashboard**: Enable or disable the Traefik dashboard.
 
+### AI Configuration
+
+Vessl supports multi-provider AI integrations for features like **AI Log Diagnosis**.
+- **Supported Providers**: OpenAI, Groq, Mistral, DeepSeek, xAI, Moonshot.
+- **Provider Settings**: Configure your default provider, preferred models, and API keys.
+
 ## System Updates
 
 ### Automatic Update Checks
