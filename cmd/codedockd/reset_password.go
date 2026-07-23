@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"vessl.dev/vessl/internal/repositories"
-	"vessl.dev/vessl/internal/utils"
+	"codedock.run/codedock/internal/repositories"
+	"codedock.run/codedock/internal/utils"
 )
 
 func runResetPassword() {

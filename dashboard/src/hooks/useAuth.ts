@@ -17,7 +17,7 @@ export const useLogin = () => {
         return;
       }
 
-      useAuthStore.getState().setAuth(data.token, data.user);
+      useAuthStore.getState().setAuth(data.token, data.refreshToken || null, data.user);
 
       queryClient.clear();
 
@@ -44,11 +44,11 @@ export const useRegister = () => {
         return;
       }
 
-      useAuthStore.getState().setAuth(data.token, data.user);
+      useAuthStore.getState().setAuth(data.token, data.refreshToken || null, data.user);
       queryClient.clear();
       await router.navigate({ to: '/' });
 
-      toast.success('Account created! Welcome to Vessl.');
+      toast.success('Account created! Welcome to Codedock.');
     },
     onError: (error: Error) => {
       toast.error(error?.message || 'Registration failed. Please try again.');

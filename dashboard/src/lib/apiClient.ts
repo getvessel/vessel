@@ -1,5 +1,5 @@
 /**
- * A lightweight fetch wrapper for interacting with the Vessl Go Daemon API.
+ * A lightweight fetch wrapper for interacting with the Codedock Go Daemon API.
  * Designed to be used seamlessly with TanStack Query.
  */
 
@@ -54,6 +54,38 @@ export const apiClient = {
     });
 
     if (response.status === 401) {
+      const authState = useAuthStore.getState();
+      if (authState.refreshToken) {
+        try {
+          const refreshRes = await fetch(`${API_BASE_URL}/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken: authState.refreshToken }),
+          });
+          if (refreshRes.ok) {
+            const data = await refreshRes.json();
+            if (data.data?.token && data.data?.user) {
+              authState.setAuth(data.data.token, data.data.refreshToken || null, data.data.user);
+              // Retry the original request
+              headers.set('Authorization', `Bearer ${data.data.token}`);
+              const retryResponse = await fetch(url, {
+                ...options,
+                headers,
+                credentials: 'include',
+              });
+              if (retryResponse.ok) {
+                const isJson = retryResponse.headers
+                  .get('content-type')
+                  ?.includes('application/json');
+                return (isJson ? await retryResponse.json() : await retryResponse.text()) as T;
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Failed to refresh token', e);
+        }
+      }
+
       useAuthStore.getState().logout();
       if (
         !window.location.pathname.startsWith('/signin') &&
@@ -107,6 +139,35 @@ export const apiClient = {
     });
 
     if (response.status === 401) {
+      const authState = useAuthStore.getState();
+      if (authState.refreshToken) {
+        try {
+          const refreshRes = await fetch(`${API_BASE_URL}/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken: authState.refreshToken }),
+          });
+          if (refreshRes.ok) {
+            const data = await refreshRes.json();
+            if (data.data?.token && data.data?.user) {
+              authState.setAuth(data.data.token, data.data.refreshToken || null, data.data.user);
+              headers.set('Authorization', `Bearer ${data.data.token}`);
+              const retryResponse = await fetch(url, {
+                ...options,
+                method: 'GET',
+                headers,
+                credentials: 'include',
+              });
+              if (retryResponse.ok) {
+                return retryResponse.blob();
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Failed to refresh token', e);
+        }
+      }
+
       useAuthStore.getState().logout();
       if (
         !window.location.pathname.startsWith('/signin') &&
@@ -154,6 +215,36 @@ export const apiClient = {
     });
 
     if (response.status === 401) {
+      const authState = useAuthStore.getState();
+      if (authState.refreshToken) {
+        try {
+          const refreshRes = await fetch(`${API_BASE_URL}/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken: authState.refreshToken }),
+          });
+          if (refreshRes.ok) {
+            const data = await refreshRes.json();
+            if (data.data?.token && data.data?.user) {
+              authState.setAuth(data.data.token, data.data.refreshToken || null, data.data.user);
+              headers.set('Authorization', `Bearer ${data.data.token}`);
+              const retryResponse = await fetch(url, {
+                ...options,
+                method: 'POST',
+                body: body instanceof FormData ? body : JSON.stringify(body),
+                headers,
+                credentials: 'include',
+              });
+              if (retryResponse.ok) {
+                return retryResponse.blob();
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Failed to refresh token', e);
+        }
+      }
+
       useAuthStore.getState().logout();
       if (
         !window.location.pathname.startsWith('/signin') &&

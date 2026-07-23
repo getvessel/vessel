@@ -11,6 +11,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Detect File Changes
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.filter.outputs.go }}
+      dashboard: ${{ steps.filter.outputs.dashboard }}
+      web: ${{ steps.filter.outputs.web }}
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            go:
+              - '**/*.go'
+              - 'go.mod'
+              - 'go.sum'
+              - 'cmd/**'
+              - 'internal/**'
+              - 'tests/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'dashboard/**' # Go builds embed the dashboard, so dashboard changes trigger go builds
+            dashboard:
+              - 'dashboard/**'
+              - 'package.json'
+              - 'package-lock.json'
+            web:
+              - 'web/**'
+              - 'package.json'
+              - 'package-lock.json'
+            docs:
+              - 'docs/**'
+              - 'package.json'
+              - 'package-lock.json'
+
   lint:
     name: Lint & Format
     runs-on: ubuntu-latest
@@ -39,6 +76,8 @@ jobs:
 
   build-go:
     name: Build Go
+    needs: changes
+    if: ${{ needs.changes.outputs.go == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,6 +98,8 @@ jobs:
 
   build-dashboard:
     name: Build Dashboard
+    needs: changes
+    if: ${{ needs.changes.outputs.dashboard == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -76,6 +117,8 @@ jobs:
 
   build-web:
     name: Build Web
+    needs: changes
+    if: ${{ needs.changes.outputs.web == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -89,6 +132,8 @@ jobs:
 
   build-docs:
     name: Build Docs
+    needs: changes
+    if: ${{ needs.changes.outputs.docs == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -102,6 +147,8 @@ jobs:
 
   test-go:
     name: Test Go
+    needs: changes
+    if: ${{ needs.changes.outputs.go == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
