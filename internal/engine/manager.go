@@ -8,7 +8,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/utils"
 )
 
 //go:embed compose/*.yaml

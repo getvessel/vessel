@@ -6,7 +6,7 @@ import (
 	"io"
 	nethttp "net/http"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 // GetSecrets retrieves the secrets/environment variables for a project.

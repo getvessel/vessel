@@ -8,9 +8,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"codedock.dev/codedock/internal/engine"
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/repositories"
+	"codedock.run/codedock/internal/engine"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/repositories"
 )
 
 type BackupService struct {

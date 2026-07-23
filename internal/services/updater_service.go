@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"codedock.dev/codedock/internal/repositories"
+	"codedock.run/codedock/internal/repositories"
 )
 
 const (

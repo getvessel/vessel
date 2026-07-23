@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 	"github.com/jmoiron/sqlx"
 )
 

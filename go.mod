@@ -1,4 +1,4 @@
-module codedock.dev/codedock
+module codedock.run/codedock
 
 go 1.25.11
 

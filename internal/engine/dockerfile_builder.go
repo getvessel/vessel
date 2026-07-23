@@ -9,7 +9,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/utils"
 )
 
 type DockerfileBuilder struct {

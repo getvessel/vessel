@@ -5,10 +5,10 @@ description: Command-line interface reference for Codedock — covering both the
 
 Codedock ships two CLI tools with distinct responsibilities.
 
-| Tool | Runs on | Connects to |
-|---|---|---|
-| `codedockd` | Your VPS / server | SQLite + Docker directly |
-| `codedock` | Your local machine | `codedockd` over HTTP |
+| Tool        | Runs on            | Connects to              |
+| ----------- | ------------------ | ------------------------ |
+| `codedockd` | Your VPS / server  | SQLite + Docker directly |
+| `codedock`  | Your local machine | `codedockd` over HTTP    |
 
 ---
 
@@ -160,13 +160,13 @@ The `codedock` binary runs on your **local machine** and communicates with your 
 ### Installation
 
 ```sh
-curl -fsSL https://get.codedock.dev/cli | sh
+curl -fsSL https://get.codedock.run/cli | sh
 ```
 
 Or if you have Go installed:
 
 ```sh
-go install codedock.dev/codedock/cmd/codedock@latest
+go install codedock.run/codedock/cmd/codedock@latest
 ```
 
 Or download a pre-built binary from the [releases page](https://github.com/buildwithtechx/codedock/releases).

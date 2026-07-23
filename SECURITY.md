@@ -17,7 +17,7 @@ Codedock takes infrastructure and deployment security extremely seriously. Becau
 If you discover a security vulnerability in Codedock (such as unauthorized container access, `.env` secret leakage, or authentication bypass), **please do not report it publicly via GitHub Issues**.
 
 Instead, please send an email or private advisory to our maintainers at:
-**<security@codedock.dev>** (or open a private GitHub Security Advisory).
+**<security@codedock.run>** (or open a private GitHub Security Advisory).
 
 ### What to Include in Your Report
 

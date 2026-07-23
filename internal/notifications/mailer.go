@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/smtp"
 
-	"codedock.dev/codedock/internal/services"
+	"codedock.run/codedock/internal/services"
 )
 
 type MailerService struct {

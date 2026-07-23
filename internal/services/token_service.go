@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 type TokenService struct {

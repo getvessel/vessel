@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"codedock.dev/codedock/internal/repositories"
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/repositories"
+	"codedock.run/codedock/internal/utils"
 )
 
 func runResetPassword() {

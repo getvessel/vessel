@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/services"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/services"
 )
 
 type mockAppRepo struct {

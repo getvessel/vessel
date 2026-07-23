@@ -8,9 +8,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/repositories"
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/repositories"
+	"codedock.run/codedock/internal/utils"
 )
 
 func runSetup() {
@@ -82,7 +82,7 @@ func runSetup() {
 
 	fmt.Println("\n📖 Next steps:")
 	fmt.Println("   Dashboard: http://localhost:" + os.Getenv("PORT"))
-	fmt.Println("   Docs: https://docs.codedock.dev")
+	fmt.Println("   Docs: https://docs.codedock.run")
 }
 
 func exitError(format string, args ...any) {

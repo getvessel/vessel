@@ -6,7 +6,7 @@ import (
 	"io"
 	nethttp "net/http"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 // ListServices returns all app services in a specific environment.

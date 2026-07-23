@@ -19,9 +19,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/utils"
 )
 
 type BackupManager struct {

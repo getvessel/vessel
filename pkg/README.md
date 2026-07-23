@@ -9,7 +9,7 @@ This directory contains the public Go packages that power the `codedock` remote 
 A typed HTTP client for the Codedock API. Handles authentication, request building, and response decoding.
 
 ```go
-import codedockhttp "codedock.dev/codedock/pkg/http"
+import codedockhttp "codedock.run/codedock/pkg/http"
 
 client := codedockhttp.NewClient("https://your-server.com", "your-jwt-token")
 ```
@@ -103,7 +103,7 @@ metrics, err     := client.GetServiceMetrics("service-id")
 Manages saved server credentials on the local filesystem at `~/.codedock/config.json`.
 
 ```go
-import "codedock.dev/codedock/pkg/config"
+import "codedock.run/codedock/pkg/config"
 ```
 
 #### Load saved config
@@ -138,8 +138,8 @@ package main
 import (
     "fmt"
 
-    "codedock.dev/codedock/pkg/config"
-    codedockhttp "codedock.dev/codedock/pkg/http"
+    "codedock.run/codedock/pkg/config"
+    codedockhttp "codedock.run/codedock/pkg/http"
 )
 
 func main() {

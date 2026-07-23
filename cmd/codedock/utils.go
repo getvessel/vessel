@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"codedock.dev/codedock/pkg/config"
-	"codedock.dev/codedock/pkg/http"
+	"codedock.run/codedock/pkg/config"
+	"codedock.run/codedock/pkg/http"
 )
 
 func getClient() *http.Client {

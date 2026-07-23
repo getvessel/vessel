@@ -10,9 +10,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/services"
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/services"
+	"codedock.run/codedock/internal/utils"
 )
 
 type contextKey string
@@ -114,7 +114,7 @@ func (g *AuthGuard) baseAuth(c echo.Context, denyAPITokens bool) (*models.UserCl
 		if g.TokenService == nil {
 			return &models.UserClaims{
 				UserID: "default",
-				Email:  "default@codedock.dev",
+				Email:  "default@codedock.run",
 				Role:   "admin",
 			}, nil
 		}

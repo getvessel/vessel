@@ -9,9 +9,9 @@ import (
 	"github.com/docker/docker/client"
 	_ "modernc.org/sqlite"
 
-	codedockhttp "codedock.dev/codedock/internal/http"
-	"codedock.dev/codedock/internal/repositories"
-	"codedock.dev/codedock/internal/utils"
+	codedockhttp "codedock.run/codedock/internal/http"
+	"codedock.run/codedock/internal/repositories"
+	"codedock.run/codedock/internal/utils"
 )
 
 func TestCodedockBackendInitialization(t *testing.T) {

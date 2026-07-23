@@ -13,14 +13,14 @@ import (
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
 
-	"codedock.dev/codedock/internal/core"
-	"codedock.dev/codedock/internal/engine"
-	"codedock.dev/codedock/internal/handlers"
-	"codedock.dev/codedock/internal/http/middleware"
-	"codedock.dev/codedock/internal/notifications"
-	"codedock.dev/codedock/internal/repositories"
-	"codedock.dev/codedock/internal/services"
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/core"
+	"codedock.run/codedock/internal/engine"
+	"codedock.run/codedock/internal/handlers"
+	"codedock.run/codedock/internal/http/middleware"
+	"codedock.run/codedock/internal/notifications"
+	"codedock.run/codedock/internal/repositories"
+	"codedock.run/codedock/internal/services"
+	"codedock.run/codedock/internal/utils"
 )
 
 func NewServer(db *sql.DB, v *utils.Vault, deployer *engine.Deployer, traefikManager *engine.TraefikManager, dockerClient *client.Client, dataDir string) (*Server, error) {

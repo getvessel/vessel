@@ -5,7 +5,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 	"github.com/spf13/cobra"
 )
 

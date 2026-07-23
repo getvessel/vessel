@@ -5,13 +5,13 @@ The `codedock` binary is the remote client for your self-hosted Codedock server.
 ## Installation
 
 ```sh
-curl -fsSL https://get.codedock.dev/cli | sh
+curl -fsSL https://get.codedock.run/cli | sh
 ```
 
 Or if you have Go installed:
 
 ```sh
-go install codedock.dev/codedock/cmd/codedock@latest
+go install codedock.run/codedock/cmd/codedock@latest
 ```
 
 After installing, authenticate against your server:

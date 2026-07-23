@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 	"context"
 	"database/sql"
 	"fmt"

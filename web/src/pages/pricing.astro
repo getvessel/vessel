@@ -16,7 +16,7 @@ const tableRows = [
   { feature: 'Notification Channels', sh: true, cloud: true },
   { feature: 'Codebase', sh: 'MIT open source', cloud: 'MIT open source' },
   { feature: 'Daemon Hosting', sh: 'Your server', cloud: 'Your server' },
-  { feature: 'Control Plane', sh: 'Local dashboard', cloud: 'Managed (app.codedock.dev)' },
+  { feature: 'Control Plane', sh: 'Local dashboard', cloud: 'Managed (app.codedock.run)' },
   { feature: 'Fleet Management', sh: '—', cloud: true },
   { feature: 'Usage Metering + Alerts', sh: '—', cloud: true },
   { feature: 'Yamux Tunnel Handshake', sh: 'Manual token', cloud: 'Managed' },
@@ -39,7 +39,7 @@ const faqs = [
   },
   {
     q: 'Can I move from Cloud back to pure self-hosted?',
-    a: "Yes. It's a config change — point your daemon at your own dashboard instead of app.codedock.dev. No vendor lock-in, no export-import dance.",
+    a: "Yes. It's a config change — point your daemon at your own dashboard instead of app.codedock.run. No vendor lock-in, no export-import dance.",
   },
   {
     q: 'How does billing work when I add more servers?',
@@ -104,7 +104,7 @@ const faqs = [
           ))}
         </ul>
 
-        <a href="https://docs.codedock.dev/self-host" target="_blank" class="mt-8 flex items-center justify-center gap-2 py-3.5 rounded-lg border border-border bg-background hover:bg-border text-foreground font-semibold text-sm transition-colors">
+        <a href="https://docs.codedock.run/self-host" target="_blank" class="mt-8 flex items-center justify-center gap-2 py-3.5 rounded-lg border border-border bg-background hover:bg-border text-foreground font-semibold text-sm transition-colors">
           <Icon name="lucide:book" class="size-4 text-primary" />
           Read the Docs
         </a>
@@ -160,7 +160,7 @@ const faqs = [
           Your apps run on <em>your</em> servers. Codedock Cloud only manages the control plane.
         </div>
 
-        <a href="https://app.codedock.dev/register" class="mt-6 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-primary hover:bg-primary-hover text-white font-semibold text-sm transition-colors relative">
+        <a href="https://app.codedock.run/register" class="mt-6 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-primary hover:bg-primary-hover text-white font-semibold text-sm transition-colors relative">
           Start 14-day trial
           <Icon name="lucide:arrow-right" class="size-4" />
         </a>

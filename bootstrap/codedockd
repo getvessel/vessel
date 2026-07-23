@@ -267,7 +267,7 @@ case "${1:-help}" in
   uninstall)
     echo -e "${RED}⚠️  WARNING: This removes Codedock but keeps your apps running.${NC}"
     echo -e "${YELLOW}   Your Docker containers, databases, and volumes will NOT be touched.${NC}"
-    echo -e "${YELLOW}   See https://docs.codedock.dev/adopt/ to learn how to take over.${NC}"
+    echo -e "${YELLOW}   See https://docs.codedock.run/adopt/ to learn how to take over.${NC}"
     echo ""
     echo -n "Type '${BOLD}uninstall${NC}' to confirm: "
     read -r CONFIRM

@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"strings"
 
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/repositories"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/repositories"
 )
 
 type DNSProviderService struct {

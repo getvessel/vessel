@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 type SetupEnv struct {

@@ -3,7 +3,7 @@ package services
 import (
 	"strings"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 	"gopkg.in/yaml.v3"
 )
 

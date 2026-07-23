@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Codedock 1-Click Installer
-# Usage: curl -fsSL https://get.codedock.dev | sh
+# Usage: curl -fsSL https://get.codedock.run | sh
 set -eo pipefail
 
 RELEASE=${CODEDOCK_VERSION:-latest}
@@ -201,9 +201,9 @@ print_summary() {
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
   echo -e "  ${BOLD}📍 Dashboard:${NC}  http://${SERVER_IP}:8080"
-  echo -e "  ${BOLD}📖 Docs:${NC}       https://docs.codedock.dev"
+  echo -e "  ${BOLD}📖 Docs:${NC}       https://docs.codedock.run"
   echo -e "  ${BOLD}🛠️  Server CLI:${NC}  codedockd --help (runs commands inside the container)"
-  echo -e "  ${DIM}Install the remote CLI on your laptop: curl -fsSL https://get.codedock.dev/cli | sh${NC}"
+  echo -e "  ${DIM}Install the remote CLI on your laptop: curl -fsSL https://get.codedock.run/cli | sh${NC}"
   echo ""
 
   echo -e "  ${BOLD}📍 Dashboard:${NC}  ${DASHBOARD_URL:-http://${SERVER_IP}:8080}"

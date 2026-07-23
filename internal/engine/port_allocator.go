@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/utils"
 )
 
 func GetAvailablePort() (int, error) {

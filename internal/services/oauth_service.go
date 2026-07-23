@@ -9,9 +9,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/repositories"
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/repositories"
+	"codedock.run/codedock/internal/utils"
 )
 
 var ErrInvalidPasscode = errors.New("invalid passcode")

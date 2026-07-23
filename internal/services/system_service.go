@@ -12,7 +12,7 @@ import (
 	"syscall"
 	"time"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 var (

@@ -3,7 +3,7 @@ title: Getting Started
 description: Install Codedock on your VPS and deploy your first application.
 ---
 
-import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+import { Steps, Tabs, TabItem, Aside } from "@astrojs/starlight/components";
 
 Codedock turns any bare-metal VPS into your own private Platform-as-a-Service in under 60 seconds.
 
@@ -11,14 +11,10 @@ Codedock turns any bare-metal VPS into your own private Platform-as-a-Service in
 
 <Tabs>
   <TabItem label="curl" icon="seti:shell">
-```sh
-curl -fsSL https://get.codedock.dev | sh
-```
+    ```sh curl -fsSL https://get.codedock.run | sh ```
   </TabItem>
   <TabItem label="wget" icon="seti:shell">
-```sh
-wget -qO- https://get.codedock.dev | sh
-```
+    ```sh wget -qO- https://get.codedock.run | sh ```
   </TabItem>
 </Tabs>
 
@@ -41,7 +37,7 @@ After the install script completes, you'll see:
 ✅ Codedock vlatest installed successfully!
   📍 Dashboard:    http://203.0.113.42:8080
   🛠️  Server CLI:  codedockd --help
-  💻 Remote CLI:   curl -fsSL https://get.codedock.dev/cli | sh
+  💻 Remote CLI:   curl -fsSL https://get.codedock.run/cli | sh
 ```
 
 ### Create Your Account
@@ -80,7 +76,7 @@ codedockd downgrade v0.1.0  # Downgrade to a specific version
 Install on your **local machine** to manage your server from anywhere:
 
 ```sh
-curl -fsSL https://get.codedock.dev/cli | sh
+curl -fsSL https://get.codedock.run/cli | sh
 codedock login    # Connect to your server
 codedock project list
 codedock deploy <service-id>

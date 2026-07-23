@@ -8,12 +8,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/mark3labs/mcp-go/server"
 
-	"codedock.dev/codedock/internal/core"
-	"codedock.dev/codedock/internal/engine"
-	"codedock.dev/codedock/internal/handlers"
-	"codedock.dev/codedock/internal/http/middleware"
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/services"
+	"codedock.run/codedock/internal/core"
+	"codedock.run/codedock/internal/engine"
+	"codedock.run/codedock/internal/handlers"
+	"codedock.run/codedock/internal/http/middleware"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/services"
 )
 
 type Server struct {

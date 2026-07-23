@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 type ExampleService struct {

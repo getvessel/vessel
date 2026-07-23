@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/utils"
 	"context"
 	"database/sql"
 	"errors"
@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 type BackupRepository interface {

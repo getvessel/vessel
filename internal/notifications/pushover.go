@@ -1,7 +1,7 @@
 package notifications
 
 import (
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 func SendPushoverNotification(appToken, userKey string, event *models.NotificationEvent) error {

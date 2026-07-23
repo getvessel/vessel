@@ -135,5 +135,5 @@ Codedock checks for updates automatically. To manage updates:
 Updates can also be triggered manually via the CLI:
 
 ```sh
-curl -fsSL https://get.codedock.dev | sh
+curl -fsSL https://get.codedock.run | sh
 ```

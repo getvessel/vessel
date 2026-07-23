@@ -11,7 +11,7 @@ Codedock is a lightweight, open-source Platform-as-a-Service (PaaS) designed to 
 Install Codedock on any fresh Linux server (Ubuntu/Debian recommended):
 
 ```bash
-curl -fsSL https://get.codedock.dev | sh
+curl -fsSL https://get.codedock.run | sh
 ```
 
 Once installed, your dashboard will be available at `http://your-server-ip:8080`.
@@ -33,9 +33,9 @@ Codedock is built to be simple but powerful, giving you everything you need to r
 
 Codedock ships two CLI tools. See their individual READMEs for full command references.
 
-| Tool                      | Purpose                                                             | Docs                             |
-| ------------------------- | ------------------------------------------------------------------- | -------------------------------- |
-| [`codedockd`](./cmd/codedockd/) | Server daemon — runs on your VPS, manages Docker & SQLite directly  | [README](./cmd/codedockd/README.md) |
+| Tool                            | Purpose                                                                | Docs                                |
+| ------------------------------- | ---------------------------------------------------------------------- | ----------------------------------- |
+| [`codedockd`](./cmd/codedockd/) | Server daemon — runs on your VPS, manages Docker & SQLite directly     | [README](./cmd/codedockd/README.md) |
 | [`codedock`](./cmd/codedock/)   | Remote client — runs on your laptop, connects to `codedockd` over HTTP | [README](./cmd/codedock/README.md)  |
 
 **Quick example:**
@@ -89,4 +89,4 @@ go run ./cmd/codedockd
 
 ## 📚 Documentation
 
-For complete guides, API references, and advanced configuration, please visit our documentation at **[docs.codedock.dev](https://docs.codedock.dev)**.
+For complete guides, API references, and advanced configuration, please visit our documentation at **[docs.codedock.run](https://docs.codedock.run)**.

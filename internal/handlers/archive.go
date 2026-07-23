@@ -10,8 +10,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	"codedock.dev/codedock/internal/services"
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/services"
+	"codedock.run/codedock/internal/utils"
 )
 
 type ArchiveHandler struct {

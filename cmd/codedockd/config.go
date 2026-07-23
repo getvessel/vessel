@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"codedock.dev/codedock/internal/repositories"
+	"codedock.run/codedock/internal/repositories"
 )
 
 func runConfig() {

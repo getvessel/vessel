@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/utils"
 	"context"
 	"database/sql"
 	"errors"
@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 type GitRepository interface {

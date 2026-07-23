@@ -6,7 +6,7 @@ import (
 	"io"
 	nethttp "net/http"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 func (c *Client) ListBackups(databaseID string) ([]models.BackupConfig, error) {

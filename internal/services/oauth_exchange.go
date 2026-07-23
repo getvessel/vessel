@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 type oauthConfig struct {

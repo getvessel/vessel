@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/utils"
 
 	"github.com/jmoiron/sqlx"
 )

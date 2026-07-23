@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"codedock.dev/codedock/internal/services"
+	"codedock.run/codedock/internal/services"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )

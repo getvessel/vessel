@@ -5,10 +5,10 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/services"
-	"codedock.dev/codedock/internal/telemetry"
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/services"
+	"codedock.run/codedock/internal/telemetry"
+	"codedock.run/codedock/internal/utils"
 )
 
 type AuthHandler struct {

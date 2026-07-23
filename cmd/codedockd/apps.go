@@ -8,8 +8,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/repositories"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/repositories"
 )
 
 func runApps(args []string) {

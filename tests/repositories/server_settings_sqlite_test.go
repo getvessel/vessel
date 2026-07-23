@@ -1,7 +1,7 @@
 package repositories_test
 
 import (
-	"codedock.dev/codedock/internal/repositories"
+	"codedock.run/codedock/internal/repositories"
 	"context"
 	"database/sql"
 	"testing"

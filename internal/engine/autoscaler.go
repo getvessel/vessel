@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 type AppRepository interface {

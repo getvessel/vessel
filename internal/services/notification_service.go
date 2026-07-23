@@ -5,7 +5,7 @@ import (
 	"errors"
 	"os"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 type NotificationDispatcher interface {

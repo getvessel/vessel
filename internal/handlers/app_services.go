@@ -9,13 +9,13 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/utils"
 
-	"codedock.dev/codedock/internal/engine"
-	"codedock.dev/codedock/internal/http/middleware"
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/services"
-	"codedock.dev/codedock/internal/telemetry"
+	"codedock.run/codedock/internal/engine"
+	"codedock.run/codedock/internal/http/middleware"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/services"
+	"codedock.run/codedock/internal/telemetry"
 )
 
 type AppHandler struct {

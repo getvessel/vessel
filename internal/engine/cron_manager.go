@@ -19,8 +19,8 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/robfig/cron/v3"
 
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/utils"
 )
 
 type CronManager struct {

@@ -17,13 +17,13 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	"codedock.dev/codedock/internal/engine"
-	codedockhttp "codedock.dev/codedock/internal/http"
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/repositories"
-	"codedock.dev/codedock/internal/services"
-	"codedock.dev/codedock/internal/telemetry"
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/engine"
+	codedockhttp "codedock.run/codedock/internal/http"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/repositories"
+	"codedock.run/codedock/internal/services"
+	"codedock.run/codedock/internal/telemetry"
+	"codedock.run/codedock/internal/utils"
 )
 
 var codedockVersion = "dev"

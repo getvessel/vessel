@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 )

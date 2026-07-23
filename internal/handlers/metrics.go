@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"codedock.dev/codedock/internal/services"
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/services"
+	"codedock.run/codedock/internal/utils"
 	"github.com/labstack/echo/v4"
 )
 

@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"codedock.dev/codedock/internal/models"
+	"codedock.run/codedock/internal/models"
 )
 
 func (c *Client) Me() (*models.User, error) {

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # codedock CLI Installer
-# Usage: curl -fsSL https://get.codedock.dev/cli | sh
+# Usage: curl -fsSL https://get.codedock.run/cli | sh
 set -eo pipefail
 
 REPO="buildwithtechx/codedock"
@@ -52,7 +52,7 @@ get_latest_version() {
 install_via_go() {
   if command -v go &>/dev/null; then
     echo -e "${YELLOW}⚙️  No pre-built binary found. Installing via 'go install'...${NC}"
-    go install "codedock.dev/codedock/cmd/codedock@latest"
+    go install "codedock.run/codedock/cmd/codedock@latest"
     GOBIN=$(go env GOPATH)/bin
     if [ -f "$GOBIN/codedock" ]; then
       if [ -w "$INSTALL_DIR" ] || [ "$(id -u)" -eq 0 ]; then
@@ -82,7 +82,7 @@ if [ -z "$TARGET_VERSION" ]; then
   echo -e "${YELLOW}⚠️  Could not fetch latest release from GitHub.${NC}"
   install_via_go || {
     echo -e "${RED}❌ Could not install codedock. Install Go and run:${NC}"
-    echo -e "   go install codedock.dev/codedock/cmd/codedock@latest"
+    echo -e "   go install codedock.run/codedock/cmd/codedock@latest"
     exit 1
   }
   exit 0
@@ -102,7 +102,7 @@ if ! curl -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/codedock.tar.gz" 2>/dev/null; then
   echo -e "${YELLOW}⚠️  Pre-built binary not available for this platform/version.${NC}"
   install_via_go || {
     echo -e "${RED}❌ Could not install codedock. Install Go and run:${NC}"
-    echo -e "   go install codedock.dev/codedock/cmd/codedock@latest"
+    echo -e "   go install codedock.run/codedock/cmd/codedock@latest"
     exit 1
   }
   exit 0
@@ -150,5 +150,5 @@ echo -e ""
 echo -e "  3. Trigger a deployment:"
 echo -e "     ${BOLD}codedock deploy <service-id>${NC}"
 echo ""
-echo -e "  ${DIM}Docs: https://docs.codedock.dev/cli${NC}"
+echo -e "  ${DIM}Docs: https://docs.codedock.run/cli${NC}"
 echo ""

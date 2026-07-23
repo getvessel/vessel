@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/repositories"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/repositories"
 )
 
 type SettingsService struct {

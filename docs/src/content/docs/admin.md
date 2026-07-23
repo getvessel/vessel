@@ -61,7 +61,7 @@ codedockd version            # Show version
 For remote management from your local machine, install the `codedock` client:
 
 ```sh
-curl -fsSL https://get.codedock.dev/cli | sh
+curl -fsSL https://get.codedock.run/cli | sh
 codedock login    # Connect to your server
 ```
 
@@ -101,6 +101,7 @@ Access from **Settings** in the dashboard. Only the first registered user (insta
 ### AI Configuration
 
 Codedock supports multi-provider AI integrations for features like **AI Log Diagnosis**.
+
 - **Supported Providers**: OpenAI, Groq, Mistral, DeepSeek, xAI, Moonshot.
 - **Provider Settings**: Configure your default provider, preferred models, and API keys.
 

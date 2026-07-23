@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"codedock.dev/codedock/internal/models"
-	"codedock.dev/codedock/internal/services"
-	"codedock.dev/codedock/internal/utils"
+	"codedock.run/codedock/internal/models"
+	"codedock.run/codedock/internal/services"
+	"codedock.run/codedock/internal/utils"
 	"github.com/labstack/echo/v4"
 )
 
